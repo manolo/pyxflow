@@ -64,6 +64,10 @@ class Element:
         """Get an attribute."""
         return self._node.get(Feature.ELEMENT_ATTRIBUTE_MAP, name)
 
+    def remove_attribute(self, name: str):
+        """Remove an attribute."""
+        self._node.remove(Feature.ELEMENT_ATTRIBUTE_MAP, name)
+
     def add_event_listener(self, event_type: str, listener: Callable):
         """Add an event listener."""
         if event_type not in self._listeners:

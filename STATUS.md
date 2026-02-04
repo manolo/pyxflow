@@ -1,10 +1,10 @@
 # PyFlow Implementation Status
 
-## Current State: MVP Working
+## Current State: MVP + Routing + More Components
 
-**Lines of code:** ~1,500
-**Tests:** 148 passing
-**Last updated:** 2024-02-04
+**Lines of code:** ~2,400
+**Tests:** 220 passing
+**Last updated:** 2025-02-04
 
 ---
 
@@ -18,10 +18,19 @@
 
 ### Components
 - [x] Button - Text, click listener
+- [x] Checkbox - Label, checked, indeterminate, value change
+- [x] IntegerField - Integer input with min/max/step
+- [x] NumberField - Numeric input with min/max/step
+- [x] TextArea - Multi-line text input with placeholder
 - [x] TextField - Label, value, change event, mSync
 - [x] Span - Text content
 - [x] VerticalLayout - Theme, add children, padding/spacing
 - [x] HorizontalLayout - Theme, add children, margin/spacing, vertical alignment
+
+### Component Base Features
+- [x] `setVisible()` / `isVisible()` - Show/hide components
+- [x] `setEnabled()` / `isEnabled()` - Enable/disable components
+- [x] `addClassName()` / `removeClassName()` - CSS class management
 
 ### Server
 - [x] HTTP Server (aiohttp) - Sessions, static files
@@ -34,14 +43,16 @@
 - [x] RPC: event - click, change, ui-navigate, keydown
 - [x] RPC: mSync - Property sync from client
 
+### Routing
+- [x] `@Route` decorator - Path registration
+- [x] Multiple views - HelloWorldView, AboutView
+- [x] Page title - Explicit or auto-generated from class name
+
 ---
 
 ## Not Implemented
 
 ### Components (Priority: High)
-- [ ] Checkbox
-- [ ] TextArea
-- [ ] NumberField
 - [ ] PasswordField
 - [ ] ComboBox / Select
 - [ ] DatePicker / TimePicker
@@ -58,20 +69,17 @@
 - [ ] ProgressBar
 
 ### Component Features
-- [ ] `setVisible()` / `isVisible()`
-- [ ] `setEnabled()` / `isEnabled()`
-- [ ] `addClassName()` / `removeClassName()`
 - [ ] `setId()` / `getId()`
 - [ ] `focus()` / `blur()`
 - [ ] Keyboard shortcuts (`addClickShortcut(Key.ENTER)`)
 - [ ] Tooltips
+- [ ] Helper text
 
-### Routing
-- [ ] `@Route` decorator
+### Routing (Advanced)
 - [ ] Route parameters (`/users/:id`)
 - [ ] Navigation guards (BeforeEnter/Leave)
-- [ ] Multiple views
-- [ ] Page title from `@PageTitle`
+- [ ] RouterLink component
+- [ ] `@PageTitle` decorator (alternative to page_title param)
 
 ### Data Binding
 - [ ] Binder
@@ -97,9 +105,9 @@
 
 ## Suggested Implementation Order
 
-1. **More basic components** - Checkbox, TextArea, NumberField
-2. **Component features** - setVisible, setEnabled, addClassName
-3. **Routing** - @Route decorator, multiple views
+1. ~~**More basic components** - Checkbox, TextArea, NumberField~~ ✓ DONE
+2. ~~**Component features** - setVisible, setEnabled, addClassName~~ ✓ DONE
+3. ~~**Routing** - @Route decorator, multiple views~~ ✓ DONE
 4. **Feedback components** - Dialog, Notification
 5. **Grid** - Complex but essential for data apps
 

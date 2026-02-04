@@ -59,6 +59,17 @@ class StateNode:
         """Get a feature value."""
         return self._features.get(feature, {}).get(key, default)
 
+    def remove(self, feature: int, key: str):
+        """Remove a feature value and record change."""
+        if feature in self._features and key in self._features[feature]:
+            del self._features[feature][key]
+            self._tree.add_change({
+                "node": self._id,
+                "type": "remove",
+                "key": key,
+                "feat": feature
+            })
+
     def add_child(self, child: "StateNode", index: int | None = None):
         """Add a child node."""
         if index is None:
