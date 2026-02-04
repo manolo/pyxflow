@@ -4,5 +4,6 @@ __version__ = "0.1.0"
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.element import Element
+from vaadin.flow.router import Route
 
-__all__ = ["Component", "Element", "__version__"]
+__all__ = ["Component", "Element", "Route", "__version__"]

@@ -1,5 +1,6 @@
 """Hello World example - matches my-hello Java application."""
 
+from vaadin.flow import Route
 from vaadin.flow.components import (
     Button,
     HorizontalLayout,
@@ -10,6 +11,7 @@ from vaadin.flow.components import (
 from vaadin.flow.components.horizontal_layout import Alignment
 
 
+@Route("", page_title="Hello World")
 class HelloWorldView(VerticalLayout):
     """Hello World view matching the Java reference implementation."""
 

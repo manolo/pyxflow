@@ -78,11 +78,15 @@ class UidlHandler:
         self._pending_execute: list = []  # Execute commands for next response
         self._last_client_id = 0  # Track client's message counter
 
-    def handle_init(self, browser_details: dict) -> dict:
+    def handle_init(self, browser_details: dict, initial_route: str = "") -> dict:
         """Handle init request.
 
         Returns appConfig with initial UIDL.
         Each init creates a fresh UI (handles page reload).
+
+        Args:
+            browser_details: Browser details from client
+            initial_route: The route from the request path (e.g., "about" for /about)
         """
         # Reset state for fresh UI (handles page reload)
         self._tree.reset()
@@ -93,6 +97,7 @@ class UidlHandler:
         self._container_node = None
         self._pending_execute = []
         self._last_client_id = 0
+        self._initial_route = initial_route  # Store for use in navigation
 
         self._create_initial_nodes()
         self._initialized = True
@@ -111,7 +116,7 @@ class UidlHandler:
                 "productionMode": True,
                 "v-uiId": 0,
                 "appId": self._app_id,
-                "contextRootUrl": "./",
+                "contextRootUrl": "/",
                 "heartbeatInterval": 300,
                 "maxMessageSuspendTimeout": 5000,
                 "sessExpMsg": {"caption": None, "message": None, "url": None},
@@ -220,15 +225,31 @@ class UidlHandler:
 
         route = event_data.get("route", "")
 
-        # Import here to avoid circular imports
-        from vaadin.flow.server.http_server import _view_class
+        # Normalize route - strip leading/trailing slashes
+        route = route.strip("/")
 
-        if _view_class is None:
-            # Use default HelloWorldView
-            from examples.hello_world import HelloWorldView
-            view_class = HelloWorldView
-        else:
-            view_class = _view_class
+        # Use initial_route from request path if client sent empty or root route
+        # This handles the case where the client's contextRootUrl calculation is wrong
+        if not route and hasattr(self, "_initial_route") and self._initial_route:
+            route = self._initial_route
+
+        # Use router to find view class
+        from vaadin.flow.router import get_view_class, get_page_title
+
+        view_class = get_view_class(route)
+
+        if view_class is None:
+            # Fallback to http_server._view_class for backwards compatibility
+            from vaadin.flow.server.http_server import _view_class
+            if _view_class is not None:
+                view_class = _view_class
+            else:
+                # No route found, return 404-like behavior
+                # For now, just return without creating a view
+                return
+
+        # Get page title
+        page_title = get_page_title(route) or "PyFlow"
 
         # Create the view
         from vaadin.flow.core.component import UI
@@ -251,7 +272,7 @@ class UidlHandler:
 
         # Find TextField nodes to add execute command for invalid property
         self._pending_execute = [
-            ["Hello World", "document.title = $0"],
+            [page_title, "document.title = $0"],
         ]
 
         # Add execute command for each TextField's invalid property

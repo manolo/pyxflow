@@ -63,8 +63,10 @@ async def handle_init(request: web.Request) -> web.Response:
             pass
 
     # Get init response from handler
+    # Pass the request path so the handler knows the initial route
     handler: UidlHandler = session["handler"]
-    response_data = handler.handle_init(browser_details)
+    initial_route = request.path.strip("/")  # "/about" -> "about", "/" -> ""
+    response_data = handler.handle_init(browser_details, initial_route=initial_route)
 
     session["initialized"] = True
 
@@ -207,8 +209,29 @@ def create_app() -> web.Application:
     app.router.add_get("/", handle_root)
     app.router.add_post("/", handle_uidl_post)
     app.router.add_get("/VAADIN/{path:.*}", handle_static)
+    # Catch-all for other routes (e.g., /about) - serve index.html
+    app.router.add_get("/{path:.*}", handle_route)
+    app.router.add_post("/{path:.*}", handle_route_post)
 
     return app
+
+
+async def handle_route(request: web.Request) -> web.Response:
+    """Handle GET for any route - serve index.html (client handles routing)."""
+    # Check if this is an init request
+    if request.query.get("v-r") == "init":
+        return await handle_init(request)
+
+    # Serve index.html - the client will handle the routing
+    html = generate_index_html()
+    return web.Response(text=html, content_type="text/html")
+
+
+async def handle_route_post(request: web.Request) -> web.Response:
+    """Handle POST for any route."""
+    if request.query.get("v-r") == "uidl":
+        return await handle_uidl(request)
+    return web.Response(text="Bad request", status=400)
 
 
 async def handle_uidl_post(request: web.Request) -> web.Response:
@@ -222,14 +245,25 @@ async def run_server(view_class=None, host: str = "localhost", port: int = 8080)
     """Run the Vaadin Flow server.
 
     Args:
-        view_class: The root view class to instantiate for each session.
+        view_class: (Deprecated) Use @Route decorator instead.
+                    If provided, registers as fallback for "/" route.
         host: The host to bind to.
         port: The port to listen on.
     """
-    # Store view class for later use
+    # Store view class for backwards compatibility
     if view_class:
         global _view_class
         _view_class = view_class
+
+    # Show registered routes
+    from vaadin.flow.router import get_all_routes
+    routes = get_all_routes()
+    if routes:
+        print("Registered routes:")
+        for path, cls in routes.items():
+            print(f"  /{path} -> {cls.__name__}")
+    elif view_class:
+        print(f"Using view: {view_class.__name__} (consider using @Route decorator)")
 
     app = create_app()
     runner = web.AppRunner(app)
@@ -244,5 +278,5 @@ async def run_server(view_class=None, host: str = "localhost", port: int = 8080)
         await asyncio.sleep(3600)
 
 
-# Default view class
+# Default view class (for backwards compatibility)
 _view_class = None
