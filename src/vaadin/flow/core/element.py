@@ -1,0 +1,90 @@
+"""Element - represents a DOM element on the client."""
+
+from typing import TYPE_CHECKING, Any, Callable
+
+from vaadin.flow.core.state_node import Feature, StateNode
+
+if TYPE_CHECKING:
+    from vaadin.flow.core.state_tree import StateTree
+
+
+class Style:
+    """Inline style manager for an element."""
+
+    def __init__(self, node: StateNode):
+        self._node = node
+
+    def set(self, name: str, value: str):
+        """Set a style property."""
+        self._node.put(Feature.INLINE_STYLE_PROPERTY_MAP, name, value)
+
+    def get(self, name: str) -> str | None:
+        """Get a style property."""
+        return self._node.get(Feature.INLINE_STYLE_PROPERTY_MAP, name)
+
+
+class Element:
+    """Represents a DOM element."""
+
+    def __init__(self, tag: str, tree: "StateTree"):
+        self._tree = tree
+        self._node = tree.create_node()
+        self._node.attach()
+        self._node.put(Feature.ELEMENT_DATA, "tag", tag)
+        self._style = Style(self._node)
+        self._listeners: dict[str, list[Callable]] = {}
+        # Register element for event dispatch
+        tree.register_element(self)
+
+    @property
+    def node(self) -> StateNode:
+        return self._node
+
+    @property
+    def node_id(self) -> int:
+        return self._node.id
+
+    def get_style(self) -> Style:
+        """Get the style manager."""
+        return self._style
+
+    def set_property(self, name: str, value: Any):
+        """Set a property."""
+        self._node.put(Feature.ELEMENT_PROPERTY_MAP, name, value)
+
+    def get_property(self, name: str, default: Any = None) -> Any:
+        """Get a property."""
+        return self._node.get(Feature.ELEMENT_PROPERTY_MAP, name, default)
+
+    def set_attribute(self, name: str, value: str):
+        """Set an attribute."""
+        self._node.put(Feature.ELEMENT_ATTRIBUTE_MAP, name, value)
+
+    def get_attribute(self, name: str) -> str | None:
+        """Get an attribute."""
+        return self._node.get(Feature.ELEMENT_ATTRIBUTE_MAP, name)
+
+    def add_event_listener(self, event_type: str, listener: Callable):
+        """Add an event listener."""
+        if event_type not in self._listeners:
+            self._listeners[event_type] = []
+            # Register with UIDL
+            self._node.put(Feature.ELEMENT_LISTENER_MAP, event_type, True)
+        self._listeners[event_type].append(listener)
+
+    def fire_event(self, event_type: str, event_data: dict):
+        """Fire an event to listeners."""
+        for listener in self._listeners.get(event_type, []):
+            listener(event_data)
+
+    def add_child(self, child: "Element", index: int | None = None):
+        """Add a child element."""
+        self._node.add_child(child._node, index)
+
+    def add_children(self, children: list["Element"], index: int = 0):
+        """Add multiple child elements in a single splice operation."""
+        self._node.add_children([child._node for child in children], index)
+
+    def remove_child(self, child: "Element"):
+        """Remove a child element."""
+        self._node.remove_child(child._node)
