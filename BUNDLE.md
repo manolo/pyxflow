@@ -6,18 +6,30 @@ PyFlow reuses Vaadin's frontend infrastructure (FlowClient, web components, Lumo
 
 ```
 bundle/VAADIN/build/
-├── indexhtml-*.js           # Entry point, initializes FlowClient
-├── FlowClient-*.js          # UIDL protocol handler
-├── FlowBootstrap-*.js       # Bootstrap utilities
-├── generated-flow-imports-*.js  # Web components (Button, TextField, etc.)
-├── commonjsHelpers-*.js     # CommonJS compatibility
-└── *.br                     # Brotli-compressed versions
+├── indexhtml-*.js              # Entry point, initializes FlowClient
+├── FlowClient-*.js             # UIDL protocol handler
+├── FlowBootstrap-*.js          # Bootstrap utilities
+├── generated-flow-imports-*.js # ALL web components (~3.7MB)
+├── commonjsHelpers-*.js        # CommonJS compatibility
+└── *.br                        # Brotli-compressed versions
 ```
 
-These files handle:
-- **FlowClient**: Communication with the server via UIDL protocol
-- **Web Components**: `<vaadin-button>`, `<vaadin-text-field>`, layouts, etc.
-- **Lumo Theme**: Default Vaadin styling
+The bundle includes **all Vaadin components**:
+- Basic: Button, TextField, TextArea, Checkbox, NumberField, etc.
+- Layout: VerticalLayout, HorizontalLayout, FormLayout, etc.
+- Data: Grid, ComboBox, Select, DatePicker, etc.
+- Feedback: Dialog, Notification, ProgressBar, etc.
+- Navigation: Tabs, MenuBar, SideNav, etc.
+
+## Bundle Source
+
+The bundle comes from **vaadin-prod-bundle** on Maven Central:
+
+```
+https://repo1.maven.org/maven2/com/vaadin/vaadin-prod-bundle/25.0.4/vaadin-prod-bundle-25.0.4.jar
+```
+
+We use the **unoptimized** version (single file, no code splitting) for simplicity.
 
 ## How It Works
 
@@ -45,114 +57,88 @@ These files handle:
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## Generating the Bundle
+## Updating the Bundle
 
-The bundle is generated from a reference Java Vaadin application. Currently we use `my-hello` as the reference.
+### Download from Maven Central
 
-### Prerequisites
+```bash
+cd /tmp
 
-- Java 21+
-- Maven
+# Download the JAR
+curl -LO "https://repo1.maven.org/maven2/com/vaadin/vaadin-prod-bundle/25.0.4/vaadin-prod-bundle-25.0.4.jar"
 
-### Steps
+# Extract the unoptimized bundle
+unzip -o vaadin-prod-bundle-25.0.4.jar "vaadin-prod-bundle-unoptimized/webapp/VAADIN/build/*" -d extracted
 
-1. **Build the reference application**
-
-   ```bash
-   cd /Users/manolo/Github/platform/python/my-hello
-   ./mvnw package
-   ```
-
-   This creates a production bundle in:
-   ```
-   target/classes/META-INF/VAADIN/webapp/VAADIN/build/
-   ```
-
-2. **Copy the bundle to PyFlow**
-
-   ```bash
-   cd /Users/manolo/Github/platform/python/vaadin-pyflow
-
-   # Remove old bundle
-   rm -rf bundle/VAADIN/build/*
-
-   # Copy new bundle
-   cp -r ../my-hello/target/classes/META-INF/VAADIN/webapp/VAADIN/build/* bundle/VAADIN/build/
-   ```
-
-3. **Verify**
-
-   ```bash
-   ls bundle/VAADIN/build/
-   # Should show: FlowClient-*.js, indexhtml-*.js, etc.
-   ```
-
-### What Components Are Included
-
-The bundle includes web components based on what's imported in the reference app. The `my-hello` app includes:
-
-- `vaadin-button`
-- `vaadin-text-field`
-- `vaadin-horizontal-layout`
-- `vaadin-vertical-layout`
-- Lumo theme
-
-To add more components (e.g., `vaadin-checkbox`, `vaadin-grid`), add them to the reference app's Java code and rebuild.
-
-## Reference Application (my-hello)
-
-Location: `/Users/manolo/Github/platform/python/my-hello`
-
-This is a minimal Vaadin 25 application that:
-1. Imports the components we need
-2. Generates the production frontend bundle
-3. Serves as a reference for UIDL protocol behavior
-
-### Adding New Components
-
-1. Add the component to `my-hello/pom.xml` (if not already included)
-2. Use the component in Java code (to trigger inclusion in bundle)
-3. Rebuild: `./mvnw package`
-4. Copy the new bundle to PyFlow
-
-Example - to add Checkbox:
-```java
-// In my-hello's MainView.java
-import com.vaadin.flow.component.checkbox.Checkbox;
-
-// Use it somewhere to ensure it's bundled
-Checkbox cb = new Checkbox("Example");
+# Copy to PyFlow
+cd /path/to/vaadin-pyflow
+rm -rf bundle/VAADIN/build/*
+cp /tmp/extracted/vaadin-prod-bundle-unoptimized/webapp/VAADIN/build/* bundle/VAADIN/build/
 ```
 
-## Bundle Version
+### Verify
 
-The bundle is tied to a specific Vaadin version. Current: **Vaadin 25.x**
+```bash
+ls bundle/VAADIN/build/
+# Should show: FlowClient-*.js, indexhtml-*.js, generated-flow-imports-*.js, etc.
+```
 
-When upgrading Vaadin:
-1. Update `my-hello/pom.xml` with new Vaadin version
-2. Rebuild and copy the bundle
-3. Test that PyFlow still works with the new FlowClient
+## Bundle Versions
+
+| PyFlow Version | Vaadin Bundle Version | Notes |
+|----------------|----------------------|-------|
+| Current        | 25.0.4               | All components included |
+
+### Upgrading Vaadin Version
+
+1. Find the new version on Maven Central
+2. Download and extract as shown above
+3. Test that PyFlow still works
+4. Update this table
+
+## Optimized vs Unoptimized Bundle
+
+The JAR contains two versions:
+
+| Version | Path | Size | Structure |
+|---------|------|------|-----------|
+| Optimized | `vaadin-prod-bundle/webapp/` | ~4MB | Multiple chunks (code splitting) |
+| Unoptimized | `vaadin-prod-bundle-unoptimized/webapp/` | ~5MB | Single `generated-flow-imports.js` |
+
+We use **unoptimized** because:
+- Simpler (one file for all components)
+- No chunk loading logic needed
+- Easier to debug
+- Size difference is minimal with compression
 
 ## Troubleshooting
 
 ### "Component not rendering"
 
-The web component might not be in the bundle. Check:
-```bash
-grep "vaadin-checkbox" bundle/VAADIN/build/generated-flow-imports-*.js
-```
-
-If not found, add it to the reference app and rebuild.
+All components are included in the bundle. If a component doesn't render:
+1. Check that PyFlow has the component class implemented
+2. Verify the tag name matches (`vaadin-checkbox`, `vaadin-grid`, etc.)
+3. Check browser console for errors
 
 ### "FlowClient error"
 
-The UIDL protocol might have changed. Compare:
-1. Capture UIDL from Java app (browser DevTools → Network)
-2. Compare with PyFlow's UIDL responses
+The UIDL protocol might have changed between Vaadin versions:
+1. Check the Vaadin version in the bundle
+2. Compare UIDL responses with a Java Vaadin app of the same version
 3. Adjust `uidl_handler.py` as needed
 
-### "Styles not applied"
+### "Old bundle cached"
 
-Lumo theme is included in the bundle. If custom styles are needed:
-1. Add them to the reference app's theme
-2. Rebuild the bundle
+Clear the browser cache or use incognito mode to ensure the latest bundle is loaded.
+
+## File Sizes (v25.0.4)
+
+| File | Original | Brotli |
+|------|----------|--------|
+| generated-flow-imports-*.js | 3.7 MB | 807 KB |
+| indexhtml-*.js | 329 KB | 92 KB |
+| FlowClient-*.js | 145 KB | 41 KB |
+| FlowBootstrap-*.js | 2.7 KB | 0.9 KB |
+| **Total** | **~4.2 MB** | **~942 KB** |
+
+With Brotli compression (enabled by default in browsers), the download is under 1MB.

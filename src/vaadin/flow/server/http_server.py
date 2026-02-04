@@ -173,10 +173,10 @@ def guess_content_type(path: Path) -> str:
 
 def generate_index_html() -> str:
     """Generate the index.html page matching Vaadin's format."""
-    # Find the actual indexhtml JS file
+    # Find the actual indexhtml JS/CSS files
     bundle_dir = get_bundle_directory()
     js_file = "indexhtml.js"  # fallback
-    css_file = "indexhtml.css"  # fallback
+    css_file = None  # optional
     if bundle_dir:
         build_dir = bundle_dir / "VAADIN" / "build"
         if build_dir.exists():
@@ -185,6 +185,9 @@ def generate_index_html() -> str:
                     js_file = f.name
                 elif f.name.startswith("indexhtml-") and f.name.endswith(".css") and not f.name.endswith(".br"):
                     css_file = f.name
+
+    # CSS link is optional (prod-bundle doesn't have it)
+    css_link = f'<link rel="stylesheet" crossorigin href="./VAADIN/build/{css_file}">' if css_file else ""
 
     return f"""<!DOCTYPE html>
 <html>
@@ -200,7 +203,7 @@ def generate_index_html() -> str:
   </style>
   <script type="module" crossorigin src="./VAADIN/build/{js_file}"></script>
   <link rel="modulepreload" crossorigin href="./VAADIN/build/commonjsHelpers-CqkleIqs.js">
-  <link rel="stylesheet" crossorigin href="./VAADIN/build/{css_file}">
+  {css_link}
 </head>
 <body>
   <div id="outlet"></div>
