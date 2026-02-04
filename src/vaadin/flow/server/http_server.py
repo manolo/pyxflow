@@ -132,13 +132,21 @@ async def handle_static(request: web.Request) -> web.Response:
 
 
 def get_bundle_directory() -> Path | None:
-    """Find the bundle directory from my-hello JAR or extracted files."""
-    # Check common locations
+    """Find the bundle directory containing Vaadin frontend assets.
+
+    The bundle contains the FlowClient, web components, and Lumo theme.
+    It is generated from a reference Java Vaadin application.
+
+    Search order:
+    1. ./bundle/ in the project root (recommended)
+    2. ../my-hello/target/... (development fallback)
+    """
+    # Check common locations (in priority order)
     candidates = [
-        Path(__file__).parents[5] / "my-hello" / "target" / "classes" / "META-INF" / "VAADIN" / "webapp",
-        Path(__file__).parents[5] / "my-hello" / "target" / "classes",
-        Path(__file__).parents[5] / "extracted",
+        # Project-local bundle (recommended)
         Path.cwd() / "bundle",
+        # Development: my-hello reference app
+        Path(__file__).parents[5] / "my-hello" / "target" / "classes" / "META-INF" / "VAADIN" / "webapp",
     ]
 
     for candidate in candidates:

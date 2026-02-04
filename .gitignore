@@ -4,7 +4,9 @@ __pycache__/
 *$py.class
 *.so
 .Python
-build/
+/build/
+# Keep bundle/VAADIN/build (Vaadin frontend assets)
+!bundle/
 develop-eggs/
 dist/
 downloads/
