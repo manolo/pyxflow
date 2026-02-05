@@ -5,7 +5,7 @@ import asyncio
 from vaadin.flow.server.http_server import run_server
 
 # Import views to register them via @Route decorator
-from examples import HelloWorldView, AboutView  # noqa: F401
+from examples import HelloWorldView, AboutView, DialogDemoView  # noqa: F401
 
 if __name__ == "__main__":
     print("=" * 50)
@@ -13,8 +13,9 @@ if __name__ == "__main__":
     print("=" * 50)
     print()
     print("  Routes:")
-    print("    http://localhost:8080/       -> HelloWorldView")
-    print("    http://localhost:8080/about  -> AboutView")
+    print("    http://localhost:8080/            -> HelloWorldView")
+    print("    http://localhost:8080/about       -> AboutView")
+    print("    http://localhost:8080/dialog-demo -> DialogDemoView")
     print()
     print("  Stop: Ctrl+C")
     print()

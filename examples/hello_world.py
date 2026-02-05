@@ -18,6 +18,9 @@ class HelloWorldView(VerticalLayout):
     def __init__(self):
         super().__init__()
 
+        # Header to identify the view
+        self.add(Span("=== HelloWorldView ==="))
+
         self.name = TextField("Your name")
         self.say_hello = Button("Say hello")
         self.say_hello.add_click_listener(self._on_click)

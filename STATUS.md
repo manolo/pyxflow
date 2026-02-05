@@ -4,7 +4,7 @@
 
 **Vaadin version:** 25.0.4
 **Lines of code:** ~2,500
-**Tests:** 220 passing
+**Tests:** 257 passing
 **Last updated:** 2026-02-05
 
 ---
@@ -30,6 +30,7 @@
   - ui-refresh: `18ACma10cDE=`
 - [x] **contextRootUrl** - Uses `"./"` matching Java Flow
 - [x] **Execute commands** - document.title, invalid property, serverConnected
+- [x] **FlowComponentHost** - Virtual children renderer for Dialog/Overlay components
 
 ### Components
 - [x] Button - Text, click listener
@@ -41,6 +42,8 @@
 - [x] Span - Text content
 - [x] VerticalLayout - Theme, add children, padding/spacing
 - [x] HorizontalLayout - Theme, add children, margin/spacing, vertical alignment
+- [x] Dialog - Header title, modal, draggable, resizable, FlowComponentHost renderer
+- [x] Notification - Position, duration, theme variants, open/close
 
 ### Component Base Features
 - [x] `setVisible()` / `isVisible()` - Show/hide components
@@ -87,8 +90,6 @@
 - [ ] RadioButtonGroup / CheckboxGroup
 
 ### Components (Priority: Medium)
-- [ ] Dialog (code exists, pending commit)
-- [ ] Notification (code exists, pending commit)
 - [ ] Grid (complex)
 - [ ] MenuBar
 - [ ] Tabs / TabSheet
@@ -136,7 +137,7 @@
 1. ~~**More basic components** - Checkbox, TextArea, NumberField~~ ✓ DONE
 2. ~~**Component features** - setVisible, setEnabled, addClassName~~ ✓ DONE
 3. ~~**Routing** - @Route decorator, multiple views~~ ✓ DONE
-4. **Feedback components** - Dialog, Notification
+4. ~~**Feedback components** - Dialog, Notification~~ ✓ DONE
 5. **Grid** - Complex but essential for data apps
 
 ---

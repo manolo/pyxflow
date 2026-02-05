@@ -328,6 +328,22 @@ class UidlHandler:
                 [False, {"@v-node": tf_node_id}, "return (async function() { this.invalid = $0}).apply($1)"]
             )
 
+        # Add execute commands for Dialog components (FlowComponentHost renderer)
+        dialog_nodes = self._find_dialog_nodes()
+        for dialog_node_id in dialog_nodes:
+            # Patch the virtual container
+            self._pending_execute.append(
+                [{"@v-node": dialog_node_id}, "return (async function() { Vaadin.FlowComponentHost.patchVirtualContainer(this) }).apply($0)"]
+            )
+            # Set up the renderer
+            self._pending_execute.append(
+                [self._app_id, {"@v-node": dialog_node_id}, "return (async function() { this.renderer = (root) => Vaadin.FlowComponentHost.setChildNodes($0, this.virtualChildNodeIds, root) }).apply($1)"]
+            )
+            # Request content update
+            self._pending_execute.append(
+                [{"@v-node": dialog_node_id}, "return (async function() { this.requestContentUpdate() }).apply($0)"]
+            )
+
         # Add serverConnected execute command
         self._pending_execute.append(
             [False, {"@v-node": self._container_node.id}, "return (async function() { this.serverConnected($0)}).apply($1)"]
@@ -341,6 +357,15 @@ class UidlHandler:
             if tag == "vaadin-text-field":
                 textfield_nodes.append(node_id)
         return textfield_nodes
+
+    def _find_dialog_nodes(self) -> list[int]:
+        """Find all Dialog node IDs in the current view."""
+        dialog_nodes = []
+        for node_id, node in self._tree._nodes.items():
+            tag = node.get(Feature.ELEMENT_DATA, "tag")
+            if tag == "vaadin-dialog":
+                dialog_nodes.append(node_id)
+        return dialog_nodes
 
     def _handle_click(self, node_id: int, event_data: dict):
         """Handle click event."""
