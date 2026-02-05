@@ -2,9 +2,10 @@
 
 ## Current State: MVP + Routing + Full UIDL Compatibility
 
+**Vaadin version:** 25.0.4
 **Lines of code:** ~2,500
 **Tests:** 220 passing
-**Last updated:** 2025-02-05
+**Last updated:** 2026-02-05
 
 ---
 
@@ -50,6 +51,14 @@
 - [x] HTTP Server (aiohttp) - Sessions, static files
 - [x] UIDL Handler - Init, navigation, events, mSync
 - [x] Page reload support - State reset on init
+- [x] Serves index.html from bundle (Vaadin-generated)
+
+### Bundle Generator
+- [x] Minimal Maven project (`bundle-generator/`)
+- [x] Uses `vaadin-core` (no Spring)
+- [x] Lumo theme via `@StyleSheet(Lumo.STYLESHEET)`
+- [x] `AllComponentsView.java` includes all ported components
+- [x] Build: `./mvnw vaadin:clean-frontend clean package -DskipTests`
 
 ### Protocol
 - [x] Init response - appConfig, CSRF, constants (Java-compatible hashes)
@@ -78,8 +87,8 @@
 - [ ] RadioButtonGroup / CheckboxGroup
 
 ### Components (Priority: Medium)
-- [ ] Dialog
-- [ ] Notification
+- [ ] Dialog (code exists, pending commit)
+- [ ] Notification (code exists, pending commit)
 - [ ] Grid (complex)
 - [ ] MenuBar
 - [ ] Tabs / TabSheet
