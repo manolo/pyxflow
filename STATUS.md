@@ -1,10 +1,10 @@
 # PyFlow Implementation Status
 
-## Current State: MVP + Routing + More Components
+## Current State: MVP + Routing + Full UIDL Compatibility
 
-**Lines of code:** ~2,400
+**Lines of code:** ~2,500
 **Tests:** 220 passing
-**Last updated:** 2025-02-04
+**Last updated:** 2025-02-05
 
 ---
 
@@ -15,6 +15,20 @@
 - [x] StateNode - Features, attach/put/splice
 - [x] Element - Properties, attributes, styles, events
 - [x] Component - Base class with element attachment
+
+### UIDL Protocol Compatibility (Java Flow)
+- [x] **Event hashes** - Hardcoded Java Flow hashes for exact compatibility
+  - Click: `F8oCtNArLiI=`
+  - Change: `Fg73o1qebBo=`
+  - Keydown: `OSoHnU3SjNg=`
+  - Opened-changed: `t7mULTj4JVU=`
+  - Checked-changed: `azhwx/bqd+0=`
+- [x] **UI navigation hashes** - For client-side routing
+  - ui-navigate: `msDV4SvCysE=`
+  - ui-leave-navigation: `i2nDWhpwLZE=`
+  - ui-refresh: `18ACma10cDE=`
+- [x] **contextRootUrl** - Uses `"./"` matching Java Flow
+- [x] **Execute commands** - document.title, invalid property, serverConnected
 
 ### Components
 - [x] Button - Text, click listener
@@ -38,10 +52,15 @@
 - [x] Page reload support - State reset on init
 
 ### Protocol
-- [x] Init response - appConfig, CSRF, constants
+- [x] Init response - appConfig, CSRF, constants (Java-compatible hashes)
 - [x] UIDL response - syncId, changes, execute
 - [x] RPC: event - click, change, ui-navigate, keydown
 - [x] RPC: mSync - Property sync from client
+- [x] **UIDL compatibility verified** - Matches Java Flow exactly:
+  - Same constants keys (Base64 hashes)
+  - Same execute commands format
+  - Same number of changes (27 for HelloWorldView)
+  - Same change types (5 attach, 17 put, 1 clear, 4 splice)
 
 ### Routing
 - [x] `@Route` decorator - Path registration

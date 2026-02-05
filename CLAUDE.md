@@ -32,10 +32,10 @@ pytest tests/test_rpc_events.py -v
 vaadin-pyflow/
 ├── src/vaadin/flow/
 │   ├── core/           # StateTree, StateNode, Element, Component
-│   ├── components/     # Button, TextField, Span, layouts
+│   ├── components/     # Button, TextField, Span, layouts, Dialog, etc.
 │   ├── server/         # HTTP server, UIDL handler
-│   └── examples/       # HelloWorldView
-├── tests/              # 148 tests
+│   └── examples/       # HelloWorldView, AboutView, DialogDemoView
+├── tests/              # 220 tests
 ├── run.py              # Entry point
 └── STATUS.md           # Implementation checklist
 ```
@@ -69,6 +69,21 @@ vaadin-pyflow/
 ```json
 {"syncId": 1, "clientId": 1, "changes": [...], "constants": {...}}
 ```
+
+## Event Hashes (Java Flow Compatible)
+
+PyFlow uses hardcoded hashes from Java Flow for exact protocol compatibility:
+
+| Event | Hash | Usage |
+|-------|------|-------|
+| click | `F8oCtNArLiI=` | Button clicks |
+| change | `Fg73o1qebBo=` | TextField value sync |
+| keydown | `OSoHnU3SjNg=` | Enter key handling |
+| ui-navigate | `msDV4SvCysE=` | Navigation events |
+| ui-leave-navigation | `i2nDWhpwLZE=` | Leave navigation |
+| ui-refresh | `18ACma10cDE=` | Page refresh |
+
+See `../SPECS.md` for hash generation details.
 
 ## Feature IDs (for UIDL changes)
 
