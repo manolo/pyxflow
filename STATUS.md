@@ -61,7 +61,7 @@
 - [x] Uses `vaadin-core` (no Spring)
 - [x] Lumo theme via `@StyleSheet(Lumo.STYLESHEET)`
 - [x] `AllComponentsView.java` includes all ported components
-- [x] Build: `./mvnw vaadin:clean-frontend clean package -DskipTests`
+- [x] Build: `./mvnw package` (Vaadin 25 builds production bundle by default)
 
 ### Protocol
 - [x] Init response - appConfig, CSRF, constants (Java-compatible hashes)
