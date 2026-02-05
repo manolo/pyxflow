@@ -455,10 +455,10 @@ class TestInitResponseUidl:
 
         constants = response["appConfig"]["uidl"]["constants"]
 
-        # Should have navigation event constants
-        assert "c0" in constants  # ui-navigate config
-        assert "c1" in constants  # ui-leave-navigation config
-        assert "c2" in constants  # ui-refresh config
+        # Should have navigation event constants (using Java Flow hashes)
+        assert "msDV4SvCysE=" in constants  # ui-navigate config
+        assert "i2nDWhpwLZE=" in constants  # ui-leave-navigation config
+        assert "18ACma10cDE=" in constants  # ui-refresh config
 
     def test_init_uidl_changes_create_ui_structure(self):
         """Init UIDL changes should create UI structure."""

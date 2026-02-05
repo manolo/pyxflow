@@ -1,8 +1,5 @@
 """UIDL Protocol Handler."""
 
-import base64
-import hashlib
-import json
 import random
 import secrets
 from typing import TYPE_CHECKING, Any
@@ -13,8 +10,20 @@ if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
 
 
-# Event listener configurations with their Base64 hashes
-# These must match Java Flow's hash generation
+# =============================================================================
+# Event Listener Configurations
+# =============================================================================
+# These configurations and hashes are captured from Java Flow to ensure
+# exact protocol compatibility. The hashes are computed by Java using SHA-256
+# of the JSON string representation, taking the first 64 bits and Base64 encoding.
+#
+# IMPORTANT: The exact hash values from Java are used here instead of computing
+# them dynamically, because the JSON serialization order affects the hash.
+# =============================================================================
+
+# Click event configuration (for buttons, etc.)
+# Hash captured from Java Flow: F8oCtNArLiI=
+_CLICK_HASH = "F8oCtNArLiI="
 _CLICK_CONFIG = {
     "event.shiftKey": False,
     "event.metaKey": False,
@@ -28,10 +37,29 @@ _CLICK_CONFIG = {
     "event.screenX": False
 }
 
+# Change event configuration (for text fields, etc.)
+# The '}' prefix means "sync this property with server"
+# Hash captured from Java Flow: Fg73o1qebBo=
+_CHANGE_HASH = "Fg73o1qebBo="
 _CHANGE_CONFIG = {
     "}value": False
 }
 
+# Opened-changed event configuration (for dialogs, dropdowns)
+_OPENED_CHANGED_HASH = "t7mULTj4JVU="  # Placeholder - capture from Java if needed
+_OPENED_CHANGED_CONFIG = {
+    "}opened": False
+}
+
+# Checked-changed event configuration (for checkboxes)
+_CHECKED_CHANGED_HASH = "azhwx/bqd+0="  # Placeholder - capture from Java if needed
+_CHECKED_CHANGED_CONFIG = {
+    "}checked": False
+}
+
+# Keydown event configuration (Enter key handling)
+# Hash captured from Java Flow: OSoHnU3SjNg=
+_KEYDOWN_HASH = "OSoHnU3SjNg="
 _KEYDOWN_CONFIG = {
     "event.shiftKey": False,
     "event.metaKey": False,
@@ -45,19 +73,36 @@ _KEYDOWN_CONFIG = {
     "event.altKey": False
 }
 
+# =============================================================================
+# UI Navigation Event Configurations
+# =============================================================================
+# These are registered on the body element for client-side navigation.
 
-def _generate_hash(config: dict) -> str:
-    """Generate Base64 hash for event listener config."""
-    # Create a deterministic string from the config
-    config_str = json.dumps(config, sort_keys=True, separators=(",", ":"))
-    hash_bytes = hashlib.sha256(config_str.encode()).digest()[:8]
-    return base64.b64encode(hash_bytes).decode()
+# UI navigate event - triggered when the user navigates to a new route
+# Hash captured from Java Flow: msDV4SvCysE=
+_UI_NAVIGATE_HASH = "msDV4SvCysE="
+_UI_NAVIGATE_CONFIG = {
+    "route": False,
+    "appShellTitle": False,
+    "query": False,
+    "trigger": False,
+    "historyState": False
+}
 
+# UI leave navigation event - triggered when leaving a route
+# Hash captured from Java Flow: i2nDWhpwLZE=
+_UI_LEAVE_NAVIGATION_HASH = "i2nDWhpwLZE="
+_UI_LEAVE_NAVIGATION_CONFIG = {
+    "route": False,
+    "query": False
+}
 
-# Pre-compute hashes for known event types
-_CLICK_HASH = _generate_hash(_CLICK_CONFIG)
-_CHANGE_HASH = _generate_hash(_CHANGE_CONFIG)
-_KEYDOWN_HASH = _generate_hash(_KEYDOWN_CONFIG)
+# UI refresh event - triggered on page refresh
+# Hash captured from Java Flow: 18ACma10cDE=
+_UI_REFRESH_HASH = "18ACma10cDE="
+_UI_REFRESH_CONFIG = {
+    "fullRefresh": False
+}
 
 
 class UidlHandler:
@@ -104,11 +149,11 @@ class UidlHandler:
 
         changes = self._tree.collect_changes()
 
-        # Constants define event debounce/sync settings
+        # Constants for UI navigation events (using Java Flow hashes)
         constants = {
-            "c0": {"route": False, "appShellTitle": False, "query": False, "trigger": False, "historyState": False},
-            "c1": {"route": False, "query": False},
-            "c2": {"fullRefresh": False},
+            _UI_NAVIGATE_HASH: _UI_NAVIGATE_CONFIG,
+            _UI_LEAVE_NAVIGATION_HASH: _UI_LEAVE_NAVIGATION_CONFIG,
+            _UI_REFRESH_HASH: _UI_REFRESH_CONFIG,
         }
 
         return {
@@ -116,7 +161,7 @@ class UidlHandler:
                 "productionMode": True,
                 "v-uiId": 0,
                 "appId": self._app_id,
-                "contextRootUrl": "/",
+                "contextRootUrl": "./",
                 "heartbeatInterval": 300,
                 "maxMessageSuspendTimeout": 5000,
                 "sessExpMsg": {"caption": None, "message": None, "url": None},
@@ -146,10 +191,10 @@ class UidlHandler:
         # Node 1 tag
         changes.append({"node": 1, "type": "put", "key": "tag", "feat": 0, "value": "body"})
 
-        # Node 1 listeners (using constant references)
-        changes.append({"node": 1, "type": "put", "key": "ui-navigate", "feat": 4, "value": "c0"})
-        changes.append({"node": 1, "type": "put", "key": "ui-leave-navigation", "feat": 4, "value": "c1"})
-        changes.append({"node": 1, "type": "put", "key": "ui-refresh", "feat": 4, "value": "c2"})
+        # Node 1 listeners (using Java Flow hashes as constant references)
+        changes.append({"node": 1, "type": "put", "key": "ui-navigate", "feat": 4, "value": _UI_NAVIGATE_HASH})
+        changes.append({"node": 1, "type": "put", "key": "ui-leave-navigation", "feat": 4, "value": _UI_LEAVE_NAVIGATION_HASH})
+        changes.append({"node": 1, "type": "put", "key": "ui-refresh", "feat": 4, "value": _UI_REFRESH_HASH})
 
         # Node 1 virtual children splice (node 3)
         changes.append({"node": 1, "type": "splice", "feat": 24, "index": 0, "addNodes": [3]})
@@ -230,8 +275,9 @@ class UidlHandler:
 
         # Use initial_route from request path if client sent empty or root route
         # This handles the case where the client's contextRootUrl calculation is wrong
-        if not route and hasattr(self, "_initial_route") and self._initial_route:
-            route = self._initial_route
+        initial_route = getattr(self, "_initial_route", "")
+        if not route and initial_route:
+            route = initial_route
 
         # Use router to find view class
         from vaadin.flow.router import get_view_class, get_page_title
@@ -346,6 +392,8 @@ class UidlHandler:
         event_configs = {
             "click": (_CLICK_HASH, _CLICK_CONFIG),
             "change": (_CHANGE_HASH, _CHANGE_CONFIG),
+            "opened-changed": (_OPENED_CHANGED_HASH, _OPENED_CHANGED_CONFIG),
+            "checked-changed": (_CHECKED_CHANGED_HASH, _CHECKED_CHANGED_CONFIG),
             "keydown": (_KEYDOWN_HASH, _KEYDOWN_CONFIG),
         }
 
