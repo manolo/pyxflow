@@ -4,7 +4,7 @@
 
 **Vaadin version:** 25.0.4
 **Lines of code:** ~2,500
-**Tests:** 257 passing
+**Tests:** 294 passing
 **Last updated:** 2026-02-05
 
 ---
@@ -44,6 +44,12 @@
 - [x] HorizontalLayout - Theme, add children, margin/spacing, vertical alignment
 - [x] Dialog - Header title, modal, draggable, resizable, FlowComponentHost renderer
 - [x] Notification - Position, duration, theme variants, open/close
+- [x] PasswordField - Password input with reveal button
+- [x] EmailField - Email input with validation
+- [x] ProgressBar - Determinate/indeterminate progress
+- [x] Select - Dropdown single selection
+- [x] RadioButtonGroup - Radio button selection
+- [x] CheckboxGroup - Multiple checkbox selection
 
 ### Component Base Features
 - [x] `setVisible()` / `isVisible()` - Show/hide components
@@ -84,10 +90,8 @@
 ## Not Implemented
 
 ### Components (Priority: High)
-- [ ] PasswordField
-- [ ] ComboBox / Select
+- [ ] ComboBox (with filtering)
 - [ ] DatePicker / TimePicker
-- [ ] RadioButtonGroup / CheckboxGroup
 
 ### Components (Priority: Medium)
 - [ ] Grid (complex)
@@ -95,7 +99,6 @@
 - [ ] Tabs / TabSheet
 - [ ] FormLayout
 - [ ] Upload
-- [ ] ProgressBar
 
 ### Component Features
 - [ ] `setId()` / `getId()`
