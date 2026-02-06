@@ -281,6 +281,8 @@ class UidlHandler:
                     self._handle_event(rpc)
                 elif rpc_type == "mSync":
                     self._handle_msync(rpc)
+                elif rpc_type == "publishedEventHandler":
+                    self._handle_published_event(rpc)
         finally:
             _set_current_tree(None)
 
@@ -389,6 +391,20 @@ class UidlHandler:
             self._pending_execute.append(
                 [{"@v-node": dialog_node_id}, "return (async function() { this.requestContentUpdate() }).apply($0)"]
             )
+            # Register overlay close handler (calls $server.handleClientClose)
+            self._pending_execute.append(
+                [{"@v-node": dialog_node_id},
+                 "return (async function() {"
+                 "  this.$.overlay.addEventListener('vaadin-overlay-close', () => {"
+                 "    document.addEventListener('vaadin-overlay-close', (e) => {"
+                 "      if(!e.defaultPrevented && e.detail.overlay === this.$.overlay) {"
+                 "        e.preventDefault();"
+                 "        this.$server.handleClientClose();"
+                 "      }"
+                 "    }, {once: true})"
+                 "  })"
+                 "}).apply($0)"]
+            )
 
         # Add serverConnected execute command
         self._pending_execute.append(
@@ -445,6 +461,20 @@ class UidlHandler:
                 self._pending_execute.append(
                     [{"@v-node": node_id}, "return (async function() { this.requestContentUpdate() }).apply($0)"]
                 )
+                # Register overlay close handler (calls $server.handleClientClose)
+                self._pending_execute.append(
+                    [{"@v-node": node_id},
+                     "return (async function() {"
+                     "  this.$.overlay.addEventListener('vaadin-overlay-close', () => {"
+                     "    document.addEventListener('vaadin-overlay-close', (e) => {"
+                     "      if(!e.defaultPrevented && e.detail.overlay === this.$.overlay) {"
+                     "        e.preventDefault();"
+                     "        this.$server.handleClientClose();"
+                     "      }"
+                     "    }, {once: true})"
+                     "  })"
+                     "}).apply($0)"]
+                )
             elif tag == "vaadin-notification":
                 # 1. Request content update BEFORE patching
                 self._pending_execute.append(
@@ -491,6 +521,19 @@ class UidlHandler:
             component = self._tree.get_component(node_id)
             if component:
                 component._sync_property(prop, value)
+
+    def _handle_published_event(self, rpc: dict):
+        """Handle publishedEventHandler RPC (client-callable methods).
+
+        This is used by Dialog's overlay close handler to notify the server
+        when the user closes the dialog (Escape, click outside).
+        """
+        node_id = rpc.get("node")
+        method_name = rpc.get("templateEventMethodName")
+
+        component = self._tree.get_component(node_id)
+        if component and method_name == "handleClientClose":
+            component.handle_client_close()
 
     def _build_response(self) -> dict:
         """Build UIDL response."""

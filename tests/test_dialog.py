@@ -143,17 +143,21 @@ class TestDialog:
 
         dialog.add_open_listener(on_open)
 
-        # Simulate opened-changed event
-        dialog._handle_opened_changed({"opened": True})
+        # Open the dialog (server-initiated) - fires open listeners
+        dialog.open()
 
         assert len(events_received) == 1
         assert events_received[0][0] == "open"
 
     def test_close_listener(self, tree):
-        """Close listener is called when dialog closes."""
+        """Close listener is called when user closes the dialog."""
         dialog = Dialog()
         dialog._attach(tree)
-        dialog._opened = True  # Start opened
+
+        # Open the dialog first
+        dialog.open()
+        # Simulate the echo from client (consumed by pending flag)
+        dialog._handle_opened_changed({})
 
         events_received = []
 
@@ -162,8 +166,8 @@ class TestDialog:
 
         dialog.add_close_listener(on_close)
 
-        # Simulate opened-changed event
-        dialog._handle_opened_changed({"opened": False})
+        # Simulate user closing the dialog (client sends opened-changed with empty data)
+        dialog._handle_opened_changed({})
 
         assert len(events_received) == 1
         assert events_received[0][0] == "close"

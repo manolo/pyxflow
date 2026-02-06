@@ -24,6 +24,7 @@ class Dialog(Component):
     def __init__(self):
         super().__init__()
         self._opened = False
+        self._pending_server_change = False
         self._modal = True
         self._draggable = False
         self._resizable = False
@@ -57,8 +58,18 @@ class Dialog(Component):
         # Update virtualChildNodeIds property
         self._update_virtual_child_node_ids()
 
-        # Register opened-changed listener
+        # Register opened-changed listener (absorbs echoes from server-initiated changes)
         self.element.add_event_listener("opened-changed", self._handle_opened_changed)
+
+        # Register handleClientClose as a client-callable method (feature 19).
+        # FlowClient creates $server proxy with this method on the dialog element.
+        tree.add_change({
+            "node": self.element.node_id,
+            "type": "splice",
+            "feat": Feature.CLIENT_DELEGATE_HANDLERS,
+            "index": 0,
+            "add": ["handleClientClose"]
+        })
 
     def _update_virtual_child_node_ids(self):
         """Update the virtualChildNodeIds property with child node IDs."""
@@ -80,12 +91,16 @@ class Dialog(Component):
         """Open the dialog."""
         self._opened = True
         if self._element:
+            self._pending_server_change = True
             self.element.set_property("opened", True)
+        for listener in self._open_listeners:
+            listener({})
 
     def close(self):
         """Close the dialog."""
         self._opened = False
         if self._element:
+            self._pending_server_change = True
             self.element.set_property("opened", False)
 
     def is_opened(self) -> bool:
@@ -160,17 +175,41 @@ class Dialog(Component):
         self._close_listeners.append(listener)
 
     def _handle_opened_changed(self, event_data: dict):
-        """Handle opened-changed event from client."""
-        opened = event_data.get("opened", self._opened)
-        was_opened = self._opened
-        self._opened = opened
+        """Handle opened-changed event from client.
 
-        if opened and not was_opened:
-            for listener in self._open_listeners:
-                listener(event_data)
-        elif not opened and was_opened:
+        Absorbs echoes from server-initiated open/close calls.
+        The actual close detection is handled by handleClientClose
+        (publishedEventHandler from the overlay's close event).
+        """
+        if self._pending_server_change:
+            self._pending_server_change = False
+            return
+
+        # Fallback: if opened-changed arrives without a pending server change
+        # and we were open, treat it as a close (shouldn't happen with
+        # publishedEventHandler, but handles edge cases).
+        was_opened = self._opened
+        self._opened = False
+        if was_opened and self._element:
+            self._pending_server_change = True
+            self.element.set_property("opened", False)
+        if was_opened:
             for listener in self._close_listeners:
                 listener(event_data)
+
+    def handle_client_close(self):
+        """Called when the client reports the dialog was closed.
+
+        This is triggered by the overlay's vaadin-overlay-close event
+        via $server.handleClientClose() (publishedEventHandler RPC).
+        The server sets opened=false and sends the change back to the
+        client, keeping both state trees synchronized.
+        """
+        if not self._opened:
+            return
+        self.close()
+        for listener in self._close_listeners:
+            listener({})
 
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""

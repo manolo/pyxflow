@@ -74,6 +74,7 @@ class Notification(Component):
         self._position = position or Notification.Position.BOTTOM_START
         self._assertive = assertive
         self._opened = False
+        self._pending_server_change = False
         self._children: list[Component] = []
         self._open_listeners: list[Callable] = []
         self._close_listeners: list[Callable] = []
@@ -194,15 +195,22 @@ class Notification(Component):
             # Auto-attach using current tree context
             tree = _get_current_tree()
             if tree:
+                self._pending_server_change = True
                 self._attach(tree)
+                for listener in self._open_listeners:
+                    listener({})
                 return
         if self._element:
+            self._pending_server_change = True
             self.element.set_property("opened", True)
+        for listener in self._open_listeners:
+            listener({})
 
     def close(self):
         """Close the notification."""
         self._opened = False
         if self._element:
+            self._pending_server_change = True
             self.element.set_property("opened", False)
 
     def is_opened(self) -> bool:
@@ -264,17 +272,20 @@ class Notification(Component):
         self._close_listeners.append(listener)
 
     def _handle_opened_changed(self, event_data: dict):
-        """Handle opened-changed event from client."""
-        opened = event_data.get("opened", self._opened)
-        was_opened = self._opened
-        self._opened = opened
+        """Handle opened-changed event from client.
 
-        if opened and not was_opened:
-            for listener in self._open_listeners:
-                listener(event_data)
-        elif not opened and was_opened:
-            for listener in self._close_listeners:
-                listener(event_data)
+        Same pattern as Dialog: track server-initiated changes to distinguish
+        echoes from user/auto-close events. Sync server tree on client close.
+        """
+        if self._pending_server_change:
+            self._pending_server_change = False
+            return
+
+        # Client-initiated close (user dismissed or duration expired)
+        self._opened = False
+        if self._element:
+            self._pending_server_change = True
+            self.element.set_property("opened", False)
 
     def _handle_closed(self, event_data: dict):
         """Handle closed event from client."""

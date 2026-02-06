@@ -195,7 +195,7 @@ class TestNotification:
         assert opened_change["value"] == "uqvzCy8jAQc="
 
     def test_opened_changed_listener(self, tree):
-        """Opened-changed listener is called correctly."""
+        """Open/close listeners are called correctly."""
         n = Notification("Test")
         n._attach(tree)
 
@@ -210,13 +210,17 @@ class TestNotification:
         n.add_open_listener(on_open)
         n.add_close_listener(on_close)
 
-        # Simulate opened-changed event (opening)
-        n._handle_opened_changed({"opened": True})
+        # Open the notification (server-initiated) - fires open listener
+        n.open()
         assert len(events_received) == 1
         assert events_received[0][0] == "open"
 
-        # Simulate opened-changed event (closing)
-        n._handle_opened_changed({"opened": False})
+        # Simulate echo from client (consumed by pending flag)
+        n._handle_opened_changed({})
+
+        # Simulate user/auto-close: client sends opened-changed then closed
+        n._handle_opened_changed({})
+        n._handle_closed({})
         assert len(events_received) == 2
         assert events_received[1][0] == "close"
 

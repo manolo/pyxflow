@@ -33,6 +33,8 @@
 - [x] **contextRootUrl** - Uses `"./"` matching Java Flow
 - [x] **Execute commands** - document.title, invalid property, serverConnected
 - [x] **FlowComponentHost** - Virtual children renderer for Dialog/Overlay components
+- [x] **publishedEventHandler** - Client-callable methods via Feature 19 (`CLIENT_DELEGATE_HANDLERS`)
+- [x] **Server-client state sync** - `_pending_server_change` flag absorbs echoes from server-initiated property changes
 
 ### Components
 - [x] Button - Text, click listener
@@ -44,7 +46,7 @@
 - [x] Span - Text content
 - [x] VerticalLayout - Theme, add children, padding/spacing
 - [x] HorizontalLayout - Theme, add children, margin/spacing, vertical alignment
-- [x] Dialog - Header title, modal, draggable, resizable, FlowComponentHost renderer
+- [x] Dialog - Header title, modal, draggable, resizable, FlowComponentHost renderer, publishedEventHandler close
 - [x] Notification - Position, duration, theme variants, open/close, static show(), body attachment
 - [x] PasswordField - Password input with reveal button
 - [x] EmailField - Email input with validation
@@ -78,6 +80,7 @@
 - [x] UIDL response - syncId, changes, execute
 - [x] RPC: event - click, change, ui-navigate, keydown
 - [x] RPC: mSync - Property sync from client
+- [x] RPC: publishedEventHandler - Client-callable methods (Dialog close)
 - [x] **UIDL compatibility verified** - Matches Java Flow exactly:
   - Same constants keys (Base64 hashes)
   - Same execute commands format
