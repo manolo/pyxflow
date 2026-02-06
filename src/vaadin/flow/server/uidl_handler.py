@@ -148,6 +148,7 @@ class UidlHandler:
         self._container_node = None
         self._pending_execute: list = []  # Execute commands for next response
         self._last_client_id = 0  # Track client's message counter
+        self._sent_constants: set[str] = set()  # Track already-sent constant hashes
 
     def handle_init(self, browser_details: dict, initial_route: str = "") -> dict:
         """Handle init request.
@@ -168,6 +169,7 @@ class UidlHandler:
         self._container_node = None
         self._pending_execute = []
         self._last_client_id = 0
+        self._sent_constants = set()
         self._initial_route = initial_route  # Store for use in navigation
 
         self._create_initial_nodes()
@@ -181,6 +183,8 @@ class UidlHandler:
             _UI_LEAVE_NAVIGATION_HASH: _UI_LEAVE_NAVIGATION_CONFIG,
             _UI_REFRESH_HASH: _UI_REFRESH_CONFIG,
         }
+        # Track these as sent so they won't be resent in UIDL responses
+        self._sent_constants.update(constants.keys())
 
         return {
             "appConfig": {
@@ -518,7 +522,9 @@ class UidlHandler:
             "keydown": (_KEYDOWN_HASH, _KEYDOWN_CONFIG),
         }
 
-        # Add used constants and replace values with hash references
+        # Add used constants and replace values with hash references.
+        # Only send constants that haven't been sent in a previous response,
+        # as FlowClient caches them and resending causes processing errors.
         for change in changes:
             if change.get("feat") == Feature.ELEMENT_LISTENER_MAP:
                 value = change.get("value")
@@ -527,11 +533,15 @@ class UidlHandler:
                     event_type = change.get("key")
                     if event_type in event_configs:
                         hash_key, config = event_configs[event_type]
-                        constants[hash_key] = config
+                        if hash_key not in self._sent_constants:
+                            constants[hash_key] = config
+                            self._sent_constants.add(hash_key)
                         change["value"] = hash_key
                 elif isinstance(value, str) and value in _HASH_TO_CONFIG:
-                    # Explicit hash from component — add its config to constants
-                    constants[value] = _HASH_TO_CONFIG[value]
+                    # Explicit hash from component — only send config if new
+                    if value not in self._sent_constants:
+                        constants[value] = _HASH_TO_CONFIG[value]
+                        self._sent_constants.add(value)
 
         response = {
             "syncId": self._sync_id,
