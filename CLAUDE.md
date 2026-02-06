@@ -57,6 +57,11 @@ vaadin-pyflow/
 3. Create `components/new_component.py`
 4. Export in `components/__init__.py`
 5. Add tests in `tests/`
+6. **IMPORTANT: Keep demos in sync** — Update BOTH:
+   - Python: `src/vaadin/flow/examples/components_demo.py` (`ComponentsDemoView`)
+   - Java: `bundle-generator/src/main/java/com/vaadin/pyflow/AllComponentsView.java`
+   These two files MUST mirror each other (same structure, same components). The Java view drives the bundle generation — if a web component isn't used there, it won't be in the bundle.
+7. Regenerate the bundle: `cd bundle-generator && ./generate-bundle.sh`
 
 ## UIDL Protocol Summary
 
