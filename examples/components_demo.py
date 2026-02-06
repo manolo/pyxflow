@@ -158,7 +158,8 @@ class ComponentsDemoView(VerticalLayout):
         button_row = HorizontalLayout()
         button_row.add(button, dialog_btn, notification_btn, success_btn, error_btn)
         self.add(button_row)
-        self.add(Span("Click count: 0"))
+        self.click_label = Span("Click count: 0")
+        self.add(self.click_label)
 
         # Dialog (hidden initially)
         self.dialog = Dialog()
@@ -189,7 +190,7 @@ class ComponentsDemoView(VerticalLayout):
     def on_button_click(self, event):
         """Handle button click."""
         self.click_count += 1
-        self.add(Span(f"Click count: {self.click_count}"))
+        self.click_label.set_text(f"Click count: {self.click_count}")
 
     def open_dialog(self, event):
         """Open the dialog."""
