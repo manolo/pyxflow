@@ -69,7 +69,7 @@
 - [x] Minimal Maven project (`bundle-generator/`)
 - [x] Uses `vaadin-core` (no Spring)
 - [x] Lumo theme via `@StyleSheet(Lumo.STYLESHEET)`
-- [x] `AllComponentsView.java` includes all ported components
+- [x] `AllComponentsView.java` mirrors Python `ComponentsDemoView` (identical content/structure)
 - [x] Build: `./mvnw package` (Vaadin 25 builds production bundle by default)
 - [x] `generate-bundle.sh` extracts Lumo CSS from nested JAR (version-independent)
 

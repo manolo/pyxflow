@@ -25,16 +25,19 @@ from vaadin.flow.components import (
 
 @Route("components", page_title="Components Demo")
 class ComponentsDemoView(VerticalLayout):
-    """Demo view showing all implemented components."""
+    """View containing ALL components supported by PyFlow.
+    Must match the Java AllComponentsView in structure and content."""
 
     def __init__(self):
         super().__init__()
 
+        self.click_count = 0
+
         # Header
         self.add(Span("=== PyFlow Components Demo ==="))
 
-        # Text Input Fields Section
-        self._add_section("Text Input Fields")
+        # --- Text Input Fields ---
+        self.add_section("Text Input Fields")
 
         text_field = TextField("TextField")
         text_field.set_value("Hello PyFlow!")
@@ -53,8 +56,8 @@ class ComponentsDemoView(VerticalLayout):
         text_area.set_placeholder("Enter multiline text...")
         self.add(text_area)
 
-        # Numeric Fields Section
-        self._add_section("Numeric Fields")
+        # --- Numeric Fields ---
+        self.add_section("Numeric Fields")
 
         number_field = NumberField("NumberField")
         number_field.set_value(3.14)
@@ -67,8 +70,8 @@ class ComponentsDemoView(VerticalLayout):
         integer_field.set_step(5)
         self.add(integer_field)
 
-        # Selection Components Section
-        self._add_section("Selection Components")
+        # --- Selection Components ---
+        self.add_section("Selection Components")
 
         checkbox = Checkbox("Single Checkbox")
         self.add(checkbox)
@@ -86,8 +89,8 @@ class ComponentsDemoView(VerticalLayout):
         checkbox_group.set_items("Item X", "Item Y", "Item Z")
         self.add(checkbox_group)
 
-        # Progress Section
-        self._add_section("Progress")
+        # --- Progress ---
+        self.add_section("Progress")
 
         progress_bar = ProgressBar()
         progress_bar.set_value(0.6)
@@ -99,31 +102,28 @@ class ComponentsDemoView(VerticalLayout):
         self.add(Span("ProgressBar (indeterminate):"))
         self.add(progress_indeterminate)
 
-        # Buttons Section
-        self._add_section("Buttons & Actions")
-
-        self.click_count = 0
-        self.status_span = Span("Click count: 0")
+        # --- Buttons & Actions ---
+        self.add_section("Buttons & Actions")
 
         button = Button("Click Me!")
-        button.add_click_listener(self._on_button_click)
+        button.add_click_listener(self.on_button_click)
 
         dialog_btn = Button("Open Dialog")
-        dialog_btn.add_click_listener(self._open_dialog)
+        dialog_btn.add_click_listener(self.open_dialog)
 
         notification_btn = Button("Show Notification")
-        notification_btn.add_click_listener(self._show_notification)
+        notification_btn.add_click_listener(self.show_notification)
 
         success_btn = Button("Success Notification")
-        success_btn.add_click_listener(self._show_success)
+        success_btn.add_click_listener(self.show_success)
 
         error_btn = Button("Error Notification")
-        error_btn.add_click_listener(self._show_error)
+        error_btn.add_click_listener(self.show_error)
 
         button_row = HorizontalLayout()
         button_row.add(button, dialog_btn, notification_btn, success_btn, error_btn)
         self.add(button_row)
-        self.add(self.status_span)
+        self.add(Span("Click count: 0"))
 
         # Dialog (hidden initially)
         self.dialog = Dialog()
@@ -132,32 +132,29 @@ class ComponentsDemoView(VerticalLayout):
         self.dialog.add(Span("You can close it by clicking outside."))
         self.add(self.dialog)
 
-    def _add_section(self, title: str):
+    def add_section(self, title: str):
         """Add a section header."""
-        section = Span(f"--- {title} ---")
-        self.add(section)
+        self.add(Span(f"--- {title} ---"))
 
-    def _on_button_click(self, event):
+    def on_button_click(self, event):
         """Handle button click."""
         self.click_count += 1
-        new_status = Span(f"Click count: {self.click_count}")
-        # Replace the old status span
-        self.add(new_status)
+        self.add(Span(f"Click count: {self.click_count}"))
 
-    def _open_dialog(self, event):
+    def open_dialog(self, event):
         """Open the dialog."""
         self.dialog.open()
 
-    def _show_notification(self, event):
+    def show_notification(self, event):
         """Show a basic notification."""
         Notification.show("This is a notification!", 3000, Notification.Position.BOTTOM_CENTER)
 
-    def _show_success(self, event):
+    def show_success(self, event):
         """Show a success notification."""
         n = Notification.show("Operation successful!", 3000, Notification.Position.TOP_CENTER)
         n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
 
-    def _show_error(self, event):
+    def show_error(self, event):
         """Show an error notification."""
         n = Notification.show("Something went wrong!", 5000, Notification.Position.MIDDLE)
         n.add_theme_variants(NotificationVariant.LUMO_ERROR)
