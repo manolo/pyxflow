@@ -12,6 +12,8 @@ from vaadin.flow.components import (
     EmailField,
     FormLayout,
     Grid,
+    H2,
+    H3,
     HorizontalLayout,
     IntegerField,
     Notification,
@@ -39,7 +41,7 @@ class ComponentsDemoView(VerticalLayout):
         self.click_count = 0
 
         # Header
-        self.add(Span("=== PyFlow Components Demo ==="))
+        self.add(H2("PyFlow Components Demo"))
 
         # --- Text Input Fields ---
         self.add_section("Text Input Fields")
@@ -174,7 +176,7 @@ class ComponentsDemoView(VerticalLayout):
 
     def add_section(self, title: str):
         """Add a section header."""
-        self.add(Span(f"--- {title} ---"))
+        self.add(H3(title))
 
     def on_grid_select(self, event):
         """Handle grid selection."""
