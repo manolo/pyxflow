@@ -10,6 +10,7 @@ from vaadin.flow.components import (
     CheckboxGroup,
     Dialog,
     EmailField,
+    FormLayout,
     Grid,
     HorizontalLayout,
     IntegerField,
@@ -43,55 +44,67 @@ class ComponentsDemoView(VerticalLayout):
         # --- Text Input Fields ---
         self.add_section("Text Input Fields")
 
+        text_form = FormLayout()
+
         text_field = TextField("TextField")
         text_field.set_value("Hello PyFlow!")
-        self.add(text_field)
+        text_form.add(text_field)
 
         password_field = PasswordField("PasswordField")
         password_field.set_placeholder("Enter password")
-        self.add(password_field)
+        text_form.add(password_field)
 
         email_field = EmailField("EmailField")
         email_field.set_placeholder("name@example.com")
         email_field.set_clear_button_visible(True)
-        self.add(email_field)
+        text_form.add(email_field)
 
         text_area = TextArea("TextArea")
         text_area.set_placeholder("Enter multiline text...")
-        self.add(text_area)
+        text_form.add(text_area)
+
+        self.add(text_form)
 
         # --- Numeric Fields ---
         self.add_section("Numeric Fields")
+
+        numeric_form = FormLayout()
 
         number_field = NumberField("NumberField")
         number_field.set_value(3.14)
         number_field.set_min(0)
         number_field.set_max(100)
-        self.add(number_field)
+        numeric_form.add(number_field)
 
         integer_field = IntegerField("IntegerField")
         integer_field.set_value(42)
         integer_field.set_step(5)
-        self.add(integer_field)
+        numeric_form.add(integer_field)
+
+        self.add(numeric_form)
 
         # --- Selection Components ---
         self.add_section("Selection Components")
 
+        selection_form = FormLayout()
+
         checkbox = Checkbox("Single Checkbox")
-        self.add(checkbox)
+        selection_form.add(checkbox)
 
         select = Select("Select")
         select.set_items("Option A", "Option B", "Option C")
         select.set_placeholder("Choose an option")
-        self.add(select)
+        selection_form.add(select)
 
         radio_group = RadioButtonGroup("RadioButtonGroup")
         radio_group.set_items("Choice 1", "Choice 2", "Choice 3")
-        self.add(radio_group)
+        selection_form.add(radio_group)
 
         checkbox_group = CheckboxGroup("CheckboxGroup")
         checkbox_group.set_items("Item X", "Item Y", "Item Z")
-        self.add(checkbox_group)
+        selection_form.add(checkbox_group)
+
+        self.add(selection_form)
 
         # --- Progress ---
         self.add_section("Progress")
