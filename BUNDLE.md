@@ -5,14 +5,27 @@ PyFlow reuses Vaadin's frontend infrastructure (FlowClient, web components, Lumo
 ## What's in the Bundle
 
 ```
-bundle/VAADIN/build/
-├── indexhtml-*.js              # Entry point, initializes FlowClient
-├── FlowClient-*.js             # UIDL protocol handler
-├── FlowBootstrap-*.js          # Bootstrap utilities
-├── generated-flow-imports-*.js # ALL web components (~3.7MB)
-├── commonjsHelpers-*.js        # CommonJS compatibility
-└── *.br                        # Brotli-compressed versions
+bundle/
+├── index.html                     # Entry point HTML
+├── VAADIN/build/
+│   ├── indexhtml-*.js              # Entry point, initializes FlowClient
+│   ├── FlowClient-*.js             # UIDL protocol handler
+│   ├── FlowBootstrap-*.js          # Bootstrap utilities
+│   ├── generated-flow-imports-*.js # ALL web components (~3.7MB)
+│   ├── commonjsHelpers-*.js        # CommonJS compatibility
+│   └── *.br                        # Brotli-compressed versions
+└── lumo/                           # Lumo theme CSS (from vaadin-lumo-theme JAR)
+    ├── lumo.css                    # Main theme (224KB) - colors, typography, icons
+    ├── utility.css                 # Utility classes (34KB, optional)
+    └── presets/
+        └── compact.css             # Compact preset (566B, optional)
 ```
+
+### Theme CSS
+
+The `lumo/` directory contains the Lumo theme CSS extracted from `vaadin-lumo-theme-25.0.4.jar`.
+**Without this CSS, components render with browser defaults** (no Lumo styling).
+The server injects `<link rel="stylesheet" href="lumo/lumo.css">` into the HTML at serve time.
 
 The bundle includes **all Vaadin components**:
 - Basic: Button, TextField, TextArea, Checkbox, NumberField, etc.

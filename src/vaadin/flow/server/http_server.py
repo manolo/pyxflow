@@ -184,7 +184,13 @@ def get_index_html() -> str:
     if bundle_dir:
         index_path = bundle_dir / "index.html"
         if index_path.is_file():
-            return index_path.read_text()
+            html = index_path.read_text()
+            # Inject Lumo theme CSS
+            html = html.replace(
+                "</head>",
+                '  <link rel="stylesheet" type="text/css" href="lumo/lumo.css">\n</head>'
+            )
+            return html
 
     # Fallback if no bundle found
     return """<!DOCTYPE html>
@@ -209,11 +215,24 @@ def create_app() -> web.Application:
     app.router.add_get("/", handle_root)
     app.router.add_post("/", handle_uidl_post)
     app.router.add_get("/VAADIN/{path:.*}", handle_static)
+    app.router.add_get("/lumo/{path:.*}", handle_lumo)
     # Catch-all for other routes (e.g., /about) - serve index.html
     app.router.add_get("/{path:.*}", handle_route)
     app.router.add_post("/{path:.*}", handle_route_post)
 
     return app
+
+
+async def handle_lumo(request: web.Request) -> web.Response:
+    """Handle static file requests for /lumo/*."""
+    path = request.match_info.get("path", "")
+    bundle_dir = get_bundle_directory()
+    if bundle_dir:
+        file_path = bundle_dir / "lumo" / path
+        if file_path.is_file():
+            content_type = guess_content_type(file_path)
+            return web.FileResponse(file_path, headers={"Content-Type": content_type})
+    return web.Response(text="Not found", status=404)
 
 
 async def handle_route(request: web.Request) -> web.Response:

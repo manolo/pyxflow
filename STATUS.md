@@ -5,7 +5,7 @@
 **Vaadin version:** 25.0.4
 **Lines of code:** ~2,500
 **Tests:** 302 passing
-**Last updated:** 2026-02-05
+**Last updated:** 2026-02-06
 
 ---
 
@@ -63,6 +63,7 @@
 - [x] UIDL Handler - Init, navigation, events, mSync
 - [x] Page reload support - State reset on init
 - [x] Serves index.html from bundle (Vaadin-generated)
+- [x] Lumo theme CSS loading - Extracted from JAR, served at `/lumo/*`, injected in index.html
 
 ### Bundle Generator
 - [x] Minimal Maven project (`bundle-generator/`)
@@ -70,6 +71,7 @@
 - [x] Lumo theme via `@StyleSheet(Lumo.STYLESHEET)`
 - [x] `AllComponentsView.java` includes all ported components
 - [x] Build: `./mvnw package` (Vaadin 25 builds production bundle by default)
+- [x] `generate-bundle.sh` extracts Lumo CSS from nested JAR (version-independent)
 
 ### Protocol
 - [x] Init response - appConfig, CSRF, constants (Java-compatible hashes)
@@ -129,6 +131,10 @@
 - [ ] `@ClientCallable` methods
 - [ ] Return channels
 
+### Theme
+- [ ] Aura theme support (alternative to Lumo)
+- [ ] Theme switching at runtime
+
 ### Server Infrastructure
 - [ ] Session timeout / cleanup
 - [ ] Error handling
@@ -143,7 +149,8 @@
 2. ~~**Component features** - setVisible, setEnabled, addClassName~~ ✓ DONE
 3. ~~**Routing** - @Route decorator, multiple views~~ ✓ DONE
 4. ~~**Feedback components** - Dialog, Notification~~ ✓ DONE
-5. **Grid** - Complex but essential for data apps
+5. ~~**Lumo theme loading** - Extract and serve theme CSS~~ ✓ DONE
+6. **Grid** - Complex but essential for data apps
 
 ---
 
