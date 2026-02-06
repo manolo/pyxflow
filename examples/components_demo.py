@@ -1,5 +1,8 @@
 """Demo view showcasing all implemented components."""
 
+import csv
+from pathlib import Path
+
 from vaadin.flow import Route
 from vaadin.flow.components import (
     Button,
@@ -7,6 +10,7 @@ from vaadin.flow.components import (
     CheckboxGroup,
     Dialog,
     EmailField,
+    Grid,
     HorizontalLayout,
     IntegerField,
     Notification,
@@ -102,6 +106,22 @@ class ComponentsDemoView(VerticalLayout):
         self.add(Span("ProgressBar (indeterminate):"))
         self.add(progress_indeterminate)
 
+        # --- Grid ---
+        self.add_section("Grid")
+
+        people = self._load_people()
+        grid = Grid()
+        grid.add_column("name", header="Name").set_auto_width(True)
+        grid.add_column("email", header="Email").set_auto_width(True)
+        grid.add_column("role", header="Role")
+        grid.add_column("city", header="City").set_auto_width(True)
+        grid.add_column("department", header="Department")
+        grid.set_items(people)
+        self.grid_selection_label = Span("Selected: (none)")
+        grid.add_selection_listener(self.on_grid_select)
+        self.add(grid)
+        self.add(self.grid_selection_label)
+
         # --- Buttons & Actions ---
         self.add_section("Buttons & Actions")
 
@@ -132,9 +152,24 @@ class ComponentsDemoView(VerticalLayout):
         self.dialog.add(Span("You can close it by clicking outside."))
         self.add(self.dialog)
 
+    @staticmethod
+    def _load_people() -> list[dict]:
+        """Load people data from CSV."""
+        csv_path = Path(__file__).parent / "people.csv"
+        with open(csv_path, newline="", encoding="utf-8") as f:
+            return list(csv.DictReader(f))
+
     def add_section(self, title: str):
         """Add a section header."""
         self.add(Span(f"--- {title} ---"))
+
+    def on_grid_select(self, event):
+        """Handle grid selection."""
+        item = event.get("item")
+        if item:
+            self.grid_selection_label.set_text(f"Selected: {item['name']}")
+        else:
+            self.grid_selection_label.set_text("Selected: (none)")
 
     def on_button_click(self, event):
         """Handle button click."""

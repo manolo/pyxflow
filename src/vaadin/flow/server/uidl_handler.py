@@ -525,15 +525,21 @@ class UidlHandler:
     def _handle_published_event(self, rpc: dict):
         """Handle publishedEventHandler RPC (client-callable methods).
 
-        This is used by Dialog's overlay close handler to notify the server
-        when the user closes the dialog (Escape, click outside).
+        Dispatches to the component method named by templateEventMethodName.
+        Used by Dialog (handleClientClose), Grid (select, deselect, etc.).
         """
         node_id = rpc.get("node")
         method_name = rpc.get("templateEventMethodName")
+        args = rpc.get("templateEventMethodArgs", [])
 
         component = self._tree.get_component(node_id)
-        if component and method_name == "handleClientClose":
-            component.handle_client_close()
+        if component and method_name:
+            # Convert camelCase to snake_case for Python method lookup
+            import re
+            py_name = re.sub(r'([A-Z])', r'_\1', method_name).lower().lstrip('_')
+            method = getattr(component, py_name, None)
+            if method and callable(method):
+                method(*args)
 
     def _build_response(self) -> dict:
         """Build UIDL response."""
@@ -592,8 +598,10 @@ class UidlHandler:
             "constants": constants,
             "changes": changes,
         }
-        # Add execute commands if any
-        if self._pending_execute:
-            response["execute"] = self._pending_execute
-            self._pending_execute = []
+        # Merge execute commands from both UidlHandler and tree (components)
+        tree_execute = self._tree.collect_execute()
+        all_execute = self._pending_execute + tree_execute
+        if all_execute:
+            response["execute"] = all_execute
+        self._pending_execute = []
         return response

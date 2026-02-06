@@ -1,0 +1,201 @@
+name,email,role,city,department
+Hugo Santos,hugo.santos@company.com,Developer,Oslo,HR
+Rashid Traore,rashid.traore@acme.org,User,Dhaka,Engineering
+Diana Novak,diana.novak@initech.com,Manager,Vancouver,Engineering
+William Patel,william.patel@horizon.co,Analyst,Prague,Product
+Bruno Nielsen,bruno.nielsen@company.com,Editor,Dhaka,Support
+Jamal Wang,jamal.wang@initech.com,Designer,Moscow,Marketing
+Xander Kowalski,xander.kowalski@nexus.io,Designer,Copenhagen,Engineering
+Tariq Ortiz,tariq.ortiz@horizon.co,User,Tel Aviv,Marketing
+Valentina Dubois,valentina.dubois@pinnacle.com,Designer,Miami,HR
+Qiong Schmidt,qiong.schmidt@company.com,Manager,Athens,Marketing
+Deepa Kowalski,deepa.kowalski@vertex.com,Developer,Manila,Support
+Uma Rossi,uma.rossi@nexus.io,Manager,Dublin,Marketing
+David Nair,david.nair@globex.com,Manager,Buenos Aires,Product
+Xander Andersen,xander.andersen@horizon.co,Manager,Johannesburg,Engineering
+Deepa Rodriguez,deepa.rodriguez@nexus.io,Analyst,Dublin,Marketing
+Bianca Popov,bianca.popov@nexus.io,Manager,Auckland,Design
+Ines Ortiz,ines.ortiz@globex.com,Developer,Dubai,HR
+Vincenzo Ivanov,vincenzo.ivanov@horizon.co,Developer,Dhaka,Design
+Vera Ali,vera.ali@globex.com,Support,Cairo,Engineering
+Omar Wang,omar.wang@globex.com,Analyst,Shanghai,Design
+Xander Takahashi,xander.takahashi@synapse.org,Developer,Austin,Engineering
+Nils Mensah,nils.mensah@acme.org,Developer,Addis Ababa,Marketing
+Leo Diaz,leo.diaz@globex.com,Support,New York,Finance
+Olivia Abadi,olivia.abadi@globex.com,User,Budapest,HR
+Tomasz Rossi,tomasz.rossi@globex.com,Admin,Johannesburg,Product
+Carlos Santos,carlos.santos@nexus.io,Developer,Stockholm,Engineering
+Erik Popov,erik.popov@acme.org,User,Melbourne,Marketing
+Xiomara Bakker,xiomara.bakker@globex.com,Editor,Taipei,Sales
+Hiro De Vries,hiro.devries@pinnacle.com,Analyst,Vienna,HR
+Ravi Bernard,ravi.bernard@vertex.com,Designer,Hanoi,Product
+Priya Berg,priya.berg@initech.com,User,Addis Ababa,Engineering
+Bruno Smirnov,bruno.smirnov@initech.com,Manager,New York,Marketing
+Qiong Sato,qiong.sato@company.com,Manager,Shanghai,Engineering
+Rina Johansson,rina.johansson@horizon.co,Manager,Zurich,Product
+Bianca Visser,bianca.visser@globex.com,Support,Oslo,Product
+Camille Nakamura,camille.nakamura@acme.org,User,Colombo,Support
+Eva Torres,eva.torres@synapse.org,Admin,Lagos,Engineering
+Beatriz Diallo,beatriz.diallo@nexus.io,User,Oslo,HR
+Yuki Bakker,yuki.bakker@synapse.org,Editor,Dhaka,Sales
+Jamal Vargas,jamal.vargas@initech.com,User,Hanoi,Marketing
+Gabriel Sharma,gabriel.sharma@horizon.co,Admin,Cairo,HR
+Viktor Torres,viktor.torres@synapse.org,Support,Vienna,Design
+Hana Zhang,hana.zhang@vertex.com,Admin,Riyadh,Finance
+Isla Hansen,isla.hansen@vertex.com,Support,Nairobi,HR
+Leo Kumar,leo.kumar@company.com,Admin,Cape Town,Engineering
+Gabriel Volkov,gabriel.volkov@synapse.org,Editor,Mumbai,Marketing
+Xena Schmidt,xena.schmidt@pinnacle.com,User,Stockholm,Design
+Priya Popov,priya.popov@initech.com,Admin,Mexico City,Design
+Karla Volkov,karla.volkov@pinnacle.com,Designer,Copenhagen,HR
+Lars Okafor,lars.okafor@nexus.io,Manager,Copenhagen,Design
+Quinn Joshi,quinn.joshi@umbrella.co,Support,Cape Town,Marketing
+Bob Ortiz,bob.ortiz@pinnacle.com,User,Sao Paulo,HR
+Olivia Eriksson,olivia.eriksson@globex.com,Designer,Shanghai,HR
+Wojciech Hansen,wojciech.hansen@globex.com,Support,Seattle,Finance
+Elisa Sharma,elisa.sharma@horizon.co,Admin,Austin,Finance
+Karla Silva,karla.silva@globex.com,Developer,Seoul,Marketing
+Vincenzo Smirnov,vincenzo.smirnov@globex.com,Developer,Lisbon,HR
+Ravi Weber,ravi.weber@initech.com,Developer,Vancouver,Product
+Gustav Tanaka,gustav.tanaka@acme.org,Analyst,Zurich,Engineering
+Alice Fischer,alice.fischer@globex.com,Developer,Buenos Aires,Product
+Valentina Nilsson,valentina.nilsson@vertex.com,Admin,Seoul,Marketing
+Oana Wang,oana.wang@horizon.co,Admin,Beirut,Sales
+Felix Lopez,felix.lopez@company.com,Developer,Algiers,Engineering
+Umar Singh,umar.singh@initech.com,User,Tunis,Design
+Farid Kone,farid.kone@globex.com,Manager,Buenos Aires,Sales
+Camille Martinez,camille.martinez@globex.com,Designer,Karachi,HR
+Ingrid Li,ingrid.li@acme.org,Analyst,Berlin,Product
+Chen Patel,chen.patel@synapse.org,Designer,Bucharest,HR
+Chen Martinez,chen.martinez@initech.com,Analyst,Accra,Finance
+Igor Farah,igor.farah@umbrella.co,Designer,Montreal,Design
+Marta Bakker,marta.bakker@nexus.io,Admin,Seoul,Finance
+Wei Volkov,wei.volkov@umbrella.co,Admin,Moscow,Design
+Tanya Diallo,tanya.diallo@nexus.io,Analyst,Montreal,Marketing
+Yasmin Kuznetsov,yasmin.kuznetsov@initech.com,Developer,Sydney,Design
+Alice Jansen,alice.jansen@horizon.co,Manager,Algiers,Design
+Igor Joshi,igor.joshi@nexus.io,Designer,Bangkok,Finance
+Olivia Bernard,olivia.bernard@vertex.com,Designer,Muscat,Finance
+Valentina Lopez,valentina.lopez@initech.com,Analyst,Tel Aviv,Sales
+Elisa Popov,elisa.popov@umbrella.co,Analyst,Austin,Engineering
+Maya Hansen,maya.hansen@initech.com,Analyst,Johannesburg,Product
+Grace Cruz,grace.cruz@initech.com,Support,Lima,Marketing
+Katya Yoon,katya.yoon@pinnacle.com,Designer,Cairo,HR
+Marta Bernard,marta.bernard@initech.com,Manager,Singapore,Engineering
+Fatima Berg,fatima.berg@synapse.org,User,Manila,Design
+Greta Kuznetsov,greta.kuznetsov@initech.com,Analyst,Auckland,Design
+Fiona Chen,fiona.chen@company.com,User,Dhaka,HR
+Wei Persson,wei.persson@horizon.co,Support,Toronto,HR
+Priya Ortiz,priya.ortiz@globex.com,Support,San Francisco,Support
+Wanda Cruz,wanda.cruz@pinnacle.com,Analyst,Austin,Product
+Uma Kone,uma.kone@synapse.org,Support,Copenhagen,HR
+Hugo Nielsen,hugo.nielsen@horizon.co,Support,Stockholm,Finance
+Grace Johansson,grace.johansson@umbrella.co,Manager,Dublin,Support
+Olga Visser,olga.visser@acme.org,Editor,Nairobi,HR
+Yasmin Olsson,yasmin.olsson@globex.com,Manager,Shanghai,Design
+Camille Fischer,camille.fischer@horizon.co,Support,Lahore,Engineering
+Aiden Ramirez,aiden.ramirez@vertex.com,Admin,Miami,Design
+Liam Johnson,liam.johnson@nexus.io,Developer,Riyadh,Design
+Thiago Kone,thiago.kone@horizon.co,Manager,Melbourne,HR
+Ingrid Diaz,ingrid.diaz@synapse.org,Admin,Riyadh,Support
+Lars Muller,lars.muller@vertex.com,Editor,Kuala Lumpur,Sales
+Farid Bakker,farid.bakker@company.com,Analyst,Boston,Engineering
+Kenji Gupta,kenji.gupta@vertex.com,Editor,Kuala Lumpur,Sales
+Gabriel Eriksson,gabriel.eriksson@vertex.com,Designer,Vienna,Product
+Paulo Weber,paulo.weber@vertex.com,Developer,Lahore,Finance
+Kenji Mendoza,kenji.mendoza@company.com,Admin,Casablanca,HR
+Jin Schmidt,jin.schmidt@company.com,Admin,Oslo,HR
+Carlos Ito,carlos.ito@globex.com,Manager,Istanbul,Product
+Lars Santos,lars.santos@pinnacle.com,Manager,Kuala Lumpur,Finance
+Youssef Rossi,youssef.rossi@globex.com,User,Buenos Aires,Finance
+Nadia Volkov,nadia.volkov@company.com,Developer,Miami,Design
+Ahmed Okafor,ahmed.okafor@initech.com,User,Oslo,Marketing
+Patrick Farah,patrick.farah@umbrella.co,User,Boston,Engineering
+Tanya Bakker,tanya.bakker@vertex.com,Designer,Shanghai,Support
+Bob Ramirez,bob.ramirez@synapse.org,User,Colombo,Support
+Hugo Ortiz,hugo.ortiz@globex.com,Analyst,Bogota,Finance
+Elisa Bakker,elisa.bakker@synapse.org,Support,Colombo,Finance
+Paulo Berg,paulo.berg@acme.org,Developer,Jakarta,HR
+Wanda Vargas,wanda.vargas@pinnacle.com,Analyst,Addis Ababa,Engineering
+Noah Laurent,noah.laurent@globex.com,Support,Vienna,Support
+Hiro Weber,hiro.weber@umbrella.co,Developer,Denver,Engineering
+Rosa Nakamura,rosa.nakamura@acme.org,Manager,Karachi,Product
+William Abadi,william.abadi@initech.com,Support,Melbourne,Product
+Carlos Novak,carlos.novak@umbrella.co,Manager,Muscat,HR
+Nikolai Verma,nikolai.verma@pinnacle.com,Designer,Taipei,Support
+Eva Kone,eva.kone@horizon.co,Designer,Tunis,Product
+Ingrid Bernard,ingrid.bernard@umbrella.co,Manager,Bangkok,HR
+Olga Hernandez,olga.hernandez@horizon.co,Editor,Amsterdam,HR
+Ulrike Castillo,ulrike.castillo@umbrella.co,Developer,Lagos,HR
+Leo Ahmed,leo.ahmed@nexus.io,Editor,Budapest,Engineering
+Qiong Bakker,qiong.bakker@globex.com,Developer,Sydney,Engineering
+Valentina Dubois,valentina.dubois@globex.com,Support,Moscow,Engineering
+Zoe Hansen,zoe.hansen@synapse.org,Support,Hanoi,Support
+Xena Tanaka,xena.tanaka@umbrella.co,Support,Seoul,Marketing
+Beatriz Park,beatriz.park@acme.org,Admin,Nairobi,Sales
+Yara Martin,yara.martin@acme.org,Manager,Bangkok,Design
+David Takahashi,david.takahashi@pinnacle.com,Manager,Chicago,Design
+Hassan Cruz,hassan.cruz@umbrella.co,Analyst,Bucharest,Engineering
+Elisa Traore,elisa.traore@acme.org,Manager,Vienna,Finance
+Karla Petrov,karla.petrov@globex.com,Manager,Bogota,Marketing
+Uma Johnson,uma.johnson@vertex.com,Support,Taipei,Finance
+Elena Ahmed,elena.ahmed@umbrella.co,Developer,Manila,Marketing
+Nils Ahmed,nils.ahmed@umbrella.co,Manager,Dhaka,Marketing
+Ursula Ali,ursula.ali@globex.com,Developer,Singapore,Marketing
+Hana Zhang,hana.zhang@umbrella.co,Developer,Hanoi,Marketing
+Jorge Olsson,jorge.olsson@umbrella.co,Analyst,Dublin,Product
+Grace Petrov,grace.petrov@pinnacle.com,Admin,Colombo,Support
+David Lund,david.lund@company.com,User,Warsaw,Engineering
+Xiomara Muller,xiomara.muller@umbrella.co,Admin,Bogota,Product
+Rosa Sharma,rosa.sharma@synapse.org,Developer,Santiago,Design
+Hugo Park,hugo.park@acme.org,Support,Casablanca,Design
+Rina Laurent,rina.laurent@acme.org,Editor,Accra,Design
+Oana Choi,oana.choi@umbrella.co,Analyst,Austin,Engineering
+Isla Novak,isla.novak@nexus.io,Developer,Johannesburg,Marketing
+Youssef Fernandez,youssef.fernandez@horizon.co,Admin,Seattle,Product
+Camille Tanaka,camille.tanaka@initech.com,Designer,Auckland,Product
+Xiomara Tanaka,xiomara.tanaka@initech.com,Developer,Austin,Sales
+Katya Cruz,katya.cruz@synapse.org,User,Paris,HR
+Qiong Li,qiong.li@umbrella.co,Admin,Austin,Design
+Lina Ali,lina.ali@acme.org,Support,Bangkok,Sales
+Noah Okafor,noah.okafor@umbrella.co,Developer,Lahore,Product
+Kira Berg,kira.berg@synapse.org,Editor,Riyadh,HR
+Celine Yoon,celine.yoon@globex.com,User,Zurich,Design
+Sven Ibrahim,sven.ibrahim@horizon.co,Developer,New York,Finance
+Sakura Martin,sakura.martin@pinnacle.com,Support,Nairobi,Product
+Thiago Castillo,thiago.castillo@nexus.io,Designer,Austin,Design
+Isla Laurent,isla.laurent@initech.com,Manager,Miami,Design
+Deepa Osman,deepa.osman@vertex.com,Admin,Cape Town,Product
+Qiong Colombo,qiong.colombo@vertex.com,Editor,Auckland,Engineering
+Quinn Kang,quinn.kang@pinnacle.com,Designer,Lagos,Product
+Marco De Vries,marco.devries@synapse.org,Admin,Singapore,Design
+Jin Wang,jin.wang@acme.org,Support,Copenhagen,Support
+Farid Olsson,farid.olsson@vertex.com,User,Accra,Design
+Olga Sato,olga.sato@synapse.org,Admin,Shanghai,HR
+Greta Larsson,greta.larsson@umbrella.co,Manager,Cairo,Design
+Marco Abadi,marco.abadi@acme.org,Support,Lima,Finance
+Diana Kim,diana.kim@nexus.io,Admin,Athens,Support
+Wojciech Diaz,wojciech.diaz@globex.com,Manager,San Francisco,Design
+Yara Larsson,yara.larsson@globex.com,Editor,Bogota,Marketing
+Elisa Colombo,elisa.colombo@pinnacle.com,Manager,Auckland,Sales
+Deepa Vargas,deepa.vargas@umbrella.co,Support,Helsinki,Engineering
+Jorge Hansen,jorge.hansen@horizon.co,Editor,Sao Paulo,Product
+Tanya Morozov,tanya.morozov@umbrella.co,Analyst,Helsinki,Product
+Maya Patel,maya.patel@vertex.com,Support,Moscow,HR
+Xander Kuznetsov,xander.kuznetsov@nexus.io,Developer,Athens,Engineering
+Karla Romano,karla.romano@umbrella.co,Admin,Boston,Engineering
+David Kone,david.kone@synapse.org,Developer,Warsaw,Support
+Chen Nair,chen.nair@initech.com,Developer,Dubai,Marketing
+Greta Gupta,greta.gupta@company.com,Developer,Hanoi,Engineering
+Amara Hoffmann,amara.hoffmann@globex.com,User,Athens,Support
+Vincenzo Ramirez,vincenzo.ramirez@globex.com,Manager,Istanbul,Support
+Samuel Kang,samuel.kang@umbrella.co,Editor,Helsinki,Product
+Leo Kone,leo.kone@nexus.io,User,Kuala Lumpur,Marketing
+Sofia Nkomo,sofia.nkomo@initech.com,Analyst,Denver,Support
+Lina Romano,lina.romano@company.com,Developer,Los Angeles,Marketing
+Isla Rossi,isla.rossi@umbrella.co,Analyst,Beirut,Marketing
+Marta Ahmed,marta.ahmed@synapse.org,Admin,Denver,Support
+Elisa Ali,elisa.ali@acme.org,Support,Budapest,Design
+Omar Gonzalez,omar.gonzalez@company.com,Admin,Budapest,Product
+Omar Kowalski,omar.kowalski@initech.com,Editor,Riyadh,Product
+Wojciech Joshi,wojciech.joshi@horizon.co,Analyst,Nairobi,Design

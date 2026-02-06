@@ -10,6 +10,7 @@ class StateTree:
         self._changes: list[dict] = []
         self._elements: dict[int, "Element"] = {}  # node_id -> Element
         self._components: dict[int, "Component"] = {}  # node_id -> Component
+        self._pending_execute: list = []  # Execute commands queued by components
 
     def register_element(self, element: "Element"):
         """Register an element for event dispatch."""
@@ -51,6 +52,19 @@ class StateTree:
         """Add a change to the pending changes."""
         self._changes.append(change)
 
+    def queue_execute(self, command: list):
+        """Queue a JS execute command for the next UIDL response.
+
+        Components use this to register execute commands (e.g., grid connector init).
+        """
+        self._pending_execute.append(command)
+
+    def collect_execute(self) -> list:
+        """Collect and clear pending execute commands."""
+        commands = self._pending_execute.copy()
+        self._pending_execute.clear()
+        return commands
+
     def reset(self):
         """Reset the tree to initial state (for page reload)."""
         self._nodes.clear()
@@ -58,3 +72,4 @@ class StateTree:
         self._changes.clear()
         self._elements.clear()
         self._components.clear()
+        self._pending_execute.clear()

@@ -5,6 +5,7 @@ from vaadin.flow.components.checkbox import Checkbox
 from vaadin.flow.components.checkbox_group import CheckboxGroup
 from vaadin.flow.components.dialog import Dialog
 from vaadin.flow.components.email_field import EmailField
+from vaadin.flow.components.grid import Grid
 from vaadin.flow.components.notification import Notification, NotificationVariant
 from vaadin.flow.components.number_field import NumberField, IntegerField
 from vaadin.flow.components.password_field import PasswordField
@@ -23,6 +24,7 @@ __all__ = [
     "CheckboxGroup",
     "Dialog",
     "EmailField",
+    "Grid",
     "Notification",
     "NotificationVariant",
     "IntegerField",

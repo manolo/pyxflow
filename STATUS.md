@@ -1,10 +1,10 @@
 # PyFlow Implementation Status
 
-## Current State: MVP + Routing + Full UIDL Compatibility
+## Current State: MVP + Routing + Grid + Full UIDL Compatibility
 
 **Vaadin version:** 25.0.4
-**Lines of code:** ~2,500
-**Tests:** 302 passing
+**Lines of code:** ~2,800
+**Tests:** 320 passing
 **Last updated:** 2026-02-06
 
 ---
@@ -31,10 +31,11 @@
   - ui-leave-navigation: `i2nDWhpwLZE=`
   - ui-refresh: `18ACma10cDE=`
 - [x] **contextRootUrl** - Uses `"./"` matching Java Flow
-- [x] **Execute commands** - document.title, invalid property, serverConnected
+- [x] **Execute commands** - document.title, invalid property, serverConnected, component-queued (`queue_execute`)
 - [x] **FlowComponentHost** - Virtual children renderer for Dialog/Overlay components
 - [x] **publishedEventHandler** - Client-callable methods via Feature 19 (`CLIENT_DELEGATE_HANDLERS`)
 - [x] **Server-client state sync** - `_pending_server_change` flag absorbs echoes from server-initiated property changes
+- [x] **Grid connector protocol** - `gridConnector.initLazy`, `$connector.set/updateSize/confirm`, `setHeaderRenderer`
 
 ### Components
 - [x] Button - Text, click listener
@@ -54,6 +55,7 @@
 - [x] Select - Dropdown single selection
 - [x] RadioButtonGroup - Radio button selection
 - [x] CheckboxGroup - Multiple checkbox selection
+- [x] Grid - Columns (path, header, width, flexGrow, autoWidth), in-memory data push, single selection with listener
 
 ### Component Base Features
 - [x] `setVisible()` / `isVisible()` - Show/hide components
@@ -80,7 +82,7 @@
 - [x] UIDL response - syncId, changes, execute
 - [x] RPC: event - click, change, ui-navigate, keydown
 - [x] RPC: mSync - Property sync from client
-- [x] RPC: publishedEventHandler - Client-callable methods (Dialog close)
+- [x] RPC: publishedEventHandler - Generic dispatch to any component method (Dialog close, Grid select/deselect)
 - [x] **UIDL compatibility verified** - Matches Java Flow exactly:
   - Same constants keys (Base64 hashes)
   - Same execute commands format
@@ -100,8 +102,14 @@
 - [ ] ComboBox (with filtering)
 - [ ] DatePicker / TimePicker
 
+### Grid (Advanced Features)
+- [ ] Lazy loading / DataProvider
+- [ ] Sorting
+- [ ] Multi-select
+- [ ] Component renderers
+- [ ] Column reordering / resizing
+
 ### Components (Priority: Medium)
-- [ ] Grid (complex)
 - [ ] MenuBar
 - [ ] Tabs / TabSheet
 - [ ] FormLayout
@@ -153,7 +161,8 @@
 3. ~~**Routing** - @Route decorator, multiple views~~ ✓ DONE
 4. ~~**Feedback components** - Dialog, Notification~~ ✓ DONE
 5. ~~**Lumo theme loading** - Extract and serve theme CSS~~ ✓ DONE
-6. **Grid** - Complex but essential for data apps
+6. ~~**Grid** - Complex but essential for data apps~~ ✓ DONE (MVP: in-memory, single select)
+7. **Grid advanced** - Lazy loading, sorting, multi-select
 
 ---
 
