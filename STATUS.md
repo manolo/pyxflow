@@ -4,7 +4,7 @@
 
 **Vaadin version:** 25.0.4
 **Lines of code:** ~2,800
-**Tests:** 320 passing
+**Tests:** 365 passing
 **Last updated:** 2026-02-06
 
 ---
@@ -56,6 +56,7 @@
 - [x] Select - Dropdown single selection, `selectConnector.initLazy` overlay renderer
 - [x] RadioButtonGroup - Radio button selection
 - [x] CheckboxGroup - Multiple checkbox selection
+- [x] FormLayout - Responsive steps, colspan, FormItem (label slot), FormRow, auto-responsive, CSS custom properties
 - [x] Grid - Columns (path, header, width, flexGrow, autoWidth), in-memory data push, single selection with listener
 
 ### Component Base Features
@@ -113,7 +114,7 @@
 ### Components (Priority: Medium)
 - [ ] MenuBar
 - [ ] Tabs / TabSheet
-- [ ] FormLayout
+- [x] FormLayout - Responsive steps, colspan, FormItem (label slot), FormRow, auto-responsive, CSS custom properties
 - [ ] Upload
 
 ### Component Features
