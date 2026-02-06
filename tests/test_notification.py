@@ -2,13 +2,11 @@
 
 import pytest
 
-from vaadin.flow.components import (
-    Notification,
-    NotificationPosition,
-    NotificationVariant,
-    Span,
-)
+from vaadin.flow.components import Notification, NotificationVariant
+from vaadin.flow.components.notification import _set_current_tree, _get_current_tree
+from vaadin.flow.components.span import Span
 from vaadin.flow.core.state_tree import StateTree
+from vaadin.flow.core.state_node import Feature
 
 
 class TestNotification:
@@ -16,190 +14,396 @@ class TestNotification:
 
     @pytest.fixture
     def tree(self):
-        return StateTree()
+        """Create a tree with body node (node 1) pre-created."""
+        t = StateTree()
+        # Create body node (node 1) as UidlHandler does
+        body = t.create_node()
+        assert body.id == 1
+        return t
 
     def test_create_notification(self):
-        """Notification can be created."""
-        notification = Notification()
-        assert notification.is_opened() is False
-        assert notification.get_text() == ""
-        assert notification.get_duration() == 5000
+        """Notification can be created with defaults."""
+        n = Notification()
+        assert n.text == ""
+        assert n.duration == 0
+        assert n.position == Notification.Position.BOTTOM_START
+        assert n.assertive is False
+        assert n.is_opened() is False
 
-    def test_create_notification_with_text(self):
+    def test_create_with_text(self):
         """Notification can be created with text."""
-        notification = Notification("Hello!")
-        assert notification.get_text() == "Hello!"
+        n = Notification("Hello")
+        assert n.text == "Hello"
 
-    def test_create_notification_with_duration(self):
-        """Notification can be created with custom duration."""
-        notification = Notification("Test", duration=3000)
-        assert notification.get_duration() == 3000
+    def test_create_with_all_params(self):
+        """Notification can be created with all parameters."""
+        n = Notification("Msg", 3000, Notification.Position.TOP_CENTER, True)
+        assert n.text == "Msg"
+        assert n.duration == 3000
+        assert n.position == Notification.Position.TOP_CENTER
+        assert n.assertive is True
 
-    def test_notification_tag(self):
+    def test_tag(self):
         """Notification has correct tag."""
-        notification = Notification()
-        assert notification._tag == "vaadin-notification"
+        assert Notification._tag == "vaadin-notification"
+
+    def test_set_text(self, tree):
+        """Text property can be set."""
+        n = Notification()
+        n._attach(tree)
+        n.text = "Updated"
+        assert n.text == "Updated"
+
+    def test_set_duration(self, tree):
+        """Duration property can be set."""
+        n = Notification()
+        n._attach(tree)
+        n.duration = 5000
+        assert n.duration == 5000
+
+    def test_set_position(self, tree):
+        """Position property can be set."""
+        n = Notification()
+        n._attach(tree)
+        n.position = Notification.Position.TOP_END
+        assert n.position == Notification.Position.TOP_END
+
+    def test_set_assertive(self, tree):
+        """Assertive property can be set."""
+        n = Notification()
+        n._attach(tree)
+        n.assertive = True
+        assert n.assertive is True
 
     def test_open_close(self, tree):
         """open() and close() work correctly."""
-        notification = Notification("Test")
-        notification._attach(tree)
+        n = Notification("Test")
+        n._attach(tree)
 
-        notification.open()
-        assert notification.is_opened() is True
+        n.open()
+        assert n.is_opened() is True
 
-        notification.close()
-        assert notification.is_opened() is False
+        n.close()
+        assert n.is_opened() is False
 
     def test_set_opened(self, tree):
         """set_opened works correctly."""
-        notification = Notification("Test")
-        notification._attach(tree)
+        n = Notification("Test")
+        n._attach(tree)
 
-        notification.set_opened(True)
-        assert notification.is_opened() is True
+        n.set_opened(True)
+        assert n.is_opened() is True
 
-        notification.set_opened(False)
-        assert notification.is_opened() is False
+        n.set_opened(False)
+        assert n.is_opened() is False
 
-    def test_set_text(self):
-        """set_text works correctly."""
-        notification = Notification()
-        notification.set_text("New text")
-        assert notification.get_text() == "New text"
+    def test_uidl_changes_on_attach(self, tree):
+        """Attach produces correct UIDL changes."""
+        n = Notification("Hello", 5000)
+        n._opened = True
+        n._attach(tree)
 
-    def test_set_duration(self, tree):
-        """set_duration works correctly."""
-        notification = Notification("Test")
-        notification._attach(tree)
+        changes = tree.collect_changes()
 
-        notification.set_duration(10000)
-        assert notification.get_duration() == 10000
+        # Should have attach change
+        attach_changes = [c for c in changes if c.get("type") == "attach"]
+        assert len(attach_changes) >= 1
 
-    def test_set_position(self, tree):
-        """set_position works correctly."""
-        notification = Notification("Test")
-        notification._attach(tree)
+        # Should have tag
+        tag_change = next(
+            (c for c in changes if c.get("key") == "tag" and c.get("value") == "vaadin-notification"),
+            None
+        )
+        assert tag_change is not None
 
-        notification.set_position(NotificationPosition.TOP_CENTER)
-        assert notification.get_position() == NotificationPosition.TOP_CENTER
+        # Duration should be float
+        duration_change = next(
+            (c for c in changes if c.get("key") == "duration"),
+            None
+        )
+        assert duration_change is not None
+        assert duration_change["value"] == 5000.0
+        assert isinstance(duration_change["value"], float)
 
-    def test_default_position(self):
-        """Default position is BOTTOM_START."""
-        notification = Notification()
-        assert notification.get_position() == NotificationPosition.BOTTOM_START
+        # Position
+        position_change = next(
+            (c for c in changes if c.get("key") == "position"),
+            None
+        )
+        assert position_change is not None
+        assert position_change["value"] == "bottom-start"
 
-    def test_add_theme_variants(self, tree):
-        """add_theme_variants works correctly."""
-        notification = Notification("Test")
-        notification._attach(tree)
+        # Text
+        text_change = next(
+            (c for c in changes if c.get("key") == "text" and c.get("feat") == Feature.ELEMENT_PROPERTY_MAP),
+            None
+        )
+        assert text_change is not None
+        assert text_change["value"] == "Hello"
 
-        notification.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
-        assert "success" in notification._theme_variants
+        # virtualChildNodeIds
+        vcni_change = next(
+            (c for c in changes if c.get("key") == "virtualChildNodeIds"),
+            None
+        )
+        assert vcni_change is not None
+        assert vcni_change["value"] == []
 
-    def test_remove_theme_variants(self, tree):
-        """remove_theme_variants works correctly."""
-        notification = Notification("Test")
-        notification._attach(tree)
+        # Clear feat 2
+        clear_change = next(
+            (c for c in changes if c.get("type") == "clear" and c.get("feat") == Feature.ELEMENT_CHILDREN_LIST),
+            None
+        )
+        assert clear_change is not None
 
-        notification.add_theme_variants(NotificationVariant.LUMO_ERROR)
-        notification.remove_theme_variants(NotificationVariant.LUMO_ERROR)
-        assert "error" not in notification._theme_variants
+    def test_body_attachment(self, tree):
+        """Notification is spliced to body (node 1), not to the view."""
+        n = Notification("Test")
+        n._attach(tree)
 
-    def test_add_children(self, tree):
-        """Custom children can be added."""
-        notification = Notification()
-        notification._attach(tree)
+        changes = tree.collect_changes()
 
-        span = Span("Custom content")
-        notification.add(span)
+        # Find splice to node 1
+        body_splice = next(
+            (c for c in changes if c.get("node") == 1 and c.get("type") == "splice" and c.get("feat") == Feature.ELEMENT_CHILDREN_LIST),
+            None
+        )
+        assert body_splice is not None
+        assert n.element.node_id in body_splice["addNodes"]
 
-        assert len(notification._children) == 1
+    def test_event_hashes(self, tree):
+        """Event listeners use correct notification-specific hashes."""
+        n = Notification("Test")
+        n._attach(tree)
 
-    def test_open_listener(self, tree):
-        """Open listener is called when notification opens."""
-        notification = Notification("Test")
-        notification._attach(tree)
+        changes = tree.collect_changes()
+
+        # closed event should use notification hash
+        closed_change = next(
+            (c for c in changes if c.get("key") == "closed" and c.get("feat") == Feature.ELEMENT_LISTENER_MAP),
+            None
+        )
+        assert closed_change is not None
+        assert closed_change["value"] == "vIpODLLAUDo="
+
+        # opened-changed event should use notification hash (not dialog hash)
+        opened_change = next(
+            (c for c in changes if c.get("key") == "opened-changed" and c.get("feat") == Feature.ELEMENT_LISTENER_MAP),
+            None
+        )
+        assert opened_change is not None
+        assert opened_change["value"] == "uqvzCy8jAQc="
+
+    def test_opened_changed_listener(self, tree):
+        """Opened-changed listener is called correctly."""
+        n = Notification("Test")
+        n._attach(tree)
 
         events_received = []
 
         def on_open(event):
             events_received.append(("open", event))
 
-        notification.add_open_listener(on_open)
+        def on_close(event):
+            events_received.append(("close", event))
 
-        # Simulate opened-changed event
-        notification._handle_opened_changed({"opened": True})
+        n.add_open_listener(on_open)
+        n.add_close_listener(on_close)
 
+        # Simulate opened-changed event (opening)
+        n._handle_opened_changed({"opened": True})
         assert len(events_received) == 1
+        assert events_received[0][0] == "open"
 
-    def test_close_listener(self, tree):
-        """Close listener is called when notification closes."""
-        notification = Notification("Test")
-        notification._attach(tree)
-        notification._opened = True  # Start opened
+        # Simulate opened-changed event (closing)
+        n._handle_opened_changed({"opened": False})
+        assert len(events_received) == 2
+        assert events_received[1][0] == "close"
+
+    def test_closed_listener(self, tree):
+        """Closed event listener is called correctly."""
+        n = Notification("Test")
+        n._attach(tree)
+        n._opened = True
 
         events_received = []
 
         def on_close(event):
-            events_received.append(("close", event))
+            events_received.append(event)
 
-        notification.add_close_listener(on_close)
+        n.add_close_listener(on_close)
 
-        # Simulate opened-changed event
-        notification._handle_opened_changed({"opened": False})
-
+        n._handle_closed({"some": "data"})
         assert len(events_received) == 1
+        assert n.is_opened() is False
 
     def test_sync_property(self, tree):
         """_sync_property updates internal state."""
-        notification = Notification("Test")
-        notification._attach(tree)
+        n = Notification("Test")
+        n._attach(tree)
 
-        notification._sync_property("opened", True)
-        assert notification.is_opened() is True
+        n._sync_property("opened", True)
+        assert n.is_opened() is True
 
-    def test_attach_creates_card_node(self, tree):
-        """Attach creates card node for content."""
-        notification = Notification("Test")
-        notification._attach(tree)
+        n._sync_property("opened", False)
+        assert n.is_opened() is False
 
-        assert hasattr(notification, "_card_node")
-        assert notification._card_node is not None
+    def test_theme_variants_add(self, tree):
+        """Theme variants can be added."""
+        n = Notification("Test")
+        n._attach(tree)
 
-    def test_show_static_method(self):
-        """Notification.show creates and opens notification."""
-        notification = Notification.show("Hello", 3000, NotificationPosition.TOP_END)
+        n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
 
-        assert notification.get_text() == "Hello"
-        assert notification.get_duration() == 3000
-        assert notification.get_position() == NotificationPosition.TOP_END
-        assert notification.is_opened() is True  # _opened is True but not actually opened until attached
+        changes = tree.collect_changes()
+        theme_change = next(
+            (c for c in changes if c.get("key") == "theme" and c.get("feat") == Feature.ELEMENT_ATTRIBUTE_MAP),
+            None
+        )
+        assert theme_change is not None
+        assert "success" in theme_change["value"]
 
+    def test_theme_variants_remove(self, tree):
+        """Theme variants can be removed."""
+        n = Notification("Test")
+        n._attach(tree)
 
-class TestNotificationPosition:
-    """Test NotificationPosition enum."""
+        n.add_theme_variants(NotificationVariant.LUMO_SUCCESS, NotificationVariant.LUMO_ERROR)
+        tree.collect_changes()  # clear
 
-    def test_all_positions_have_values(self):
-        """All positions have correct string values."""
-        assert NotificationPosition.TOP_STRETCH.value == "top-stretch"
-        assert NotificationPosition.TOP_START.value == "top-start"
-        assert NotificationPosition.TOP_CENTER.value == "top-center"
-        assert NotificationPosition.TOP_END.value == "top-end"
-        assert NotificationPosition.MIDDLE.value == "middle"
-        assert NotificationPosition.BOTTOM_START.value == "bottom-start"
-        assert NotificationPosition.BOTTOM_CENTER.value == "bottom-center"
-        assert NotificationPosition.BOTTOM_END.value == "bottom-end"
-        assert NotificationPosition.BOTTOM_STRETCH.value == "bottom-stretch"
+        n.remove_theme_variants(NotificationVariant.LUMO_SUCCESS)
+        changes = tree.collect_changes()
 
+        theme_change = next(
+            (c for c in changes if c.get("key") == "theme" and c.get("feat") == Feature.ELEMENT_ATTRIBUTE_MAP),
+            None
+        )
+        assert theme_change is not None
+        assert "error" in theme_change["value"]
+        assert "success" not in theme_change["value"]
 
-class TestNotificationVariant:
-    """Test NotificationVariant enum."""
+    def test_theme_variants_remove_all(self, tree):
+        """Removing all theme variants removes the attribute."""
+        n = Notification("Test")
+        n._attach(tree)
 
-    def test_all_variants_have_values(self):
-        """All variants have correct string values."""
+        n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
+        tree.collect_changes()  # clear
+
+        n.remove_theme_variants(NotificationVariant.LUMO_SUCCESS)
+        changes = tree.collect_changes()
+
+        # Should have a remove for the theme attribute
+        remove_change = next(
+            (c for c in changes if c.get("key") == "theme" and c.get("type") == "remove"),
+            None
+        )
+        assert remove_change is not None
+
+    def test_theme_variants_before_attach(self, tree):
+        """Theme variants set before attach are applied."""
+        n = Notification("Test")
+        n.add_theme_variants(NotificationVariant.LUMO_ERROR)
+        n._attach(tree)
+
+        changes = tree.collect_changes()
+        theme_change = next(
+            (c for c in changes if c.get("key") == "theme" and c.get("feat") == Feature.ELEMENT_ATTRIBUTE_MAP),
+            None
+        )
+        assert theme_change is not None
+        assert "error" in theme_change["value"]
+
+    def test_static_show(self, tree):
+        """Notification.show() creates and opens a notification."""
+        _set_current_tree(tree)
+        try:
+            n = Notification.show("Hello World")
+            assert n.is_opened() is True
+            assert n.text == "Hello World"
+            assert n.duration == 5000
+            assert n.position == Notification.Position.BOTTOM_START
+        finally:
+            _set_current_tree(None)
+
+    def test_static_show_with_params(self, tree):
+        """Notification.show() accepts all parameters."""
+        _set_current_tree(tree)
+        try:
+            n = Notification.show("Msg", 3000, Notification.Position.TOP_CENTER, True)
+            assert n.is_opened() is True
+            assert n.text == "Msg"
+            assert n.duration == 3000
+            assert n.position == Notification.Position.TOP_CENTER
+            assert n.assertive is True
+        finally:
+            _set_current_tree(None)
+
+    def test_static_show_attaches_to_body(self, tree):
+        """Notification.show() attaches to body node."""
+        _set_current_tree(tree)
+        try:
+            n = Notification.show("Test")
+            changes = tree.collect_changes()
+
+            # Should be spliced to node 1 (body)
+            body_splice = next(
+                (c for c in changes if c.get("node") == 1 and c.get("type") == "splice"),
+                None
+            )
+            assert body_splice is not None
+        finally:
+            _set_current_tree(None)
+
+    def test_add_components(self, tree):
+        """Components can be added as notification content."""
+        n = Notification()
+        n._attach(tree)
+        tree.collect_changes()  # clear
+
+        span = Span("Custom content")
+        n.add(span)
+
+        assert len(n._children) == 1
+
+    def test_position_enum_values(self):
+        """All Position enum values are correct."""
+        assert Notification.Position.TOP_STRETCH.value == "top-stretch"
+        assert Notification.Position.TOP_START.value == "top-start"
+        assert Notification.Position.TOP_CENTER.value == "top-center"
+        assert Notification.Position.TOP_END.value == "top-end"
+        assert Notification.Position.MIDDLE.value == "middle"
+        assert Notification.Position.BOTTOM_START.value == "bottom-start"
+        assert Notification.Position.BOTTOM_CENTER.value == "bottom-center"
+        assert Notification.Position.BOTTOM_END.value == "bottom-end"
+        assert Notification.Position.BOTTOM_STRETCH.value == "bottom-stretch"
+
+    def test_variant_enum_values(self):
+        """All NotificationVariant enum values are correct."""
         assert NotificationVariant.LUMO_PRIMARY.value == "primary"
         assert NotificationVariant.LUMO_CONTRAST.value == "contrast"
         assert NotificationVariant.LUMO_SUCCESS.value == "success"
         assert NotificationVariant.LUMO_ERROR.value == "error"
         assert NotificationVariant.LUMO_WARNING.value == "warning"
+
+    def test_open_auto_attaches(self, tree):
+        """open() auto-attaches when tree context is available."""
+        _set_current_tree(tree)
+        try:
+            n = Notification("Auto")
+            n.open()
+            assert n.is_opened() is True
+            assert n._element is not None
+        finally:
+            _set_current_tree(None)
+
+    def test_current_tree_context(self):
+        """Tree context management works correctly."""
+        assert _get_current_tree() is None
+
+        tree = StateTree()
+        _set_current_tree(tree)
+        assert _get_current_tree() is tree
+
+        _set_current_tree(None)
+        assert _get_current_tree() is None

@@ -1,5 +1,6 @@
 """Notification component."""
 
+import threading
 from enum import Enum
 from typing import Callable, TYPE_CHECKING
 
@@ -10,21 +11,24 @@ if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
 
 
-class NotificationPosition(Enum):
-    """Notification display positions."""
-    TOP_STRETCH = "top-stretch"
-    TOP_START = "top-start"
-    TOP_CENTER = "top-center"
-    TOP_END = "top-end"
-    MIDDLE = "middle"
-    BOTTOM_START = "bottom-start"
-    BOTTOM_CENTER = "bottom-center"
-    BOTTOM_END = "bottom-end"
-    BOTTOM_STRETCH = "bottom-stretch"
+# Thread-local storage for the current tree context.
+# Used by Notification.show() to auto-attach without an explicit tree reference.
+_current_tree_local = threading.local()
+
+
+def _set_current_tree(tree: "StateTree | None"):
+    """Set the current tree context (called by UidlHandler during RPC processing)."""
+    _current_tree_local.tree = tree
+
+
+def _get_current_tree() -> "StateTree | None":
+    """Get the current tree context."""
+    return getattr(_current_tree_local, "tree", None)
 
 
 class NotificationVariant(Enum):
-    """Notification theme variants."""
+    """Theme variants for Notification."""
+
     LUMO_PRIMARY = "primary"
     LUMO_CONTRAST = "contrast"
     LUMO_SUCCESS = "success"
@@ -35,73 +39,163 @@ class NotificationVariant(Enum):
 class Notification(Component):
     """A notification overlay component.
 
-    Notification is used to provide feedback to the user about activities,
-    processes, or events in the application.
+    Notification is used to show brief messages to the user.
+    It appears as a small popup and can auto-close after a duration.
+
+    The notification is attached to the body (node 1) of the StateTree,
+    not to the current view.
     """
 
     _tag = "vaadin-notification"
 
-    def __init__(self, text: str = "", duration: int = 5000):
-        """Create a notification.
+    class Position(Enum):
+        """Notification position on the screen."""
 
-        Args:
-            text: The text content of the notification.
-            duration: Duration in milliseconds. 0 means no auto-close.
-        """
+        TOP_STRETCH = "top-stretch"
+        TOP_START = "top-start"
+        TOP_CENTER = "top-center"
+        TOP_END = "top-end"
+        MIDDLE = "middle"
+        BOTTOM_START = "bottom-start"
+        BOTTOM_CENTER = "bottom-center"
+        BOTTOM_END = "bottom-end"
+        BOTTOM_STRETCH = "bottom-stretch"
+
+    # Notification-specific event hashes (different from Dialog)
+    _CLOSED_HASH = "vIpODLLAUDo="
+    _OPENED_CHANGED_HASH = "uqvzCy8jAQc="
+
+    def __init__(self, text: str = "", duration: int = 0,
+                 position: "Notification.Position" = None,
+                 assertive: bool = False):
         super().__init__()
         self._text = text
         self._duration = duration
-        self._position = NotificationPosition.BOTTOM_START
+        self._position = position or Notification.Position.BOTTOM_START
+        self._assertive = assertive
         self._opened = False
-        self._theme_variants: set[str] = set()
         self._children: list[Component] = []
         self._open_listeners: list[Callable] = []
         self._close_listeners: list[Callable] = []
+        self._theme_variants: set[str] = set()
 
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
-        # Set initial properties
-        self.element.set_property("duration", self._duration)
-        self.element.set_property("position", self._position.value)
 
-        # Create card node for notification content
-        self._card_node = tree.create_node()
-        self._card_node.attach()
-        self._card_node.put(Feature.ELEMENT_DATA, "tag", "vaadin-notification-card")
-
-        # Apply theme variants to card
-        if self._theme_variants:
-            self._card_node.put(Feature.ELEMENT_ATTRIBUTE_MAP, "theme",
-                               " ".join(self._theme_variants))
-
-        # Link card to notification
-        self.element.node.put(Feature.VIRTUAL_CHILDREN_LIST, "0", self._card_node.id)
+        # Clear children list (matches UIDL captured: clear feat 2)
         tree.add_change({
             "node": self.element.node_id,
-            "type": "splice",
-            "feat": Feature.VIRTUAL_CHILDREN_LIST,
-            "index": 0,
-            "addNodes": [self._card_node.id]
+            "type": "clear",
+            "feat": Feature.ELEMENT_CHILDREN_LIST,
         })
 
-        # If there's text, create a text node in the card
-        if self._text and not self._children:
-            text_node = tree.create_node()
-            text_node.attach()
-            text_node.put(Feature.TEXT_NODE, "text", self._text)
-            self._card_node.add_child(text_node)
+        # Set initial properties (order matches captured UIDL)
+        self.element.set_property("duration", float(self._duration))
+        self.element.set_property("assertive", self._assertive)
+        self.element.set_property("opened", self._opened)
+        if self._text:
+            self.element.set_property("text", self._text)
+        self.element.set_property("position", self._position.value)
 
-        # Attach custom children to card
+        # Attach children if any
         for child in self._children:
             child._attach(tree)
-            self._card_node.add_child(child.element.node)
+            self.element.node.add_child(child.element.node)
 
-        # Register opened-changed listener
-        self.element.add_event_listener("opened-changed", self._handle_opened_changed)
+        # virtualChildNodeIds — empty for text-only, child IDs for component mode
+        self._update_virtual_child_node_ids()
+
+        # Register event listeners with explicit hashes
+        self.element.add_event_listener(
+            "closed", self._handle_closed, self._CLOSED_HASH
+        )
+        self.element.add_event_listener(
+            "opened-changed", self._handle_opened_changed, self._OPENED_CHANGED_HASH
+        )
+
+        # Set theme attribute if variants were added before attach
+        if self._theme_variants:
+            self.element.set_attribute("theme", " ".join(sorted(self._theme_variants)))
+
+        # Attach to body (node 1), not to the current view
+        body_node = tree.get_node(1)
+        if body_node:
+            body_node.add_child(self.element.node)
+
+    def _update_virtual_child_node_ids(self):
+        """Update the virtualChildNodeIds property with child node IDs."""
+        if not self._element:
+            return
+        child_ids = [child.element.node_id for child in self._children if child._element]
+        self.element.set_property("virtualChildNodeIds", child_ids)
+
+    # --- Text ---
+
+    @property
+    def text(self) -> str:
+        """Get the notification text."""
+        return self._text
+
+    @text.setter
+    def text(self, value: str):
+        """Set the notification text."""
+        self._text = value
+        if self._element:
+            self.element.set_property("text", value)
+
+    # --- Duration ---
+
+    @property
+    def duration(self) -> int:
+        """Get the duration in milliseconds. 0 means no auto-close."""
+        return self._duration
+
+    @duration.setter
+    def duration(self, value: int):
+        """Set the duration in milliseconds."""
+        self._duration = value
+        if self._element:
+            self.element.set_property("duration", float(value))
+
+    # --- Position ---
+
+    @property
+    def position(self) -> "Notification.Position":
+        """Get the notification position."""
+        return self._position
+
+    @position.setter
+    def position(self, value: "Notification.Position"):
+        """Set the notification position."""
+        self._position = value
+        if self._element:
+            self.element.set_property("position", value.value)
+
+    # --- Assertive ---
+
+    @property
+    def assertive(self) -> bool:
+        """Get whether the notification uses assertive aria-live."""
+        return self._assertive
+
+    @assertive.setter
+    def assertive(self, value: bool):
+        """Set whether the notification uses assertive aria-live."""
+        self._assertive = value
+        if self._element:
+            self.element.set_property("assertive", value)
+
+    # --- Open / Close ---
 
     def open(self):
         """Open the notification."""
         self._opened = True
+        if not self._element:
+            # Auto-attach using current tree context
+            tree = _get_current_tree()
+            if tree:
+                self._attach(tree)
+                return
         if self._element:
             self.element.set_property("opened", True)
 
@@ -122,69 +216,44 @@ class Notification(Component):
         else:
             self.close()
 
-    def set_text(self, text: str):
-        """Set the notification text."""
-        self._text = text
-        if self._element and hasattr(self, "_card_node"):
-            # Update or create text node
-            # For simplicity, we recreate the text content
-            # In a full implementation, we'd track the text node
-            pass
+    # --- Content (component mode) ---
 
-    def get_text(self) -> str:
-        """Get the notification text."""
-        return self._text
+    def add(self, *components: Component):
+        """Add components to the notification content.
 
-    def set_duration(self, duration: int):
-        """Set the duration in milliseconds.
-
-        Args:
-            duration: Duration in ms. 0 means no auto-close.
+        When components are added, the text property is removed
+        and content is rendered via FlowComponentHost.
         """
-        self._duration = duration
-        if self._element:
-            self.element.set_property("duration", duration)
+        for component in components:
+            self._children.append(component)
+            if self._element:
+                component._attach(self._element._tree)
+                self.element.node.add_child(component.element.node)
+                self._update_virtual_child_node_ids()
+                # Remove text property when using component content
+                self.element.remove_property("text")
+                self._text = ""
 
-    def get_duration(self) -> int:
-        """Get the duration in milliseconds."""
-        return self._duration
-
-    def set_position(self, position: NotificationPosition):
-        """Set the notification position."""
-        self._position = position
-        if self._element:
-            self.element.set_property("position", position.value)
-
-    def get_position(self) -> NotificationPosition:
-        """Get the notification position."""
-        return self._position
+    # --- Theme Variants ---
 
     def add_theme_variants(self, *variants: NotificationVariant):
         """Add theme variants to the notification."""
         for variant in variants:
             self._theme_variants.add(variant.value)
-        if self._element and hasattr(self, "_card_node"):
-            self._card_node.put(Feature.ELEMENT_ATTRIBUTE_MAP, "theme",
-                               " ".join(self._theme_variants))
+        if self._element:
+            self.element.set_attribute("theme", " ".join(sorted(self._theme_variants)))
 
     def remove_theme_variants(self, *variants: NotificationVariant):
         """Remove theme variants from the notification."""
         for variant in variants:
             self._theme_variants.discard(variant.value)
-        if self._element and hasattr(self, "_card_node"):
+        if self._element:
             if self._theme_variants:
-                self._card_node.put(Feature.ELEMENT_ATTRIBUTE_MAP, "theme",
-                                   " ".join(self._theme_variants))
+                self.element.set_attribute("theme", " ".join(sorted(self._theme_variants)))
             else:
-                self._card_node.remove(Feature.ELEMENT_ATTRIBUTE_MAP, "theme")
+                self.element.remove_attribute("theme")
 
-    def add(self, *components: Component):
-        """Add components to the notification content."""
-        for component in components:
-            self._children.append(component)
-            if self._element and hasattr(self, "_card_node"):
-                component._attach(self._element._tree)
-                self._card_node.add_child(component.element.node)
+    # --- Listeners ---
 
     def add_open_listener(self, listener: Callable):
         """Add a listener for when the notification opens."""
@@ -207,28 +276,39 @@ class Notification(Component):
             for listener in self._close_listeners:
                 listener(event_data)
 
+    def _handle_closed(self, event_data: dict):
+        """Handle closed event from client."""
+        self._opened = False
+        for listener in self._close_listeners:
+            listener(event_data)
+
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""
         if name == "opened":
             self._opened = value
 
+    # --- Static factory ---
+
     @staticmethod
     def show(text: str, duration: int = 5000,
-             position: NotificationPosition = NotificationPosition.BOTTOM_START) -> "Notification":
-        """Show a simple text notification.
+             position: "Notification.Position" = None,
+             assertive: bool = False) -> "Notification":
+        """Show a text notification.
 
-        This is a convenience method for quickly showing notifications.
-        Note: The notification must be added to a view to work.
+        This is the most common way to show a notification.
+        The notification auto-attaches to the current tree context.
 
         Args:
-            text: The text to show.
-            duration: Duration in milliseconds.
-            position: The position of the notification.
+            text: The notification text.
+            duration: Auto-close duration in ms. 0 means no auto-close.
+            position: Position on screen. Default is BOTTOM_START.
+            assertive: Use assertive aria-live for screen readers.
 
         Returns:
             The created Notification instance.
         """
-        notification = Notification(text, duration)
-        notification.set_position(position)
-        notification.open()
-        return notification
+        if position is None:
+            position = Notification.Position.BOTTOM_START
+        n = Notification(text, duration, position, assertive)
+        n.open()
+        return n

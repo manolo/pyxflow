@@ -4,7 +4,7 @@
 
 **Vaadin version:** 25.0.4
 **Lines of code:** ~2,500
-**Tests:** 294 passing
+**Tests:** 302 passing
 **Last updated:** 2026-02-05
 
 ---
@@ -24,6 +24,8 @@
   - Keydown: `OSoHnU3SjNg=`
   - Opened-changed: `t7mULTj4JVU=`
   - Checked-changed: `azhwx/bqd+0=`
+  - Notification closed: `vIpODLLAUDo=`
+  - Notification opened-changed: `uqvzCy8jAQc=`
 - [x] **UI navigation hashes** - For client-side routing
   - ui-navigate: `msDV4SvCysE=`
   - ui-leave-navigation: `i2nDWhpwLZE=`
@@ -43,7 +45,7 @@
 - [x] VerticalLayout - Theme, add children, padding/spacing
 - [x] HorizontalLayout - Theme, add children, margin/spacing, vertical alignment
 - [x] Dialog - Header title, modal, draggable, resizable, FlowComponentHost renderer
-- [x] Notification - Position, duration, theme variants, open/close
+- [x] Notification - Position, duration, theme variants, open/close, static show(), body attachment
 - [x] PasswordField - Password input with reveal button
 - [x] EmailField - Email input with validation
 - [x] ProgressBar - Determinate/indeterminate progress

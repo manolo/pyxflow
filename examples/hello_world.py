@@ -4,7 +4,7 @@ from vaadin.flow import Route
 from vaadin.flow.components import (
     Button,
     HorizontalLayout,
-    Span,
+    Notification,
     TextField,
     VerticalLayout,
 )
@@ -17,9 +17,6 @@ class HelloWorldView(VerticalLayout):
 
     def __init__(self):
         super().__init__()
-
-        # Header to identify the view
-        self.add(Span("=== HelloWorldView ==="))
 
         self.name = TextField("Your name")
         self.say_hello = Button("Say hello")
@@ -34,5 +31,4 @@ class HelloWorldView(VerticalLayout):
 
     def _on_click(self, event):
         """Handle button click."""
-        span = Span(f"Hello {self.name.value}")
-        self.add(span)
+        Notification.show(f"Hello {self.name.value}", 0, Notification.Position.BOTTOM_CENTER)

@@ -108,14 +108,20 @@ class ComponentsDemoView(VerticalLayout):
         button = Button("Click Me!")
         button.add_click_listener(self._on_button_click)
 
-        notification_btn = Button("Show Notification")
-        notification_btn.add_click_listener(self._show_notification)
-
         dialog_btn = Button("Open Dialog")
         dialog_btn.add_click_listener(self._open_dialog)
 
+        notification_btn = Button("Show Notification")
+        notification_btn.add_click_listener(self._show_notification)
+
+        success_btn = Button("Success Notification")
+        success_btn.add_click_listener(self._show_success)
+
+        error_btn = Button("Error Notification")
+        error_btn.add_click_listener(self._show_error)
+
         button_row = HorizontalLayout()
-        button_row.add(button, notification_btn, dialog_btn)
+        button_row.add(button, dialog_btn, notification_btn, success_btn, error_btn)
         self.add(button_row)
         self.add(self.status_span)
 
@@ -138,10 +144,20 @@ class ComponentsDemoView(VerticalLayout):
         # Replace the old status span
         self.add(new_status)
 
-    def _show_notification(self, event):
-        """Show a notification."""
-        Notification.show("This is a notification!", 3000)
-
     def _open_dialog(self, event):
         """Open the dialog."""
         self.dialog.open()
+
+    def _show_notification(self, event):
+        """Show a basic notification."""
+        Notification.show("This is a notification!", 3000, Notification.Position.BOTTOM_CENTER)
+
+    def _show_success(self, event):
+        """Show a success notification."""
+        n = Notification.show("Operation successful!", 3000, Notification.Position.TOP_CENTER)
+        n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
+
+    def _show_error(self, event):
+        """Show an error notification."""
+        n = Notification.show("Something went wrong!", 5000, Notification.Position.MIDDLE)
+        n.add_theme_variants(NotificationVariant.LUMO_ERROR)

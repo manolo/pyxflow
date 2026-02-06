@@ -110,6 +110,9 @@ async def handle_uidl(request: web.Request) -> web.Response:
     # Wrap response with XSS protection prefix
     response_text = f"for(;;);[{json.dumps(response_data)}]"
     print(f"[UIDL] Response: {response_text[:500]}...", flush=True)
+    # Write full response to file for debugging
+    with open('/tmp/pyflow_uidl.json', 'w') as f:
+        f.write(json.dumps(response_data, indent=2))
     return web.Response(
         text=response_text,
         content_type="application/json"

@@ -68,12 +68,20 @@ class Element:
         """Remove an attribute."""
         self._node.remove(Feature.ELEMENT_ATTRIBUTE_MAP, name)
 
-    def add_event_listener(self, event_type: str, listener: Callable):
-        """Add an event listener."""
+    def add_event_listener(self, event_type: str, listener: Callable, hash_key: str = None):
+        """Add an event listener.
+
+        Args:
+            event_type: The DOM event type (e.g., "click", "opened-changed").
+            listener: Callback function.
+            hash_key: Optional explicit hash for the UIDL constant. If provided,
+                      it is used directly instead of True (which is resolved later
+                      by the UIDL handler based on event type).
+        """
         if event_type not in self._listeners:
             self._listeners[event_type] = []
             # Register with UIDL
-            self._node.put(Feature.ELEMENT_LISTENER_MAP, event_type, True)
+            self._node.put(Feature.ELEMENT_LISTENER_MAP, event_type, hash_key if hash_key else True)
         self._listeners[event_type].append(listener)
 
     def fire_event(self, event_type: str, event_data: dict):
@@ -92,3 +100,29 @@ class Element:
     def remove_child(self, child: "Element"):
         """Remove a child element."""
         self._node.remove_child(child._node)
+
+    def remove_property(self, name: str):
+        """Remove a property."""
+        self._node.remove(Feature.ELEMENT_PROPERTY_MAP, name)
+
+    def execute_js(self, script: str, *args):
+        """Execute JavaScript on this element.
+
+        The element is available as 'this' in the script.
+        Arguments can be referenced as $0, $1, etc.
+
+        Args:
+            script: JavaScript code to execute.
+            *args: Arguments passed to the script.
+        """
+        # Create an execute change for the UIDL
+        self._tree.add_change({
+            "node": self._node.id,
+            "type": "put",
+            "key": "execute",
+            "feat": Feature.ELEMENT_PROPERTY_MAP,
+            "value": {
+                "script": script,
+                "args": list(args)
+            }
+        })

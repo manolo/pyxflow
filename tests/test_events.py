@@ -51,8 +51,8 @@ class TestClickEvent:
             "button_node_id": button_node_id,
         }
 
-    def test_click_adds_span(self, session_with_view):
-        """Click on button should add a Span."""
+    def test_click_adds_notification(self, session_with_view):
+        """Click on button should show a Notification."""
         session = session_with_view
         assert session["button_node_id"] is not None, "Button node should exist"
 
@@ -70,12 +70,12 @@ class TestClickEvent:
         response = session["handler"].handle_uidl(payload)
         changes = response.get("changes", [])
 
-        # Should create a span
-        span = next(
-            (c for c in changes if c.get("key") == "tag" and c.get("value") == "span"),
+        # Should create a notification
+        notification = next(
+            (c for c in changes if c.get("key") == "tag" and c.get("value") == "vaadin-notification"),
             None
         )
-        assert span is not None, "Click should create a span"
+        assert notification is not None, "Click should create a notification"
 
 
 class TestValueSync:
@@ -163,13 +163,13 @@ class TestValueSync:
         response = session["handler"].handle_uidl(click_payload)
         changes = response.get("changes", [])
 
-        # Should have text "Hello World"
+        # Should have notification with text "Hello World"
         text = next(
             (c for c in changes
-             if c.get("feat") == Feature.TEXT_NODE and c.get("key") == "text" and "World" in str(c.get("value", ""))),
+             if c.get("key") == "text" and c.get("feat") == Feature.ELEMENT_PROPERTY_MAP and "World" in str(c.get("value", ""))),
             None
         )
-        assert text is not None, "Span text should contain 'World'"
+        assert text is not None, "Notification text should contain 'World'"
 
 
 class TestChangeEvent:

@@ -71,18 +71,18 @@ class TestCompleteFlow:
             "clientId": 0,
         })
 
-        # Verify Span was added
+        # Verify Notification was created
         click_changes = click_response.get("changes", [])
-        span_tag = next((c for c in click_changes if c.get("key") == "tag" and c.get("value") == "span"), None)
-        assert span_tag is not None, "Click should create a span"
+        notification_tag = next((c for c in click_changes if c.get("key") == "tag" and c.get("value") == "vaadin-notification"), None)
+        assert notification_tag is not None, "Click should create a notification"
 
-        # Verify text is "Hello World"
-        text_node = next(
-            (c for c in click_changes if c.get("feat") == Feature.TEXT_NODE and c.get("key") == "text"),
+        # Verify notification text is "Hello World"
+        text_prop = next(
+            (c for c in click_changes if c.get("key") == "text" and c.get("feat") == Feature.ELEMENT_PROPERTY_MAP),
             None
         )
-        assert text_node is not None
-        assert text_node["value"] == "Hello World"
+        assert text_prop is not None
+        assert text_prop["value"] == "Hello World"
 
 
 class TestUidlResponseFormat:

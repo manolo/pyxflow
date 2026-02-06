@@ -115,15 +115,15 @@ class TestPropertySync:
         click_response = session["handler"].handle_uidl(click_payload)
         changes = click_response.get("changes", [])
 
-        # The span text should contain the synced name
+        # The notification text should contain the synced name
         text = next(
             (c for c in changes
-             if c.get("feat") == Feature.TEXT_NODE and
-             c.get("key") == "text" and
+             if c.get("key") == "text" and
+             c.get("feat") == Feature.ELEMENT_PROPERTY_MAP and
              "SyncedName" in str(c.get("value", ""))),
             None
         )
-        assert text is not None, "Span text should contain synced value"
+        assert text is not None, "Notification text should contain synced value"
 
     def test_sync_on_nonexistent_node_ignored(self, session_with_view):
         """mSync on non-existent node should be ignored."""

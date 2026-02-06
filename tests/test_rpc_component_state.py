@@ -75,12 +75,12 @@ class TestComponentAttached:
         response = session["handler"].handle_uidl(payload)
         changes = response.get("changes", [])
 
-        # Click handler should have created a span
-        span = next(
-            (c for c in changes if c.get("key") == "tag" and c.get("value") == "span"),
+        # Click handler should have created a notification
+        notification = next(
+            (c for c in changes if c.get("key") == "tag" and c.get("value") == "vaadin-notification"),
             None
         )
-        assert span is not None
+        assert notification is not None
 
 
 class TestComponentRegistration:
@@ -198,11 +198,11 @@ class TestComponentStateUpdates:
         session = session_with_view
         assert session["button_node_id"] is not None
 
-        # Get initial child count of vertical layout
-        vl_node = session["tree"].get_node(session["vl_node_id"])
-        initial_children = len(vl_node._children)
+        # Get initial child count of body node (notifications attach to body)
+        body_node = session["tree"].get_node(1)
+        initial_children = len(body_node._children)
 
-        # Click adds a span
+        # Click shows a notification (attached to body)
         payload = {
             "csrfToken": session["csrf"],
             "rpc": [{
@@ -216,8 +216,8 @@ class TestComponentStateUpdates:
         }
         session["handler"].handle_uidl(payload)
 
-        # Should have more children now
-        assert len(vl_node._children) > initial_children
+        # Body should have more children now (notification added)
+        assert len(body_node._children) > initial_children
 
 
 class TestDynamicComponents:
@@ -280,23 +280,23 @@ class TestDynamicComponents:
         response = session["handler"].handle_uidl(payload)
         changes = response.get("changes", [])
 
-        # Should have created new span node
-        span = next(
-            (c for c in changes if c.get("key") == "tag" and c.get("value") == "span"),
+        # Should have created new notification node
+        notification = next(
+            (c for c in changes if c.get("key") == "tag" and c.get("value") == "vaadin-notification"),
             None
         )
-        assert span is not None
+        assert notification is not None
 
-        # New span should be attached
-        span_node_id = span.get("node")
+        # New notification should be attached
+        notification_node_id = notification.get("node")
         attach = next(
-            (c for c in changes if c.get("node") == span_node_id and c.get("type") == "attach"),
+            (c for c in changes if c.get("node") == notification_node_id and c.get("type") == "attach"),
             None
         )
         assert attach is not None
 
     def test_dynamic_component_added_to_parent(self, session_with_view):
-        """Dynamic component should be added to parent's children."""
+        """Dynamic component should be added to parent (body for notification)."""
         session = session_with_view
         assert session["button_node_id"] is not None
 
@@ -314,18 +314,18 @@ class TestDynamicComponents:
         response = session["handler"].handle_uidl(payload)
         changes = response.get("changes", [])
 
-        # Find the span node
-        span = next(
-            (c for c in changes if c.get("key") == "tag" and c.get("value") == "span"),
+        # Find the notification node
+        notification = next(
+            (c for c in changes if c.get("key") == "tag" and c.get("value") == "vaadin-notification"),
             None
         )
-        span_node_id = span.get("node")
+        notification_node_id = notification.get("node")
 
-        # Should have splice adding span to parent
+        # Should have splice adding notification to body (node 1)
         splice = next(
             (c for c in changes
              if c.get("type") == "splice" and
-             span_node_id in c.get("addNodes", [])),
+             notification_node_id in c.get("addNodes", [])),
             None
         )
         assert splice is not None
@@ -437,11 +437,11 @@ class TestPropertySyncUpdatesComponent:
         click_response = session["handler"].handle_uidl(click_payload)
         changes = click_response.get("changes", [])
 
-        # Span text should contain synced value
+        # Notification text should contain synced value
         text = next(
             (c for c in changes
-             if c.get("feat") == Feature.TEXT_NODE and
-             c.get("key") == "text" and
+             if c.get("key") == "text" and
+             c.get("feat") == Feature.ELEMENT_PROPERTY_MAP and
              "SyncedUser" in str(c.get("value", ""))),
             None
         )

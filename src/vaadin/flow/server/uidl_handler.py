@@ -73,6 +73,18 @@ _KEYDOWN_CONFIG = {
     "event.altKey": False
 }
 
+# Notification closed event
+# Hash captured from Java Flow: vIpODLLAUDo=
+_CLOSED_HASH = "vIpODLLAUDo="
+_CLOSED_CONFIG = {}
+
+# Notification opened-changed event (different hash from Dialog's opened-changed)
+# Hash captured from Java Flow: uqvzCy8jAQc=
+_NOTIFICATION_OPENED_CHANGED_HASH = "uqvzCy8jAQc="
+_NOTIFICATION_OPENED_CHANGED_CONFIG = {
+    "}opened": False
+}
+
 # =============================================================================
 # UI Navigation Event Configurations
 # =============================================================================
@@ -102,6 +114,20 @@ _UI_LEAVE_NAVIGATION_CONFIG = {
 _UI_REFRESH_HASH = "18ACma10cDE="
 _UI_REFRESH_CONFIG = {
     "fullRefresh": False
+}
+
+
+# Reverse lookup: hash → config for all known event hashes.
+# Used when a component registers a listener with an explicit hash_key
+# (value is a string, not True) so we can add the config to constants.
+_HASH_TO_CONFIG = {
+    _CLICK_HASH: _CLICK_CONFIG,
+    _CHANGE_HASH: _CHANGE_CONFIG,
+    _OPENED_CHANGED_HASH: _OPENED_CHANGED_CONFIG,
+    _CHECKED_CHANGED_HASH: _CHECKED_CHANGED_CONFIG,
+    _KEYDOWN_HASH: _KEYDOWN_CONFIG,
+    _CLOSED_HASH: _CLOSED_CONFIG,
+    _NOTIFICATION_OPENED_CHANGED_HASH: _NOTIFICATION_OPENED_CHANGED_CONFIG,
 }
 
 
@@ -242,12 +268,17 @@ class UidlHandler:
 
     def _process_rpc(self, rpc_list: list[dict]):
         """Process RPC calls from client."""
-        for rpc in rpc_list:
-            rpc_type = rpc.get("type")
-            if rpc_type == "event":
-                self._handle_event(rpc)
-            elif rpc_type == "mSync":
-                self._handle_msync(rpc)
+        from vaadin.flow.components.notification import _set_current_tree
+        _set_current_tree(self._tree)
+        try:
+            for rpc in rpc_list:
+                rpc_type = rpc.get("type")
+                if rpc_type == "event":
+                    self._handle_event(rpc)
+                elif rpc_type == "mSync":
+                    self._handle_msync(rpc)
+        finally:
+            _set_current_tree(None)
 
     def _handle_event(self, rpc: dict):
         """Handle event RPC."""
@@ -261,6 +292,11 @@ class UidlHandler:
             self._handle_click(node_id, event_data)
         elif event_type == "change":
             self._handle_change(node_id, event_data)
+        else:
+            # Generic dispatch for events like opened-changed, closed, etc.
+            element = self._tree.get_element(node_id)
+            if element:
+                element.fire_event(event_type, event_data)
 
     def _handle_navigation(self, event_data: dict):
         """Handle navigation event - create the view."""
@@ -297,12 +333,18 @@ class UidlHandler:
         # Get page title
         page_title = get_page_title(route) or "PyFlow"
 
-        # Create the view
-        from vaadin.flow.core.component import UI
-        ui = UI(self._tree)
-        self._view = view_class()
-        self._view._ui = ui
-        self._view._attach(self._tree)
+        # Set tree context so Notification.show() works during view construction
+        from vaadin.flow.components.notification import _set_current_tree
+        _set_current_tree(self._tree)
+        try:
+            # Create the view
+            from vaadin.flow.core.component import UI
+            ui = UI(self._tree)
+            self._view = view_class()
+            self._view._ui = ui
+            self._view._attach(self._tree)
+        finally:
+            _set_current_tree(None)
 
         # Add view to container
         self._container_node.add_child(self._view.element.node)
@@ -367,6 +409,56 @@ class UidlHandler:
                 dialog_nodes.append(node_id)
         return dialog_nodes
 
+    def _add_execute_for_new_overlays(self, changes: list[dict]):
+        """Add execute commands for newly attached dialog nodes.
+
+        This scans the changes for 'attach' operations and adds FlowComponentHost
+        execute commands for any newly attached overlay components.
+        """
+        # Find newly attached node IDs
+        newly_attached = set()
+        for change in changes:
+            if change.get("type") == "attach":
+                newly_attached.add(change.get("node"))
+
+        # Check each newly attached node to see if it's a dialog
+        for node_id in newly_attached:
+            node = self._tree.get_node(node_id)
+            if not node:
+                continue
+            tag = node.get(Feature.ELEMENT_DATA, "tag")
+
+            if tag == "vaadin-dialog":
+                # Patch the virtual container
+                self._pending_execute.append(
+                    [{"@v-node": node_id}, "return (async function() { Vaadin.FlowComponentHost.patchVirtualContainer(this) }).apply($0)"]
+                )
+                # Set up the renderer
+                self._pending_execute.append(
+                    [self._app_id, {"@v-node": node_id}, "return (async function() { this.renderer = (root) => Vaadin.FlowComponentHost.setChildNodes($0, this.virtualChildNodeIds, root) }).apply($1)"]
+                )
+                # Request content update
+                self._pending_execute.append(
+                    [{"@v-node": node_id}, "return (async function() { this.requestContentUpdate() }).apply($0)"]
+                )
+            elif tag == "vaadin-notification":
+                # 1. Request content update BEFORE patching
+                self._pending_execute.append(
+                    [{"@v-node": node_id}, "return $0.requestContentUpdate()"]
+                )
+                # 2. Patch virtual container for FlowComponentHost
+                self._pending_execute.append(
+                    [{"@v-node": node_id}, "return (async function() { Vaadin.FlowComponentHost.patchVirtualContainer(this)}).apply($0)"]
+                )
+                # 3. Set renderer - uses text property or FlowComponentHost for children
+                self._pending_execute.append(
+                    [self._app_id, {"@v-node": node_id}, "return (async function() { this.renderer = (root) => {  if (this.text) {    root.textContent = this.text;  } else {    Vaadin.FlowComponentHost.setChildNodes($0, this.virtualChildNodeIds, root)  }}}).apply($1)"]
+                )
+                # 4. Request content update AFTER setting renderer
+                self._pending_execute.append(
+                    [{"@v-node": node_id}, "return $0.requestContentUpdate()"]
+                )
+
     def _handle_click(self, node_id: int, event_data: dict):
         """Handle click event."""
         element = self._tree.get_element(node_id)
@@ -403,6 +495,10 @@ class UidlHandler:
         # clientId reflects the last client message we processed
         self._client_id = self._last_client_id + 1
 
+        # Check for newly attached notification or dialog nodes
+        # and add execute commands for FlowComponentHost
+        self._add_execute_for_new_overlays(changes)
+
         # Build constants dict with Base64 hashes
         # Only include constants that are actually used in changes
         constants = {}
@@ -424,19 +520,18 @@ class UidlHandler:
 
         # Add used constants and replace values with hash references
         for change in changes:
-            if change.get("feat") == Feature.ELEMENT_LISTENER_MAP and change.get("value") is True:
-                event_type = change.get("key")
-                if event_type in event_configs:
-                    hash_key, config = event_configs[event_type]
-                    constants[hash_key] = config
-                    change["value"] = hash_key
-
-        # Also check for keydown hash already in changes (added by _handle_navigation)
-        for change in changes:
             if change.get("feat") == Feature.ELEMENT_LISTENER_MAP:
                 value = change.get("value")
-                if value == _KEYDOWN_HASH:
-                    constants[_KEYDOWN_HASH] = _KEYDOWN_CONFIG
+                if value is True:
+                    # Resolve event type → hash via event_configs lookup
+                    event_type = change.get("key")
+                    if event_type in event_configs:
+                        hash_key, config = event_configs[event_type]
+                        constants[hash_key] = config
+                        change["value"] = hash_key
+                elif isinstance(value, str) and value in _HASH_TO_CONFIG:
+                    # Explicit hash from component — add its config to constants
+                    constants[value] = _HASH_TO_CONFIG[value]
 
         response = {
             "syncId": self._sync_id,

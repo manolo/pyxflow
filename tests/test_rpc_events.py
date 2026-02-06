@@ -78,12 +78,12 @@ class TestClickEvent:
         response = session["handler"].handle_uidl(payload)
         changes = response.get("changes", [])
 
-        # Should create a span (HelloWorldView creates span on click)
-        span = next(
-            (c for c in changes if c.get("key") == "tag" and c.get("value") == "span"),
+        # Should create a notification (HelloWorldView shows notification on click)
+        notification = next(
+            (c for c in changes if c.get("key") == "tag" and c.get("value") == "vaadin-notification"),
             None
         )
-        assert span is not None, "Click should create a span"
+        assert notification is not None, "Click should create a notification"
 
     def test_click_event_with_empty_data(self, session_with_view):
         """Click event with empty data should work."""
@@ -129,7 +129,7 @@ class TestClickEvent:
         session = session_with_view
         assert session["button_node_id"] is not None
 
-        span_count = 0
+        notification_count = 0
         current_sync_id = session["sync_id"]
         current_client_id = session["client_id"]
 
@@ -149,13 +149,13 @@ class TestClickEvent:
             changes = response.get("changes", [])
             current_sync_id = response["syncId"]
 
-            # Count spans created
+            # Count notifications created
             for c in changes:
-                if c.get("key") == "tag" and c.get("value") == "span":
-                    span_count += 1
+                if c.get("key") == "tag" and c.get("value") == "vaadin-notification":
+                    notification_count += 1
 
-        # Should have created 3 spans
-        assert span_count == 3
+        # Should have created 3 notifications
+        assert notification_count == 3
 
 
 class TestChangeEvent:
@@ -489,13 +489,13 @@ class TestEventDataPassing:
 
         # Should process event correctly
         assert "syncId" in response
-        # Should have created span (click handler ran)
+        # Should have created notification (click handler ran)
         changes = response.get("changes", [])
-        span = next(
-            (c for c in changes if c.get("key") == "tag" and c.get("value") == "span"),
+        notification = next(
+            (c for c in changes if c.get("key") == "tag" and c.get("value") == "vaadin-notification"),
             None
         )
-        assert span is not None
+        assert notification is not None
 
 
 class TestMultipleRpcInSingleRequest:
@@ -579,18 +579,18 @@ class TestMultipleRpcInSingleRequest:
         response = session["handler"].handle_uidl(payload)
         changes = response.get("changes", [])
 
-        # Should have created span with the synced value
-        span = next(
-            (c for c in changes if c.get("key") == "tag" and c.get("value") == "span"),
+        # Should have created notification with the synced value
+        notification = next(
+            (c for c in changes if c.get("key") == "tag" and c.get("value") == "vaadin-notification"),
             None
         )
-        assert span is not None
+        assert notification is not None
 
-        # The text should contain "TestUser"
+        # The notification text should contain "TestUser"
         text = next(
             (c for c in changes
-             if c.get("feat") == Feature.TEXT_NODE and
-             c.get("key") == "text" and
+             if c.get("key") == "text" and
+             c.get("feat") == Feature.ELEMENT_PROPERTY_MAP and
              "TestUser" in str(c.get("value", ""))),
             None
         )
