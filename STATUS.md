@@ -36,6 +36,7 @@
 - [x] **publishedEventHandler** - Client-callable methods via Feature 19 (`CLIENT_DELEGATE_HANDLERS`)
 - [x] **Server-client state sync** - `_pending_server_change` flag absorbs echoes from server-initiated property changes
 - [x] **Grid connector protocol** - `gridConnector.initLazy`, `$connector.set/updateSize/confirm`, `setHeaderRenderer`
+- [x] **Select connector protocol** - `selectConnector.initLazy`, `requestContentUpdate`
 
 ### Components
 - [x] Button - Text, click listener
@@ -52,7 +53,7 @@
 - [x] PasswordField - Password input with reveal button
 - [x] EmailField - Email input with validation
 - [x] ProgressBar - Determinate/indeterminate progress
-- [x] Select - Dropdown single selection
+- [x] Select - Dropdown single selection, `selectConnector.initLazy` overlay renderer
 - [x] RadioButtonGroup - Radio button selection
 - [x] CheckboxGroup - Multiple checkbox selection
 - [x] Grid - Columns (path, header, width, flexGrow, autoWidth), in-memory data push, single selection with listener
@@ -172,7 +173,7 @@
 cd /Users/manolo/Github/platform/python/vaadin-pyflow
 source .venv/bin/activate
 python run.py
-# Open http://localhost:8080
+# Open http://localhost:8088
 ```
 
 ## Running Tests
