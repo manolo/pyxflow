@@ -37,6 +37,13 @@ class Select(Component, Generic[T]):
         # Create the list-box for items
         self._create_list_box(tree)
 
+        # Initialize the selectConnector (moves list-box into overlay)
+        el_ref = {"@v-node": self.element.node.id}
+        tree.queue_execute([
+            el_ref,
+            "return window.Vaadin.Flow.selectConnector.initLazy($0)"
+        ])
+
         # Register value change listener
         self.element.add_event_listener("value-changed", self._handle_value_changed)
 
@@ -45,16 +52,16 @@ class Select(Component, Generic[T]):
         if not self._items:
             return
 
-        # Create vaadin-list-box element
+        # Create vaadin-select-list-box element
         list_box_node = tree.create_node()
         list_box_node.attach()
-        list_box_node.put(Feature.ELEMENT_DATA, "tag", "vaadin-list-box")
+        list_box_node.put(Feature.ELEMENT_DATA, "tag", "vaadin-select-list-box")
 
         # Add items to the list box
         for i, item in enumerate(self._items):
             item_node = tree.create_node()
             item_node.attach()
-            item_node.put(Feature.ELEMENT_DATA, "tag", "vaadin-item")
+            item_node.put(Feature.ELEMENT_DATA, "tag", "vaadin-select-item")
 
             # Create text node for the item label
             text_node = tree.create_node()
@@ -90,8 +97,15 @@ class Select(Component, Generic[T]):
         """Set the items for the select."""
         self._items = list(items)
         if self._element and self._element._tree:
+            tree = self._element._tree
             # Re-create list box with new items
-            self._create_list_box(self._element._tree)
+            self._create_list_box(tree)
+            # Tell the client to re-render the overlay content
+            el_ref = {"@v-node": self.element.node.id}
+            tree.queue_execute([
+                el_ref,
+                "return $0.requestContentUpdate()"
+            ])
 
     def get_items(self) -> list[T]:
         """Get the items."""
