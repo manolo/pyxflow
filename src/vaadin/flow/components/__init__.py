@@ -7,6 +7,7 @@ from vaadin.flow.components.dialog import Dialog
 from vaadin.flow.components.email_field import EmailField
 from vaadin.flow.components.form_layout import FormLayout, FormItem, FormRow, ResponsiveStep
 from vaadin.flow.components.grid import Grid
+from vaadin.flow.components.html import H1, H2, H3, H4, Paragraph
 from vaadin.flow.components.notification import Notification, NotificationVariant
 from vaadin.flow.components.number_field import NumberField, IntegerField
 from vaadin.flow.components.password_field import PasswordField
@@ -30,10 +31,15 @@ __all__ = [
     "FormRow",
     "ResponsiveStep",
     "Grid",
+    "H1",
+    "H2",
+    "H3",
+    "H4",
     "Notification",
     "NotificationVariant",
     "IntegerField",
     "NumberField",
+    "Paragraph",
     "PasswordField",
     "ProgressBar",
     "RadioButtonGroup",
