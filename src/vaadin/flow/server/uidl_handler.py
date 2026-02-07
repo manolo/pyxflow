@@ -85,6 +85,12 @@ _NOTIFICATION_OPENED_CHANGED_CONFIG = {
     "}opened": False
 }
 
+# Selected-changed event configuration (for Tabs)
+_SELECTED_CHANGED_HASH = "RiYMkfOpMJU="  # Placeholder - sync selected property
+_SELECTED_CHANGED_CONFIG = {
+    "}selected": False
+}
+
 # =============================================================================
 # UI Navigation Event Configurations
 # =============================================================================
@@ -128,6 +134,7 @@ _HASH_TO_CONFIG = {
     _KEYDOWN_HASH: _KEYDOWN_CONFIG,
     _CLOSED_HASH: _CLOSED_CONFIG,
     _NOTIFICATION_OPENED_CHANGED_HASH: _NOTIFICATION_OPENED_CHANGED_CONFIG,
+    _SELECTED_CHANGED_HASH: _SELECTED_CHANGED_CONFIG,
 }
 
 
@@ -581,6 +588,7 @@ class UidlHandler:
             "opened-changed": (_OPENED_CHANGED_HASH, _OPENED_CHANGED_CONFIG),
             "checked-changed": (_CHECKED_CHANGED_HASH, _CHECKED_CHANGED_CONFIG),
             "keydown": (_KEYDOWN_HASH, _KEYDOWN_CONFIG),
+            "selected-changed": (_SELECTED_CHANGED_HASH, _SELECTED_CHANGED_CONFIG),
         }
 
         # Add used constants and replace values with hash references.
