@@ -21,6 +21,7 @@ from vaadin.flow.components import (
     HorizontalLayout,
     IntegerField,
     LitRenderer,
+    MenuBar,
     Notification,
     NotificationVariant,
     NumberField,
@@ -29,6 +30,9 @@ from vaadin.flow.components import (
     RadioButtonGroup,
     Select,
     Span,
+    Tab,
+    Tabs,
+    TabSheet,
     TextArea,
     TextField,
     TimePicker,
@@ -147,6 +151,42 @@ class ComponentsDemoView(VerticalLayout):
         progress_indeterminate.set_indeterminate(True)
         self.add(Span("ProgressBar (indeterminate):"))
         self.add(progress_indeterminate)
+
+        # --- Tabs ---
+        self.add_section("Tabs")
+
+        tab1 = Tab("Tab 1")
+        tab2 = Tab("Tab 2")
+        tab3 = Tab("Tab 3")
+        tabs = Tabs(tab1, tab2, tab3)
+        self.tabs_label = Span("Selected tab: Tab 1")
+        tabs.add_selected_change_listener(self.on_tab_selected)
+        self.tabs = tabs
+        self.tab_list = [tab1, tab2, tab3]
+        self.add(tabs)
+        self.add(self.tabs_label)
+
+        # --- TabSheet ---
+        self.add_section("TabSheet")
+
+        tab_sheet = TabSheet()
+        tab_sheet.add("Dashboard", Span("Dashboard content"))
+        tab_sheet.add("Settings", Span("Settings content"))
+        self.add(tab_sheet)
+
+        # --- MenuBar ---
+        self.add_section("MenuBar")
+
+        menu_bar = MenuBar()
+        file_item = menu_bar.add_item("File")
+        file_item.get_sub_menu().add_item("New", self.on_menu_click)
+        file_item.get_sub_menu().add_item("Open", self.on_menu_click)
+        edit_item = menu_bar.add_item("Edit")
+        edit_item.get_sub_menu().add_item("Undo", self.on_menu_click)
+        menu_bar.add_item("Help", self.on_menu_click)
+        self.menu_label = Span("Menu action: (none)")
+        self.add(menu_bar)
+        self.add(self.menu_label)
 
         # --- Grid ---
         self.add_section("Grid")
@@ -293,3 +333,13 @@ class ComponentsDemoView(VerticalLayout):
     def on_comp_view(self, item):
         """Handle ComponentRenderer view button click."""
         self.comp_renderer_label.set_text(f"ComponentRenderer action: View {item['name']}")
+
+    def on_tab_selected(self, event_data):
+        """Handle tab selection."""
+        idx = event_data.get("selectedIndex", 0)
+        if 0 <= idx < len(self.tab_list):
+            self.tabs_label.set_text(f"Selected tab: {self.tab_list[idx].get_label()}")
+
+    def on_menu_click(self, event_data):
+        """Handle menu item click."""
+        self.menu_label.set_text("Menu action: clicked")

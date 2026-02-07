@@ -4,7 +4,7 @@
 
 **Vaadin version:** 25.0.4
 **Lines of code:** ~3,400
-**Tests:** 503 passing
+**Tests:** 566 passing
 **Last updated:** 2026-02-07
 
 ---
@@ -40,6 +40,7 @@
 - [x] **ComboBox connector protocol** - `comboBoxConnector.initLazy`, `$connector.set/updateSize/confirm`, filtering
 - [x] **DatePicker connector protocol** - `datepickerConnector.initLazy`
 - [x] **TimePicker connector protocol** - `timepickerConnector.initLazy`
+- [x] **MenuBar connector protocol** - `menubarConnector.initLazy`, `contextMenuConnector.generateItemsTree`
 
 ### Components
 - [x] Button - Text, click listener
@@ -64,6 +65,10 @@
 - [x] ComboBox - Filtered dropdown, data push protocol, item label generator, custom value support
 - [x] DatePicker - Date selection with calendar overlay, min/max, connector init
 - [x] TimePicker - Time selection with dropdown, step, min/max, connector init
+- [x] Tabs - Tab container with selected index, orientation, selection change events
+- [x] Tab - Individual tab with label text
+- [x] TabSheet - Tabs + content panels with slot-based association
+- [x] MenuBar - Hierarchical menus with connector protocol, submenu support, click listeners
 
 ### Component Base Features
 - [x] `setVisible()` / `isVisible()` - Show/hide components
@@ -118,8 +123,8 @@
 - [x] Column reordering / resizing
 
 ### Components (Priority: Medium)
-- [ ] MenuBar
-- [ ] Tabs / TabSheet
+- [x] MenuBar
+- [x] Tabs / TabSheet
 - [x] FormLayout - Responsive steps, colspan, FormItem (label slot), FormRow, auto-responsive, CSS custom properties
 - [ ] Upload
 
