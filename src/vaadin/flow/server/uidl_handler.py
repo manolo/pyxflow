@@ -172,6 +172,7 @@ class UidlHandler:
         self._sent_constants = set()
         self._initial_route = initial_route  # Store for use in navigation
 
+        self._tree._app_id = self._app_id
         self._create_initial_nodes()
         self._initialized = True
 
@@ -283,6 +284,11 @@ class UidlHandler:
                     self._handle_msync(rpc)
                 elif rpc_type == "publishedEventHandler":
                     self._handle_published_event(rpc)
+                elif rpc_type == "channel":
+                    node_id = rpc.get("node")
+                    channel_id = rpc.get("channel")
+                    args = rpc.get("args", [])
+                    self._tree.handle_return_channel(node_id, channel_id, args)
         finally:
             _set_current_tree(None)
 
@@ -349,6 +355,12 @@ class UidlHandler:
             self._view = view_class()
             self._view._ui = ui
             self._view._attach(self._tree)
+        except Exception as e:
+            import traceback
+            print(f"[UIDL] ERROR creating view: {e}", flush=True)
+            traceback.print_exc()
+            self._view = None
+            return
         finally:
             _set_current_tree(None)
 

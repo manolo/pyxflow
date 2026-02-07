@@ -1,6 +1,7 @@
 """Demo view showcasing all implemented components."""
 
 import csv
+import datetime
 from pathlib import Path
 
 from vaadin.flow import Route
@@ -8,6 +9,9 @@ from vaadin.flow.components import (
     Button,
     Checkbox,
     CheckboxGroup,
+    ComboBox,
+    ComponentRenderer,
+    DatePicker,
     Dialog,
     EmailField,
     FormLayout,
@@ -16,6 +20,7 @@ from vaadin.flow.components import (
     H3,
     HorizontalLayout,
     IntegerField,
+    LitRenderer,
     Notification,
     NotificationVariant,
     NumberField,
@@ -26,6 +31,7 @@ from vaadin.flow.components import (
     Span,
     TextArea,
     TextField,
+    TimePicker,
     VerticalLayout,
 )
 
@@ -85,6 +91,22 @@ class ComponentsDemoView(VerticalLayout):
 
         self.add(numeric_form)
 
+        # --- Date & Time ---
+        self.add_section("Date & Time")
+
+        date_time_form = FormLayout()
+
+        date_picker = DatePicker("DatePicker")
+        date_picker.set_value(datetime.date.today())
+        date_time_form.add(date_picker)
+
+        time_picker = TimePicker("TimePicker")
+        time_picker.set_step(1800)
+        time_picker.set_value(datetime.time(12, 0))
+        date_time_form.add(time_picker)
+
+        self.add(date_time_form)
+
         # --- Selection Components ---
         self.add_section("Selection Components")
 
@@ -92,6 +114,11 @@ class ComponentsDemoView(VerticalLayout):
 
         checkbox = Checkbox("Single Checkbox")
         selection_form.add(checkbox)
+
+        combo_box = ComboBox("ComboBox")
+        combo_box.set_items("Firefox", "Chrome", "Safari", "Edge", "Opera")
+        combo_box.set_placeholder("Select a browser")
+        selection_form.add(combo_box)
 
         select = Select("Select")
         select.set_items("Option A", "Option B", "Option C")
@@ -137,6 +164,45 @@ class ComponentsDemoView(VerticalLayout):
         grid.add_selection_listener(self.on_grid_select)
         self.add(grid)
         self.add(self.grid_selection_label)
+
+        # --- Grid with LitRenderer ---
+        self.add_section("Grid with LitRenderer")
+
+        lit_grid = Grid()
+        lit_grid.add_column(
+            LitRenderer.of('<strong>${item.name}</strong>')
+            .with_property("name", lambda item: item["name"]),
+            header="Name",
+        ).set_auto_width(True)
+        lit_grid.add_column(
+            LitRenderer.of('<span theme="badge">${item.role}</span>')
+            .with_property("role", lambda item: item["role"]),
+            header="Role",
+        )
+        lit_grid.add_column("city", header="City").set_auto_width(True)
+        self.lit_renderer_label = Span("LitRenderer action: (none)")
+        lit_grid.add_column(
+            LitRenderer.of(
+                '<vaadin-button theme="small" @click="${handleEdit}">Edit</vaadin-button>'
+            )
+            .with_function("handleEdit", self.on_lit_edit),
+            header="Actions",
+        )
+        lit_grid.set_items(people)
+        self.add(lit_grid)
+        self.add(self.lit_renderer_label)
+
+        # --- Grid with ComponentRenderer ---
+        self.add_section("Grid with ComponentRenderer")
+
+        comp_grid = Grid()
+        comp_grid.add_column("name", header="Name").set_auto_width(True)
+        comp_grid.add_column(
+            ComponentRenderer(lambda item: Span(f"Hi {item['name']}")),
+            header="Greeting",
+        )
+        comp_grid.set_items(people[:3])  # Only 3 items for debugging
+        self.add(comp_grid)
 
         # --- Buttons & Actions ---
         self.add_section("Buttons & Actions")
@@ -210,3 +276,17 @@ class ComponentsDemoView(VerticalLayout):
         """Show an error notification."""
         n = Notification.show("Something went wrong!", 5000, Notification.Position.MIDDLE)
         n.add_theme_variants(NotificationVariant.LUMO_ERROR)
+
+    def on_lit_edit(self, item):
+        """Handle LitRenderer edit button click."""
+        self.lit_renderer_label.set_text(f"LitRenderer action: Edit {item['name']}")
+
+    def create_action_buttons(self, item):
+        """Create action buttons for ComponentRenderer."""
+        btn = Button(f"View {item['name']}")
+        btn.add_click_listener(lambda e, i=item: self.on_comp_view(i))
+        return btn
+
+    def on_comp_view(self, item):
+        """Handle ComponentRenderer view button click."""
+        self.comp_renderer_label.set_text(f"ComponentRenderer action: View {item['name']}")

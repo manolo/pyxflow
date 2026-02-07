@@ -1,5 +1,7 @@
 """StateTree - manages the server-side component tree."""
 
+from typing import Callable
+
 
 class StateTree:
     """Manages the server-side state tree for a UI."""
@@ -11,6 +13,9 @@ class StateTree:
         self._elements: dict[int, "Element"] = {}  # node_id -> Element
         self._components: dict[int, "Component"] = {}  # node_id -> Component
         self._pending_execute: list = []  # Execute commands queued by components
+        self._app_id: str = ""  # Set by UidlHandler during init
+        self._return_channels: dict[tuple[int, int], Callable] = {}
+        self._next_channel_id: int = 0
 
     def register_element(self, element: "Element"):
         """Register an element for event dispatch."""
@@ -65,6 +70,22 @@ class StateTree:
         self._pending_execute.clear()
         return commands
 
+    def register_return_channel(self, node_id: int, handler: Callable) -> int:
+        """Register a return channel handler for a node.
+
+        Returns the channel ID to use in execute commands.
+        """
+        channel_id = self._next_channel_id
+        self._next_channel_id += 1
+        self._return_channels[(node_id, channel_id)] = handler
+        return channel_id
+
+    def handle_return_channel(self, node_id: int, channel_id: int, args: list):
+        """Dispatch a return channel call to its handler."""
+        handler = self._return_channels.get((node_id, channel_id))
+        if handler:
+            handler(args)
+
     def reset(self):
         """Reset the tree to initial state (for page reload)."""
         self._nodes.clear()
@@ -73,3 +94,5 @@ class StateTree:
         self._elements.clear()
         self._components.clear()
         self._pending_execute.clear()
+        self._return_channels.clear()
+        self._next_channel_id = 0

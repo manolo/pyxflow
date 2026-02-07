@@ -1,10 +1,10 @@
 # PyFlow Implementation Status
 
-## Current State: MVP + Routing + Grid (Advanced) + Full UIDL Compatibility
+## Current State: MVP + Routing + Grid (Advanced) + Renderers + Full UIDL Compatibility
 
 **Vaadin version:** 25.0.4
-**Lines of code:** ~3,200
-**Tests:** 400 passing
+**Lines of code:** ~3,400
+**Tests:** 503 passing
 **Last updated:** 2026-02-07
 
 ---
@@ -37,6 +37,9 @@
 - [x] **Server-client state sync** - `_pending_server_change` flag absorbs echoes from server-initiated property changes
 - [x] **Grid connector protocol** - `gridConnector.initLazy`, `$connector.set/updateSize/confirm`, `setHeaderRenderer`
 - [x] **Select connector protocol** - `selectConnector.initLazy`, `requestContentUpdate`
+- [x] **ComboBox connector protocol** - `comboBoxConnector.initLazy`, `$connector.set/updateSize/confirm`, filtering
+- [x] **DatePicker connector protocol** - `datepickerConnector.initLazy`
+- [x] **TimePicker connector protocol** - `timepickerConnector.initLazy`
 
 ### Components
 - [x] Button - Text, click listener
@@ -57,7 +60,10 @@
 - [x] RadioButtonGroup - Radio button selection
 - [x] CheckboxGroup - Multiple checkbox selection
 - [x] FormLayout - Responsive steps, colspan, FormItem (label slot), FormRow, auto-responsive, CSS custom properties
-- [x] Grid - Columns (path, header, width, flexGrow, autoWidth, resizable, sortable), in-memory data push, single/multi selection, sorting, lazy loading/DataProvider, column reordering
+- [x] Grid - Columns (path, header, width, flexGrow, autoWidth, resizable, sortable), in-memory data push, single/multi selection, sorting, lazy loading/DataProvider, column reordering, LitRenderer, ComponentRenderer
+- [x] ComboBox - Filtered dropdown, data push protocol, item label generator, custom value support
+- [x] DatePicker - Date selection with calendar overlay, min/max, connector init
+- [x] TimePicker - Time selection with dropdown, step, min/max, connector init
 
 ### Component Base Features
 - [x] `setVisible()` / `isVisible()` - Show/hide components
@@ -101,14 +107,14 @@
 ## Not Implemented
 
 ### Components (Priority: High)
-- [ ] ComboBox (with filtering)
-- [ ] DatePicker / TimePicker
+- [x] ComboBox (with filtering)
+- [x] DatePicker / TimePicker
 
 ### Grid (Advanced Features)
 - [x] Lazy loading / DataProvider
 - [x] Sorting (single and multi-column, in-memory + data provider)
 - [x] Multi-select (selection column, select-all/deselect-all, checkbox state)
-- [ ] Component renderers
+- [x] Component renderers (LitRenderer, ComponentRenderer)
 - [x] Column reordering / resizing
 
 ### Components (Priority: Medium)
@@ -142,7 +148,7 @@
 - [ ] SyncId validation (out-of-sync detection)
 - [ ] Resynchronize flag support
 - [ ] `@ClientCallable` methods
-- [ ] Return channels
+- [x] Return channels
 
 ### Theme
 - [ ] Aura theme support (alternative to Lumo)

@@ -6,6 +6,7 @@ from typing import Callable, TYPE_CHECKING, Any
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
+from vaadin.flow.components.renderer import Renderer, LitRenderer, ComponentRenderer
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -54,6 +55,7 @@ class Column:
         self._sortable = False
         self._element = None
         self._node = None
+        self._renderer: Renderer | None = None
 
     @property
     def internal_id(self) -> str:
@@ -104,13 +106,20 @@ class Column:
         self._sortable = sortable
         return self
 
+    def set_renderer(self, renderer: Renderer) -> "Column":
+        """Set a renderer for this column."""
+        self._renderer = renderer
+        return self
+
     def _create_element(self, tree: "StateTree"):
         """Create the vaadin-grid-column state node."""
         self._node = tree.create_node()
         self._node.attach()
         self._node.put(Feature.ELEMENT_DATA, "tag", "vaadin-grid-column")
         # path tells the grid which property on the item to display
-        self._node.put(Feature.ELEMENT_PROPERTY_MAP, "path", self._internal_id)
+        # Skip path when a renderer is used (renderer provides its own content)
+        if not self._renderer:
+            self._node.put(Feature.ELEMENT_PROPERTY_MAP, "path", self._internal_id)
         self._node.put(Feature.ELEMENT_PROPERTY_MAP, "_flowId", self._internal_id)
         if self._width:
             self._node.put(Feature.ELEMENT_PROPERTY_MAP, "width", self._width)
@@ -217,18 +226,22 @@ class Grid(Component):
         self._data_provider: Callable | None = None
         self._data_provider_size: int = 0
 
-    def add_column(self, property_name: str, header: str = "") -> Column:
+    def add_column(self, arg: "str | Renderer", header: str = "") -> Column:
         """Add a column to the grid.
 
         Args:
-            property_name: Key in the item dict to display.
-            header: Column header text. Defaults to property_name.
+            arg: Either a property name (str) or a Renderer instance.
+            header: Column header text. Defaults to property_name for str columns.
 
         Returns:
             The created Column for further configuration.
         """
         internal_id = f"col{len(self._columns)}"
-        column = Column(internal_id, property_name, header)
+        if isinstance(arg, Renderer):
+            column = Column(internal_id, property_name="", header=header)
+            column._renderer = arg
+        else:
+            column = Column(internal_id, arg, header)
         self._columns.append(column)
         return column
 
@@ -390,11 +403,95 @@ class Grid(Component):
                 f"return $0.$connector.setHeaderRenderer($1, {{ content: $2, showSorter: {show_sorter}, sorterPath: {sorter_path} }})",
             ])
 
+        # 3b. Set up renderers for columns that have one
+        for col in self._columns:
+            if col._renderer:
+                self._setup_renderer(tree, col)
+
         # 4. Push initial data if available
         if self._data_provider:
             self._fetch_and_push(0, self._page_size)
         elif self._items:
             self._push_data()
+
+    def _setup_renderer(self, tree: "StateTree", col: Column):
+        """Set up a renderer on a column (called during _attach)."""
+        renderer = col._renderer
+        grid_ref = {"@v-node": self.element.node_id}
+        col_ref = {"@v-node": col._node.id}
+
+        if isinstance(renderer, LitRenderer):
+            template = renderer._template
+            renderer_name = "renderer"
+
+            # Build client-callable function names list
+            client_callables = list(renderer._functions.keys())
+
+            # Register return channel for function callbacks
+            if client_callables:
+                channel_id = tree.register_return_channel(
+                    self.element.node_id,
+                    lambda args, r=renderer: self._handle_renderer_callback(args, r),
+                )
+                return_channel = {"@v-return": [self.element.node_id, channel_id]}
+            else:
+                return_channel = None
+
+            tree.queue_execute([
+                col_ref, renderer_name, template,
+                return_channel, client_callables,
+                renderer._namespace, tree._app_id,
+                "return window.Vaadin.setLitRenderer($0, $1, $2, $3, $4, $5, $6)",
+            ])
+
+        elif isinstance(renderer, ComponentRenderer):
+            template = "${Vaadin.FlowComponentHost.getNode(appId, item.nodeid)}"
+            renderer_name = "renderer"
+            client_callables = []
+
+            # Create container div — virtual child of the column, regular parent of components
+            container_node = tree.create_node()
+            container_node.attach()
+            container_node.put(Feature.ELEMENT_DATA, "tag", "div")
+            # Mark as in-memory virtual child (required by FlowClient)
+            container_node.put(Feature.ELEMENT_DATA, "payload", {"type": "inMemory"})
+            # Add container as virtual child of the column
+            tree.add_change({
+                "node": col._node.id,
+                "type": "splice",
+                "feat": Feature.VIRTUAL_CHILDREN_LIST,
+                "index": 0,
+                "addNodes": [container_node.id],
+            })
+            renderer._container_node = container_node
+
+            # appId must match the client registry key ("ROOT"), not the full
+            # app ID ("ROOT-NNNNNNN"), because getNode() looks up
+            # Vaadin.Flow.clients[appId].getByNodeId(nodeId).
+            client_key = tree._app_id.split("-")[0]
+
+            tree.queue_execute([
+                col_ref, renderer_name, template,
+                None, client_callables,
+                renderer._namespace, client_key,
+                "return window.Vaadin.setLitRenderer($0, $1, $2, $3, $4, $5, $6)",
+            ])
+
+            # Patch virtual container on the CONTAINER div, not the column
+            container_ref = {"@v-node": container_node.id}
+            tree.queue_execute([
+                container_ref,
+                "return (async function() { Vaadin.FlowComponentHost.patchVirtualContainer(this) }).apply($0)",
+            ])
+
+    def _handle_renderer_callback(self, args: list, renderer: LitRenderer):
+        """Handle a return channel callback from a LitRenderer function."""
+        if len(args) >= 2:
+            handler_name = args[0]
+            item_key = str(args[1])
+            item = self._key_to_item.get(item_key)
+            if item and handler_name in renderer._functions:
+                renderer._functions[handler_name](item)
 
     def _sorted_items(self) -> list[dict]:
         """Return items sorted according to current sort orders."""
@@ -435,7 +532,10 @@ class Grid(Component):
                 new_selected.add(key)
             connector_item = {"key": key, "selected": is_selected}
             for col in self._columns:
-                connector_item[col.internal_id] = item.get(col.property_name, "")
+                if col._renderer:
+                    self._add_renderer_data(tree, col, connector_item, item, key)
+                else:
+                    connector_item[col.internal_id] = item.get(col.property_name, "")
             connector_items.append(connector_item)
 
         if selected_item_ids:
@@ -459,6 +559,26 @@ class Grid(Component):
             grid_ref, self._update_id,
             "return $0.$connector.confirm($1)",
         ])
+
+    def _add_renderer_data(self, tree: "StateTree", col: Column, connector_item: dict, item: dict, key: str):
+        """Add renderer-specific data to a connector item."""
+        renderer = col._renderer
+        ns = renderer._namespace
+
+        if isinstance(renderer, LitRenderer):
+            for prop_name, provider in renderer._properties.items():
+                connector_item[ns + prop_name] = provider(item)
+
+        elif isinstance(renderer, ComponentRenderer):
+            # Create or reuse component for this item
+            if key not in renderer._components:
+                component = renderer._factory(item)
+                component._attach(tree)
+                # Add as regular child of the container div
+                renderer._container_node.add_child(component.element.node)
+                renderer._components[key] = component
+            component = renderer._components[key]
+            connector_item[ns + "nodeid"] = component.element.node_id
 
     def _apply_sort_and_push(self):
         """Apply current sort orders and re-push data."""
@@ -503,7 +623,10 @@ class Grid(Component):
             selected = key in self._selected_keys
             connector_item = {"key": key, "selected": selected}
             for col in self._columns:
-                connector_item[col.internal_id] = item.get(col.property_name, "")
+                if col._renderer:
+                    self._add_renderer_data(tree, col, connector_item, item, key)
+                else:
+                    connector_item[col.internal_id] = item.get(col.property_name, "")
             connector_items.append(connector_item)
 
         # updateSize
