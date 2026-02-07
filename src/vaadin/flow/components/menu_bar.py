@@ -188,6 +188,8 @@ class MenuBar(Component):
             el = _ItemElement(item_node, tree)
             el._listeners["click"] = [item._click_listener]
             tree.register_element(el)
+            # Register click event in Feature 4 so FlowClient sends click events
+            item_node.put(Feature.ELEMENT_LISTENER_MAP, "click", True)
 
         # Add item to parent container
         parent_node.add_child(item_node)

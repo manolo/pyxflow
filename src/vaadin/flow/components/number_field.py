@@ -155,6 +155,12 @@ class IntegerField(NumberField):
         super().__init__(label)
         self._int_value: Optional[int] = None
 
+    def _attach(self, tree):
+        # Set _value to int before parent _attach calls str(self._value)
+        if self._int_value is not None:
+            self._value = self._int_value  # int, not float — so str() gives "42" not "42.0"
+        super()._attach(tree)
+
     @property
     def value(self) -> Optional[int]:
         """Get the current value as integer."""

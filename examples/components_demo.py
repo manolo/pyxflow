@@ -179,11 +179,11 @@ class ComponentsDemoView(VerticalLayout):
 
         menu_bar = MenuBar()
         file_item = menu_bar.add_item("File")
-        file_item.get_sub_menu().add_item("New", self.on_menu_click)
-        file_item.get_sub_menu().add_item("Open", self.on_menu_click)
+        file_item.get_sub_menu().add_item("New", lambda e: self.on_menu_click("New"))
+        file_item.get_sub_menu().add_item("Open", lambda e: self.on_menu_click("Open"))
         edit_item = menu_bar.add_item("Edit")
-        edit_item.get_sub_menu().add_item("Undo", self.on_menu_click)
-        menu_bar.add_item("Help", self.on_menu_click)
+        edit_item.get_sub_menu().add_item("Undo", lambda e: self.on_menu_click("Undo"))
+        menu_bar.add_item("Help", lambda e: self.on_menu_click("Help"))
         self.menu_label = Span("Menu action: (none)")
         self.add(menu_bar)
         self.add(self.menu_label)
@@ -340,6 +340,6 @@ class ComponentsDemoView(VerticalLayout):
         if 0 <= idx < len(self.tab_list):
             self.tabs_label.set_text(f"Selected tab: {self.tab_list[idx].get_label()}")
 
-    def on_menu_click(self, event_data):
+    def on_menu_click(self, name):
         """Handle menu item click."""
-        self.menu_label.set_text("Menu action: clicked")
+        self.menu_label.set_text(f"Menu action: {name}")

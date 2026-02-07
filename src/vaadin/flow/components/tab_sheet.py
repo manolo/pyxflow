@@ -34,10 +34,12 @@ class TabSheet(Component):
         self._tabs_component.element.set_attribute("slot", "tabs")
         self.element.node.add_child(self._tabs_component.element.node)
 
-        # Attach all content panels
+        # Attach all content panels and set tab/content ID links
         for tab, content in self._tab_to_content.items():
-            content._attach(tree)
             tab_id = self._tab_ids[tab]
+            # Set the tab's ID so the web component can associate tab ↔ content
+            tab.element.set_attribute("id", tab_id)
+            content._attach(tree)
             content.element.set_attribute("tab", tab_id)
             self.element.node.add_child(content.element.node)
 
