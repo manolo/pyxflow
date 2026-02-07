@@ -6,7 +6,7 @@ from vaadin.flow.components.checkbox_group import CheckboxGroup
 from vaadin.flow.components.dialog import Dialog
 from vaadin.flow.components.email_field import EmailField
 from vaadin.flow.components.form_layout import FormLayout, FormItem, FormRow, ResponsiveStep
-from vaadin.flow.components.grid import Grid
+from vaadin.flow.components.grid import Grid, Column, SortDirection, GridSortOrder, SelectionMode
 from vaadin.flow.components.html import H1, H2, H3, H4, Paragraph
 from vaadin.flow.components.notification import Notification, NotificationVariant
 from vaadin.flow.components.number_field import NumberField, IntegerField
@@ -30,7 +30,11 @@ __all__ = [
     "FormItem",
     "FormRow",
     "ResponsiveStep",
+    "Column",
     "Grid",
+    "GridSortOrder",
+    "SelectionMode",
+    "SortDirection",
     "H1",
     "H2",
     "H3",

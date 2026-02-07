@@ -1,11 +1,11 @@
 # PyFlow Implementation Status
 
-## Current State: MVP + Routing + Grid + Full UIDL Compatibility
+## Current State: MVP + Routing + Grid (Advanced) + Full UIDL Compatibility
 
 **Vaadin version:** 25.0.4
-**Lines of code:** ~2,800
-**Tests:** 365 passing
-**Last updated:** 2026-02-06
+**Lines of code:** ~3,200
+**Tests:** 400 passing
+**Last updated:** 2026-02-07
 
 ---
 
@@ -57,7 +57,7 @@
 - [x] RadioButtonGroup - Radio button selection
 - [x] CheckboxGroup - Multiple checkbox selection
 - [x] FormLayout - Responsive steps, colspan, FormItem (label slot), FormRow, auto-responsive, CSS custom properties
-- [x] Grid - Columns (path, header, width, flexGrow, autoWidth), in-memory data push, single selection with listener
+- [x] Grid - Columns (path, header, width, flexGrow, autoWidth, resizable, sortable), in-memory data push, single/multi selection, sorting, lazy loading/DataProvider, column reordering
 
 ### Component Base Features
 - [x] `setVisible()` / `isVisible()` - Show/hide components
@@ -105,11 +105,11 @@
 - [ ] DatePicker / TimePicker
 
 ### Grid (Advanced Features)
-- [ ] Lazy loading / DataProvider
-- [ ] Sorting
-- [ ] Multi-select
+- [x] Lazy loading / DataProvider
+- [x] Sorting (single and multi-column, in-memory + data provider)
+- [x] Multi-select (selection column, select-all/deselect-all, checkbox state)
 - [ ] Component renderers
-- [ ] Column reordering / resizing
+- [x] Column reordering / resizing
 
 ### Components (Priority: Medium)
 - [ ] MenuBar
@@ -164,7 +164,7 @@
 4. ~~**Feedback components** - Dialog, Notification~~ ✓ DONE
 5. ~~**Lumo theme loading** - Extract and serve theme CSS~~ ✓ DONE
 6. ~~**Grid** - Complex but essential for data apps~~ ✓ DONE (MVP: in-memory, single select)
-7. **Grid advanced** - Lazy loading, sorting, multi-select
+7. ~~**Grid advanced** - Lazy loading, sorting, multi-select~~ ✓ DONE
 
 ---
 

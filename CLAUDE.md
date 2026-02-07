@@ -17,13 +17,17 @@ PyFlow is a Python implementation of Vaadin Flow. It reuses Vaadin's frontend (w
 # Run the app
 source .venv/bin/activate
 python run.py
-# Open http://localhost:8080
+# Open http://localhost:8088
 
 # Run tests
 pytest tests/ -v
 
 # Run specific test file
 pytest tests/test_rpc_events.py -v
+
+# Run Java reference app (bundle-generator with AllComponentsView)
+cd bundle-generator && ./mvnw package jetty:run-war
+# Open http://localhost:8080
 ```
 
 ## Project Structure
