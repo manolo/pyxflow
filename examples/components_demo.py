@@ -197,12 +197,15 @@ class ComponentsDemoView(VerticalLayout):
 
         comp_grid = Grid()
         comp_grid.add_column("name", header="Name").set_auto_width(True)
+        comp_grid.add_column("email", header="Email").set_auto_width(True)
+        self.comp_renderer_label = Span("ComponentRenderer action: (none)")
         comp_grid.add_column(
-            ComponentRenderer(lambda item: Span(f"Hi {item['name']}")),
-            header="Greeting",
+            ComponentRenderer(self.create_action_buttons),
+            header="Actions",
         )
-        comp_grid.set_items(people[:3])  # Only 3 items for debugging
+        comp_grid.set_items(people)
         self.add(comp_grid)
+        self.add(self.comp_renderer_label)
 
         # --- Buttons & Actions ---
         self.add_section("Buttons & Actions")
