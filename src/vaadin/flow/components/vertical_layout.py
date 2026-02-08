@@ -15,9 +15,10 @@ class VerticalLayout(Component):
         self._padding = True
 
     def _attach(self, tree):
+        # Set default width before _attach applies pending styles
+        if "width" not in self._pending_styles:
+            self._pending_styles["width"] = "100%"
         super()._attach(tree)
-        # Default: width=100%, padding, spacing
-        self.element.get_style().set("width", "100%")
         self._update_theme()
         # Attach all children first
         for child in self._children:

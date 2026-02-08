@@ -102,6 +102,11 @@ class Component:
         self._visible = visible
         if self._element:
             self.element.get_style().set("display", "" if visible else "none")
+        else:
+            if not visible:
+                self._pending_styles["display"] = "none"
+            else:
+                self._pending_styles.pop("display", None)
 
     # Enabled methods
 
