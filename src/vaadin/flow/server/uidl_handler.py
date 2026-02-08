@@ -581,7 +581,9 @@ class UidlHandler:
 
     def _handle_change(self, node_id: int, event_data: dict):
         """Handle change event."""
-        pass
+        element = self._tree.get_element(node_id)
+        if element:
+            element.fire_event("change", event_data)
 
     def _handle_keydown(self, node_id: int, event_data: dict):
         """Handle keydown event.
