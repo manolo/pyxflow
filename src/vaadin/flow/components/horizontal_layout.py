@@ -25,10 +25,14 @@ class HorizontalLayout(Component):
         self._spacing = True
         self._margin = False
         self._component_alignments: dict[Component, Alignment] = {}
+        self._expanded_components: set[Component] = set()
+        self._default_alignment: Alignment | None = None
 
     def _attach(self, tree):
         super()._attach(tree)
         self._update_theme()
+        if self._default_alignment:
+            self.element.get_style().set("align-items", self._default_alignment.value)
         # Attach all children first
         for child in self._children:
             child._ui = self._ui
@@ -69,6 +73,19 @@ class HorizontalLayout(Component):
         self._margin = margin
         self._update_theme()
 
+    def expand(self, *components: Component):
+        """Set flex-grow to 1 on the given components so they fill available space."""
+        for component in components:
+            self._expanded_components.add(component)
+            if component._element:
+                component.element.get_style().set("flex-grow", "1")
+
+    def set_default_vertical_component_alignment(self, alignment: Alignment):
+        """Set default vertical alignment for all children."""
+        self._default_alignment = alignment
+        if self._element:
+            self.element.get_style().set("align-items", alignment.value)
+
     def set_vertical_component_alignment(self, alignment: Alignment, *components: Component):
         """Set vertical alignment for specific components."""
         for component in components:
@@ -78,10 +95,13 @@ class HorizontalLayout(Component):
                 component.element.get_style().set("align-self", alignment.value)
 
     def _apply_alignments(self):
-        """Apply stored alignments to attached components."""
+        """Apply stored alignments and expand to attached components."""
         for component, alignment in self._component_alignments.items():
             if component._element:
                 component.element.get_style().set("align-self", alignment.value)
+        for component in self._expanded_components:
+            if component._element:
+                component.element.get_style().set("flex-grow", "1")
 
     def _update_theme(self):
         """Update the theme attribute."""
