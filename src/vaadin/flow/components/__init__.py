@@ -8,6 +8,10 @@ from vaadin.flow.components.confirm_dialog import ConfirmDialog
 from vaadin.flow.components.date_picker import DatePicker
 from vaadin.flow.components.dialog import Dialog
 from vaadin.flow.components.email_field import EmailField
+from vaadin.flow.components.flex_layout import (
+    FlexLayout, FlexDirection, FlexWrap, JustifyContentMode, ContentAlignment,
+    Alignment as FlexAlignment,
+)
 from vaadin.flow.components.form_layout import FormLayout, FormItem, FormRow, ResponsiveStep
 from vaadin.flow.components.grid import Grid, Column, SortDirection, GridSortOrder, SelectionMode
 from vaadin.flow.components.renderer import LitRenderer, ComponentRenderer
@@ -39,6 +43,12 @@ __all__ = [
     "DatePicker",
     "Dialog",
     "EmailField",
+    "FlexLayout",
+    "FlexDirection",
+    "FlexWrap",
+    "JustifyContentMode",
+    "ContentAlignment",
+    "FlexAlignment",
     "FormLayout",
     "FormItem",
     "FormRow",
