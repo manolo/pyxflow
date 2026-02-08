@@ -55,3 +55,7 @@ class H4(_TextComponent):
 
 class Paragraph(_TextComponent):
     _tag = "p"
+
+
+class Div(_TextComponent):
+    _tag = "div"

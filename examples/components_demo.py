@@ -14,7 +14,10 @@ from vaadin.flow.components import (
     ConfirmDialog,
     DatePicker,
     Dialog,
+    Div,
     EmailField,
+    FlexDirection,
+    FlexLayout,
     FormLayout,
     Grid,
     H2,
@@ -301,6 +304,53 @@ class ComponentsDemoView(VerticalLayout):
         self.dialog.add(Span("This is a dialog with some content."))
         self.dialog.add(Span("You can close it by clicking outside."))
         self.add(self.dialog)
+
+        # --- FlexLayout ---
+        self.add_section("FlexLayout")
+
+        header_div = Div("Header")
+        header_div.set_width("100%")
+        header_div.set_height("150px")
+        header_div._set_style("background-color", "red")
+        header_div._set_style("color", "white")
+        header_div._set_style("display", "flex")
+        header_div._set_style("align-items", "center")
+        header_div._set_style("justify-content", "center")
+
+        footer_div = Div("Footer")
+        footer_div.set_width("100%")
+        footer_div.set_height("100px")
+        footer_div._set_style("background-color", "blue")
+        footer_div._set_style("color", "white")
+        footer_div._set_style("display", "flex")
+        footer_div._set_style("align-items", "center")
+        footer_div._set_style("justify-content", "center")
+
+        nav_div = Div("Navigation")
+        nav_div.set_width("25%")
+        nav_div._set_style("background-color", "yellow")
+        nav_div._set_style("display", "flex")
+        nav_div._set_style("align-items", "center")
+        nav_div._set_style("justify-content", "center")
+
+        content_div = Div("Content")
+        content_div.set_width("75%")
+        content_div._set_style("background-color", "green")
+        content_div._set_style("color", "white")
+        content_div._set_style("display", "flex")
+        content_div._set_style("align-items", "center")
+        content_div._set_style("justify-content", "center")
+
+        middle = FlexLayout(nav_div, content_div)
+        middle.set_width("100%")
+
+        page_layout = FlexLayout(header_div, middle, footer_div)
+        page_layout.set_flex_direction(FlexDirection.COLUMN)
+        page_layout.set_width("100%")
+        page_layout.set_height("500px")
+        page_layout.expand(middle)
+
+        self.add(page_layout)
 
         # --- Shared data for all grids ---
         people = self._load_people()

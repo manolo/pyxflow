@@ -15,7 +15,7 @@ from vaadin.flow.components.flex_layout import (
 from vaadin.flow.components.form_layout import FormLayout, FormItem, FormRow, ResponsiveStep
 from vaadin.flow.components.grid import Grid, Column, SortDirection, GridSortOrder, SelectionMode
 from vaadin.flow.components.renderer import LitRenderer, ComponentRenderer
-from vaadin.flow.components.html import H1, H2, H3, H4, Paragraph
+from vaadin.flow.components.html import Div, H1, H2, H3, H4, Paragraph
 from vaadin.flow.components.notification import Notification, NotificationVariant
 from vaadin.flow.components.number_field import NumberField, IntegerField
 from vaadin.flow.components.password_field import PasswordField
@@ -42,6 +42,7 @@ __all__ = [
     "ConfirmDialog",
     "DatePicker",
     "Dialog",
+    "Div",
     "EmailField",
     "FlexLayout",
     "FlexDirection",
