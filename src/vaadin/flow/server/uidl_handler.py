@@ -123,6 +123,24 @@ _UI_REFRESH_CONFIG = {
 }
 
 
+# Upload event configurations (hashes captured from Java Flow)
+_FILE_REJECT_HASH = "0dtnkjBiKGk="
+_FILE_REJECT_CONFIG = {
+    "event.detail.file.name": False,
+    "event.detail.error": False,
+}
+
+_UPLOAD_SUCCESS_HASH = "RwCOyvcoKgk="
+_UPLOAD_SUCCESS_CONFIG = {
+    "element.files": False,
+}
+
+_UPLOAD_ERROR_HASH = "RwCOyvcoKgk="
+_UPLOAD_ERROR_CONFIG = {
+    "element.files": False,
+}
+
+
 # Reverse lookup: hash → config for all known event hashes.
 # Used when a component registers a listener with an explicit hash_key
 # (value is a string, not True) so we can add the config to constants.
@@ -135,6 +153,9 @@ _HASH_TO_CONFIG = {
     _CLOSED_HASH: _CLOSED_CONFIG,
     _NOTIFICATION_OPENED_CHANGED_HASH: _NOTIFICATION_OPENED_CHANGED_CONFIG,
     _SELECTED_CHANGED_HASH: _SELECTED_CHANGED_CONFIG,
+    _FILE_REJECT_HASH: _FILE_REJECT_CONFIG,
+    _UPLOAD_SUCCESS_HASH: _UPLOAD_SUCCESS_CONFIG,
+    _UPLOAD_ERROR_HASH: _UPLOAD_ERROR_CONFIG,
 }
 
 

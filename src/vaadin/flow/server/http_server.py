@@ -4,7 +4,7 @@ import json
 import secrets
 import uuid
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from aiohttp import web
 
@@ -14,6 +14,16 @@ from vaadin.flow.core.state_tree import StateTree
 
 # Session storage (in-memory for now)
 _sessions: dict[str, dict[str, Any]] = {}
+
+# Upload handler registry: resource_id → (session_id, handler_callable)
+_upload_handlers: dict[str, tuple[str, Callable]] = {}
+
+
+def register_upload_handler(session_id: str, handler: Callable) -> str:
+    """Register an upload handler and return its resource_id (UUID)."""
+    resource_id = str(uuid.uuid4())
+    _upload_handlers[resource_id] = (session_id, handler)
+    return resource_id
 
 
 def get_or_create_session(request: web.Request) -> tuple[str, dict[str, Any]]:
@@ -119,6 +129,57 @@ async def handle_uidl(request: web.Request) -> web.Response:
     )
 
 
+async def handle_upload(request: web.Request) -> web.Response:
+    """Handle file upload POST.
+
+    vaadin-upload sends the file as raw body (not multipart) with headers:
+    - Content-Type: application/octet-stream (or the file's MIME type)
+    - X-Filename: URL-encoded filename
+    """
+    resource_id = request.match_info.get("resource_id", "")
+    if resource_id not in _upload_handlers:
+        return web.Response(text="Not found", status=404)
+
+    session_id = request.cookies.get("JSESSIONID")
+    expected_session_id, handler = _upload_handlers[resource_id]
+    if session_id != expected_session_id:
+        return web.Response(text="Forbidden", status=403)
+
+    try:
+        content_type = request.content_type or "application/octet-stream"
+
+        if content_type.startswith("multipart/"):
+            # Multipart form data
+            reader = await request.multipart()
+            while True:
+                part = await reader.next()
+                if part is None:
+                    break
+                if part.filename:
+                    data = await part.read()
+                    mime_type = part.headers.get("Content-Type", "application/octet-stream")
+                    handler(part.filename, mime_type, data)
+        else:
+            # Raw body upload (vaadin-upload default)
+            data = await request.read()
+            from urllib.parse import unquote
+            filename = unquote(request.headers.get("X-Filename", "unknown"))
+            mime_type = request.headers.get("Content-Type", "application/octet-stream")
+            handler(filename, mime_type, data)
+    except Exception as e:
+        print(f"[Upload] Error: {e}", flush=True)
+        return web.Response(
+            text="<html><body>upload failed</body></html>",
+            content_type="text/html",
+            status=500,
+        )
+
+    return web.Response(
+        text="<html><body>download handled</body></html>",
+        content_type="text/html",
+    )
+
+
 async def handle_static(request: web.Request) -> web.Response:
     """Handle static file requests for /VAADIN/*."""
     path = request.match_info.get("path", "")
@@ -220,6 +281,7 @@ def create_app() -> web.Application:
     # Routes
     app.router.add_get("/", handle_root)
     app.router.add_post("/", handle_uidl_post)
+    app.router.add_post("/VAADIN/dynamic/resource/{ui_id}/{resource_id}/{name}", handle_upload)
     app.router.add_get("/VAADIN/{path:.*}", handle_static)
     app.router.add_get("/lumo/{path:.*}", handle_lumo)
     # Catch-all for other routes (e.g., /about) - serve index.html

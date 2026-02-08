@@ -4,7 +4,7 @@
 
 **Vaadin version:** 25.0.4
 **Lines of code:** ~3,400
-**Tests:** 620 passing
+**Tests:** 637 passing
 **Last updated:** 2026-02-08
 
 ---
@@ -69,6 +69,7 @@
 - [x] Tab - Individual tab with label text
 - [x] TabSheet - Tabs + content panels with slot-based association
 - [x] MenuBar - Hierarchical menus with connector protocol, submenu support, click listeners
+- [x] Upload - File upload via multipart HTTP POST, receiver callback, file reject/success/error events, max files/size, accepted types, auto-upload, drop zone
 
 ### Component Base Features
 - [x] `setVisible()` / `isVisible()` - Show/hide components
@@ -136,7 +137,7 @@
 - [x] MenuBar
 - [x] Tabs / TabSheet
 - [x] FormLayout - Responsive steps, colspan, FormItem (label slot), FormRow, auto-responsive, CSS custom properties
-- [ ] Upload
+- [x] Upload
 
 ### Component Features
 - [x] `setId()` / `getId()`

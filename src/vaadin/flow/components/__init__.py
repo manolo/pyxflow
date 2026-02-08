@@ -25,6 +25,7 @@ from vaadin.flow.components.tab_sheet import TabSheet
 from vaadin.flow.components.menu_bar import MenuBar, MenuItem
 from vaadin.flow.components.router_link import RouterLink
 from vaadin.flow.components.span import Span
+from vaadin.flow.components.upload import Upload
 from vaadin.flow.components.vertical_layout import VerticalLayout
 from vaadin.flow.components.horizontal_layout import HorizontalLayout
 
@@ -70,6 +71,7 @@ __all__ = [
     "MenuBar",
     "MenuItem",
     "Span",
+    "Upload",
     "VerticalLayout",
     "HorizontalLayout",
 ]

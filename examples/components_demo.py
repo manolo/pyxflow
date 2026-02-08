@@ -37,6 +37,7 @@ from vaadin.flow.components import (
     TextArea,
     TextField,
     TimePicker,
+    Upload,
     VerticalLayout,
 )
 from vaadin.flow.core.keys import Key
@@ -249,6 +250,16 @@ class ComponentsDemoView(VerticalLayout):
         self.add(comp_grid)
         self.add(self.comp_renderer_label)
 
+        # --- Upload ---
+        self.add_section("Upload")
+
+        upload = Upload()
+        self.upload_label = Span("Upload status: (none)")
+        upload.set_receiver(self.on_upload_received)
+        upload.add_succeeded_listener(self.on_upload_succeeded)
+        self.add(upload)
+        self.add(self.upload_label)
+
         # --- Navigation ---
         self.add_section("Navigation")
 
@@ -379,6 +390,14 @@ class ComponentsDemoView(VerticalLayout):
     def on_menu_click(self, name):
         """Handle menu item click."""
         self.menu_label.set_text(f"Menu action: {name}")
+
+    def on_upload_received(self, filename, mime_type, data):
+        """Handle file upload."""
+        self.upload_label.set_text(f"Uploaded: {filename} ({len(data)} bytes)")
+
+    def on_upload_succeeded(self, event_data):
+        """Handle upload success event."""
+        pass
 
     def on_shortcut(self, source):
         """Handle shortcut from any component."""
