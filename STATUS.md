@@ -4,7 +4,7 @@
 
 **Vaadin version:** 25.0.4
 **Lines of code:** ~3,400
-**Tests:** 637 passing
+**Tests:** 693 passing
 **Last updated:** 2026-02-08
 
 ---
@@ -81,6 +81,14 @@
 - [x] `setTooltipText()` / `getTooltipText()` - Tooltips via `<vaadin-tooltip>` child
 - [x] `addClickShortcut(Key)` - Keyboard shortcuts (keydown→click dispatch)
 
+### Data Binding
+- [x] Binder - Fluent API (`for_field().with_validator().with_converter().bind()`), `read_bean`, `write_bean`, `set_bean` (auto two-way sync)
+- [x] Validators - `required`, `min_length`, `max_length`, `pattern`, `value_range`, `positive`, `email`
+- [x] Converters - `string_to_int`, `string_to_float`, custom `Converter(to_model, to_presentation)`
+- [x] ValidationError - Raised by `write_bean()` with error results
+- [x] Bean-level validators - Cross-field validation via `binder.with_validator(predicate, message)`
+- [x] Field error display - Sets `invalid`/`errorMessage` properties on Vaadin web components
+
 ### Server
 - [x] HTTP Server (aiohttp) - Sessions, static files
 - [x] UIDL Handler - Init, navigation, events, mSync
@@ -153,9 +161,9 @@
 - [x] `@PageTitle` decorator (alternative to page_title param)
 
 ### Data Binding
-- [ ] Binder
-- [ ] Validators
-- [ ] Converters
+- [x] Binder - Form field ↔ bean binding, read/write, auto two-way sync via `set_bean()`
+- [x] Validators - required, min/max_length, pattern, value_range, positive, email
+- [x] Converters - string_to_int, string_to_float, custom Converter class
 - [ ] DataProvider
 
 ### Protocol / Security

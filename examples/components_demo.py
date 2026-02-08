@@ -41,6 +41,40 @@ from vaadin.flow.components import (
     VerticalLayout,
 )
 from vaadin.flow.core.keys import Key
+from vaadin.flow.data import (
+    Binder,
+    ValidationError,
+    email,
+    max_length,
+    min_length,
+    required,
+    string_to_int,
+    value_range,
+)
+
+
+class CrudPerson:
+    """Data model for the CRUD demo section."""
+
+    _next_id = 1
+
+    def __init__(self, name="", email="", age=0, role="", city="", department=""):
+        self.id = CrudPerson._next_id
+        CrudPerson._next_id += 1
+        self.name = name
+        self.email = email
+        self.age = age
+        self.role = role
+        self.city = city
+        self.department = department
+
+    @staticmethod
+    def from_dict(d: dict) -> "CrudPerson":
+        return CrudPerson(d["name"], d["email"], int(d["age"]), d["role"], d["city"], d["department"])
+
+
+CRUD_ROLES = ["Developer", "Manager", "Analyst", "Designer", "Tester"]
+CRUD_DEPARTMENTS = ["Engineering", "Product", "HR", "Marketing", "Sales"]
 
 
 @Route("components", page_title="Components Demo")
@@ -191,65 +225,6 @@ class ComponentsDemoView(VerticalLayout):
         self.add(menu_bar)
         self.add(self.menu_label)
 
-        # --- Grid ---
-        self.add_section("Grid")
-
-        people = self._load_people()
-        grid = Grid()
-        grid.add_column("name", header="Name").set_auto_width(True).set_sortable(True)
-        grid.add_column("email", header="Email").set_auto_width(True).set_sortable(True)
-        grid.add_column("role", header="Role").set_sortable(True)
-        grid.add_column("city", header="City").set_auto_width(True).set_sortable(True).set_resizable(True)
-        grid.add_column("department", header="Department").set_sortable(True).set_resizable(True)
-        grid.set_column_reordering_allowed(True)
-        grid.set_items(people)
-        self.grid_selection_label = Span("Selected: (none)")
-        grid.add_selection_listener(self.on_grid_select)
-        self.add(grid)
-        self.add(self.grid_selection_label)
-
-        # --- Grid with LitRenderer ---
-        self.add_section("Grid with LitRenderer")
-
-        lit_grid = Grid()
-        lit_grid.add_column(
-            LitRenderer.of('<strong>${item.name}</strong>')
-            .with_property("name", lambda item: item["name"]),
-            header="Name",
-        ).set_auto_width(True)
-        lit_grid.add_column(
-            LitRenderer.of('<span theme="badge">${item.role}</span>')
-            .with_property("role", lambda item: item["role"]),
-            header="Role",
-        )
-        lit_grid.add_column("city", header="City").set_auto_width(True)
-        self.lit_renderer_label = Span("LitRenderer action: (none)")
-        lit_grid.add_column(
-            LitRenderer.of(
-                '<vaadin-button theme="small" @click="${handleEdit}">Edit</vaadin-button>'
-            )
-            .with_function("handleEdit", self.on_lit_edit),
-            header="Actions",
-        )
-        lit_grid.set_items(people)
-        self.add(lit_grid)
-        self.add(self.lit_renderer_label)
-
-        # --- Grid with ComponentRenderer ---
-        self.add_section("Grid with ComponentRenderer")
-
-        comp_grid = Grid()
-        comp_grid.add_column("name", header="Name").set_auto_width(True)
-        comp_grid.add_column("email", header="Email").set_auto_width(True)
-        self.comp_renderer_label = Span("ComponentRenderer action: (none)")
-        comp_grid.add_column(
-            ComponentRenderer(self.create_action_buttons),
-            header="Actions",
-        )
-        comp_grid.set_items(people)
-        self.add(comp_grid)
-        self.add(self.comp_renderer_label)
-
         # --- Upload ---
         self.add_section("Upload")
 
@@ -324,6 +299,166 @@ class ComponentsDemoView(VerticalLayout):
         self.dialog.add(Span("This is a dialog with some content."))
         self.dialog.add(Span("You can close it by clicking outside."))
         self.add(self.dialog)
+
+        # --- Shared data for all grids ---
+        people = self._load_people()
+
+        # --- CRUD Master-Detail ---
+        self.add_section("CRUD Master-Detail (Binder)")
+
+        self.crud_people = [CrudPerson.from_dict(p) for p in people]
+        self.crud_selected: CrudPerson | None = None
+        self.crud_is_new = False
+
+        crud_layout = HorizontalLayout()
+        crud_layout.set_width_full()
+
+        # Master: Grid
+        crud_master = VerticalLayout()
+        crud_master.set_width("60%")
+
+        self.crud_grid = Grid()
+        self.crud_grid.add_column("name", header="Name").set_auto_width(True)
+        self.crud_grid.add_column("email", header="Email").set_auto_width(True)
+        self.crud_grid.add_column("age", header="Age")
+        self.crud_grid.add_column("role", header="Role")
+        self.crud_grid.add_column("city", header="City").set_auto_width(True)
+        self.crud_grid.add_column("department", header="Department")
+        self.crud_grid.add_selection_listener(self._crud_on_select)
+        self._crud_refresh_grid()
+
+        crud_new_btn = Button("+ New Person")
+        crud_new_btn.add_theme_name("primary")
+        crud_new_btn.add_click_listener(self._crud_on_new)
+
+        crud_master.add(self.crud_grid, crud_new_btn)
+
+        # Detail: Form (hidden until selection or new)
+        self.crud_detail = VerticalLayout()
+        self.crud_detail.set_width("40%")
+        self.crud_detail.set_visible(False)
+
+        crud_form = FormLayout()
+
+        self.crud_name = TextField("Name")
+        self.crud_email = EmailField("Email")
+        self.crud_age = TextField("Age")
+        self.crud_role = Select("Role")
+        self.crud_role.set_items(*CRUD_ROLES)
+        self.crud_city = TextField("City")
+        self.crud_dept = Select("Department")
+        self.crud_dept.set_items(*CRUD_DEPARTMENTS)
+
+        crud_form.add(self.crud_name, self.crud_email, self.crud_age,
+                      self.crud_role, self.crud_city, self.crud_dept)
+        self.crud_detail.add(crud_form)
+
+        crud_btn_bar = HorizontalLayout()
+        crud_save = Button("Save")
+        crud_save.add_theme_name("primary")
+        crud_save.add_click_listener(self._crud_on_save)
+        crud_delete = Button("Delete")
+        crud_delete.add_theme_name("error")
+        crud_delete.add_click_listener(self._crud_on_delete)
+        crud_cancel = Button("Cancel")
+        crud_cancel.add_click_listener(self._crud_on_cancel)
+        crud_btn_bar.add(crud_save, crud_delete, crud_cancel)
+        self.crud_detail.add(crud_btn_bar)
+
+        self.crud_status = Span("Select a person to edit")
+        self.crud_detail.add(self.crud_status)
+
+        crud_layout.add(crud_master, self.crud_detail)
+        self.add(crud_layout)
+
+        # Binder setup
+        self.binder = Binder(CrudPerson)
+
+        self.binder.for_field(self.crud_name) \
+            .as_required("Name is required") \
+            .with_validator(min_length(2, "Name must be at least 2 characters")) \
+            .with_validator(max_length(50, "Name must be at most 50 characters")) \
+            .bind(lambda p: p.name, lambda p, v: setattr(p, 'name', v))
+
+        self.binder.for_field(self.crud_email) \
+            .as_required("Email is required") \
+            .with_validator(email("Please enter a valid email address")) \
+            .bind(lambda p: p.email, lambda p, v: setattr(p, 'email', v))
+
+        self.binder.for_field(self.crud_age) \
+            .as_required("Age is required") \
+            .with_converter(string_to_int("Age must be a number")) \
+            .with_validator(value_range(1, 120, "Age must be between 1 and 120")) \
+            .bind(lambda p: p.age, lambda p, v: setattr(p, 'age', v))
+
+        self.binder.for_field(self.crud_role) \
+            .as_required("Role is required") \
+            .bind(lambda p: p.role, lambda p, v: setattr(p, 'role', v))
+
+        self.binder.for_field(self.crud_city) \
+            .bind(lambda p: p.city, lambda p, v: setattr(p, 'city', v))
+
+        self.binder.for_field(self.crud_dept) \
+            .as_required("Department is required") \
+            .bind(lambda p: p.department, lambda p, v: setattr(p, 'department', v))
+
+        # --- Grid ---
+        self.add_section("Grid")
+
+        grid = Grid()
+        grid.add_column("name", header="Name").set_auto_width(True).set_sortable(True)
+        grid.add_column("email", header="Email").set_auto_width(True).set_sortable(True)
+        grid.add_column("role", header="Role").set_sortable(True)
+        grid.add_column("city", header="City").set_auto_width(True).set_sortable(True).set_resizable(True)
+        grid.add_column("department", header="Department").set_sortable(True).set_resizable(True)
+        grid.set_column_reordering_allowed(True)
+        grid.set_items(people)
+        self.grid_selection_label = Span("Selected: (none)")
+        grid.add_selection_listener(self.on_grid_select)
+        self.add(grid)
+        self.add(self.grid_selection_label)
+
+        # --- Grid with LitRenderer ---
+        self.add_section("Grid with LitRenderer")
+
+        lit_grid = Grid()
+        lit_grid.add_column(
+            LitRenderer.of('<strong>${item.name}</strong>')
+            .with_property("name", lambda item: item["name"]),
+            header="Name",
+        ).set_auto_width(True)
+        lit_grid.add_column(
+            LitRenderer.of('<span theme="badge">${item.role}</span>')
+            .with_property("role", lambda item: item["role"]),
+            header="Role",
+        )
+        lit_grid.add_column("city", header="City").set_auto_width(True)
+        self.lit_renderer_label = Span("LitRenderer action: (none)")
+        lit_grid.add_column(
+            LitRenderer.of(
+                '<vaadin-button theme="small" @click="${handleEdit}">Edit</vaadin-button>'
+            )
+            .with_function("handleEdit", self.on_lit_edit),
+            header="Actions",
+        )
+        lit_grid.set_items(people)
+        self.add(lit_grid)
+        self.add(self.lit_renderer_label)
+
+        # --- Grid with ComponentRenderer ---
+        self.add_section("Grid with ComponentRenderer")
+
+        comp_grid = Grid()
+        comp_grid.add_column("name", header="Name").set_auto_width(True)
+        comp_grid.add_column("email", header="Email").set_auto_width(True)
+        self.comp_renderer_label = Span("ComponentRenderer action: (none)")
+        comp_grid.add_column(
+            ComponentRenderer(self.create_action_buttons),
+            header="Actions",
+        )
+        comp_grid.set_items(people)
+        self.add(comp_grid)
+        self.add(self.comp_renderer_label)
 
     @staticmethod
     def _load_people() -> list[dict]:
@@ -402,3 +537,81 @@ class ComponentsDemoView(VerticalLayout):
     def on_shortcut(self, source):
         """Handle shortcut from any component."""
         self.shortcut_label.set_text(f"Shortcut: {source}")
+
+    # --- CRUD Master-Detail methods ---
+
+    def _crud_refresh_grid(self):
+        items = [
+            {"id": p.id, "name": p.name, "email": p.email,
+             "age": p.age, "role": p.role, "city": p.city, "department": p.department}
+            for p in self.crud_people
+        ]
+        self.crud_grid.set_items(items)
+
+    def _crud_on_select(self, event):
+        item = event.get("item")
+        if item:
+            person = next((p for p in self.crud_people if p.id == item["id"]), None)
+            if person:
+                self.crud_selected = person
+                self.crud_is_new = False
+                self.binder.read_bean(person)
+                self.crud_status.set_text(f"Editing: {person.name}")
+                self.crud_detail.set_visible(True)
+        else:
+            self._crud_clear_form()
+
+    def _crud_on_new(self, event):
+        self.crud_selected = CrudPerson()
+        self.crud_is_new = True
+        self.binder.read_bean(self.crud_selected)
+        self.crud_status.set_text("New person")
+        self.crud_detail.set_visible(True)
+
+    def _crud_on_save(self, event):
+        if self.crud_selected is None:
+            Notification.show("Select a person or click New first", 3000)
+            return
+        try:
+            self.binder.write_bean(self.crud_selected)
+        except ValidationError:
+            n = Notification.show("Please fix the errors in the form", 3000)
+            n.add_theme_variants(NotificationVariant.LUMO_ERROR)
+            return
+        if self.crud_is_new:
+            self.crud_people.append(self.crud_selected)
+            self.crud_is_new = False
+        self._crud_refresh_grid()
+        n = Notification.show(f"Saved: {self.crud_selected.name}", 3000)
+        n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
+        self.crud_status.set_text(f"Saved: {self.crud_selected.name}")
+
+    def _crud_on_delete(self, event):
+        if self.crud_selected is None or self.crud_is_new:
+            Notification.show("Select a person to delete", 3000)
+            return
+        name = self.crud_selected.name
+        self.crud_people = [p for p in self.crud_people if p.id != self.crud_selected.id]
+        self._crud_refresh_grid()
+        self._crud_clear_form()
+        n = Notification.show(f"Deleted: {name}", 3000)
+        n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
+
+    def _crud_on_cancel(self, event):
+        if self.crud_selected and not self.crud_is_new:
+            self.binder.read_bean(self.crud_selected)
+            self.crud_status.set_text("Changes discarded")
+        else:
+            self._crud_clear_form()
+
+    def _crud_clear_form(self):
+        self.crud_selected = None
+        self.crud_is_new = False
+        self.crud_name.set_value("")
+        self.crud_email.set_value("")
+        self.crud_age.set_value("")
+        self.crud_role.set_value("")
+        self.crud_city.set_value("")
+        self.crud_dept.set_value("")
+        self.crud_status.set_text("Select a person to edit")
+        self.crud_detail.set_visible(False)
