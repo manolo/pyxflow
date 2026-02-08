@@ -99,14 +99,6 @@
 - [x] Serves index.html from bundle (Vaadin-generated)
 - [x] Lumo theme CSS loading - Extracted from JAR, served at `/lumo/*`, injected in index.html
 
-### Bundle Generator
-- [x] Minimal Maven project (`bundle-generator/`)
-- [x] Uses `vaadin-core` (no Spring)
-- [x] Lumo theme via `@StyleSheet(Lumo.STYLESHEET)`
-- [x] `AllComponentsView.java` mirrors Python `ComponentsDemoView` (identical content/structure)
-- [x] Build: `./mvnw package` (Vaadin 25 builds production bundle by default)
-- [x] `generate-bundle.sh` extracts Lumo CSS from nested JAR (version-independent)
-
 ### Protocol
 - [x] Init response - appConfig, CSRF, constants (Java-compatible hashes)
 - [x] UIDL response - syncId, changes, execute
@@ -133,62 +125,58 @@
 
 ## Not Implemented
 
-### Components (Priority: High)
-- [x] ComboBox (with filtering)
-- [x] DatePicker / TimePicker
+### Component Inventory (Vaadin 25 — 20 missing components)
 
-### Grid (Advanced Features)
-- [x] Lazy loading / DataProvider
-- [x] Sorting (single and multi-column, in-memory + data provider)
-- [x] Multi-select (selection column, select-all/deselect-all, checkbox state)
-- [x] Component renderers (LitRenderer, ComponentRenderer)
-- [x] Column reordering / resizing
+Vaadin 25 has 72 npm packages. Filtering out infrastructure/themes/internals, there are **20 real UI components** not yet implemented in PyFlow, organized by implementation phase.
 
-### Components (Priority: Medium)
-- [x] MenuBar
-- [x] Tabs / TabSheet
-- [x] FormLayout - Responsive steps, colspan, FormItem (label slot), FormRow, auto-responsive, CSS custom properties
-- [x] Upload
+Full analysis with complexity, connectors, and dependencies: **`../specs/COMPONENTS.md`**
 
-### Component Features
-- [x] `setId()` / `getId()`
-- [x] `focus()` / `blur()`
-- [x] Keyboard shortcuts (`addClickShortcut(Key.ENTER)`)
-- [x] Tooltips
-- [x] Helper text
+### Phase 8 — AppLayout & Prerequisites (enables real app layouts)
 
-### Routing (Advanced)
-- [x] Route parameters (`/users/:id`)
-- [x] Navigation guards (BeforeEnter/Leave)
-- [x] RouterLink component
-- [x] `@PageTitle` decorator (alternative to page_title param)
+| Component | Tag | Complexity | Notes |
+|---|---|---|---|
+| [ ] **Icon** | `vaadin-icon` | Trivial | Properties: `icon`, `svg`. Required by AppLayout, SideNav, MenuBar icons |
+| [ ] **App Layout** | `vaadin-app-layout` | Medium-High | Slots: drawer, navbar, content. RouterLayout interface. DrawerToggle |
+| [ ] **DrawerToggle** | `vaadin-drawer-toggle` | Trivial | Hamburger button for AppLayout drawer |
+| [ ] **SideNav / SideNavItem** | `vaadin-side-nav` | Medium | Navigation items with path, nested items, path matching |
+| [ ] **RouterLayout interface** | (infrastructure) | Medium | `show_router_layout_content()`, `@Route(layout=...)`, layout chain in navigation |
+| [ ] **`@ParentLayout` / `@RoutePrefix`** | (infrastructure) | Low | Nested layout hierarchies, path prefix from parent layouts |
 
-### Data Binding
-- [x] Binder - Form field ↔ bean binding, read/write, auto two-way sync via `set_bean()`
-- [x] Validators - required, min/max_length, pattern, value_range, positive, email
-- [x] Converters - string_to_int, string_to_float, custom Converter class
-- [x] DataProvider - Query, ListDataProvider (filter, sort, add/remove), CallbackDataProvider, Grid + ComboBox integration, refresh listeners
+### Phase 9 — Menu System + Simple High-Value Components
 
-### AppLayout & Router Layouts (Priority: High)
+| Component | Tag | Complexity | Notes |
+|---|---|---|---|
+| [ ] **`@Menu` decorator** | (infrastructure) | Low | `@Menu(title, order, icon)`, stores metadata on view class |
+| [ ] **`MenuConfiguration`** | (infrastructure) | Low | `get_menu_entries()` — collects `@Menu` routes, filters, sorts |
+| [ ] **Details** | `vaadin-details` | Low | Collapsible panel. Property `opened`, slot `summary` |
+| [ ] **Accordion** | `vaadin-accordion` | Medium | AccordionPanel children, `opened-changed` event |
+| [ ] **Context Menu** | `vaadin-context-menu` | Medium-High | Reuses `contextMenuConnector` (already implemented for MenuBar!) |
+| [ ] **DateTimePicker** | `vaadin-date-time-picker` | Medium | Composition of DatePicker + TimePicker (both already implemented) |
+| [ ] **Markdown** | `vaadin-markdown` | Low | Property `content`. **New in v25**, useful for AI apps |
 
-Enables shared layouts (navbar, sidebar) across views. Currently each view is standalone.
+### Phase 10 — Visual & Layout Components
 
-- [ ] **`RouterLayout` interface** - `show_router_layout_content(content)`, `remove_router_layout_content(old)`
-- [ ] **`@Route(layout=...)` parameter** - Associate views with a parent layout class
-- [ ] **Layout chain in `_handle_navigation()`** - Build chain `[View, Layout1, ...]`, reuse layout instances across navigations, only swap view content
-- [ ] **`AppLayout` component** - Tag `vaadin-app-layout`, slots: `drawer`, `navbar`, default (content). Properties: `drawerOpened` (synced), `primarySection`. Implements `RouterLayout` via `set_content()`
-- [ ] **`DrawerToggle` component** - Tag `vaadin-drawer-toggle` (hamburger button)
-- [ ] **`SideNav` / `SideNavItem`** - Tag `vaadin-side-nav`, `vaadin-side-nav-item` for navigation menus
-- [ ] **`@ParentLayout` decorator** - For nested layout hierarchies (layout inside layout)
-- [ ] **`@RoutePrefix` decorator** - Adds path prefix from parent layouts
+| Component | Tag | Complexity | Notes |
+|---|---|---|---|
+| [ ] **Avatar** | `vaadin-avatar` | Low | Properties: `name`, `abbr`, `img` |
+| [ ] **Avatar Group** | `vaadin-avatar-group` | Low | Property `items` (JSON array), max visible |
+| [ ] **Card** | `vaadin-card` | Low | Container with slots. **New in v25** |
+| [ ] **Split Layout** | `vaadin-split-layout` | Medium | Property `splitterPosition`, orientation, resize event |
+| [ ] **Scroller** | `vaadin-scroller` | Low | Scrollable container. Property `scrollDirection` |
+| [ ] **Popover** | `vaadin-popover` | Medium | Overlay component. Target, trigger, position. Similar to Dialog |
+| [ ] **Master Detail Layout** | `vaadin-master-detail-layout` | Medium | Layout with slots. **New in v25** |
 
-### Menu System (Priority: Medium)
+### Phase 11 — Data & Specialized Components
 
-Auto-generate navigation menus from route metadata.
-
-- [ ] **`@Menu` decorator** - `@Menu(title="...", order=0, icon="vaadin:dashboard")`. Stores metadata on view class
-- [ ] **`MenuConfiguration.get_menu_entries()`** - Collects all `@Menu`-annotated routes, filters (exclude routes with required params), sorts by `order` then path. Returns `list[MenuEntry(path, title, order, icon)]`
-- [ ] **Demo: AppLayout + SideNav + auto-menu** - MainLayout with drawer/navbar, views using `@Route(layout=MainLayout)` + `@Menu`, SideNav populated via `get_menu_entries()`
+| Component | Tag | Complexity | Notes |
+|---|---|---|---|
+| [ ] **List Box** | `vaadin-list-box` | Medium | Selection with items. Similar to RadioButtonGroup |
+| [ ] **Multi Select Combo Box** | `vaadin-multi-select-combo-box` | High | Extends ComboBox: multi-select, chips, data provider |
+| [ ] **Virtual List** | `vaadin-virtual-list` | High | Data provider integration (like Grid but simpler), renderer |
+| [ ] **Message Input** | `vaadin-message-input` | Low | Text input with submit button |
+| [ ] **Message List** | `vaadin-message-list` | Medium | Property `items` (JSON), timestamp formatting |
+| [ ] **Login Form / Login Overlay** | `vaadin-login-form` | Medium | Form with `login` and `forgot-password` events |
+| [ ] **Custom Field** | `vaadin-custom-field` | Medium-Low | Composite field wrapper, combines children as value |
 
 ### Protocol / Security
 - [ ] CSRF token validation (actual check)
@@ -217,10 +205,12 @@ Auto-generate navigation menus from route metadata.
 3. ~~**Routing** - @Route decorator, multiple views~~ ✓ DONE
 4. ~~**Feedback components** - Dialog, Notification~~ ✓ DONE
 5. ~~**Lumo theme loading** - Extract and serve theme CSS~~ ✓ DONE
-6. ~~**Grid** - Complex but essential for data apps~~ ✓ DONE (MVP: in-memory, single select)
-7. ~~**Grid advanced** - Lazy loading, sorting, multi-select~~ ✓ DONE
-8. **AppLayout + Router Layouts** - `RouterLayout` interface, `@Route(layout=...)`, layout chain in navigation, `AppLayout`/`DrawerToggle`/`SideNav`
-9. **Menu system** - `@Menu` decorator, `MenuConfiguration.get_menu_entries()`, auto-generated nav menus
+6. ~~**Grid** - Complex but essential for data apps~~ ✓ DONE
+7. ~~**Grid advanced** - Lazy loading, sorting, multi-select, renderers~~ ✓ DONE
+8. **AppLayout & Prerequisites** - Icon, AppLayout, DrawerToggle, SideNav, RouterLayout interface, `@Route(layout=...)`, layout chain
+9. **Menu System + High-Value Components** - `@Menu`, MenuConfiguration, Details, Accordion, ContextMenu, DateTimePicker, Markdown
+10. **Visual & Layout Components** - Avatar, Card, SplitLayout, Scroller, Popover, MasterDetailLayout
+11. **Data & Specialized Components** - ListBox, MultiSelectComboBox, VirtualList, MessageInput/List, Login, CustomField
 
 ---
 
@@ -245,4 +235,4 @@ pytest tests/ -v
 
 See parent directory:
 - `/Users/manolo/Github/platform/python/CLAUDE.md` - Development guide
-- `/Users/manolo/Github/platform/python/SPECS.md` - Protocol specs
+- `/Users/manolo/Github/platform/python/specs/PROTOCOL.md` - Protocol specs
