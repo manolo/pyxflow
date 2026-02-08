@@ -7,6 +7,7 @@ from typing import Callable, TYPE_CHECKING, Any
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
 from vaadin.flow.components.renderer import Renderer, LitRenderer, ComponentRenderer
+from vaadin.flow.data.provider import DataProvider, ListDataProvider, Query
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -224,6 +225,8 @@ class Grid(Component):
         self._selected_keys: set[str] = set()
         # Lazy loading
         self._data_provider: Callable | None = None
+        self._data_provider_obj: DataProvider | None = None
+        self._data_provider_listener_unsub: Callable | None = None
         self._data_provider_size: int = 0
 
     def add_column(self, arg: "str | Renderer", header: str = "") -> Column:
@@ -245,13 +248,18 @@ class Grid(Component):
         self._columns.append(column)
         return column
 
-    def set_items(self, items: list[dict]):
+    def set_items(self, items):
         """Set the data items (in-memory mode).
 
-        Each item should be a dict with keys matching column property_names.
+        Args:
+            items: A list of dicts, or a ListDataProvider.
         Clears any data provider.
         """
+        if isinstance(items, ListDataProvider):
+            self.set_data_provider(items)
+            return
         self._data_provider = None
+        self._clear_data_provider_obj()
         self._items = items
         self._key_to_item.clear()
         self._selected_keys.clear()
@@ -328,19 +336,48 @@ class Grid(Component):
 
     # --- Lazy Loading ---
 
-    def set_data_provider(self, fetch: Callable):
-        """Set a lazy data provider.
+    def set_data_provider(self, provider):
+        """Set a data provider.
 
         Args:
-            fetch: A callable(offset, limit, sort_orders) -> (items, total_count)
-                   where sort_orders is a list of GridSortOrder.
+            provider: A DataProvider instance, or a callable(offset, limit, sort_orders) -> (items, total_count).
         Clears any in-memory items.
         """
-        self._data_provider = fetch
+        self._clear_data_provider_obj()
+        if isinstance(provider, DataProvider):
+            self._data_provider_obj = provider
+            self._data_provider = None
+            self._data_provider_listener_unsub = provider.add_data_provider_listener(
+                self._on_data_provider_change
+            )
+        elif callable(provider):
+            self._data_provider = provider
+            self._data_provider_obj = None
         self._items = []
         self._key_to_item.clear()
         self._selected_keys.clear()
         if self._element:
+            self._fetch_and_push(0, self._page_size)
+
+    def _clear_data_provider_obj(self):
+        """Unsubscribe from previous DataProvider listener."""
+        if self._data_provider_listener_unsub:
+            self._data_provider_listener_unsub()
+            self._data_provider_listener_unsub = None
+        self._data_provider_obj = None
+
+    def _on_data_provider_change(self, event: dict):
+        """Called when the DataProvider notifies of a change."""
+        if not self._element:
+            return
+        dp = self._data_provider_obj
+        if dp and dp.is_in_memory:
+            # Re-fetch all data and push
+            query = Query(offset=0, limit=dp.size(Query()), sort_orders=self._sort_orders)
+            items = dp.fetch(query)
+            self._items = items
+            self._push_data()
+        else:
             self._fetch_and_push(0, self._page_size)
 
     def _attach(self, tree: "StateTree"):
@@ -409,7 +446,15 @@ class Grid(Component):
                 self._setup_renderer(tree, col)
 
         # 4. Push initial data if available
-        if self._data_provider:
+        if self._data_provider_obj:
+            dp = self._data_provider_obj
+            if dp.is_in_memory:
+                query = Query(offset=0, limit=dp.size(Query()), sort_orders=self._sort_orders)
+                self._items = dp.fetch(query)
+                self._push_data()
+            else:
+                self._fetch_and_push(0, self._page_size)
+        elif self._data_provider:
             self._fetch_and_push(0, self._page_size)
         elif self._items:
             self._push_data()
@@ -582,7 +627,16 @@ class Grid(Component):
 
     def _apply_sort_and_push(self):
         """Apply current sort orders and re-push data."""
-        if self._data_provider:
+        if self._data_provider_obj:
+            dp = self._data_provider_obj
+            if dp.is_in_memory:
+                query = Query(offset=0, limit=dp.size(Query()), sort_orders=self._sort_orders)
+                self._items = dp.fetch(query)
+                self._push_data()
+            else:
+                self._key_to_item.clear()
+                self._fetch_and_push(0, self._page_size)
+        elif self._data_provider:
             self._key_to_item.clear()
             self._fetch_and_push(0, self._page_size)
         else:
@@ -607,12 +661,20 @@ class Grid(Component):
 
     def _fetch_and_push(self, offset: int, limit: int):
         """Fetch data from provider and push to client."""
-        if not self._data_provider or not self._element:
+        if not self._element:
+            return
+        if not self._data_provider and not self._data_provider_obj:
             return
         tree = self._element._tree
         grid_ref = {"@v-node": self.element.node_id}
 
-        items, total = self._data_provider(offset, limit, self._sort_orders)
+        if self._data_provider_obj:
+            dp = self._data_provider_obj
+            query = Query(offset=offset, limit=limit, sort_orders=self._sort_orders)
+            items = dp.fetch(query)
+            total = dp.size(Query(sort_orders=self._sort_orders))
+        else:
+            items, total = self._data_provider(offset, limit, self._sort_orders)
         self._data_provider_size = total
 
         # Build connector items
@@ -710,7 +772,7 @@ class Grid(Component):
 
     def set_viewport_range(self, start: int, length: int):
         """Called by client when visible range changes."""
-        if self._data_provider:
+        if self._data_provider or self._data_provider_obj:
             self._fetch_and_push(start, length)
 
     def sorters_changed(self, sorters):
@@ -745,5 +807,5 @@ class Grid(Component):
 
     def set_requested_range(self, start: int, length: int):
         """Called by client to request a data range."""
-        if self._data_provider:
+        if self._data_provider or self._data_provider_obj:
             self._fetch_and_push(start, length)

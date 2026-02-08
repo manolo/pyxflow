@@ -4,6 +4,7 @@ from typing import Callable, Generic, TypeVar, Optional, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
+from vaadin.flow.data.provider import DataProvider, Query
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -33,6 +34,8 @@ class ComboBox(Component, Generic[T]):
         self._change_listeners: list[Callable] = []
         self._custom_value_listeners: list[Callable] = []
         self._update_id = 0
+        self._provider: DataProvider | None = None
+        self._provider_listener_unsub: Callable | None = None
 
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
@@ -103,22 +106,36 @@ class ComboBox(Component, Generic[T]):
         tree = self._element._tree
         el_ref = {"@v-node": self.element.node_id}
 
-        # Filter items
-        if filter_text:
-            filtered = [
-                (i, item) for i, item in enumerate(self._items)
-                if filter_text.lower() in self._get_item_label(item).lower()
-            ]
+        if self._provider:
+            # Use DataProvider — fetch with filter as string
+            query = Query(offset=0, limit=self._provider.size(Query(filter=filter_text)), filter=filter_text)
+            provider_items = self._provider.fetch(query)
+            # Build connector items from provider results
+            connector_items = []
+            for i, item in enumerate(provider_items):
+                connector_items.append({
+                    "key": str(i),
+                    "label": self._get_item_label(item),
+                })
+            # Store provider items so value selection works
+            self._items = provider_items
         else:
-            filtered = list(enumerate(self._items))
+            # Filter items from internal list
+            if filter_text:
+                filtered = [
+                    (i, item) for i, item in enumerate(self._items)
+                    if filter_text.lower() in self._get_item_label(item).lower()
+                ]
+            else:
+                filtered = list(enumerate(self._items))
 
-        # Build connector items
-        connector_items = []
-        for i, item in filtered:
-            connector_items.append({
-                "key": str(i),
-                "label": self._get_item_label(item),
-            })
+            # Build connector items
+            connector_items = []
+            for i, item in filtered:
+                connector_items.append({
+                    "key": str(i),
+                    "label": self._get_item_label(item),
+                })
 
         size = len(connector_items)
 
@@ -146,9 +163,30 @@ class ComboBox(Component, Generic[T]):
 
     def set_items(self, *items: T):
         """Set the items for the combo box."""
+        self._clear_provider()
         self._items = list(items)
         if self._element:
             self._push_data("")
+
+    def set_data_provider(self, provider: DataProvider):
+        """Set a DataProvider for the combo box.
+
+        The provider's fetch/size will be used instead of the internal items list.
+        """
+        self._clear_provider()
+        self._provider = provider
+        self._provider_listener_unsub = provider.add_data_provider_listener(
+            lambda e: self._push_data("")
+        )
+        if self._element:
+            self._push_data("")
+
+    def _clear_provider(self):
+        """Unsubscribe from previous DataProvider."""
+        if self._provider_listener_unsub:
+            self._provider_listener_unsub()
+            self._provider_listener_unsub = None
+        self._provider = None
 
     def get_items(self) -> list[T]:
         return self._items.copy()
