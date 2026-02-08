@@ -169,6 +169,27 @@
 - [x] Converters - string_to_int, string_to_float, custom Converter class
 - [x] DataProvider - Query, ListDataProvider (filter, sort, add/remove), CallbackDataProvider, Grid + ComboBox integration, refresh listeners
 
+### AppLayout & Router Layouts (Priority: High)
+
+Enables shared layouts (navbar, sidebar) across views. Currently each view is standalone.
+
+- [ ] **`RouterLayout` interface** - `show_router_layout_content(content)`, `remove_router_layout_content(old)`
+- [ ] **`@Route(layout=...)` parameter** - Associate views with a parent layout class
+- [ ] **Layout chain in `_handle_navigation()`** - Build chain `[View, Layout1, ...]`, reuse layout instances across navigations, only swap view content
+- [ ] **`AppLayout` component** - Tag `vaadin-app-layout`, slots: `drawer`, `navbar`, default (content). Properties: `drawerOpened` (synced), `primarySection`. Implements `RouterLayout` via `set_content()`
+- [ ] **`DrawerToggle` component** - Tag `vaadin-drawer-toggle` (hamburger button)
+- [ ] **`SideNav` / `SideNavItem`** - Tag `vaadin-side-nav`, `vaadin-side-nav-item` for navigation menus
+- [ ] **`@ParentLayout` decorator** - For nested layout hierarchies (layout inside layout)
+- [ ] **`@RoutePrefix` decorator** - Adds path prefix from parent layouts
+
+### Menu System (Priority: Medium)
+
+Auto-generate navigation menus from route metadata.
+
+- [ ] **`@Menu` decorator** - `@Menu(title="...", order=0, icon="vaadin:dashboard")`. Stores metadata on view class
+- [ ] **`MenuConfiguration.get_menu_entries()`** - Collects all `@Menu`-annotated routes, filters (exclude routes with required params), sorts by `order` then path. Returns `list[MenuEntry(path, title, order, icon)]`
+- [ ] **Demo: AppLayout + SideNav + auto-menu** - MainLayout with drawer/navbar, views using `@Route(layout=MainLayout)` + `@Menu`, SideNav populated via `get_menu_entries()`
+
 ### Protocol / Security
 - [ ] CSRF token validation (actual check)
 - [ ] ClientId validation (duplicate detection)
@@ -198,6 +219,8 @@
 5. ~~**Lumo theme loading** - Extract and serve theme CSS~~ ✓ DONE
 6. ~~**Grid** - Complex but essential for data apps~~ ✓ DONE (MVP: in-memory, single select)
 7. ~~**Grid advanced** - Lazy loading, sorting, multi-select~~ ✓ DONE
+8. **AppLayout + Router Layouts** - `RouterLayout` interface, `@Route(layout=...)`, layout chain in navigation, `AppLayout`/`DrawerToggle`/`SideNav`
+9. **Menu system** - `@Menu` decorator, `MenuConfiguration.get_menu_entries()`, auto-generated nav menus
 
 ---
 

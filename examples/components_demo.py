@@ -95,6 +95,120 @@ class ComponentsDemoView(VerticalLayout):
         # Header
         self.add(H2("PyFlow Components Demo"))
 
+        # --- Navigation ---
+        self.add_section("Navigation")
+
+        self.add(RouterLink("Go to Hello World", "/"))
+        self.add(RouterLink("Go to About", "/about"))
+        self.add(RouterLink("Go to Greet", "/greet/World"))
+
+        # --- Progress ---
+        self.add_section("Progress")
+
+        progress_bar = ProgressBar()
+        progress_bar.set_value(0.6)
+        self.add(Span("ProgressBar (60%):"))
+        self.add(progress_bar)
+
+        progress_indeterminate = ProgressBar()
+        progress_indeterminate.set_indeterminate(True)
+        self.add(Span("ProgressBar (indeterminate):"))
+        self.add(progress_indeterminate)
+
+        # --- Tabs ---
+        self.add_section("Tabs")
+
+        tab1 = Tab("Tab 1")
+        tab2 = Tab("Tab 2")
+        tab3 = Tab("Tab 3")
+        tabs = Tabs(tab1, tab2, tab3)
+        self.tabs_label = Span("Selected tab: Tab 1")
+        tabs.add_selected_change_listener(self.on_tab_selected)
+        self.tabs = tabs
+        self.tab_list = [tab1, tab2, tab3]
+        self.add(tabs)
+        self.add(self.tabs_label)
+
+        # --- TabSheet ---
+        self.add_section("TabSheet")
+
+        tab_sheet = TabSheet()
+        tab_sheet.add("Dashboard", Span("Dashboard content"))
+        tab_sheet.add("Settings", Span("Settings content"))
+        self.add(tab_sheet)
+
+        # --- MenuBar ---
+        self.add_section("MenuBar")
+
+        menu_bar = MenuBar()
+        file_item = menu_bar.add_item("File")
+        file_item.get_sub_menu().add_item("New", lambda e: self.on_menu_click("New"))
+        file_item.get_sub_menu().add_item("Open", lambda e: self.on_menu_click("Open"))
+        edit_item = menu_bar.add_item("Edit")
+        edit_item.get_sub_menu().add_item("Undo", lambda e: self.on_menu_click("Undo"))
+        menu_bar.add_item("Help", lambda e: self.on_menu_click("Help"))
+        self.menu_label = Span("Menu action: (none)")
+        self.add(menu_bar)
+        self.add(self.menu_label)
+
+        # --- Component Features ---
+        self.add_section("Component Features")
+
+        features_form = FormLayout()
+
+        helper_field = TextField("With Helper Text")
+        helper_field.set_helper_text("This is a helper text")
+        helper_field.set_id("helper-text-field")
+        helper_field.add_click_shortcut(Key.ENTER)
+        helper_field.add_click_listener(lambda e: self.on_shortcut("With Helper Text"))
+        features_form.add(helper_field)
+
+        tooltip_field = TextField("With Tooltip")
+        tooltip_field.set_tooltip_text("Hover to see this tooltip")
+        tooltip_field.add_click_shortcut(Key.ENTER)
+        tooltip_field.add_click_listener(lambda e: self.on_shortcut("With Tooltip"))
+        features_form.add(tooltip_field)
+
+        self.add(features_form)
+
+        shortcut_label = Span("Shortcut: (none)")
+        self.shortcut_label = shortcut_label
+        shortcut_btn = Button("Press Enter (shortcut)")
+        shortcut_btn.add_click_listener(lambda e: self.on_shortcut("Button"))
+        shortcut_btn.add_click_shortcut(Key.ENTER)
+        self.add(HorizontalLayout(shortcut_btn, shortcut_label))
+
+        # --- Buttons & Actions ---
+        self.add_section("Buttons & Actions")
+
+        button = Button("Click Me!")
+        button.add_click_listener(self.on_button_click)
+
+        dialog_btn = Button("Open Dialog")
+        dialog_btn.add_click_listener(self.open_dialog)
+
+        notification_btn = Button("Show Notification")
+        notification_btn.add_click_listener(self.show_notification)
+
+        success_btn = Button("Success Notification")
+        success_btn.add_click_listener(self.show_success)
+
+        error_btn = Button("Error Notification")
+        error_btn.add_click_listener(self.show_error)
+
+        button_row = HorizontalLayout()
+        button_row.add(button, dialog_btn, notification_btn, success_btn, error_btn)
+        self.add(button_row)
+        self.click_label = Span("Click count: 0")
+        self.add(self.click_label)
+
+        # Dialog (hidden initially)
+        self.dialog = Dialog()
+        self.dialog.set_header_title("Sample Dialog")
+        self.dialog.add(Span("This is a dialog with some content."))
+        self.dialog.add(Span("You can close it by clicking outside."))
+        self.add(self.dialog)
+
         # --- Text Input Fields ---
         self.add_section("Text Input Fields")
 
@@ -117,7 +231,14 @@ class ComponentsDemoView(VerticalLayout):
         text_area.set_placeholder("Enter multiline text...")
         text_form.add(text_area)
 
+        upload = Upload()
+        self.upload_label = Span("Upload status: (none)")
+        upload.set_receiver(self.on_upload_received)
+        upload.add_succeeded_listener(self.on_upload_succeeded)
+        text_form.add(upload)
+
         self.add(text_form)
+        self.add(self.upload_label)
 
         # --- Numeric Fields ---
         self.add_section("Numeric Fields")
@@ -180,130 +301,6 @@ class ComponentsDemoView(VerticalLayout):
         selection_form.add(checkbox_group)
 
         self.add(selection_form)
-
-        # --- Progress ---
-        self.add_section("Progress")
-
-        progress_bar = ProgressBar()
-        progress_bar.set_value(0.6)
-        self.add(Span("ProgressBar (60%):"))
-        self.add(progress_bar)
-
-        progress_indeterminate = ProgressBar()
-        progress_indeterminate.set_indeterminate(True)
-        self.add(Span("ProgressBar (indeterminate):"))
-        self.add(progress_indeterminate)
-
-        # --- Tabs ---
-        self.add_section("Tabs")
-
-        tab1 = Tab("Tab 1")
-        tab2 = Tab("Tab 2")
-        tab3 = Tab("Tab 3")
-        tabs = Tabs(tab1, tab2, tab3)
-        self.tabs_label = Span("Selected tab: Tab 1")
-        tabs.add_selected_change_listener(self.on_tab_selected)
-        self.tabs = tabs
-        self.tab_list = [tab1, tab2, tab3]
-        self.add(tabs)
-        self.add(self.tabs_label)
-
-        # --- TabSheet ---
-        self.add_section("TabSheet")
-
-        tab_sheet = TabSheet()
-        tab_sheet.add("Dashboard", Span("Dashboard content"))
-        tab_sheet.add("Settings", Span("Settings content"))
-        self.add(tab_sheet)
-
-        # --- MenuBar ---
-        self.add_section("MenuBar")
-
-        menu_bar = MenuBar()
-        file_item = menu_bar.add_item("File")
-        file_item.get_sub_menu().add_item("New", lambda e: self.on_menu_click("New"))
-        file_item.get_sub_menu().add_item("Open", lambda e: self.on_menu_click("Open"))
-        edit_item = menu_bar.add_item("Edit")
-        edit_item.get_sub_menu().add_item("Undo", lambda e: self.on_menu_click("Undo"))
-        menu_bar.add_item("Help", lambda e: self.on_menu_click("Help"))
-        self.menu_label = Span("Menu action: (none)")
-        self.add(menu_bar)
-        self.add(self.menu_label)
-
-        # --- Upload ---
-        self.add_section("Upload")
-
-        upload = Upload()
-        self.upload_label = Span("Upload status: (none)")
-        upload.set_receiver(self.on_upload_received)
-        upload.add_succeeded_listener(self.on_upload_succeeded)
-        self.add(upload)
-        self.add(self.upload_label)
-
-        # --- Navigation ---
-        self.add_section("Navigation")
-
-        self.add(RouterLink("Go to Hello World", "/"))
-        self.add(RouterLink("Go to About", "/about"))
-        self.add(RouterLink("Go to Greet", "/greet/World"))
-
-        # --- Component Features ---
-        self.add_section("Component Features")
-
-        features_form = FormLayout()
-
-        helper_field = TextField("With Helper Text")
-        helper_field.set_helper_text("This is a helper text")
-        helper_field.set_id("helper-text-field")
-        helper_field.add_click_shortcut(Key.ENTER)
-        helper_field.add_click_listener(lambda e: self.on_shortcut("With Helper Text"))
-        features_form.add(helper_field)
-
-        tooltip_field = TextField("With Tooltip")
-        tooltip_field.set_tooltip_text("Hover to see this tooltip")
-        tooltip_field.add_click_shortcut(Key.ENTER)
-        tooltip_field.add_click_listener(lambda e: self.on_shortcut("With Tooltip"))
-        features_form.add(tooltip_field)
-
-        self.add(features_form)
-
-        shortcut_label = Span("Shortcut: (none)")
-        self.shortcut_label = shortcut_label
-        shortcut_btn = Button("Press Enter (shortcut)")
-        shortcut_btn.add_click_listener(lambda e: self.on_shortcut("Button"))
-        shortcut_btn.add_click_shortcut(Key.ENTER)
-        self.add(HorizontalLayout(shortcut_btn, shortcut_label))
-
-        # --- Buttons & Actions ---
-        self.add_section("Buttons & Actions")
-
-        button = Button("Click Me!")
-        button.add_click_listener(self.on_button_click)
-
-        dialog_btn = Button("Open Dialog")
-        dialog_btn.add_click_listener(self.open_dialog)
-
-        notification_btn = Button("Show Notification")
-        notification_btn.add_click_listener(self.show_notification)
-
-        success_btn = Button("Success Notification")
-        success_btn.add_click_listener(self.show_success)
-
-        error_btn = Button("Error Notification")
-        error_btn.add_click_listener(self.show_error)
-
-        button_row = HorizontalLayout()
-        button_row.add(button, dialog_btn, notification_btn, success_btn, error_btn)
-        self.add(button_row)
-        self.click_label = Span("Click count: 0")
-        self.add(self.click_label)
-
-        # Dialog (hidden initially)
-        self.dialog = Dialog()
-        self.dialog.set_header_title("Sample Dialog")
-        self.dialog.add(Span("This is a dialog with some content."))
-        self.dialog.add(Span("You can close it by clicking outside."))
-        self.add(self.dialog)
 
         # --- FlexLayout ---
         self.add_section("FlexLayout")
