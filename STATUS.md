@@ -4,7 +4,7 @@
 
 **Vaadin version:** 25.0.4
 **Lines of code:** ~3,400
-**Tests:** 598 passing
+**Tests:** 620 passing
 **Last updated:** 2026-02-08
 
 ---
@@ -74,6 +74,11 @@
 - [x] `setVisible()` / `isVisible()` - Show/hide components
 - [x] `setEnabled()` / `isEnabled()` - Enable/disable components
 - [x] `addClassName()` / `removeClassName()` - CSS class management
+- [x] `setId()` / `getId()` - Component id attribute
+- [x] `focus()` / `blur()` - Focus management via execute commands
+- [x] `setHelperText()` / `getHelperText()` - Helper text below fields
+- [x] `setTooltipText()` / `getTooltipText()` - Tooltips via `<vaadin-tooltip>` child
+- [x] `addClickShortcut(Key)` - Keyboard shortcuts (keydown→click dispatch)
 
 ### Server
 - [x] HTTP Server (aiohttp) - Sessions, static files
@@ -134,11 +139,11 @@
 - [ ] Upload
 
 ### Component Features
-- [ ] `setId()` / `getId()`
-- [ ] `focus()` / `blur()`
-- [ ] Keyboard shortcuts (`addClickShortcut(Key.ENTER)`)
-- [ ] Tooltips
-- [ ] Helper text
+- [x] `setId()` / `getId()`
+- [x] `focus()` / `blur()`
+- [x] Keyboard shortcuts (`addClickShortcut(Key.ENTER)`)
+- [x] Tooltips
+- [x] Helper text
 
 ### Routing (Advanced)
 - [x] Route parameters (`/users/:id`)

@@ -313,6 +313,8 @@ class UidlHandler:
             self._handle_click(node_id, event_data)
         elif event_type == "change":
             self._handle_change(node_id, event_data)
+        elif event_type == "keydown":
+            self._handle_keydown(node_id, event_data)
         else:
             # Generic dispatch for events like opened-changed, closed, etc.
             element = self._tree.get_element(node_id)
@@ -559,6 +561,21 @@ class UidlHandler:
     def _handle_change(self, node_id: int, event_data: dict):
         """Handle change event."""
         pass
+
+    def _handle_keydown(self, node_id: int, event_data: dict):
+        """Handle keydown event.
+
+        If the component has a click shortcut registered, dispatch as click.
+        """
+        component = self._tree.get_component(node_id)
+        if component and getattr(component, "_click_shortcut_registered", False):
+            # Dispatch as click on the same element
+            self._handle_click(node_id, event_data)
+        else:
+            # Generic keydown dispatch
+            element = self._tree.get_element(node_id)
+            if element:
+                element.fire_event("keydown", event_data)
 
     def _handle_msync(self, rpc: dict):
         """Handle property sync RPC."""

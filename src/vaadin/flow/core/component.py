@@ -1,10 +1,13 @@
 """Component - base class for UI components."""
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from vaadin.flow.core.element import Element
 
 if TYPE_CHECKING:
+    from vaadin.flow.core.keys import Key
     from vaadin.flow.core.state_tree import StateTree
 
 
@@ -15,13 +18,15 @@ class Component:
 
     def __init__(self):
         self._element: Element | None = None
-        self._parent: "Component | None" = None
-        self._ui: "UI | None" = None
+        self._parent: Component | None = None
+        self._ui: UI | None = None
         self._visible: bool = True
         self._enabled: bool = True
         self._class_names: set[str] = set()
         self._pending_styles: dict[str, str] = {}
         self._pending_theme: str | None = None
+        self._tooltip_element: Element | None = None
+        self._click_shortcut_registered: bool = False
 
     @property
     def element(self) -> Element:
@@ -48,6 +53,29 @@ class Component:
         if self._pending_theme is not None:
             self._element.set_attribute("theme", self._pending_theme)
             self._pending_theme = None
+        # Apply deferred id
+        pending_id = getattr(self, "_pending_id", None)
+        if pending_id is not None:
+            self._element.set_attribute("id", pending_id)
+            del self._pending_id
+        # Apply deferred properties (helperText, etc.)
+        pending_props = getattr(self, "_pending_properties", None)
+        if pending_props:
+            tooltip_text = pending_props.pop("_tooltip_text", None)
+            for name, value in pending_props.items():
+                self._element.set_property(name, value)
+            pending_props.clear()
+            if tooltip_text:
+                self.set_tooltip_text(tooltip_text)
+        # Apply deferred click listeners (only if base add_click_listener was used)
+        if getattr(self, "_base_click_listeners", None) and not getattr(self, "_click_event_registered", False):
+            self._click_event_registered = True
+            self._element.add_event_listener("click", self._dispatch_click)
+        # Apply deferred click shortcut
+        pending_shortcut = getattr(self, "_pending_click_shortcut", None)
+        if pending_shortcut is not None:
+            self._register_click_shortcut(pending_shortcut)
+            del self._pending_click_shortcut
 
     def get_element(self) -> Element:
         """Get the element (public API)."""
@@ -262,6 +290,127 @@ class Component:
                 self._element.remove_attribute("theme")
         else:
             self._pending_theme = theme_name
+
+    # --- Id methods ---
+
+    def set_id(self, id: str):
+        """Set the component's id attribute."""
+        if self._element:
+            self._element.set_attribute("id", id)
+        else:
+            # Buffer for later (reuse _pending_styles pattern isn't ideal,
+            # so we store in a simple attribute)
+            self._pending_id = id
+
+    def get_id(self) -> str | None:
+        """Get the component's id attribute."""
+        if self._element:
+            return self._element.get_attribute("id")
+        return getattr(self, "_pending_id", None)
+
+    # --- Helper text ---
+
+    def set_helper_text(self, text: str):
+        """Set the helper text shown below the field."""
+        if self._element:
+            self._element.set_property("helperText", text)
+        else:
+            if not hasattr(self, "_pending_properties"):
+                self._pending_properties = {}
+            self._pending_properties["helperText"] = text
+
+    def get_helper_text(self) -> str:
+        """Get the helper text."""
+        if self._element:
+            return self._element.get_property("helperText", "")
+        return getattr(self, "_pending_properties", {}).get("helperText", "")
+
+    # --- Focus / Blur ---
+
+    def focus(self):
+        """Focus this component."""
+        if self._element:
+            self._element._tree.queue_execute([
+                {"@v-node": self._element.node_id},
+                "return (async function() { setTimeout(function(){$0.focus()},0) }).apply($0)"
+            ])
+
+    def blur(self):
+        """Remove focus from this component."""
+        if self._element:
+            self._element._tree.queue_execute([
+                {"@v-node": self._element.node_id},
+                "return (async function() { setTimeout(function(){$0.blur()},0) }).apply($0)"
+            ])
+
+    # --- Tooltip ---
+
+    def set_tooltip_text(self, text: str):
+        """Set the tooltip text. Creates a <vaadin-tooltip> child element."""
+        if not self._element:
+            if not hasattr(self, "_pending_properties"):
+                self._pending_properties = {}
+            self._pending_properties["_tooltip_text"] = text
+            return
+
+        if self._tooltip_element is None:
+            # Create tooltip element as child
+            tooltip = Element("vaadin-tooltip", self._element._tree)
+            tooltip.set_attribute("slot", "tooltip")
+            tooltip.set_property("text", text)
+            self._element.add_child(tooltip)
+            self._tooltip_element = tooltip
+        else:
+            self._tooltip_element.set_property("text", text)
+
+    def get_tooltip_text(self) -> str | None:
+        """Get the tooltip text."""
+        if self._tooltip_element:
+            return self._tooltip_element.get_property("text")
+        props = getattr(self, "_pending_properties", {})
+        return props.get("_tooltip_text")
+
+    # --- Click listener (base) ---
+
+    def add_click_listener(self, listener):
+        """Add a click listener. Works on any component."""
+        if not hasattr(self, "_base_click_listeners"):
+            self._base_click_listeners = []
+        self._base_click_listeners.append(listener)
+        # Register click event on element if attached and not already registered
+        if self._element and not getattr(self, "_click_event_registered", False):
+            self._click_event_registered = True
+            self._element.add_event_listener("click", self._dispatch_click)
+
+    def _dispatch_click(self, event_data: dict):
+        """Dispatch click event to base click listeners."""
+        for listener in getattr(self, "_base_click_listeners", []):
+            listener(event_data)
+
+    # --- Keyboard Shortcuts ---
+
+    def add_click_shortcut(self, key: Key):
+        """Register a keyboard shortcut that triggers click on this component.
+
+        Args:
+            key: The Key to use as shortcut (e.g., Key.ENTER).
+        """
+        if self._click_shortcut_registered:
+            return
+        self._click_shortcut_registered = True
+
+        if self._element:
+            self._register_click_shortcut(key)
+        else:
+            self._pending_click_shortcut = key
+
+    def _register_click_shortcut(self, key: Key):
+        """Internal: register the keydown listener for the click shortcut."""
+        from vaadin.flow.server.uidl_handler import _KEYDOWN_HASH
+
+        # Register keydown event listener with the ENTER hash
+        # The uidl_handler will dispatch keydown → click for this component
+        self._element.add_event_listener("keydown", lambda e: None, hash_key=_KEYDOWN_HASH)
 
     # --- HasStyle shortcut ---
 

@@ -39,6 +39,7 @@ from vaadin.flow.components import (
     TimePicker,
     VerticalLayout,
 )
+from vaadin.flow.core.keys import Key
 
 
 @Route("components", page_title="Components Demo")
@@ -255,6 +256,33 @@ class ComponentsDemoView(VerticalLayout):
         self.add(RouterLink("Go to About", "/about"))
         self.add(RouterLink("Go to Greet", "/greet/World"))
 
+        # --- Component Features ---
+        self.add_section("Component Features")
+
+        features_form = FormLayout()
+
+        helper_field = TextField("With Helper Text")
+        helper_field.set_helper_text("This is a helper text")
+        helper_field.set_id("helper-text-field")
+        helper_field.add_click_shortcut(Key.ENTER)
+        helper_field.add_click_listener(lambda e: self.on_shortcut("With Helper Text"))
+        features_form.add(helper_field)
+
+        tooltip_field = TextField("With Tooltip")
+        tooltip_field.set_tooltip_text("Hover to see this tooltip")
+        tooltip_field.add_click_shortcut(Key.ENTER)
+        tooltip_field.add_click_listener(lambda e: self.on_shortcut("With Tooltip"))
+        features_form.add(tooltip_field)
+
+        self.add(features_form)
+
+        shortcut_label = Span("Shortcut: (none)")
+        self.shortcut_label = shortcut_label
+        shortcut_btn = Button("Press Enter (shortcut)")
+        shortcut_btn.add_click_listener(lambda e: self.on_shortcut("Button"))
+        shortcut_btn.add_click_shortcut(Key.ENTER)
+        self.add(HorizontalLayout(shortcut_btn, shortcut_label))
+
         # --- Buttons & Actions ---
         self.add_section("Buttons & Actions")
 
@@ -351,3 +379,7 @@ class ComponentsDemoView(VerticalLayout):
     def on_menu_click(self, name):
         """Handle menu item click."""
         self.menu_label.set_text(f"Menu action: {name}")
+
+    def on_shortcut(self, source):
+        """Handle shortcut from any component."""
+        self.shortcut_label.set_text(f"Shortcut: {source}")
