@@ -192,7 +192,7 @@ class TestMatchRoute:
 
         result = match_route("about")
         assert result is not None
-        cls, title, params = result
+        cls, title, params, _layout = result
         assert cls == AboutView
         assert title == "About"
         assert params == {}
@@ -205,7 +205,7 @@ class TestMatchRoute:
 
         result = match_route("user/42")
         assert result is not None
-        cls, title, params = result
+        cls, title, params, _layout = result
         assert cls == UserView
         assert params == {"id": "42"}
 

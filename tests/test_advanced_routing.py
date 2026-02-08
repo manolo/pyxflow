@@ -30,7 +30,7 @@ class TestRouteParameters:
 
         result = match_route("user/123")
         assert result is not None
-        cls, title, params = result
+        cls, title, params, _layout = result
         assert cls == UserView
         assert params == {"id": "123"}
 
@@ -42,7 +42,7 @@ class TestRouteParameters:
 
         result = match_route("user/1/post/42")
         assert result is not None
-        cls, title, params = result
+        cls, title, params, _layout = result
         assert cls == PostView
         assert params == {"id": "1", "pid": "42"}
 
@@ -54,7 +54,7 @@ class TestRouteParameters:
 
         result = match_route("search/foo")
         assert result is not None
-        cls, title, params = result
+        cls, title, params, _layout = result
         assert cls == SearchView
         assert params == {"q": "foo"}
 
@@ -66,7 +66,7 @@ class TestRouteParameters:
 
         result = match_route("search")
         assert result is not None
-        cls, title, params = result
+        cls, title, params, _layout = result
         assert cls == SearchView
         assert params == {}
 
@@ -82,7 +82,7 @@ class TestRouteParameters:
 
         result = match_route("user/admin")
         assert result is not None
-        cls, title, params = result
+        cls, title, params, _layout = result
         assert cls == AdminView
         assert params == {}
 

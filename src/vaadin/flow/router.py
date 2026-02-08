@@ -7,14 +7,14 @@ if TYPE_CHECKING:
     from vaadin.flow.core.component import Component
 
 
-# Route entry: (view_class, explicit_page_title, param_names, compiled_regex)
-_RouteEntry = tuple[Type["Component"], str | None, list[str], re.Pattern | None]
+# Route entry: (view_class, explicit_page_title, param_names, compiled_regex, layout_class)
+_RouteEntry = tuple[Type["Component"], str | None, list[str], re.Pattern | None, Type["Component"] | None]
 
 # Global route registry: normalized_path -> route entry
 _routes: dict[str, _RouteEntry] = {}
 
 
-def Route(path: str = "", page_title: str | None = None):
+def Route(path: str = "", page_title: str | None = None, layout: Type["Component"] | None = None):
     """Decorator to register a view class for a route.
 
     Usage:
@@ -39,6 +39,10 @@ def Route(path: str = "", page_title: str | None = None):
         class SearchView(VerticalLayout):
             def set_parameter(self, params):
                 query = params.get("q", "")
+
+        @Route("", layout=MainLayout)
+        class HomeView(VerticalLayout):
+            pass
     """
     def decorator(cls: Type["Component"]) -> Type["Component"]:
         # Normalize path (remove leading/trailing slashes)
@@ -47,7 +51,7 @@ def Route(path: str = "", page_title: str | None = None):
         # Parse route parameters
         param_names, regex = _compile_route(normalized_path)
 
-        _routes[normalized_path] = (cls, page_title, param_names, regex)
+        _routes[normalized_path] = (cls, page_title, param_names, regex, layout)
 
         # Store route info on the class for introspection
         cls._route_path = normalized_path
@@ -122,24 +126,24 @@ def _compile_route(path: str) -> tuple[list[str], re.Pattern | None]:
     return param_names, re.compile(pattern)
 
 
-def match_route(path: str) -> tuple[Type["Component"], str | None, dict[str, str]] | None:
-    """Match a path against registered routes, returning view class, title, and params.
+def match_route(path: str) -> tuple[Type["Component"], str | None, dict[str, str], Type["Component"] | None] | None:
+    """Match a path against registered routes, returning view class, title, params, and layout.
 
     Static routes have priority over parameterized routes.
 
     Returns:
-        (view_class, page_title, params_dict) or None if no route matches.
+        (view_class, page_title, params_dict, layout_class) or None if no route matches.
     """
     normalized_path = path.strip("/")
 
     # Static routes first (exact match)
-    for route_path, (cls, title, param_names, regex) in _routes.items():
+    for route_path, (cls, title, param_names, regex, layout_cls) in _routes.items():
         if regex is None and route_path == normalized_path:
             resolved_title = _resolve_title(cls)
-            return cls, resolved_title, {}
+            return cls, resolved_title, {}, layout_cls
 
     # Parameterized routes
-    for route_path, (cls, title, param_names, regex) in _routes.items():
+    for route_path, (cls, title, param_names, regex, layout_cls) in _routes.items():
         if regex is not None:
             m = regex.match(normalized_path)
             if m:
@@ -149,7 +153,7 @@ def match_route(path: str) -> tuple[Type["Component"], str | None, dict[str, str
                     if i < len(groups) and groups[i] is not None:
                         params[name] = groups[i]
                 resolved_title = _resolve_title(cls)
-                return cls, resolved_title, params
+                return cls, resolved_title, params, layout_cls
 
     return None
 
@@ -214,7 +218,7 @@ def get_all_routes() -> dict[str, Type["Component"]]:
     Returns:
         Dict of path -> view_class
     """
-    return {path: cls for path, (cls, _, _, _) in _routes.items()}
+    return {path: cls for path, (cls, _, _, _, _) in _routes.items()}
 
 
 def clear_routes():

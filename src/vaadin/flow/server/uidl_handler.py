@@ -170,6 +170,8 @@ class UidlHandler:
         self._app_id = f"ROOT-{random.randint(1000000, 9999999)}"
         self._initialized = False
         self._view = None
+        self._layout = None  # Persistent layout instance for RouterLayout
+        self._layout_class = None  # Class of current layout
         self._current_route = None  # Track current route for re-navigation
 
         # Node references
@@ -194,6 +196,8 @@ class UidlHandler:
         self._sync_id = 0
         self._client_id = 0
         self._view = None
+        self._layout = None
+        self._layout_class = None
         self._current_route = None
         self._body_node = None
         self._container_node = None
@@ -343,7 +347,13 @@ class UidlHandler:
                 element.fire_event(event_type, event_data)
 
     def _handle_navigation(self, event_data: dict):
-        """Handle navigation event - create or switch views."""
+        """Handle navigation event - create or switch views.
+
+        Supports three layout modes:
+        1. Same layout class → reuse layout, only swap content
+        2. New/different layout → create layout + view
+        3. No layout → direct view in container (backward-compatible)
+        """
         route = event_data.get("route", "")
 
         # Normalize route - strip leading/trailing slashes
@@ -366,9 +376,10 @@ class UidlHandler:
         view_class = None
         page_title = None
         params = {}
+        layout_class = None
 
         if result:
-            view_class, page_title, params = result
+            view_class, page_title, params, layout_class = result
 
         if view_class is None:
             # Fallback to http_server._view_class for backwards compatibility
@@ -383,31 +394,63 @@ class UidlHandler:
             if self._view.before_leave() is False:
                 return  # Navigation cancelled
 
-        # --- Remove old view ---
-        is_first_navigation = (self._view is None)
-        if self._view is not None:
-            self._container_node.remove_child(self._view.element.node)
-            self._view = None
+        is_first_navigation = (self._view is None and self._layout is None)
 
         # Set tree context so Notification.show() works during view construction
         from vaadin.flow.components.notification import _set_current_tree
         _set_current_tree(self._tree)
         try:
-            # Create the view
             from vaadin.flow.core.component import UI
             ui = UI(self._tree)
-            view = view_class()
-            view._ui = ui
 
-            # Pass route params
-            if params and hasattr(view, 'set_parameter'):
-                view.set_parameter(params)
+            if layout_class is not None:
+                # --- Layout mode ---
+                if self._layout_class is layout_class and self._layout is not None:
+                    # Same layout class → reuse layout, just swap content
+                    if self._view is not None:
+                        self._layout.remove_router_layout_content(self._view)
+                        self._view = None
 
-            # Before enter guard
-            if hasattr(view, 'before_enter'):
-                view.before_enter(params)
+                    view = self._create_view(view_class, params, ui)
+                    self._layout.show_router_layout_content(view)
+                else:
+                    # Different/new layout → remove old root, create layout + view
+                    if self._layout is not None:
+                        self._container_node.remove_child(self._layout.element.node)
+                        self._layout = None
+                        self._layout_class = None
+                        self._view = None
+                    elif self._view is not None:
+                        self._container_node.remove_child(self._view.element.node)
+                        self._view = None
 
-            view._attach(self._tree)
+                    layout = layout_class()
+                    layout._ui = ui
+                    layout._attach(self._tree)
+
+                    view = self._create_view(view_class, params, ui)
+                    layout.show_router_layout_content(view)
+
+                    self._container_node.add_child(layout.element.node)
+                    self._layout = layout
+                    self._layout_class = layout_class
+            else:
+                # --- No layout (backward-compatible) ---
+                if self._layout is not None:
+                    self._container_node.remove_child(self._layout.element.node)
+                    self._layout = None
+                    self._layout_class = None
+                    self._view = None
+                elif self._view is not None:
+                    self._container_node.remove_child(self._view.element.node)
+                    self._view = None
+
+                view = self._create_view(view_class, params, ui)
+                self._container_node.add_child(view.element.node)
+
+            self._view = view
+            self._current_route = route
+
         except Exception as e:
             import traceback
             print(f"[UIDL] ERROR creating view: {e}", flush=True)
@@ -416,11 +459,6 @@ class UidlHandler:
             return
         finally:
             _set_current_tree(None)
-
-        # Add view to container
-        self._container_node.add_child(view.element.node)
-        self._view = view
-        self._current_route = route
 
         # After navigation callback
         if hasattr(view, 'after_navigation'):
@@ -431,6 +469,20 @@ class UidlHandler:
 
         # Build execute commands
         self._setup_execute_commands(page_title, is_first_navigation)
+
+    def _create_view(self, view_class, params: dict, ui) -> "Component":
+        """Create and attach a view instance."""
+        view = view_class()
+        view._ui = ui
+
+        if params and hasattr(view, 'set_parameter'):
+            view.set_parameter(params)
+
+        if hasattr(view, 'before_enter'):
+            view.before_enter(params)
+
+        view._attach(self._tree)
+        return view
 
     def _setup_execute_commands(self, page_title: str, is_first_navigation: bool):
         """Build execute commands for navigation response.
