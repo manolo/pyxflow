@@ -185,6 +185,12 @@ def get_index_html() -> str:
         index_path = bundle_dir / "index.html"
         if index_path.is_file():
             html = index_path.read_text()
+            # Add <base href="/"> for client-side routing (React Router checks
+            # document.baseURI to intercept link clicks for SPA navigation)
+            html = html.replace(
+                '<meta charset="UTF-8" />',
+                '<meta charset="UTF-8" />\n  <base href="/">'
+            )
             # Inject Lumo theme CSS
             html = html.replace(
                 "</head>",

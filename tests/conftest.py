@@ -14,11 +14,11 @@ def reset_routes():
     # Clear routes before test
     clear_routes()
     # Re-import to re-register routes
-    # The imports at module level already registered them, so we need to re-register
+    # Route entry format: (view_class, page_title, param_names, compiled_regex)
     from vaadin.flow.router import _routes
     from examples.hello_world import HelloWorldView
     from examples.about import AboutView
-    _routes[""] = (HelloWorldView, "Hello World")
-    _routes["about"] = (AboutView, "About")
+    _routes[""] = (HelloWorldView, "Hello World", [], None)
+    _routes["about"] = (AboutView, "About", [], None)
     yield
     # Clean up after test (optional)

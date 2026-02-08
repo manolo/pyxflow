@@ -223,8 +223,8 @@ class TestNavigationAddKeydownListener:
         assert keydown_change is not None
 
 
-class TestSecondNavigationIgnored:
-    """Test that second navigation doesn't recreate view."""
+class TestSameRouteNavigationSkipped:
+    """Test that same-route navigation doesn't recreate view."""
 
     @pytest.fixture
     def session(self):
@@ -239,8 +239,8 @@ class TestSecondNavigationIgnored:
             "csrf": csrf,
         }
 
-    def test_second_navigation_ignored(self, session):
-        """Second navigation should not recreate view."""
+    def test_same_route_navigation_skipped(self, session):
+        """Same route navigation should not recreate view."""
         # First navigation
         payload1 = {
             "csrfToken": session["csrf"],

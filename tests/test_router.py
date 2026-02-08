@@ -2,7 +2,7 @@
 
 import pytest
 
-from vaadin.flow.router import Route, get_view_class, get_page_title, get_all_routes, clear_routes
+from vaadin.flow.router import Route, PageTitle, match_route, get_view_class, get_page_title, get_all_routes, clear_routes
 from vaadin.flow.components import VerticalLayout
 
 
@@ -173,3 +173,84 @@ class TestRouteAttributes:
             pass
 
         assert HomeView._page_title is None
+
+
+class TestMatchRoute:
+    """Test match_route function."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        clear_routes()
+        yield
+        clear_routes()
+
+    def test_match_static_route(self):
+        """match_route should return class, title, empty params for static route."""
+        @Route("about", page_title="About")
+        class AboutView(VerticalLayout):
+            pass
+
+        result = match_route("about")
+        assert result is not None
+        cls, title, params = result
+        assert cls == AboutView
+        assert title == "About"
+        assert params == {}
+
+    def test_match_parameterized_route(self):
+        """match_route should return params for parameterized route."""
+        @Route("user/:id")
+        class UserView(VerticalLayout):
+            pass
+
+        result = match_route("user/42")
+        assert result is not None
+        cls, title, params = result
+        assert cls == UserView
+        assert params == {"id": "42"}
+
+    def test_match_returns_none(self):
+        """match_route should return None for no match."""
+        @Route("home")
+        class HomeView(VerticalLayout):
+            pass
+
+        assert match_route("other") is None
+
+    def test_match_route_normalizes_path(self):
+        """match_route should normalize path."""
+        @Route("test")
+        class TestView(VerticalLayout):
+            pass
+
+        result = match_route("/test/")
+        assert result is not None
+        assert result[0] == TestView
+
+
+class TestPageTitleDecorator:
+    """Test @PageTitle decorator."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        clear_routes()
+        yield
+        clear_routes()
+
+    def test_page_title_sets_class_attr(self):
+        """@PageTitle should set _page_title attribute."""
+        @PageTitle("My Title")
+        class MyView(VerticalLayout):
+            pass
+
+        assert MyView._page_title == "My Title"
+
+    def test_page_title_not_overwritten_by_route(self):
+        """@Route without page_title should not overwrite @PageTitle."""
+        @Route("pt")
+        @PageTitle("From PageTitle")
+        class PTView(VerticalLayout):
+            pass
+
+        assert PTView._page_title == "From PageTitle"
+        assert get_page_title("pt") == "From PageTitle"

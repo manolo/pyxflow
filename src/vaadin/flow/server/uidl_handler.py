@@ -149,6 +149,7 @@ class UidlHandler:
         self._app_id = f"ROOT-{random.randint(1000000, 9999999)}"
         self._initialized = False
         self._view = None
+        self._current_route = None  # Track current route for re-navigation
 
         # Node references
         self._body_node = None
@@ -172,6 +173,7 @@ class UidlHandler:
         self._sync_id = 0
         self._client_id = 0
         self._view = None
+        self._current_route = None
         self._body_node = None
         self._container_node = None
         self._pending_execute = []
@@ -318,11 +320,7 @@ class UidlHandler:
                 element.fire_event(event_type, event_data)
 
     def _handle_navigation(self, event_data: dict):
-        """Handle navigation event - create the view."""
-        # Only create view once
-        if self._view is not None:
-            return
-
+        """Handle navigation event - create or switch views."""
         route = event_data.get("route", "")
 
         # Normalize route - strip leading/trailing slashes
@@ -334,10 +332,20 @@ class UidlHandler:
         if not route and initial_route:
             route = initial_route
 
-        # Use router to find view class
-        from vaadin.flow.router import get_view_class, get_page_title
+        # Same route as current → skip (no-op for same-page navigation)
+        if self._view is not None and route == self._current_route:
+            return
 
-        view_class = get_view_class(route)
+        # Use router to find view class and params
+        from vaadin.flow.router import match_route, _resolve_title
+
+        result = match_route(route)
+        view_class = None
+        page_title = None
+        params = {}
+
+        if result:
+            view_class, page_title, params = result
 
         if view_class is None:
             # Fallback to http_server._view_class for backwards compatibility
@@ -345,12 +353,18 @@ class UidlHandler:
             if _view_class is not None:
                 view_class = _view_class
             else:
-                # No route found, return 404-like behavior
-                # For now, just return without creating a view
                 return
 
-        # Get page title
-        page_title = get_page_title(route) or "PyFlow"
+        # --- Before leave guard on current view ---
+        if self._view is not None and hasattr(self._view, 'before_leave'):
+            if self._view.before_leave() is False:
+                return  # Navigation cancelled
+
+        # --- Remove old view ---
+        is_first_navigation = (self._view is None)
+        if self._view is not None:
+            self._container_node.remove_child(self._view.element.node)
+            self._view = None
 
         # Set tree context so Notification.show() works during view construction
         from vaadin.flow.components.notification import _set_current_tree
@@ -359,9 +373,18 @@ class UidlHandler:
             # Create the view
             from vaadin.flow.core.component import UI
             ui = UI(self._tree)
-            self._view = view_class()
-            self._view._ui = ui
-            self._view._attach(self._tree)
+            view = view_class()
+            view._ui = ui
+
+            # Pass route params
+            if params and hasattr(view, 'set_parameter'):
+                view.set_parameter(params)
+
+            # Before enter guard
+            if hasattr(view, 'before_enter'):
+                view.before_enter(params)
+
+            view._attach(self._tree)
         except Exception as e:
             import traceback
             print(f"[UIDL] ERROR creating view: {e}", flush=True)
@@ -372,45 +395,49 @@ class UidlHandler:
             _set_current_tree(None)
 
         # Add view to container
-        self._container_node.add_child(self._view.element.node)
+        self._container_node.add_child(view.element.node)
+        self._view = view
+        self._current_route = route
 
-        # Add keydown listener to body for Enter key handling
-        self._tree.add_change({
-            "node": self._body_node.id,
-            "type": "put",
-            "key": "keydown",
-            "feat": Feature.ELEMENT_LISTENER_MAP,
-            "value": _KEYDOWN_HASH
-        })
+        # After navigation callback
+        if hasattr(view, 'after_navigation'):
+            view.after_navigation()
 
-        # Find TextField nodes to add execute command for invalid property
-        self._pending_execute = [
-            [page_title, "document.title = $0"],
-        ]
+        # Resolve dynamic title (instance method takes priority)
+        page_title = _resolve_title(view_class, view) or "PyFlow"
 
-        # Add execute command for each TextField's invalid property
+        # Build execute commands
+        self._setup_execute_commands(page_title, is_first_navigation)
+
+    def _setup_execute_commands(self, page_title: str, is_first_navigation: bool):
+        """Build execute commands for navigation response.
+
+        Args:
+            page_title: The resolved page title
+            is_first_navigation: True if this is the first navigation (needs keydown + serverConnected)
+        """
+        # Title is always set
+        self._pending_execute.append([page_title, "document.title = $0"])
+
+        # TextField invalid property (always)
         textfield_nodes = self._find_textfield_nodes()
         for tf_node_id in textfield_nodes:
             self._pending_execute.append(
                 [False, {"@v-node": tf_node_id}, "return (async function() { this.invalid = $0}).apply($1)"]
             )
 
-        # Add execute commands for Dialog components (FlowComponentHost renderer)
+        # Dialog execute commands (always)
         dialog_nodes = self._find_dialog_nodes()
         for dialog_node_id in dialog_nodes:
-            # Patch the virtual container
             self._pending_execute.append(
                 [{"@v-node": dialog_node_id}, "return (async function() { Vaadin.FlowComponentHost.patchVirtualContainer(this) }).apply($0)"]
             )
-            # Set up the renderer
             self._pending_execute.append(
                 [self._app_id, {"@v-node": dialog_node_id}, "return (async function() { this.renderer = (root) => Vaadin.FlowComponentHost.setChildNodes($0, this.virtualChildNodeIds, root) }).apply($1)"]
             )
-            # Request content update
             self._pending_execute.append(
                 [{"@v-node": dialog_node_id}, "return (async function() { this.requestContentUpdate() }).apply($0)"]
             )
-            # Register overlay close handler (calls $server.handleClientClose)
             self._pending_execute.append(
                 [{"@v-node": dialog_node_id},
                  "return (async function() {"
@@ -425,7 +452,18 @@ class UidlHandler:
                  "}).apply($0)"]
             )
 
-        # Add serverConnected execute command
+        # First navigation only: keydown listener on body
+        if is_first_navigation:
+            self._tree.add_change({
+                "node": self._body_node.id,
+                "type": "put",
+                "key": "keydown",
+                "feat": Feature.ELEMENT_LISTENER_MAP,
+                "value": _KEYDOWN_HASH
+            })
+
+        # serverConnected on every navigation (React Router waits for this
+        # callback before completing pushState URL update)
         self._pending_execute.append(
             [False, {"@v-node": self._container_node.id}, "return (async function() { this.serverConnected($0)}).apply($1)"]
         )

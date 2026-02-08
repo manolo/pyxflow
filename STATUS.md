@@ -4,8 +4,8 @@
 
 **Vaadin version:** 25.0.4
 **Lines of code:** ~3,400
-**Tests:** 566 passing
-**Last updated:** 2026-02-07
+**Tests:** 598 passing
+**Last updated:** 2026-02-08
 
 ---
 
@@ -106,6 +106,11 @@
 - [x] `@Route` decorator - Path registration
 - [x] Multiple views - HelloWorldView, AboutView
 - [x] Page title - Explicit or auto-generated from class name
+- [x] Route parameters (`/users/:id`) - Required and optional (`:param?`) syntax
+- [x] Re-navigation - Navigate between views without page reload
+- [x] Navigation guards - `before_leave()`, `before_enter(params)`, `after_navigation()`
+- [x] RouterLink component - `<a>` tag with `router-link` attribute for client-side navigation
+- [x] `@PageTitle` decorator - Alternative to `page_title` param, supports `get_page_title()` for dynamic titles
 
 ---
 
@@ -136,10 +141,10 @@
 - [ ] Helper text
 
 ### Routing (Advanced)
-- [ ] Route parameters (`/users/:id`)
-- [ ] Navigation guards (BeforeEnter/Leave)
-- [ ] RouterLink component
-- [ ] `@PageTitle` decorator (alternative to page_title param)
+- [x] Route parameters (`/users/:id`)
+- [x] Navigation guards (BeforeEnter/Leave)
+- [x] RouterLink component
+- [x] `@PageTitle` decorator (alternative to page_title param)
 
 ### Data Binding
 - [ ] Binder

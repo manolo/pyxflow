@@ -28,6 +28,7 @@ from vaadin.flow.components import (
     PasswordField,
     ProgressBar,
     RadioButtonGroup,
+    RouterLink,
     Select,
     Span,
     Tab,
@@ -246,6 +247,13 @@ class ComponentsDemoView(VerticalLayout):
         comp_grid.set_items(people)
         self.add(comp_grid)
         self.add(self.comp_renderer_label)
+
+        # --- Navigation ---
+        self.add_section("Navigation")
+
+        self.add(RouterLink("Go to Hello World", "/"))
+        self.add(RouterLink("Go to About", "/about"))
+        self.add(RouterLink("Go to Greet", "/greet/World"))
 
         # --- Buttons & Actions ---
         self.add_section("Buttons & Actions")

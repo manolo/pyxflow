@@ -1,7 +1,7 @@
 """About view example - demonstrates multiple routes."""
 
 from vaadin.flow import Route
-from vaadin.flow.components import Span, VerticalLayout
+from vaadin.flow.components import RouterLink, Span, VerticalLayout
 
 
 @Route("about", page_title="About")
@@ -16,3 +16,4 @@ class AboutView(VerticalLayout):
         self.add(Span("About PyFlow"))
         self.add(Span("Python implementation of Vaadin Flow"))
         self.add(Span("Version 0.1.0"))
+        self.add(RouterLink("Back to Components", "/components"))
