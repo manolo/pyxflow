@@ -4,6 +4,7 @@ from vaadin.flow.components.button import Button
 from vaadin.flow.components.checkbox import Checkbox
 from vaadin.flow.components.checkbox_group import CheckboxGroup
 from vaadin.flow.components.combo_box import ComboBox
+from vaadin.flow.components.confirm_dialog import ConfirmDialog
 from vaadin.flow.components.date_picker import DatePicker
 from vaadin.flow.components.dialog import Dialog
 from vaadin.flow.components.email_field import EmailField
@@ -34,6 +35,7 @@ __all__ = [
     "Checkbox",
     "CheckboxGroup",
     "ComboBox",
+    "ConfirmDialog",
     "DatePicker",
     "Dialog",
     "EmailField",
