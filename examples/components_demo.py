@@ -11,6 +11,7 @@ from vaadin.flow.components import (
     CheckboxGroup,
     ComboBox,
     ComponentRenderer,
+    ConfirmDialog,
     DatePicker,
     Dialog,
     EmailField,
@@ -76,9 +77,6 @@ class CrudPerson:
     def from_dict(d: dict) -> "CrudPerson":
         return CrudPerson(d["name"], d["email"], int(d["age"]), d["role"], d["city"], d["department"])
 
-
-CRUD_ROLES = ["Developer", "Manager", "Analyst", "Designer", "Tester"]
-CRUD_DEPARTMENTS = ["Engineering", "Product", "HR", "Marketing", "Sales"]
 
 
 @Route("components", page_title="Components Demo")
@@ -311,6 +309,8 @@ class ComponentsDemoView(VerticalLayout):
         self.add_section("CRUD Master-Detail (Binder)")
 
         self.crud_people = [CrudPerson.from_dict(p) for p in people]
+        crud_roles = sorted({p["role"] for p in people})
+        crud_departments = sorted({p["department"] for p in people})
         self.crud_selected: CrudPerson | None = None
         self.crud_is_new = False
 
@@ -347,10 +347,10 @@ class ComponentsDemoView(VerticalLayout):
         self.crud_email = EmailField("Email")
         self.crud_age = TextField("Age")
         self.crud_role = Select("Role")
-        self.crud_role.set_items(*CRUD_ROLES)
+        self.crud_role.set_items(*crud_roles)
         self.crud_city = TextField("City")
         self.crud_dept = Select("Department")
-        self.crud_dept.set_items(*CRUD_DEPARTMENTS)
+        self.crud_dept.set_items(*crud_departments)
 
         crud_form.add(self.crud_name, self.crud_email, self.crud_age,
                       self.crud_role, self.crud_city, self.crud_dept)
@@ -368,8 +368,25 @@ class ComponentsDemoView(VerticalLayout):
         crud_btn_bar.add(crud_save, crud_delete, crud_cancel)
         self.crud_detail.add(crud_btn_bar)
 
-        self.crud_status = Span("Select a person to edit")
-        self.crud_detail.add(self.crud_status)
+        # ConfirmDialog for delete
+        self.crud_confirm = ConfirmDialog()
+        self.crud_confirm.set_header("Confirm Delete")
+        self.crud_confirm.set_text("Are you sure you want to delete this person?")
+        self.crud_confirm.set_confirm_text("Delete")
+        self.crud_confirm.set_confirm_button_theme("error primary")
+        self.crud_confirm.set_cancelable(True)
+        self.crud_confirm.add_confirm_listener(self._crud_do_delete)
+        self.add(self.crud_confirm)
+
+        # ConfirmDialog for cancel with unsaved changes
+        self.crud_cancel_confirm = ConfirmDialog()
+        self.crud_cancel_confirm.set_header("Unsaved changes")
+        self.crud_cancel_confirm.set_text("You have unsaved changes. Discard them?")
+        self.crud_cancel_confirm.set_confirm_text("Discard")
+        self.crud_cancel_confirm.set_confirm_button_theme("error primary")
+        self.crud_cancel_confirm.set_cancelable(True)
+        self.crud_cancel_confirm.add_confirm_listener(lambda e: self._crud_clear_form())
+        self.add(self.crud_cancel_confirm)
 
         crud_layout.expand(self.crud_master)
         crud_layout.add(self.crud_master, self.crud_detail)
@@ -658,7 +675,6 @@ class ComponentsDemoView(VerticalLayout):
                 self.crud_selected = person
                 self.crud_is_new = False
                 self.binder.read_bean(person)
-                self.crud_status.set_text(f"Editing: {person.name}")
                 self.crud_detail.set_visible(True)
         else:
             self._crud_clear_form()
@@ -667,12 +683,14 @@ class ComponentsDemoView(VerticalLayout):
         self.crud_selected = CrudPerson()
         self.crud_is_new = True
         self.binder.read_bean(self.crud_selected)
-        self.crud_status.set_text("New person")
         self.crud_detail.set_visible(True)
 
     def _crud_on_save(self, event):
         if self.crud_selected is None:
             Notification.show("Select a person or click New first", 3000)
+            return
+        if not self.binder.is_dirty():
+            Notification.show("No changes to save", 3000)
             return
         try:
             self.binder.write_bean(self.crud_selected)
@@ -684,13 +702,19 @@ class ComponentsDemoView(VerticalLayout):
             self.crud_people.append(self.crud_selected)
             self.crud_is_new = False
         self._crud_refresh_grid()
+        self.binder.read_bean(self.crud_selected)
         n = Notification.show(f"Saved: {self.crud_selected.name}", 3000)
         n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
-        self.crud_status.set_text(f"Saved: {self.crud_selected.name}")
 
     def _crud_on_delete(self, event):
         if self.crud_selected is None or self.crud_is_new:
             Notification.show("Select a person to delete", 3000)
+            return
+        self.crud_confirm.set_text(f"Are you sure you want to delete {self.crud_selected.name}?")
+        self.crud_confirm.open()
+
+    def _crud_do_delete(self, event):
+        if self.crud_selected is None:
             return
         name = self.crud_selected.name
         self.crud_people = [p for p in self.crud_people if p.id != self.crud_selected.id]
@@ -700,7 +724,10 @@ class ComponentsDemoView(VerticalLayout):
         n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
 
     def _crud_on_cancel(self, event):
-        self._crud_clear_form()
+        if self.binder.is_dirty():
+            self.crud_cancel_confirm.open()
+        else:
+            self._crud_clear_form()
 
     def _crud_clear_form(self):
         self.crud_selected = None
@@ -711,5 +738,4 @@ class ComponentsDemoView(VerticalLayout):
         self.crud_role.set_value("")
         self.crud_city.set_value("")
         self.crud_dept.set_value("")
-        self.crud_status.set_text("Select a person to edit")
         self.crud_detail.set_visible(False)

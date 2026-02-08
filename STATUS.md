@@ -4,7 +4,7 @@
 
 **Vaadin version:** 25.0.4
 **Lines of code:** ~3,400
-**Tests:** 727 passing
+**Tests:** 761 passing
 **Last updated:** 2026-02-08
 
 ---
@@ -62,6 +62,7 @@
 - [x] CheckboxGroup - Multiple checkbox selection
 - [x] FormLayout - Responsive steps, colspan, FormItem (label slot), FormRow, auto-responsive, CSS custom properties
 - [x] Grid - Columns (path, header, width, flexGrow, autoWidth, resizable, sortable), in-memory data push, single/multi selection, sorting, lazy loading/DataProvider, column reordering, LitRenderer, ComponentRenderer
+- [x] ConfirmDialog - Confirm/cancel/reject actions, header/message/button text, theme, cancelable/rejectable
 - [x] ComboBox - Filtered dropdown, data push protocol, item label generator, custom value support
 - [x] DatePicker - Date selection with calendar overlay, min/max, connector init
 - [x] TimePicker - Time selection with dropdown, step, min/max, connector init
@@ -82,7 +83,7 @@
 - [x] `addClickShortcut(Key)` - Keyboard shortcuts (keydown→click dispatch)
 
 ### Data Binding
-- [x] Binder - Fluent API (`for_field().with_validator().with_converter().bind()`), `read_bean`, `write_bean`, `set_bean` (auto two-way sync)
+- [x] Binder - Fluent API (`for_field().with_validator().with_converter().bind()`), `read_bean`, `write_bean`, `set_bean` (auto two-way sync), `is_dirty()` dirty tracking
 - [x] Validators - `required`, `min_length`, `max_length`, `pattern`, `value_range`, `positive`, `email`
 - [x] Converters - `string_to_int`, `string_to_float`, custom `Converter(to_model, to_presentation)`
 - [x] ValidationError - Raised by `write_bean()` with error results
