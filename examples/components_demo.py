@@ -40,9 +40,13 @@ from vaadin.flow.components import (
     Upload,
     VerticalLayout,
 )
+from vaadin.flow.components.horizontal_layout import Alignment
 from vaadin.flow.core.keys import Key
 from vaadin.flow.data import (
     Binder,
+    CallbackDataProvider,
+    ListDataProvider,
+    Query,
     ValidationError,
     email,
     max_length,
@@ -314,8 +318,7 @@ class ComponentsDemoView(VerticalLayout):
         crud_layout.set_width_full()
 
         # Master: Grid
-        crud_master = VerticalLayout()
-        crud_master.set_width("60%")
+        self.crud_master = VerticalLayout()
 
         self.crud_grid = Grid()
         self.crud_grid.add_column("name", header="Name").set_auto_width(True)
@@ -331,7 +334,7 @@ class ComponentsDemoView(VerticalLayout):
         crud_new_btn.add_theme_name("primary")
         crud_new_btn.add_click_listener(self._crud_on_new)
 
-        crud_master.add(self.crud_grid, crud_new_btn)
+        self.crud_master.add(self.crud_grid, crud_new_btn)
 
         # Detail: Form (hidden until selection or new)
         self.crud_detail = VerticalLayout()
@@ -368,7 +371,8 @@ class ComponentsDemoView(VerticalLayout):
         self.crud_status = Span("Select a person to edit")
         self.crud_detail.add(self.crud_status)
 
-        crud_layout.add(crud_master, self.crud_detail)
+        crud_layout.expand(self.crud_master)
+        crud_layout.add(self.crud_master, self.crud_detail)
         self.add(crud_layout)
 
         # Binder setup
@@ -460,6 +464,73 @@ class ComponentsDemoView(VerticalLayout):
         self.add(comp_grid)
         self.add(self.comp_renderer_label)
 
+        # --- Grid with ListDataProvider ---
+        self.add_section("Grid with ListDataProvider")
+
+        dp_items = [
+            {"name": p["name"], "city": p["city"], "department": p["department"]}
+            for p in people
+        ]
+        self.dp = ListDataProvider(dp_items)
+        self.dp_add_counter = 0
+
+        dp_grid = Grid()
+        dp_grid.add_column("name", header="Name").set_auto_width(True).set_sortable(True)
+        dp_grid.add_column("city", header="City").set_auto_width(True).set_sortable(True)
+        dp_grid.add_column("department", header="Department").set_sortable(True)
+        dp_grid.set_data_provider(self.dp)
+
+        self.dp_filter = TextField(f"Filter by name (Items: {len(dp_items)})")
+        self.dp_filter.add_value_change_listener(self._dp_on_filter)
+
+        dp_add_btn = Button("Add Person")
+        dp_add_btn.add_click_listener(self._dp_on_add)
+
+        dp_remove_btn = Button("Remove Last")
+        dp_remove_btn.add_theme_name("error")
+        dp_remove_btn.add_click_listener(self._dp_on_remove)
+
+        dp_controls = HorizontalLayout()
+        dp_controls.set_default_vertical_component_alignment(Alignment.BASELINE)
+        dp_controls.add(self.dp_filter, dp_add_btn, dp_remove_btn)
+        self.add(dp_controls)
+        self.add(dp_grid)
+
+        # --- Grid with Lazy DataProvider ---
+        self.add_section("Grid with Lazy DataProvider")
+
+        # Simulate a large dataset (1000 items) served lazily
+        self._lazy_data = [
+            {"name": f"Person {i}", "city": f"City {i % 20}", "department": f"Dept {i % 5}"}
+            for i in range(1000)
+        ]
+        self._lazy_fetches = 0
+        self._lazy_loaded = 0
+
+        def lazy_fetch(query):
+            self._lazy_fetches += 1
+            items = self._lazy_data[query.offset:query.offset + query.limit]
+            self._lazy_loaded += len(items)
+            self._lazy_stats_label.set_text(
+                f"{len(self._lazy_data)} items totales (fetches: {self._lazy_fetches}, loaded: {self._lazy_loaded})"
+            )
+            return items
+
+        def lazy_count(query):
+            return len(self._lazy_data)
+
+        lazy_dp = CallbackDataProvider(lazy_fetch, lazy_count)
+
+        lazy_grid = Grid()
+        lazy_grid.add_column("name", header="Name").set_auto_width(True).set_sortable(True)
+        lazy_grid.add_column("city", header="City").set_auto_width(True).set_sortable(True)
+        lazy_grid.add_column("department", header="Department").set_sortable(True)
+        lazy_grid.set_data_provider(lazy_dp)
+
+        self._lazy_stats_label = Span(f"{len(self._lazy_data)} items totales (fetches: 0, loaded: 0)")
+        self.add(self._lazy_stats_label)
+        self.add(lazy_grid)
+
     @staticmethod
     def _load_people() -> list[dict]:
         """Load people data from CSV."""
@@ -538,6 +609,37 @@ class ComponentsDemoView(VerticalLayout):
         """Handle shortcut from any component."""
         self.shortcut_label.set_text(f"Shortcut: {source}")
 
+    # --- DataProvider methods ---
+
+    def _dp_update_label(self):
+        """Update the filter field label with current item count."""
+        self.dp_filter.set_label(f"Filter by name (Items: {self.dp.size(Query())})")
+
+    def _dp_on_filter(self, event):
+        """Filter DataProvider by name."""
+        text = self.dp_filter.get_value().lower()
+        if text:
+            self.dp.set_filter(lambda item, t=text: t in item["name"].lower())
+        else:
+            self.dp.set_filter(None)
+        self._dp_update_label()
+
+    def _dp_on_add(self, event):
+        """Add a person to the DataProvider."""
+        self.dp_add_counter += 1
+        self.dp.add_item({
+            "name": f"New Person {self.dp_add_counter}",
+            "city": "Unknown",
+            "department": "Unassigned",
+        })
+        self._dp_update_label()
+
+    def _dp_on_remove(self, event):
+        """Remove the last person from the DataProvider."""
+        if self.dp.items:
+            self.dp.remove_item(self.dp.items[-1])
+            self._dp_update_label()
+
     # --- CRUD Master-Detail methods ---
 
     def _crud_refresh_grid(self):
@@ -598,11 +700,7 @@ class ComponentsDemoView(VerticalLayout):
         n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
 
     def _crud_on_cancel(self, event):
-        if self.crud_selected and not self.crud_is_new:
-            self.binder.read_bean(self.crud_selected)
-            self.crud_status.set_text("Changes discarded")
-        else:
-            self._crud_clear_form()
+        self._crud_clear_form()
 
     def _crud_clear_form(self):
         self.crud_selected = None
