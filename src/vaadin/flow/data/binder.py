@@ -193,6 +193,7 @@ class Binder(Generic[T]):
         self._bean_validators: list[Callable] = []
         self._status_listeners: list[Callable] = []
         self._change_registrations: list = []
+        self._snapshot: dict | None = None
 
     def for_field(self, field) -> BindingBuilder:
         """Start building a binding for the given field."""
@@ -222,6 +223,7 @@ class Binder(Generic[T]):
         """Populate all fields from the bean."""
         for binding in self._bindings:
             binding.read(bean)
+        self._take_snapshot()
 
     def write_bean(self, bean: T):
         """Write all field values to the bean. Raises ValidationError on failure."""
@@ -263,10 +265,25 @@ class Binder(Generic[T]):
         self._bean = bean
         if bean is not None:
             self.read_bean(bean)
+        else:
+            self._snapshot = None
 
     def get_bean(self) -> T | None:
         """Get the currently bound bean."""
         return self._bean
+
+    def _take_snapshot(self):
+        """Capture current field values for dirty comparison."""
+        self._snapshot = {i: b.field.get_value() for i, b in enumerate(self._bindings)}
+
+    def is_dirty(self) -> bool:
+        """Check if any field value differs from the last read_bean snapshot."""
+        if self._snapshot is None:
+            return False
+        for i, binding in enumerate(self._bindings):
+            if i in self._snapshot and binding.field.get_value() != self._snapshot[i]:
+                return True
+        return False
 
     def validate(self) -> list[ValidationResult]:
         """Validate all bindings. Returns list of error results."""
