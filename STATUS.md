@@ -4,7 +4,7 @@
 
 **Vaadin version:** 25.0.4
 **Lines of code:** ~3,400
-**Tests:** 761 passing
+**Tests:** 798 passing
 **Last updated:** 2026-02-08
 
 ---
@@ -50,8 +50,10 @@
 - [x] TextArea - Multi-line text input with placeholder
 - [x] TextField - Label, value, change event, mSync
 - [x] Span - Text content
-- [x] VerticalLayout - Theme, add children, padding/spacing
-- [x] HorizontalLayout - Theme, add children, margin/spacing, vertical alignment
+- [x] Div - Simple `<div>` with text content
+- [x] VerticalLayout - Theme, add children, padding/spacing/margin, expand, horizontal component alignment
+- [x] HorizontalLayout - Theme, add children, margin/spacing, expand, vertical component alignment
+- [x] FlexLayout - Pure CSS Flexbox `<div>`: flex-direction, flex-wrap, justify-content, align-items/self/content, flex-grow/shrink/basis, order, expand
 - [x] Dialog - Header title, modal, draggable, resizable, FlowComponentHost renderer, publishedEventHandler close
 - [x] Notification - Position, duration, theme variants, open/close, static show(), body attachment
 - [x] PasswordField - Password input with reveal button
