@@ -33,6 +33,10 @@ from vaadin.flow.components.span import Span
 from vaadin.flow.components.upload import Upload
 from vaadin.flow.components.vertical_layout import VerticalLayout
 from vaadin.flow.components.horizontal_layout import HorizontalLayout
+from vaadin.flow.components.icon import Icon
+from vaadin.flow.components.drawer_toggle import DrawerToggle
+from vaadin.flow.components.side_nav import SideNav, SideNavItem
+from vaadin.flow.components.app_layout import AppLayout
 
 __all__ = [
     "Button",
@@ -87,4 +91,9 @@ __all__ = [
     "Upload",
     "VerticalLayout",
     "HorizontalLayout",
+    "Icon",
+    "DrawerToggle",
+    "SideNav",
+    "SideNavItem",
+    "AppLayout",
 ]

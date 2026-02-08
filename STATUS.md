@@ -1,10 +1,10 @@
 # PyFlow Implementation Status
 
-## Current State: MVP + Routing + Grid (Advanced) + Renderers + Full UIDL Compatibility
+## Current State: MVP + Routing + Grid (Advanced) + Renderers + AppLayout + Full UIDL Compatibility
 
 **Vaadin version:** 25.0.4
-**Lines of code:** ~3,400
-**Tests:** 798 passing
+**Lines of code:** ~3,700
+**Tests:** 869 passing
 **Last updated:** 2026-02-08
 
 ---
@@ -73,6 +73,10 @@
 - [x] TabSheet - Tabs + content panels with slot-based association
 - [x] MenuBar - Hierarchical menus with connector protocol, submenu support, click listeners
 - [x] Upload - File upload via multipart HTTP POST, receiver callback, file reject/success/error events, max files/size, accepted types, auto-upload, drop zone
+- [x] Icon - `vaadin-icon`, auto-prefix `vaadin:`, color (CSS fill), size
+- [x] DrawerToggle - Hamburger button for AppLayout drawer, extends Button
+- [x] SideNav / SideNavItem - Navigation items with path, prefix icon slot, nested items via children slot, collapsible, label span
+- [x] AppLayout - Navbar/drawer/content slots, drawerOpened, primarySection, RouterLayout interface
 
 ### Component Base Features
 - [x] `setVisible()` / `isVisible()` - Show/hide components
@@ -120,27 +124,20 @@
 - [x] Navigation guards - `before_leave()`, `before_enter(params)`, `after_navigation()`
 - [x] RouterLink component - `<a>` tag with `router-link` attribute for client-side navigation
 - [x] `@PageTitle` decorator - Alternative to `page_title` param, supports `get_page_title()` for dynamic titles
+- [x] `@Route(layout=...)` - RouterLayout support, layout chain in navigation, layout reuse on same-layout routes
 
 ---
 
 ## Not Implemented
 
-### Component Inventory (Vaadin 25 — 20 missing components)
+### Component Inventory (Vaadin 25 — 15 missing components)
 
-Vaadin 25 has 72 npm packages. Filtering out infrastructure/themes/internals, there are **20 real UI components** not yet implemented in PyFlow, organized by implementation phase.
+Vaadin 25 has 72 npm packages. Filtering out infrastructure/themes/internals, there are **15 real UI components** not yet implemented in PyFlow, organized by implementation phase.
 
 Full analysis with complexity, connectors, and dependencies: **`../specs/COMPONENTS.md`**
 
-### Phase 8 — AppLayout & Prerequisites (enables real app layouts)
-
-| Component | Tag | Complexity | Notes |
-|---|---|---|---|
-| [ ] **Icon** | `vaadin-icon` | Trivial | Properties: `icon`, `svg`. Required by AppLayout, SideNav, MenuBar icons |
-| [ ] **App Layout** | `vaadin-app-layout` | Medium-High | Slots: drawer, navbar, content. RouterLayout interface. DrawerToggle |
-| [ ] **DrawerToggle** | `vaadin-drawer-toggle` | Trivial | Hamburger button for AppLayout drawer |
-| [ ] **SideNav / SideNavItem** | `vaadin-side-nav` | Medium | Navigation items with path, nested items, path matching |
-| [ ] **RouterLayout interface** | (infrastructure) | Medium | `show_router_layout_content()`, `@Route(layout=...)`, layout chain in navigation |
-| [ ] **`@ParentLayout` / `@RoutePrefix`** | (infrastructure) | Low | Nested layout hierarchies, path prefix from parent layouts |
+### ~~Phase 8 — AppLayout & Prerequisites~~ ✓ DONE
+Icon, DrawerToggle, SideNav/SideNavItem, AppLayout, RouterLayout (`@Route(layout=...)`), layout chain in navigation.
 
 ### Phase 9 — Menu System + Simple High-Value Components
 
@@ -207,7 +204,7 @@ Full analysis with complexity, connectors, and dependencies: **`../specs/COMPONE
 5. ~~**Lumo theme loading** - Extract and serve theme CSS~~ ✓ DONE
 6. ~~**Grid** - Complex but essential for data apps~~ ✓ DONE
 7. ~~**Grid advanced** - Lazy loading, sorting, multi-select, renderers~~ ✓ DONE
-8. **AppLayout & Prerequisites** - Icon, AppLayout, DrawerToggle, SideNav, RouterLayout interface, `@Route(layout=...)`, layout chain
+8. ~~**AppLayout & Prerequisites** - Icon, AppLayout, DrawerToggle, SideNav, RouterLayout interface, `@Route(layout=...)`, layout chain~~ ✓ DONE
 9. **Menu System + High-Value Components** - `@Menu`, MenuConfiguration, Details, Accordion, ContextMenu, DateTimePicker, Markdown
 10. **Visual & Layout Components** - Avatar, Card, SplitLayout, Scroller, Popover, MasterDetailLayout
 11. **Data & Specialized Components** - ListBox, MultiSelectComboBox, VirtualList, MessageInput/List, Login, CustomField
