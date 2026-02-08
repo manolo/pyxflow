@@ -4,6 +4,7 @@ import csv
 from pathlib import Path
 
 from vaadin.flow import Route
+from examples.main_layout import MainLayout
 from vaadin.flow.components import (
     Button,
     Grid,
@@ -29,7 +30,7 @@ def _load_people() -> list[dict]:
 _ALL_PEOPLE = _load_people()
 
 
-@Route("grid", page_title="Grid Demo")
+@Route("grid", page_title="Grid Demo", layout=MainLayout)
 class GridDemoView(VerticalLayout):
     """View demonstrating advanced Grid features: lazy loading, sorting, multi-select."""
 

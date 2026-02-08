@@ -9,9 +9,10 @@ from vaadin.flow.components import (
     VerticalLayout,
 )
 from vaadin.flow.components.horizontal_layout import Alignment
+from examples.main_layout import MainLayout
 
 
-@Route("", page_title="Hello World")
+@Route("", page_title="Hello World", layout=MainLayout)
 class HelloWorldView(VerticalLayout):
     """Hello World view matching the Java reference implementation."""
 

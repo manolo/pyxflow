@@ -18,7 +18,8 @@ def reset_routes():
     from vaadin.flow.router import _routes
     from examples.hello_world import HelloWorldView
     from examples.about import AboutView
-    _routes[""] = (HelloWorldView, "Hello World", [], None, None)
-    _routes["about"] = (AboutView, "About", [], None, None)
+    from examples.main_layout import MainLayout
+    _routes[""] = (HelloWorldView, "Hello World", [], None, MainLayout)
+    _routes["about"] = (AboutView, "About", [], None, MainLayout)
     yield
     # Clean up after test (optional)

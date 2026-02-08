@@ -5,6 +5,7 @@ import datetime
 from pathlib import Path
 
 from vaadin.flow import Route
+from examples.main_layout import MainLayout
 from vaadin.flow.components import (
     Button,
     Checkbox,
@@ -82,7 +83,7 @@ class CrudPerson:
 
 
 
-@Route("components", page_title="Components Demo")
+@Route("components", page_title="Components Demo", layout=MainLayout)
 class ComponentsDemoView(VerticalLayout):
     """View containing ALL components supported by PyFlow.
     Must match the Java AllComponentsView in structure and content."""

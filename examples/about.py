@@ -2,9 +2,10 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import RouterLink, Span, VerticalLayout
+from examples.main_layout import MainLayout
 
 
-@Route("about", page_title="About")
+@Route("about", page_title="About", layout=MainLayout)
 class AboutView(VerticalLayout):
     """Simple about page to test routing."""
 
