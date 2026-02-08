@@ -4,7 +4,7 @@
 
 **Vaadin version:** 25.0.4
 **Lines of code:** ~3,400
-**Tests:** 693 passing
+**Tests:** 727 passing
 **Last updated:** 2026-02-08
 
 ---
@@ -164,7 +164,7 @@
 - [x] Binder - Form field ↔ bean binding, read/write, auto two-way sync via `set_bean()`
 - [x] Validators - required, min/max_length, pattern, value_range, positive, email
 - [x] Converters - string_to_int, string_to_float, custom Converter class
-- [ ] DataProvider
+- [x] DataProvider - Query, ListDataProvider (filter, sort, add/remove), CallbackDataProvider, Grid + ComboBox integration, refresh listeners
 
 ### Protocol / Security
 - [ ] CSRF token validation (actual check)
