@@ -79,6 +79,16 @@ class TextArea(Component):
         if self._element:
             self.element.set_property("minlength", min_length)
 
+    def set_min_rows(self, min_rows: int):
+        """Set the minimum number of visible rows."""
+        if self._element:
+            self.element.set_property("minRows", min_rows)
+
+    def set_max_rows(self, max_rows: int):
+        """Set the maximum number of visible rows."""
+        if self._element:
+            self.element.set_property("maxRows", max_rows)
+
     def set_min_height(self, min_height: str | None):
         """Set minimum height (e.g., '100px')."""
         if self._element and min_height:

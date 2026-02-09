@@ -52,6 +52,16 @@ class TextField(Component):
         if self._element:
             self.element.set_property("label", label)
 
+    def set_pattern(self, pattern: str):
+        """Set the regular expression pattern for validation."""
+        if self._element:
+            self.element.set_property("pattern", pattern)
+
+    def set_allowed_char_pattern(self, pattern: str):
+        """Set the pattern for allowed characters (blocks input of non-matching chars)."""
+        if self._element:
+            self.element.set_property("allowedCharPattern", pattern)
+
     def add_value_change_listener(self, listener: Callable):
         """Add a value change listener."""
         self._change_listeners.append(listener)
