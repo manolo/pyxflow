@@ -1,6 +1,7 @@
 """HTTP Server for Vaadin Flow."""
 
 import json
+import logging
 import secrets
 import uuid
 from pathlib import Path
@@ -11,6 +12,7 @@ from aiohttp import web
 from vaadin.flow.server.uidl_handler import UidlHandler
 from vaadin.flow.core.state_tree import StateTree
 
+log = logging.getLogger("vaadin.flow")
 
 # Session storage (in-memory for now)
 _sessions: dict[str, dict[str, Any]] = {}
@@ -88,7 +90,6 @@ async def handle_init(request: web.Request) -> web.Response:
 
 async def handle_uidl(request: web.Request) -> web.Response:
     """Handle POST /?v-r=uidl - process UIDL request."""
-    print(f"[UIDL] Received request", flush=True)
     session_id = request.cookies.get("JSESSIONID")
 
     if not session_id or session_id not in _sessions:
@@ -113,16 +114,13 @@ async def handle_uidl(request: web.Request) -> web.Response:
         )
 
     # Process UIDL
-    print(f"[UIDL] RPC: {payload.get('rpc', [])}", flush=True)
+    log.debug("RPC: %s", payload.get("rpc", []))
     handler: UidlHandler = session["handler"]
     response_data = handler.handle_uidl(payload)
 
     # Wrap response with XSS protection prefix
     response_text = f"for(;;);[{json.dumps(response_data)}]"
-    print(f"[UIDL] Response: {response_text[:500]}...", flush=True)
-    # Write full response to file for debugging
-    with open('/tmp/pyflow_uidl.json', 'w') as f:
-        f.write(json.dumps(response_data, indent=2))
+    log.debug("Response: %s...", response_text[:500])
     return web.Response(
         text=response_text,
         content_type="application/json"
@@ -328,7 +326,7 @@ async def handle_uidl_post(request: web.Request) -> web.Response:
     return web.Response(text="Bad request", status=400)
 
 
-async def run_server(view_class=None, host: str = "localhost", port: int = 8080):
+async def run_server(view_class=None, host: str = "localhost", port: int = 8080, debug: bool = False):
     """Run the Vaadin Flow server.
 
     Args:
@@ -336,7 +334,12 @@ async def run_server(view_class=None, host: str = "localhost", port: int = 8080)
                     If provided, registers as fallback for "/" route.
         host: The host to bind to.
         port: The port to listen on.
+        debug: Enable verbose UIDL logging.
     """
+    if debug:
+        logging.basicConfig(level=logging.DEBUG, format="%(name)s  %(message)s")
+        log.setLevel(logging.DEBUG)
+
     # Store view class for backwards compatibility
     if view_class:
         global _view_class
