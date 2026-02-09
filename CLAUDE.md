@@ -9,6 +9,14 @@
 
 ---
 
+## Git Commits
+
+- **One logical change per commit.** Never mix unrelated changes (e.g. new feature + refactor + bug fix) in a single commit.
+- Tests must pass at each commit.
+- Commit message: concise, describes the "why" not the "what".
+
+---
+
 ## Quick Commands
 
 ```bash
@@ -35,13 +43,14 @@ cd ../bundle-generator && ./mvnw package jetty:run-war
 vaadin-pyflow/
 ├── src/vaadin/flow/
 │   ├── core/           # StateTree, StateNode, Element, Component
-│   ├── components/     # Button, TextField, Grid, Dialog, etc. (25 components)
+│   ├── components/     # Button, TextField, Grid, Dialog, etc. (35 components)
 │   ├── data/           # Binder, DataProvider, validators, converters
-│   └── server/         # HTTP server (aiohttp), UIDL handler
+│   ├── server/         # HTTP server (aiohttp), UIDL handler
+│   └── app.py          # FlowApp entry point
 ├── demo/               # Demo app + __main__.py entry point
-│   ├── views/          # View files (hello_world, about, components_demo, etc.)
-│   └── main_layout.py  # Shared AppLayout
-├── tests/              # 959 unit tests
+│   ├── views/          # View files (hello_world, about, components, grid, etc.)
+│   └── services/       # PeopleService (data access layer)
+├── tests/              # 962 unit tests
 └── STATUS.md           # Implementation progress
 ../bundle-generator/    # Java project → frontend bundle (shared, at root level)
 ```
@@ -72,7 +81,7 @@ vaadin-pyflow/
 5. Export in `components/__init__.py`
 6. Add tests in `tests/`
 7. **Keep demos in sync** — Update BOTH:
-   - Python: `demo/views/components_demo.py` (`ComponentsDemoView`)
+   - Python: `demo/views/components.py` (`ComponentsDemoView`)
    - Java: `../bundle-generator/src/main/java/com/vaadin/pyflow/AllComponentsView.java`
    These MUST mirror each other. The Java view drives bundle generation — if a web component isn't used there, it won't be in the bundle.
 8. Regenerate bundle: `cd ../bundle-generator && ./generate-bundle.sh`
