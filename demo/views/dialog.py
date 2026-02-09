@@ -1,5 +1,3 @@
-"""Dialog and Notification demo view."""
-
 from vaadin.flow import Route
 from vaadin.flow.components import (
     Button,

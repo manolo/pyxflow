@@ -1,5 +1,3 @@
-"""Demo view showcasing all implemented components."""
-
 import datetime
 
 from vaadin.flow import Menu, Route

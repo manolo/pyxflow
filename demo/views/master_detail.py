@@ -1,5 +1,3 @@
-"""Master-Detail view — mirrors Java MasterDetailView."""
-
 from demo.services.sample_person_service import SamplePerson, sample_person_service
 from demo.views.main_layout import MainLayout
 from vaadin.flow import Menu, Route

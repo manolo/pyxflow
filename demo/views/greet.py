@@ -1,5 +1,3 @@
-"""Greet view - demonstrates route parameters."""
-
 from vaadin.flow import Route, PageTitle
 from demo.views.main_layout import MainLayout
 from vaadin.flow.components import H2, RouterLink, Span, VerticalLayout

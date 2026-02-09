@@ -1,5 +1,3 @@
-"""Main application layout using AppLayout with navigation drawer."""
-
 from vaadin.flow.components import (
     AppLayout,
     DrawerToggle,

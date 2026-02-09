@@ -1,5 +1,3 @@
-"""About view — default landing page."""
-
 from vaadin.flow import Menu, Route
 from vaadin.flow.components import Span, VerticalLayout
 from demo.views.main_layout import MainLayout

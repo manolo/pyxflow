@@ -1,5 +1,3 @@
-"""Grid demo view showcasing advanced grid features."""
-
 import logging
 
 from vaadin.flow import Menu, Route

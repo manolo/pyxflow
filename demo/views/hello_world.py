@@ -1,5 +1,3 @@
-"""Hello World example - matches my-hello Java application."""
-
 from vaadin.flow import Menu, Route
 from vaadin.flow.components import (
     Button,
