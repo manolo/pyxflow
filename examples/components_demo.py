@@ -7,13 +7,17 @@ from pathlib import Path
 from vaadin.flow import Route
 from examples.main_layout import MainLayout
 from vaadin.flow.components import (
+    Accordion,
     Button,
     Checkbox,
     CheckboxGroup,
     ComboBox,
     ComponentRenderer,
     ConfirmDialog,
+    ContextMenu,
     DatePicker,
+    DateTimePicker,
+    Details,
     Dialog,
     Div,
     EmailField,
@@ -26,6 +30,7 @@ from vaadin.flow.components import (
     HorizontalLayout,
     IntegerField,
     LitRenderer,
+    Markdown,
     MenuBar,
     Notification,
     NotificationVariant,
@@ -151,6 +156,79 @@ class ComponentsDemoView(VerticalLayout):
         self.menu_label = Span("Menu action: (none)")
         self.add(menu_bar)
         self.add(self.menu_label)
+
+        # --- Details ---
+        self.add_section("Details")
+
+        details1 = Details("Contact information",
+            Span("Sophia Williams — sophia.williams@company.com — (501) 555-9128"))
+        details1.set_opened(True)
+        self.add(details1)
+
+        details2 = Details("Billing address", Span("4027 Amber Lake Canyon, Springfield"))
+        self.add(details2)
+
+        # --- Accordion ---
+        self.add_section("Accordion")
+
+        accordion = Accordion()
+        accordion.add("Personal information",
+            Span("Name: Sophia Williams\nEmail: sophia.williams@company.com"))
+        accordion.add("Billing address",
+            Span("4027 Amber Lake Canyon"))
+        accordion.add("Payment method",
+            Span("Visa ending in 1234"))
+        accordion.open(0)
+        self.add(accordion)
+
+        # --- ContextMenu ---
+        self.add_section("ContextMenu")
+
+        self.context_label = Span("Context action: (none)")
+        context_target = Span("Right-click here for context menu")
+        context_target._set_style("padding", "var(--lumo-space-m)")
+        context_target._set_style("background", "var(--lumo-contrast-5pct)")
+        context_target._set_style("border-radius", "var(--lumo-border-radius-m)")
+
+        context_menu = ContextMenu(context_target)
+        context_menu.add_item("View", lambda e: self.context_label.set_text("Context action: View"))
+        context_menu.add_item("Edit", lambda e: self.context_label.set_text("Context action: Edit"))
+        context_menu.add_separator()
+        delete_item = context_menu.add_item("Delete", lambda e: self.context_label.set_text("Context action: Delete"))
+        self.add(context_menu)
+        self.add(self.context_label)
+
+        # --- DateTimePicker ---
+        self.add_section("DateTimePicker")
+
+        dt_form = FormLayout()
+        date_time_picker = DateTimePicker("Meeting date and time")
+        date_time_picker.set_value(datetime.datetime(2025, 6, 15, 14, 30))
+        date_time_picker.set_step(1800)
+        dt_form.add(date_time_picker)
+        self.add(dt_form)
+
+        # --- Markdown ---
+        self.add_section("Markdown")
+
+        md = Markdown("""## Rich Text Formatting
+
+You can create **bold text**, *italicized text*, and `inline code` with Markdown.
+
+### Lists
+1. First item
+2. Second item
+3. Third item
+
+- Apples
+- Bananas
+- Oranges
+
+> Markdown is rendered by the `vaadin-markdown` component (new in Vaadin 25).
+
+[Visit Vaadin website](https://vaadin.com)
+""")
+        self.add(md)
 
         # --- Component Features ---
         self.add_section("Component Features")
