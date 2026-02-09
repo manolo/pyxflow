@@ -1,6 +1,7 @@
 """Grid component."""
 
 import json
+import re
 from enum import Enum
 from typing import Callable, TYPE_CHECKING, Any
 
@@ -48,7 +49,7 @@ class Column:
     def __init__(self, internal_id: str, property_name: str, header: str = ""):
         self._internal_id = internal_id
         self._property_name = property_name
-        self._header = header or property_name.replace("_", " ").title()
+        self._header = header or self._auto_header(property_name)
         self._width = None
         self._flex_grow = None
         self._auto_width = False
@@ -73,6 +74,12 @@ class Column:
 
     def get_header(self) -> str:
         return self._header
+
+    @staticmethod
+    def _auto_header(name: str) -> str:
+        """Generate header from property name: 'firstName' → 'First Name'."""
+        spaced = re.sub(r"([a-z])([A-Z])", r"\1 \2", name).replace("_", " ")
+        return spaced.title()
 
     def set_width(self, width: str) -> "Column":
         """Set column width (e.g., '200px')."""
@@ -243,7 +250,10 @@ class Grid(Component):
             # grid.add_column("role", header="Role")
         """
         self._columns.clear()
-        return [self.add_column(name) for name in property_names]
+        columns = [self.add_column(name) for name in property_names]
+        for col in columns:
+            col.set_auto_width(True)
+        return columns
 
     def add_column(self, arg: "str | Renderer", header: str = "") -> Column:
         """Add a column to the grid.

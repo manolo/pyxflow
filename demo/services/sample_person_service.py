@@ -8,15 +8,15 @@ from typing import Optional
 
 @dataclass
 class SamplePerson:
-    id: int
-    first_name: str
-    last_name: str
-    email: str
-    phone: str
-    date_of_birth: str
-    occupation: str
-    role: str
-    important: bool
+    id: int = 0
+    first_name: str = ""
+    last_name: str = ""
+    email: str = ""
+    phone: str = ""
+    date_of_birth: str = ""
+    occupation: str = ""
+    role: str = ""
+    important: bool = False
 
     @staticmethod
     def from_dict(d: dict) -> "SamplePerson":

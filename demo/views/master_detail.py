@@ -37,13 +37,7 @@ class MasterDetailView(Div):
         self.add(split_layout)
 
         # Configure Grid
-        self.grid.add_column("firstName", header="First Name").set_auto_width(True)
-        self.grid.add_column("lastName", header="Last Name").set_auto_width(True)
-        self.grid.add_column("email", header="Email").set_auto_width(True)
-        self.grid.add_column("phone", header="Phone").set_auto_width(True)
-        self.grid.add_column("dateOfBirth", header="Date Of Birth").set_auto_width(True)
-        self.grid.add_column("occupation", header="Occupation").set_auto_width(True)
-        self.grid.add_column("role", header="Role").set_auto_width(True)
+        self.grid.set_columns("firstName", "lastName", "email", "phone", "dateOfBirth", "occupation", "role")
 
         important_renderer = LitRenderer.of(
             '<vaadin-icon icon="vaadin:${item.icon}" '
@@ -99,17 +93,7 @@ class MasterDetailView(Div):
     def _on_save(self, event):
         try:
             if self.sample_person is None:
-                self.sample_person = SamplePerson(
-                    id=0,
-                    first_name="",
-                    last_name="",
-                    email="",
-                    phone="",
-                    date_of_birth="",
-                    occupation="",
-                    role="",
-                    important=False,
-                )
+                self.sample_person = SamplePerson()
             self.binder.write_bean(self.sample_person)
             sample_person_service.save(self.sample_person)
             self._clear_form()
