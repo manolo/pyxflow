@@ -437,6 +437,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
         self.crud_layout = MasterDetailLayout()
         self.crud_layout.set_width_full()
+        self.crud_layout.set_detail_size("400px")
 
         # Master: Grid
         self.crud_master = VerticalLayout()
@@ -455,9 +456,8 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
 
 
-        # Detail: Form (hidden until selection or new)
+        # Detail: Form (not attached until selection or new)
         self.crud_detail = VerticalLayout()
-        self.crud_detail.set_visible(False)
 
         crud_form = FormLayout()
 
@@ -507,7 +507,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.add(self.crud_cancel_confirm)
 
         self.crud_layout.set_master(self.crud_master)
-        self.crud_layout.set_detail(self.crud_detail)
+        # Detail starts as None — master gets full width
         self.add(self.crud_layout)
 
         # Binder setup
@@ -829,7 +829,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
                 self.crud_selected = person
                 self.crud_is_new = False
                 self.binder.read_bean(person)
-                self.crud_detail.set_visible(True)
+                self.crud_layout.set_detail(self.crud_detail)
         else:
             self._crud_clear_form()
 
@@ -837,7 +837,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.crud_selected = CrudPerson()
         self.crud_is_new = True
         self.binder.read_bean(self.crud_selected)
-        self.crud_detail.set_visible(True)
+        self.crud_layout.set_detail(self.crud_detail)
 
     def _crud_on_save(self, event):
         if self.crud_selected is None:
@@ -892,4 +892,4 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.crud_role.set_value("")
         self.crud_city.set_value("")
         self.crud_dept.set_value("")
-        self.crud_detail.set_visible(False)
+        self.crud_layout.set_detail(None)

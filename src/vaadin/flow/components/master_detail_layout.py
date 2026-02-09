@@ -59,16 +59,29 @@ class MasterDetailLayout(Component):
             self.element.remove_child(self._detail.element)
         self._detail = component
         if self._element and component:
-            self._attach_child(component, self._element._tree, slot="detail")
+            if component._element:
+                # Already attached — just re-add as child
+                self.element.add_child(component.element)
+            else:
+                self._attach_child(component, self._element._tree, slot="detail")
 
     def get_detail(self) -> Component | None:
         return self._detail
 
-    def set_size(self, size: str):
-        """Set the detail area size (e.g., '400px', '40%')."""
+    def set_detail_size(self, size: str):
+        """Set the detail area size (e.g., '400px', '250px')."""
         if self._element:
-            self.element.set_property("size", size)
+            self.element.set_property("detailSize", size)
         else:
             if not hasattr(self, "_pending_properties"):
                 self._pending_properties = {}
-            self._pending_properties["size"] = size
+            self._pending_properties["detailSize"] = size
+
+    def set_master_min_size(self, size: str):
+        """Set the minimum master area size (e.g., '450px')."""
+        if self._element:
+            self.element.set_property("masterMinSize", size)
+        else:
+            if not hasattr(self, "_pending_properties"):
+                self._pending_properties = {}
+            self._pending_properties["masterMinSize"] = size
