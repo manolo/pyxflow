@@ -2,7 +2,8 @@
 
 import pytest
 
-from vaadin.flow.router import Route, PageTitle, match_route, get_view_class, get_page_title, get_all_routes, clear_routes
+from vaadin.flow.router import Route, PageTitle, match_route, get_view_class, get_page_title, get_all_routes, clear_routes, discover_views
+from vaadin.flow.menu import get_menu_entries
 from vaadin.flow.components import VerticalLayout
 
 
@@ -254,3 +255,46 @@ class TestPageTitleDecorator:
 
         assert PTView._page_title == "From PageTitle"
         assert get_page_title("pt") == "From PageTitle"
+
+
+class TestDiscoverViews:
+    """Test discover_views() auto-discovery."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        clear_routes()
+        yield
+        clear_routes()
+
+    def test_discover_views_registers_routes(self):
+        """discover_views should import all modules and trigger @Route registration."""
+        imported = discover_views("demo.views")
+        assert len(imported) > 0
+        routes = get_all_routes()
+        # At minimum, the example views should be registered
+        assert "" in routes  # HelloWorldView at root
+        assert "about" in routes
+        assert "components" in routes
+        assert "grid" in routes
+
+    def test_discover_views_returns_module_names(self):
+        """discover_views should return list of imported module names."""
+        imported = discover_views("demo.views")
+        assert "demo.views.hello_world" in imported
+        assert "demo.views.about" in imported
+        assert "demo.views.components_demo" in imported
+        assert "demo.views.grid_demo" in imported
+
+    def test_discover_views_menu_entries(self):
+        """After discover_views, get_menu_entries should return @Menu entries."""
+        discover_views("demo.views")
+        entries = get_menu_entries()
+        assert len(entries) == 4
+        titles = [e.title for e in entries]
+        assert titles == ["Home", "About", "Components", "Grid"]
+        # Verify order
+        orders = [e.order for e in entries]
+        assert orders == [0, 1, 2, 3]
+        # Verify icons
+        icons = [e.icon for e in entries]
+        assert icons == ["vaadin:home", "vaadin:info-circle", "vaadin:grid-small", "vaadin:table"]

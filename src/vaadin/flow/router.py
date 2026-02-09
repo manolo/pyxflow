@@ -224,3 +224,31 @@ def get_all_routes() -> dict[str, Type["Component"]]:
 def clear_routes():
     """Clear all registered routes. Useful for testing."""
     _routes.clear()
+
+
+def discover_views(package: str) -> list[str]:
+    """Import all modules in a package to trigger @Route registration.
+
+    If a module is already imported (e.g. after clear_routes() in tests),
+    it will be reloaded to re-execute the @Route decorators.
+
+    Args:
+        package: Dotted package name (e.g. "demo.views").
+
+    Returns:
+        List of fully qualified module names that were imported.
+    """
+    import importlib
+    import pkgutil
+    import sys
+
+    pkg = importlib.import_module(package)
+    imported = []
+    for _finder, name, _is_pkg in pkgutil.iter_modules(pkg.__path__):
+        full_name = f"{package}.{name}"
+        if full_name in sys.modules:
+            importlib.reload(sys.modules[full_name])
+        else:
+            importlib.import_module(full_name)
+        imported.append(full_name)
+    return imported
