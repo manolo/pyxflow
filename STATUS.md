@@ -3,9 +3,9 @@
 ## Current State: MVP + Routing + Grid (Advanced) + Renderers + AppLayout + Menu System + Full UIDL Compatibility
 
 **Vaadin version:** 25.0.4
-**Components:** 35 implemented, 14 pending
+**Components:** 36 implemented, 13 pending
 **Lines of code:** ~4,500 (core), ~10,500 (total with demo)
-**Tests:** 959 passing
+**Tests:** 971 passing
 **Last updated:** 2026-02-09
 
 ---
@@ -56,6 +56,7 @@
 - [x] VerticalLayout - Theme, add children, padding/spacing/margin, expand, horizontal component alignment
 - [x] HorizontalLayout - Theme, add children, margin/spacing, expand, vertical component alignment
 - [x] FlexLayout - Pure CSS Flexbox `<div>`: flex-direction, flex-wrap, justify-content, align-items/self/content, flex-grow/shrink/basis, order, expand
+- [x] SplitLayout - Horizontal/vertical split with primary/secondary slots, splitter position, orientation
 - [x] Dialog - Header title, modal, draggable, resizable, FlowComponentHost renderer, publishedEventHandler close
 - [x] Notification - Position, duration, theme variants, open/close, static show(), body attachment
 - [x] PasswordField - Password input with reveal button
@@ -109,6 +110,7 @@
 - [x] Page reload support - State reset on init
 - [x] Serves index.html from bundle (Vaadin-generated)
 - [x] Lumo theme CSS loading - Extracted from JAR, served at `/lumo/*`, injected in index.html
+- [x] `@StyleSheet` decorator - Load custom CSS via UIDL EAGER dependencies, served from app's `styles/` directory
 
 ### Protocol
 - [x] Init response - appConfig, CSRF, constants (Java-compatible hashes)
@@ -139,9 +141,9 @@
 
 ## Not Implemented
 
-### Component Inventory (Vaadin 25 — 14 missing components)
+### Component Inventory (Vaadin 25 — 13 missing components)
 
-Vaadin 25 has 72 npm packages. Filtering out infrastructure/themes/internals, there are **14 real UI components** not yet implemented in PyFlow, organized by implementation phase.
+Vaadin 25 has 72 npm packages. Filtering out infrastructure/themes/internals, there are **13 real UI components** not yet implemented in PyFlow, organized by implementation phase.
 
 Full analysis with complexity, connectors, and dependencies: **`../specs/COMPONENTS.md`**
 
@@ -158,7 +160,7 @@ Icon, DrawerToggle, SideNav/SideNavItem, AppLayout, RouterLayout (`@Route(layout
 | [ ] **Avatar** | `vaadin-avatar` | Low | Properties: `name`, `abbr`, `img` |
 | [ ] **Avatar Group** | `vaadin-avatar-group` | Low | Property `items` (JSON array), max visible |
 | [ ] **Card** | `vaadin-card` | Low | Container with slots. **New in v25** |
-| [ ] **Split Layout** | `vaadin-split-layout` | Medium | Property `splitterPosition`, orientation, resize event |
+| [x] **Split Layout** | `vaadin-split-layout` | Medium | Property `splitterPosition`, orientation, resize event. ✓ Already implemented |
 | [ ] **Scroller** | `vaadin-scroller` | Low | Scrollable container. Property `scrollDirection` |
 | [ ] **Popover** | `vaadin-popover` | Medium | Overlay component. Target, trigger, position. Similar to Dialog |
 | [ ] **Master Detail Layout** | `vaadin-master-detail-layout` | Medium | Layout with slots. **New in v25** |
