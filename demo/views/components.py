@@ -21,6 +21,7 @@ from vaadin.flow.components import (
     Details,
     Dialog,
     Div,
+    DrawerToggle,
     EmailField,
     FlexDirection,
     FlexLayout,
@@ -29,6 +30,7 @@ from vaadin.flow.components import (
     H2,
     H3,
     HorizontalLayout,
+    Icon,
     IntegerField,
     LitRenderer,
     Markdown,
@@ -46,6 +48,8 @@ from vaadin.flow.components import (
     Scroller,
     ScrollDirection,
     Select,
+    SideNav,
+    SideNavItem,
     Span,
     Tab,
     Tabs,
@@ -89,7 +93,6 @@ class CrudPerson:
     @staticmethod
     def from_dict(d: dict) -> "CrudPerson":
         return CrudPerson(d["name"], d["email"], int(d["age"]), d["role"], d["city"], d["department"])
-
 
 
 @Route("components", page_title="Components Demo", layout=MainLayout)
@@ -147,13 +150,13 @@ class ComponentsDemoView(VerticalLayout):
         self.add_section("MenuBar")
 
         menu_bar = MenuBar()
-        file_item = menu_bar.add_item("File")
-        file_item.get_sub_menu().add_item("New", lambda e: self.on_menu_click("New"))
-        file_item.get_sub_menu().add_item("Open", lambda e: self.on_menu_click("Open"))
-        edit_item = menu_bar.add_item("Edit")
-        edit_item.get_sub_menu().add_item("Undo", lambda e: self.on_menu_click("Undo"))
-        menu_bar.add_item("Help", lambda e: self.on_menu_click("Help"))
         self.menu_label = Span("Menu action: (none)")
+        file_item = menu_bar.add_item("File")
+        file_item.get_sub_menu().add_item("New", lambda e: self.menu_label.set_text("Menu action: New"))
+        file_item.get_sub_menu().add_item("Open", lambda e: self.menu_label.set_text("Menu action: Open"))
+        edit_item = menu_bar.add_item("Edit")
+        edit_item.get_sub_menu().add_item("Undo", lambda e: self.menu_label.set_text("Menu action: Undo"))
+        menu_bar.add_item("Help", lambda e: self.menu_label.set_text("Menu action: Help"))
         self.add(menu_bar)
         self.add(self.menu_label)
 
@@ -194,14 +197,15 @@ class ComponentsDemoView(VerticalLayout):
         context_menu.add_item("View", lambda e: self.context_label.set_text("Context action: View"))
         context_menu.add_item("Edit", lambda e: self.context_label.set_text("Context action: Edit"))
         context_menu.add_separator()
-        delete_item = context_menu.add_item("Delete", lambda e: self.context_label.set_text("Context action: Delete"))
+        context_menu.add_item("Delete", lambda e: self.context_label.set_text("Context action: Delete"))
         self.add(context_menu)
         self.add(self.context_label)
 
         # --- Markdown ---
         self.add_section("Markdown")
 
-        md = Markdown("""## Rich Text Formatting
+        markdown = Markdown("""
+## Rich Text Formatting
 
 You can create **bold text**, *italicized text*, and `inline code` with Markdown.
 
@@ -218,7 +222,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
 [Visit Vaadin website](https://vaadin.com)
 """)
-        self.add(md)
+        self.add(markdown)
 
         # --- Component Features ---
         self.add_section("Component Features")
@@ -228,14 +232,10 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         helper_field = TextField("With Helper Text")
         helper_field.set_helper_text("This is a helper text")
         helper_field.set_id("helper-text-field")
-        helper_field.add_click_shortcut(Key.ENTER)
-        helper_field.add_click_listener(lambda e: self.on_shortcut("With Helper Text"))
         features_form.add(helper_field)
 
         tooltip_field = TextField("With Tooltip")
         tooltip_field.set_tooltip_text("Hover to see this tooltip")
-        tooltip_field.add_click_shortcut(Key.ENTER)
-        tooltip_field.add_click_listener(lambda e: self.on_shortcut("With Tooltip"))
         features_form.add(tooltip_field)
 
         self.add(features_form)
@@ -243,8 +243,8 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         shortcut_label = Span("Shortcut: (none)")
         self.shortcut_label = shortcut_label
         shortcut_btn = Button("Press Enter (shortcut)")
-        shortcut_btn.add_click_listener(lambda e: self.on_shortcut("Button"))
         shortcut_btn.add_click_shortcut(Key.ENTER)
+        shortcut_btn.add_click_listener(lambda e: self.shortcut_label.set_text("Shortcut: Button"))
         self.add(HorizontalLayout(shortcut_btn, shortcut_label))
 
         # --- Buttons & Actions ---
@@ -381,33 +381,33 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
         header_div = Div("Header")
         header_div.set_width("100%")
-        header_div.set_height("150px")
-        header_div._set_style("background-color", "red")
-        header_div._set_style("color", "white")
+        header_div.set_height("60px")
+        header_div._set_style("background-color", "var(--lumo-primary-color)")
+        header_div._set_style("color", "var(--lumo-primary-contrast-color)")
         header_div._set_style("display", "flex")
         header_div._set_style("align-items", "center")
         header_div._set_style("justify-content", "center")
 
         footer_div = Div("Footer")
         footer_div.set_width("100%")
-        footer_div.set_height("100px")
-        footer_div._set_style("background-color", "blue")
-        footer_div._set_style("color", "white")
+        footer_div.set_height("50px")
+        footer_div._set_style("background-color", "var(--lumo-contrast-20pct)")
+        footer_div._set_style("color", "var(--lumo-body-text-color)")
         footer_div._set_style("display", "flex")
         footer_div._set_style("align-items", "center")
         footer_div._set_style("justify-content", "center")
 
         nav_div = Div("Navigation")
         nav_div.set_width("25%")
-        nav_div._set_style("background-color", "yellow")
+        nav_div._set_style("background-color", "var(--lumo-primary-color-10pct)")
         nav_div._set_style("display", "flex")
         nav_div._set_style("align-items", "center")
         nav_div._set_style("justify-content", "center")
 
         content_div = Div("Content")
         content_div.set_width("75%")
-        content_div._set_style("background-color", "green")
-        content_div._set_style("color", "white")
+        content_div._set_style("background-color", "var(--lumo-contrast-5pct)")
+        content_div._set_style("color", "var(--lumo-body-text-color)")
         content_div._set_style("display", "flex")
         content_div._set_style("align-items", "center")
         content_div._set_style("justify-content", "center")
@@ -417,11 +417,30 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
         page_layout = FlexLayout(header_div, middle, footer_div)
         page_layout.set_flex_direction(FlexDirection.COLUMN)
-        page_layout.set_width("100%")
-        page_layout.set_height("500px")
+        page_layout.set_width("50%")
+        page_layout.set_height("300px")
         page_layout.expand(middle)
 
         self.add(page_layout)
+
+        # --- Icon, DrawerToggle, SideNav (for bundle inclusion) ---
+        self.add_section("Icon / SideNav")
+
+        home_icon = Icon("vaadin:home")
+        self.add(home_icon)
+
+        drawer_toggle = DrawerToggle()
+        self.add(drawer_toggle)
+
+        side_nav = SideNav()
+        side_nav.set_label("Navigation")
+        side_nav.add_item(SideNavItem("Home", "/", Icon("vaadin:home")))
+        side_nav.add_item(SideNavItem("About", "/about", Icon("vaadin:info-circle")))
+        parent_item = SideNavItem("Settings")
+        parent_item.add_item(SideNavItem("General", "/settings/general"))
+        parent_item.add_item(SideNavItem("Security", "/settings/security"))
+        side_nav.add_item(parent_item)
+        self.add(side_nav)
 
         # --- Shared data for all grids ---
         people = [p.to_dict() for p in people_service.find_all()]
@@ -442,7 +461,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         # Master: Grid
         self.crud_master = VerticalLayout()
 
-
         self.crud_grid = Grid()
         self.crud_grid.set_columns("name", "email", "age", "role", "city", "department")
         self.crud_grid.add_selection_listener(self._crud_on_select)
@@ -453,8 +471,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         crud_new_btn.add_click_listener(self._crud_on_new)
 
         self.crud_master.add(self.crud_grid, crud_new_btn)
-
-
 
         # Detail: Form (not attached until selection or new)
         self.crud_detail = VerticalLayout()
@@ -485,26 +501,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         crud_cancel.add_click_listener(self._crud_on_cancel)
         crud_btn_bar.add(crud_save, crud_delete, crud_cancel)
         self.crud_detail.add(crud_btn_bar)
-
-        # ConfirmDialog for delete
-        self.crud_confirm = ConfirmDialog()
-        self.crud_confirm.set_header("Confirm Delete")
-        self.crud_confirm.set_text("Are you sure you want to delete this person?")
-        self.crud_confirm.set_confirm_text("Delete")
-        self.crud_confirm.set_confirm_button_theme("error primary")
-        self.crud_confirm.set_cancelable(True)
-        self.crud_confirm.add_confirm_listener(self._crud_do_delete)
-        self.add(self.crud_confirm)
-
-        # ConfirmDialog for cancel with unsaved changes
-        self.crud_cancel_confirm = ConfirmDialog()
-        self.crud_cancel_confirm.set_header("Unsaved changes")
-        self.crud_cancel_confirm.set_text("You have unsaved changes. Discard them?")
-        self.crud_cancel_confirm.set_confirm_text("Discard")
-        self.crud_cancel_confirm.set_confirm_button_theme("error primary")
-        self.crud_cancel_confirm.set_cancelable(True)
-        self.crud_cancel_confirm.add_confirm_listener(lambda e: self._crud_clear_form())
-        self.add(self.crud_cancel_confirm)
 
         self.crud_layout.set_master(self.crud_master)
         # Detail starts as None — master gets full width
@@ -540,6 +536,26 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.binder.for_field(self.crud_dept) \
             .as_required("Department is required") \
             .bind(lambda p: p.department, lambda p, v: setattr(p, 'department', v))
+
+        # ConfirmDialog for delete
+        self.crud_confirm = ConfirmDialog()
+        self.crud_confirm.set_header("Confirm Delete")
+        self.crud_confirm.set_text("Are you sure you want to delete this person?")
+        self.crud_confirm.set_confirm_text("Delete")
+        self.crud_confirm.set_confirm_button_theme("error primary")
+        self.crud_confirm.set_cancelable(True)
+        self.crud_confirm.add_confirm_listener(self._crud_do_delete)
+        self.add(self.crud_confirm)
+
+        # ConfirmDialog for cancel with unsaved changes
+        self.crud_cancel_confirm = ConfirmDialog()
+        self.crud_cancel_confirm.set_header("Unsaved changes")
+        self.crud_cancel_confirm.set_text("You have unsaved changes. Discard them?")
+        self.crud_cancel_confirm.set_confirm_text("Discard")
+        self.crud_cancel_confirm.set_confirm_button_theme("error primary")
+        self.crud_cancel_confirm.set_cancelable(True)
+        self.crud_cancel_confirm.add_confirm_listener(lambda e: self._crud_clear_form())
+        self.add(self.crud_cancel_confirm)
 
         # --- Grid ---
         self.add_section("Grid")
@@ -602,10 +618,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         # --- Grid with ListDataProvider ---
         self.add_section("Grid with ListDataProvider")
 
-        dp_items = [
-            {"name": p["name"], "city": p["city"], "department": p["department"]}
-            for p in people
-        ]
+        dp_items = list(people)
         self.dp = ListDataProvider(dp_items)
         self.dp_add_counter = 0
 
@@ -698,7 +711,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         scroller = Scroller(scroll_content, scroll_direction=ScrollDirection.VERTICAL)
         scroller.set_height("200px")
         scroller.set_width("300px")
-        scroller._set_style("flex", "0 0 auto")
+        scroller._set_style("flex", "none")
         scroller._set_style("border", "1px solid var(--lumo-contrast-20pct)")
         self.add(scroller)
 
@@ -709,9 +722,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         card.set_title("Card Title")
         card.set_subtitle("Card subtitle")
         card.add(Span("This is the card content area."))
-        card_action = Button("Action")
-        card_action.add_click_listener(lambda e: Notification.show("Card action clicked!", 3000))
-        card.add_to_footer(card_action)
+        card.add_to_footer(Button("Action"))
         self.add(card)
 
         # --- Popover ---
@@ -727,6 +738,27 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.add(popover_target)
         self.add(popover)
 
+        # --- MasterDetailLayout ---
+        self.add_section("MasterDetailLayout")
+
+        md_layout = MasterDetailLayout()
+        md_master = VerticalLayout()
+        for i in range(1, 4):
+            md_btn = Button(f"Item {i}")
+            def on_md_click(e, idx=i, layout=md_layout):
+                detail = VerticalLayout()
+                detail.add(H3(f"Item {idx}"))
+                detail.add(Span(f"Details for item {idx}."))
+                close_btn = Button("Close")
+                close_btn.add_click_listener(lambda ev, l=layout: l.set_detail(None))
+                detail.add(close_btn)
+                layout.set_detail(detail)
+            md_btn.add_click_listener(on_md_click)
+            md_master.add(md_btn)
+        md_layout.set_master(md_master)
+        md_layout.set_height("250px")
+        md_layout._set_style("border", "1px solid var(--lumo-contrast-20pct)")
+        self.add(md_layout)
 
     def add_section(self, title: str):
         self.add(H3(title))
@@ -760,9 +792,9 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.lit_renderer_label.set_text(f"LitRenderer action: Edit {item['name']}")
 
     def create_action_buttons(self, item):
-        btn = Button(f"View {item['name']}")
-        btn.add_click_listener(lambda e, i=item: self.on_comp_view(i))
-        return btn
+        view_btn = Button(f"View {item['name']}")
+        view_btn.add_click_listener(lambda e, i=item: self.on_comp_view(i))
+        return view_btn
 
     def on_comp_view(self, item):
         self.comp_renderer_label.set_text(f"ComponentRenderer action: View {item['name']}")
@@ -772,17 +804,11 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         if 0 <= idx < len(self.tab_list):
             self.tabs_label.set_text(f"Selected tab: {self.tab_list[idx].get_label()}")
 
-    def on_menu_click(self, name):
-        self.menu_label.set_text(f"Menu action: {name}")
-
     def on_upload_received(self, filename, mime_type, data):
         self.upload_label.set_text(f"Uploaded: {filename} ({len(data)} bytes)")
 
     def on_upload_succeeded(self, event_data):
         pass
-
-    def on_shortcut(self, source):
-        self.shortcut_label.set_text(f"Shortcut: {source}")
 
     # --- DataProvider methods ---
 
@@ -801,6 +827,9 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.dp_add_counter += 1
         self.dp.add_item({
             "name": f"New Person {self.dp_add_counter}",
+            "email": "",
+            "age": 0,
+            "role": "",
             "city": "Unknown",
             "department": "Unassigned",
         })
@@ -841,15 +870,15 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
     def _crud_on_save(self, event):
         if self.crud_selected is None:
-            Notification.show("Select a person or click New first", 3000)
+            Notification.show("Select a person or click New first", 3000, Notification.Position.MIDDLE)
             return
         if not self.binder.is_dirty():
-            Notification.show("No changes to save", 3000)
+            Notification.show("No changes to save", 3000, Notification.Position.MIDDLE)
             return
         try:
             self.binder.write_bean(self.crud_selected)
         except ValidationError:
-            n = Notification.show("Please fix the errors in the form", 3000)
+            n = Notification.show("Please fix the errors in the form", 3000, Notification.Position.MIDDLE)
             n.add_theme_variants(NotificationVariant.LUMO_ERROR)
             return
         if self.crud_is_new:
@@ -857,12 +886,12 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
             self.crud_is_new = False
         self._crud_refresh_grid()
         self.binder.read_bean(self.crud_selected)
-        n = Notification.show(f"Saved: {self.crud_selected.name}", 3000)
+        n = Notification.show(f"Saved: {self.crud_selected.name}", 3000, Notification.Position.MIDDLE)
         n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
 
     def _crud_on_delete(self, event):
         if self.crud_selected is None or self.crud_is_new:
-            Notification.show("Select a person to delete", 3000)
+            Notification.show("Select a person to delete", 3000, Notification.Position.MIDDLE)
             return
         self.crud_confirm.set_text(f"Are you sure you want to delete {self.crud_selected.name}?")
         self.crud_confirm.open()
@@ -874,7 +903,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.crud_people = [p for p in self.crud_people if p.id != self.crud_selected.id]
         self._crud_refresh_grid()
         self._crud_clear_form()
-        n = Notification.show(f"Deleted: {name}", 3000)
+        n = Notification.show(f"Deleted: {name}", 3000, Notification.Position.MIDDLE)
         n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
 
     def _crud_on_cancel(self, event):
