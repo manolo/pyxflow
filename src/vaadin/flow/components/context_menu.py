@@ -96,6 +96,14 @@ class ContextMenu(Component):
         if self._open_on_click:
             self.element.set_property("openOnClick", True)
 
+        # Init connector: contextMenuConnector.initLazy(element, appId)
+        client_key = tree._app_id.split("-")[0]
+        el_ref = {"@v-node": self.element.node.id}
+        tree.queue_execute([
+            el_ref, client_key,
+            "return window.Vaadin.Flow.contextMenuConnector.initLazy($0, $1)"
+        ])
+
         # Attach and add the target as a child of the context-menu element
         if self._target:
             if not self._target._element:
@@ -139,12 +147,11 @@ class ContextMenu(Component):
             "addNodes": [container.id]
         })
 
-        # 5. Call contextMenuConnector.generateItemsTree(appId, nodeId)
-        client_key = tree._app_id.split("-")[0]
+        # 5. Call $connector.generateItems(rootContainerNodeId)
         el_ref = {"@v-node": self.element.node.id}
         tree.queue_execute([
-            el_ref, client_key,
-            "return window.Vaadin.Flow.contextMenuConnector.generateItemsTree($0, $1)"
+            el_ref, root_container.id,
+            "return $0.$connector.generateItems($1)"
         ])
 
     def _create_item_node(self, tree, parent_node, item: ContextMenuItem):
