@@ -59,6 +59,15 @@ from vaadin.flow.components import (
     TimePicker,
     Upload,
     VerticalLayout,
+    MessageInput,
+    MessageList,
+    MessageListItem,
+    ListBox,
+    MultiSelectListBox,
+    CustomField,
+    LoginForm,
+    MultiSelectComboBox,
+    VirtualList,
 )
 from vaadin.flow.components.horizontal_layout import Alignment
 from vaadin.flow.core.keys import Key
@@ -99,30 +108,54 @@ class CrudPerson:
 @Menu(title="Components", order=2, icon="vaadin:grid-small")
 class ComponentsDemoView(VerticalLayout):
     def __init__(self):
+        self.add_class_name("components-view")
         self.click_count = 0
 
         # Header
         self.add(H2("PyFlow Components Demo"))
 
-        # --- Navigation ---
-        self.add_section("Navigation")
-
-        self.add(RouterLink("Go to Hello World", "/hello"))
-        self.add(RouterLink("Go to About", "/"))
-        self.add(RouterLink("Go to Greet", "/greet/World"))
-
         # --- Progress ---
-        self.add_section("Progress")
+        self.add_section("ProgressBar")
 
+        progress = HorizontalLayout()
+        progress.set_width_full()
         progress_bar = ProgressBar()
         progress_bar.set_value(0.6)
-        self.add(Span("ProgressBar (60%):"))
-        self.add(progress_bar)
+        progress.add(Span("(60%)"))
+        progress.add(progress_bar)
 
         progress_indeterminate = ProgressBar()
         progress_indeterminate.set_indeterminate(True)
-        self.add(Span("ProgressBar (indeterminate):"))
-        self.add(progress_indeterminate)
+        progress.add(Span("(indeterminate)"))
+        progress.add(progress_indeterminate)       
+
+        self.add(progress) 
+
+        # --- LoginForm ---
+        self.add_section("LoginForm")
+
+        login_form = LoginForm()
+        self.login_label = Span("Login status: (none)")
+        login_form.add_login_listener(
+            lambda e: self.login_label.set_text(f"Login: {e['username']}")
+        )
+        login_form.add_forgot_password_listener(
+            lambda e: self.login_label.set_text("Forgot password clicked")
+        )
+        self.add(login_form)
+        self.add(self.login_label)
+
+
+        # --- Navigation ---
+        self.add_section("Navigation")
+
+        navigation = HorizontalLayout()
+
+        navigation.add(RouterLink("Go to Hello World", "/hello"))
+        navigation.add(RouterLink("Go to About", "/"))
+        navigation.add(RouterLink("Go to Greet", "/greet/World"))
+
+        self.add(navigation)
 
         # --- Tabs ---
         self.add_section("Tabs")
@@ -224,29 +257,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 """)
         self.add(markdown)
 
-        # --- Component Features ---
-        self.add_section("Component Features")
-
-        features_form = FormLayout()
-
-        helper_field = TextField("With Helper Text")
-        helper_field.set_helper_text("This is a helper text")
-        helper_field.set_id("helper-text-field")
-        features_form.add(helper_field)
-
-        tooltip_field = TextField("With Tooltip")
-        tooltip_field.set_tooltip_text("Hover to see this tooltip")
-        features_form.add(tooltip_field)
-
-        self.add(features_form)
-
-        shortcut_label = Span("Shortcut: (none)")
-        self.shortcut_label = shortcut_label
-        shortcut_btn = Button("Press Enter (shortcut)")
-        shortcut_btn.add_click_shortcut(Key.ENTER)
-        shortcut_btn.add_click_listener(lambda e: self.shortcut_label.set_text("Shortcut: Button"))
-        self.add(HorizontalLayout(shortcut_btn, shortcut_label))
-
         # --- Buttons & Actions ---
         self.add_section("Buttons & Actions")
 
@@ -278,6 +288,29 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.dialog.add(Span("You can close it by clicking outside."))
         self.add(self.dialog)
 
+        # --- Component Features ---
+        self.add_section("Component Features")
+
+        features_form = FormLayout()
+
+        helper_field = TextField("With Helper Text")
+        helper_field.set_helper_text("This is a helper text")
+        helper_field.set_id("helper-text-field")
+        features_form.add(helper_field)
+
+        tooltip_field = TextField("With Tooltip")
+        tooltip_field.set_tooltip_text("Hover to see this tooltip")
+        features_form.add(tooltip_field)
+
+        self.add(features_form)
+
+        shortcut_label = Span("Shortcut: (none)")
+        self.shortcut_label = shortcut_label
+        shortcut_btn = Button("Press Enter (shortcut)")
+        shortcut_btn.add_click_shortcut(Key.ENTER)
+        shortcut_btn.add_click_listener(lambda e: self.shortcut_label.set_text("Shortcut: Button"))
+        self.add(HorizontalLayout(shortcut_btn, shortcut_label))
+
         # --- Text Input Fields ---
         self.add_section("Text Input Fields")
 
@@ -296,8 +329,15 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         email_field.set_clear_button_visible(True)
         text_form.add(email_field)
 
+        phone_field = TextField("Phone")
+        phone_field.set_pattern("^[+]?[\\(]?[0-9]{3}[\\)]?[\\-]?[0-9]{3}[\\-]?[0-9]{4,6}$")
+        phone_field.set_allowed_char_pattern("[0-9()+-]");
+        text_form.add(phone_field)
+
         text_area = TextArea("TextArea")
         text_area.set_placeholder("Enter multiline text...")
+        text_area.set_min_rows(1)
+        text_area.set_max_rows(4)
         text_form.add(text_area)
 
         upload = Upload()
@@ -366,6 +406,11 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         select.set_placeholder("Choose an option")
         selection_form.add(select)
 
+        multi_combo = MultiSelectComboBox("MultiSelectComboBox")
+        multi_combo.set_items("Java", "Python", "JavaScript", "TypeScript", "Rust", "Go")
+        multi_combo.set_placeholder("Select skills")
+        selection_form.add(multi_combo)
+
         radio_group = RadioButtonGroup("RadioButtonGroup")
         radio_group.set_items("Choice 1", "Choice 2", "Choice 3")
         selection_form.add(radio_group)
@@ -374,7 +419,43 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         checkbox_group.set_items("Item X", "Item Y", "Item Z")
         selection_form.add(checkbox_group)
 
+        list_box = ListBox()
+        list_box.set_items("Item 1", "Item 2", "Item 3", "Item 4")
+        self.list_box_label = Span("ListBox selected: (none)")
+        list_box.add_value_change_listener(
+            lambda e: self.list_box_label.set_text(f"ListBox selected: {e['value']}")
+        )
+        selection_form.add(list_box)
+
+        multi_list_box = MultiSelectListBox()
+        multi_list_box.set_items("Option A", "Option B", "Option C", "Option D")
+        self.multi_list_box_label = Span("MultiSelectListBox selected: (none)")
+        multi_list_box.add_value_change_listener(
+            lambda e: self.multi_list_box_label.set_text(
+                f"MultiSelectListBox selected: {', '.join(sorted(e['value']))}" if e['value'] else "MultiSelectListBox selected: (none)"
+            )
+        )
+        selection_form.add(multi_list_box)
+
+        selection_form.add(self.list_box_label)
+        selection_form.add(self.multi_list_box_label)
+
         self.add(selection_form)
+
+        # --- Custom Fields ---
+        self.add_section("Custom Fields")
+
+        custom_form = FormLayout()
+
+        custom_field = CustomField("Phone")
+        prefix = Select()
+        prefix.set_items("+1", "+44", "+358")
+        prefix.set_width("100px")
+        number = TextField("Phone number")
+        custom_field.add(prefix, number)
+        custom_form.add(custom_field)
+
+        self.add(custom_form)
 
         # --- FlexLayout ---
         self.add_section("FlexLayout")
@@ -424,23 +505,10 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.add(page_layout)
 
         # --- Icon, DrawerToggle, SideNav (for bundle inclusion) ---
-        self.add_section("Icon / SideNav")
+        self.add_section("Icon")
 
         home_icon = Icon("vaadin:home")
         self.add(home_icon)
-
-        drawer_toggle = DrawerToggle()
-        self.add(drawer_toggle)
-
-        side_nav = SideNav()
-        side_nav.set_label("Navigation")
-        side_nav.add_item(SideNavItem("Home", "/", Icon("vaadin:home")))
-        side_nav.add_item(SideNavItem("About", "/about", Icon("vaadin:info-circle")))
-        parent_item = SideNavItem("Settings")
-        parent_item.add_item(SideNavItem("General", "/settings/general"))
-        parent_item.add_item(SideNavItem("Security", "/settings/security"))
-        side_nav.add_item(parent_item)
-        self.add(side_nav)
 
         # --- Shared data for all grids ---
         people = [p.to_dict() for p in people_service.find_all()]
@@ -759,6 +827,51 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         md_layout.set_height("250px")
         md_layout._set_style("border", "1px solid var(--lumo-contrast-20pct)")
         self.add(md_layout)
+
+        # --- MessageInput + MessageList ---
+        self.add_section("MessageInput + MessageList")
+
+        self.message_list = MessageList()
+        self.messages = [
+            MessageListItem("Hello! How can I help?", user_name="Assistant"),
+        ]
+        self.message_list.set_items(*self.messages)
+        self.add(self.message_list)
+
+        message_input = MessageInput()
+        message_input.add_submit_listener(self._on_message_submit)
+        self.add(message_input)
+
+        # --- VirtualList ---
+        self.add_section("VirtualList")
+
+        virtual_list = VirtualList()
+        virtual_items = [{"name": f"Person {i}", "city": f"City {i % 20}", "role": f"Role {i % 5}"} for i in range(200)]
+        self.vl_label = Span("VirtualList: click an item")
+        virtual_list.set_renderer(
+            LitRenderer.of(
+                '<div style="display:flex;align-items:center;padding:var(--lumo-space-xs) var(--lumo-space-s);border-bottom:1px solid var(--lumo-contrast-10pct);cursor:pointer" @click="${handleClick}">'
+                '<vaadin-avatar name="${item.name}" style="margin-right:var(--lumo-space-s)"></vaadin-avatar>'
+                '<div><strong>${item.name}</strong><br/><small style="color:var(--lumo-secondary-text-color)">${item.city} — ${item.role}</small></div>'
+                '</div>'
+            )
+            .with_property("name", lambda x: x["name"])
+            .with_property("city", lambda x: x["city"])
+            .with_property("role", lambda x: x["role"])
+            .with_function("handleClick", lambda item: self.vl_label.set_text(f"VirtualList: clicked {item['name']}"))
+        )
+        virtual_list.set_items(virtual_items)
+        virtual_list.set_height("300px")
+        virtual_list._set_style("flex", "none")
+        virtual_list._set_style("overflow", "auto")
+        virtual_list._set_style("border", "1px solid var(--lumo-contrast-20pct)")
+        virtual_list._set_style("border-radius", "var(--lumo-border-radius-m)")
+        self.add(virtual_list)
+        self.add(self.vl_label)
+
+    def _on_message_submit(self, event):
+        self.messages.append(MessageListItem(event["value"], user_name="You"))
+        self.message_list.set_items(*self.messages)
 
     def add_section(self, title: str):
         self.add(H3(title))
