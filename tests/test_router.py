@@ -282,8 +282,8 @@ class TestDiscoverViews:
         imported = discover_views("demo.views")
         assert "demo.views.hello_world" in imported
         assert "demo.views.about" in imported
-        assert "demo.views.components_demo" in imported
-        assert "demo.views.grid_demo" in imported
+        assert "demo.views.components" in imported
+        assert "demo.views.grid" in imported
 
     def test_discover_views_menu_entries(self):
         """After discover_views, get_menu_entries should return @Menu entries."""

@@ -9,7 +9,7 @@ from vaadin.flow.components import (
     VerticalLayout,
 )
 from vaadin.flow.components.horizontal_layout import Alignment
-from demo.main_layout import MainLayout
+from demo.views.main_layout import MainLayout
 
 
 @Route("", page_title="Hello World", layout=MainLayout)

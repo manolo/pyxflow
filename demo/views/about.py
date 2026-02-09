@@ -2,7 +2,7 @@
 
 from vaadin.flow import Menu, Route
 from vaadin.flow.components import RouterLink, Span, VerticalLayout
-from demo.main_layout import MainLayout
+from demo.views.main_layout import MainLayout
 
 
 @Route("about", page_title="About", layout=MainLayout)

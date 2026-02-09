@@ -2,7 +2,7 @@
 
 from vaadin.flow import Menu, Route
 from demo.services import people_service
-from demo.main_layout import MainLayout
+from demo.views.main_layout import MainLayout
 from vaadin.flow.components import (
     Button,
     Grid,
