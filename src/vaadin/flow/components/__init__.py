@@ -37,6 +37,11 @@ from vaadin.flow.components.icon import Icon
 from vaadin.flow.components.drawer_toggle import DrawerToggle
 from vaadin.flow.components.side_nav import SideNav, SideNavItem
 from vaadin.flow.components.app_layout import AppLayout
+from vaadin.flow.components.details import Details
+from vaadin.flow.components.accordion import Accordion, AccordionPanel
+from vaadin.flow.components.context_menu import ContextMenu, ContextMenuItem
+from vaadin.flow.components.date_time_picker import DateTimePicker
+from vaadin.flow.components.markdown import Markdown
 
 __all__ = [
     "Button",
@@ -96,4 +101,11 @@ __all__ = [
     "SideNav",
     "SideNavItem",
     "AppLayout",
+    "Details",
+    "Accordion",
+    "AccordionPanel",
+    "ContextMenu",
+    "ContextMenuItem",
+    "DateTimePicker",
+    "Markdown",
 ]

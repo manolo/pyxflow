@@ -1,11 +1,11 @@
 # PyFlow Implementation Status
 
-## Current State: MVP + Routing + Grid (Advanced) + Renderers + AppLayout + Full UIDL Compatibility
+## Current State: MVP + Routing + Grid (Advanced) + Renderers + AppLayout + Menu System + Full UIDL Compatibility
 
 **Vaadin version:** 25.0.4
-**Lines of code:** ~3,700
-**Tests:** 869 passing
-**Last updated:** 2026-02-08
+**Lines of code:** ~4,200
+**Tests:** 959 passing
+**Last updated:** 2026-02-09
 
 ---
 
@@ -77,6 +77,11 @@
 - [x] DrawerToggle - Hamburger button for AppLayout drawer, extends Button
 - [x] SideNav / SideNavItem - Navigation items with path, prefix icon slot, nested items via children slot, collapsible, label span
 - [x] AppLayout - Navbar/drawer/content slots, drawerOpened, primarySection, RouterLayout interface
+- [x] Details - Expandable panel, summary (text or Component), opened-changed sync
+- [x] Accordion / AccordionPanel - Vertically stacked expandable panels, single-open, opened index sync
+- [x] ContextMenu - Right-click/long-press menu, contextMenuConnector, hierarchical items, separators
+- [x] DateTimePicker - Combined date+time, datepickerConnector + timepickerConnector, min/max/step
+- [x] Markdown - Renders markdown as HTML, `content` property, new in Vaadin 25
 
 ### Component Base Features
 - [x] `setVisible()` / `isVisible()` - Show/hide components
@@ -125,31 +130,24 @@
 - [x] RouterLink component - `<a>` tag with `router-link` attribute for client-side navigation
 - [x] `@PageTitle` decorator - Alternative to `page_title` param, supports `get_page_title()` for dynamic titles
 - [x] `@Route(layout=...)` - RouterLayout support, layout chain in navigation, layout reuse on same-layout routes
+- [x] `@Menu(title, order, icon)` - Decorator for automatic menu generation
+- [x] `get_menu_entries()` - Collects @Menu routes, filters required params, sorts by order/path
 
 ---
 
 ## Not Implemented
 
-### Component Inventory (Vaadin 25 — 15 missing components)
+### Component Inventory (Vaadin 25 — 10 missing components)
 
-Vaadin 25 has 72 npm packages. Filtering out infrastructure/themes/internals, there are **15 real UI components** not yet implemented in PyFlow, organized by implementation phase.
+Vaadin 25 has 72 npm packages. Filtering out infrastructure/themes/internals, there are **10 real UI components** not yet implemented in PyFlow, organized by implementation phase.
 
 Full analysis with complexity, connectors, and dependencies: **`../specs/COMPONENTS.md`**
 
 ### ~~Phase 8 — AppLayout & Prerequisites~~ ✓ DONE
 Icon, DrawerToggle, SideNav/SideNavItem, AppLayout, RouterLayout (`@Route(layout=...)`), layout chain in navigation.
 
-### Phase 9 — Menu System + Simple High-Value Components
-
-| Component | Tag | Complexity | Notes |
-|---|---|---|---|
-| [ ] **`@Menu` decorator** | (infrastructure) | Low | `@Menu(title, order, icon)`, stores metadata on view class |
-| [ ] **`MenuConfiguration`** | (infrastructure) | Low | `get_menu_entries()` — collects `@Menu` routes, filters, sorts |
-| [ ] **Details** | `vaadin-details` | Low | Collapsible panel. Property `opened`, slot `summary` |
-| [ ] **Accordion** | `vaadin-accordion` | Medium | AccordionPanel children, `opened-changed` event |
-| [ ] **Context Menu** | `vaadin-context-menu` | Medium-High | Reuses `contextMenuConnector` (already implemented for MenuBar!) |
-| [ ] **DateTimePicker** | `vaadin-date-time-picker` | Medium | Composition of DatePicker + TimePicker (both already implemented) |
-| [ ] **Markdown** | `vaadin-markdown` | Low | Property `content`. **New in v25**, useful for AI apps |
+### ~~Phase 9 — Menu System + High-Value Components~~ ✓ DONE
+`@Menu` decorator, `get_menu_entries()`, Details, Accordion, ContextMenu, DateTimePicker, Markdown. 90 new tests.
 
 ### Phase 10 — Visual & Layout Components
 
@@ -205,7 +203,7 @@ Icon, DrawerToggle, SideNav/SideNavItem, AppLayout, RouterLayout (`@Route(layout
 6. ~~**Grid** - Complex but essential for data apps~~ ✓ DONE
 7. ~~**Grid advanced** - Lazy loading, sorting, multi-select, renderers~~ ✓ DONE
 8. ~~**AppLayout & Prerequisites** - Icon, AppLayout, DrawerToggle, SideNav, RouterLayout interface, `@Route(layout=...)`, layout chain~~ ✓ DONE
-9. **Menu System + High-Value Components** - `@Menu`, MenuConfiguration, Details, Accordion, ContextMenu, DateTimePicker, Markdown
+9. ~~**Menu System + High-Value Components** - `@Menu`, get_menu_entries(), Details, Accordion, ContextMenu, DateTimePicker, Markdown~~ ✓ DONE
 10. **Visual & Layout Components** - Avatar, Card, SplitLayout, Scroller, Popover, MasterDetailLayout
 11. **Data & Specialized Components** - ListBox, MultiSelectComboBox, VirtualList, MessageInput/List, Login, CustomField
 
