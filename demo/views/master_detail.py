@@ -21,7 +21,7 @@ from vaadin.flow.data import Binder, ValidationError
 
 
 @Route("master-detail", page_title="Master-Detail", layout=MainLayout)
-@Menu(title="Master-Detail", order=4, icon="vaadin:columns")
+@Menu(title="Master-Detail", order=4, icon="vaadin:split-h")
 class MasterDetailView(Div):
     """Master-Detail CRUD view with SplitLayout, Grid and form editor."""
 
