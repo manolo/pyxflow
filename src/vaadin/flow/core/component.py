@@ -92,6 +92,9 @@ class Component:
         if getattr(self, "_base_click_listeners", None) and not getattr(self, "_click_event_registered", False):
             self._click_event_registered = True
             self._element.add_event_listener("click", self._dispatch_click)
+        # Apply deferred class names
+        if self._class_names:
+            self._update_class_attribute()
         # Apply deferred click shortcut
         pending_shortcut = getattr(self, "_pending_click_shortcut", None)
         if pending_shortcut is not None:
