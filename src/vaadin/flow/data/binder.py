@@ -309,6 +309,35 @@ class Binder(Generic[T]):
         self._bean_validators.append(validator)
         return self
 
+    def bind_instance_fields(self, owner):
+        """Automatically bind fields of the owner to bean properties by name.
+
+        Matches owner instance attributes that are form fields (have set_value/
+        get_value) to bean properties with the same name — like Java's
+        ``binder.bindInstanceFields(this)``.
+        """
+        if self._bean_type is None:
+            raise ValueError("bean_type required for bind_instance_fields")
+
+        # Get bean property names
+        if hasattr(self._bean_type, "__dataclass_fields__"):
+            bean_props = set(self._bean_type.__dataclass_fields__.keys())
+        elif hasattr(self._bean_type, "__annotations__"):
+            bean_props = set(self._bean_type.__annotations__.keys())
+        else:
+            bean_props = set()
+
+        for attr_name in list(vars(owner)):
+            if attr_name.startswith("_") or attr_name not in bean_props:
+                continue
+            field = getattr(owner, attr_name)
+            if hasattr(field, "set_value") and hasattr(field, "get_value"):
+                name = attr_name
+                self.for_field(field).bind(
+                    lambda bean, n=name: getattr(bean, n),
+                    lambda bean, value, n=name: setattr(bean, n, value),
+                )
+
     def add_status_change_listener(self, listener: Callable):
         """Add a listener notified when any field value changes."""
         self._status_listeners.append(listener)

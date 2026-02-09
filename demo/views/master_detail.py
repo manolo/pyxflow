@@ -70,31 +70,7 @@ class MasterDetailView(Div):
 
         # Configure Binder
         self.binder = Binder(SamplePerson)
-
-        self.binder.for_field(self.first_name).bind(
-            lambda p: p.first_name, lambda p, v: setattr(p, "first_name", v)
-        )
-        self.binder.for_field(self.last_name).bind(
-            lambda p: p.last_name, lambda p, v: setattr(p, "last_name", v)
-        )
-        self.binder.for_field(self.email).bind(
-            lambda p: p.email, lambda p, v: setattr(p, "email", v)
-        )
-        self.binder.for_field(self.phone).bind(
-            lambda p: p.phone, lambda p, v: setattr(p, "phone", v)
-        )
-        self.binder.for_field(self.date_of_birth).bind(
-            lambda p: p.date_of_birth, lambda p, v: setattr(p, "date_of_birth", v)
-        )
-        self.binder.for_field(self.occupation).bind(
-            lambda p: p.occupation, lambda p, v: setattr(p, "occupation", v)
-        )
-        self.binder.for_field(self.role).bind(
-            lambda p: p.role, lambda p, v: setattr(p, "role", v)
-        )
-        self.binder.for_field(self.important).bind(
-            lambda p: p.important, lambda p, v: setattr(p, "important", v)
-        )
+        self.binder.bind_instance_fields(self)
 
         # Button listeners
         self.cancel.add_click_listener(self._on_cancel)
