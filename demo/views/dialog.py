@@ -15,8 +15,6 @@ class DialogDemoView(VerticalLayout):
     """Demo view for Dialog component."""
 
     def __init__(self):
-        super().__init__()
-
         # Header to identify the view + working component
         self.add(Span("=== DialogDemoView ==="))
         self.add(TextField("Test field (should work)"))

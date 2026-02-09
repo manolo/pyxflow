@@ -94,8 +94,6 @@ class ComponentsDemoView(VerticalLayout):
     Must match the Java AllComponentsView in structure and content."""
 
     def __init__(self):
-        super().__init__()
-
         self.click_count = 0
 
         # Header

@@ -26,7 +26,6 @@ class MasterDetailView(Div):
     """Master-Detail CRUD view with SplitLayout, Grid and form editor."""
 
     def __init__(self):
-        super().__init__()
         self.add_class_name("master-detail-view")
         self.set_size_full()
 

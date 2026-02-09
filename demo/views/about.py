@@ -11,8 +11,6 @@ class AboutView(VerticalLayout):
     """About page — default view."""
 
     def __init__(self):
-        super().__init__()
-
         self.add(Span("About PyFlow"))
         self.add(Span("Python implementation of Vaadin Flow"))
         self.add(Span("Version 0.1.0"))

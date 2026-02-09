@@ -18,8 +18,6 @@ class HelloWorldView(VerticalLayout):
     """Hello World view matching the Java reference implementation."""
 
     def __init__(self):
-        super().__init__()
-
         self.name = TextField("Your name")
         self.say_hello = Button("Say hello")
         self.say_hello.add_click_listener(self._on_click)

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import functools
 from typing import TYPE_CHECKING
 
 from vaadin.flow.core.element import Element
@@ -12,11 +13,30 @@ if TYPE_CHECKING:
 
 
 class Component:
-    """Base class for all UI components."""
+    """Base class for all UI components.
+
+    Subclasses don't need to call ``super().__init__()`` — it is invoked
+    automatically via ``__init_subclass__``, matching Java Vaadin behavior
+    where the no-arg super constructor is called implicitly.
+    """
 
     _tag: str = "div"
 
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        orig_init = cls.__dict__.get("__init__")
+        if orig_init is not None:
+            @functools.wraps(orig_init)
+            def _auto_init(self, *args, _orig=orig_init, _cls=cls, **kwargs):
+                if not hasattr(self, "_component_init_done"):
+                    super(_cls, self).__init__()
+                _orig(self, *args, **kwargs)
+            cls.__init__ = _auto_init
+
     def __init__(self):
+        if hasattr(self, "_component_init_done"):
+            return  # Already initialized (idempotent)
+        self._component_init_done = True
         self._element: Element | None = None
         self._parent: Component | None = None
         self._ui: UI | None = None

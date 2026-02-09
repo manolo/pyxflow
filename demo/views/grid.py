@@ -27,7 +27,6 @@ class GridDemoView(VerticalLayout):
     """View demonstrating advanced Grid features: lazy loading, sorting, multi-select."""
 
     def __init__(self):
-        super().__init__()
         self.set_height_full()
 
         self.add(H2("Grid Advanced Features Demo"))

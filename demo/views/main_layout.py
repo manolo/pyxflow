@@ -15,8 +15,6 @@ class MainLayout(AppLayout):
     """Persistent application layout with navbar and drawer navigation."""
 
     def __init__(self):
-        super().__init__()
-
         # Navbar
         self.add_to_navbar(DrawerToggle(), H1("PyFlow"))
 
