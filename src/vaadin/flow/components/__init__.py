@@ -42,6 +42,7 @@ from vaadin.flow.components.accordion import Accordion, AccordionPanel
 from vaadin.flow.components.context_menu import ContextMenu, ContextMenuItem
 from vaadin.flow.components.date_time_picker import DateTimePicker
 from vaadin.flow.components.markdown import Markdown
+from vaadin.flow.components.split_layout import Orientation, SplitLayout
 
 __all__ = [
     "Button",
@@ -108,4 +109,6 @@ __all__ = [
     "ContextMenuItem",
     "DateTimePicker",
     "Markdown",
+    "Orientation",
+    "SplitLayout",
 ]
