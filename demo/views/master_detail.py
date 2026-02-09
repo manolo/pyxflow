@@ -9,10 +9,10 @@ from vaadin.flow.components import (
     FormLayout,
     Grid,
     HorizontalLayout,
-    LitRenderer,
     Notification,
     NotificationVariant,
     TextField,
+    TextRenderer,
 )
 from vaadin.flow.components.split_layout import SplitLayout
 from vaadin.flow.data import Binder, ValidationError
@@ -38,20 +38,10 @@ class MasterDetailView(Div):
 
         # Configure Grid
         self.grid.set_columns("firstName", "lastName", "email", "phone", "dateOfBirth", "occupation", "role")
-
-        important_renderer = LitRenderer.of(
-            '<vaadin-icon icon="vaadin:${item.icon}" '
-            'style="width: var(--lumo-icon-size-s); height: var(--lumo-icon-size-s); '
-            'color: ${item.color};"></vaadin-icon>'
-        ).with_property(
-            "icon", lambda item: "check" if item.get("important") else "minus"
-        ).with_property(
-            "color",
-            lambda item: "var(--lumo-primary-text-color)"
-            if item.get("important")
-            else "var(--lumo-disabled-text-color)",
-        )
-        self.grid.add_column(important_renderer, header="Important").set_auto_width(True)
+        self.grid.add_column(
+            TextRenderer(lambda item: "\u2713" if item.get("important") else "\u2010"),
+            header="Important",
+        ).set_auto_width(True)
 
         self.grid.add_theme_name("no-border")
 

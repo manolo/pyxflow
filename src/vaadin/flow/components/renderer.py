@@ -46,6 +46,21 @@ class LitRenderer(Renderer):
         return self
 
 
+class TextRenderer(LitRenderer):
+    """A renderer that displays text from a value provider function.
+
+    The function receives the item and returns a string.
+    """
+
+    def __init__(self, value_provider: Callable):
+        super().__init__("${item.text}")
+        self._properties["text"] = value_provider
+
+    @staticmethod
+    def of(value_provider: Callable) -> "TextRenderer":
+        return TextRenderer(value_provider)
+
+
 class ComponentRenderer(Renderer):
     """A renderer that creates a server-side Component for each row.
 
