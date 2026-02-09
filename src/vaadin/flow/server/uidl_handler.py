@@ -86,10 +86,16 @@ _NOTIFICATION_OPENED_CHANGED_CONFIG = {
     "}opened": False
 }
 
-# Selected-changed event configuration (for Tabs)
-_SELECTED_CHANGED_HASH = "RiYMkfOpMJU="  # Placeholder - sync selected property
+# Selected-changed event configuration (for Tabs, ListBox)
+_SELECTED_CHANGED_HASH = "RiYMkfOpMJU="
 _SELECTED_CHANGED_CONFIG = {
     "}selected": False
+}
+
+# Selected-values-changed event configuration (for MultiSelectListBox)
+_SELECTED_VALUES_CHANGED_HASH = "NfDcIkUtPrY="
+_SELECTED_VALUES_CHANGED_CONFIG = {
+    "}selectedValues": False
 }
 
 # =============================================================================
@@ -141,6 +147,19 @@ _UPLOAD_ERROR_CONFIG = {
     "element.files": False,
 }
 
+# Submit event configuration (MessageInput: event.detail.value)
+_SUBMIT_HASH = "6cdZ3Qcd5ng="
+_SUBMIT_CONFIG = {
+    "event.detail.value": False,
+}
+
+# Login event configuration (LoginForm: event.detail.username + event.detail.password)
+_LOGIN_HASH = "S9QZwwCzxQA="
+_LOGIN_CONFIG = {
+    "event.detail.password": False,
+    "event.detail.username": False,
+}
+
 
 # Reverse lookup: hash → config for all known event hashes.
 # Used when a component registers a listener with an explicit hash_key
@@ -157,6 +176,9 @@ _HASH_TO_CONFIG = {
     _FILE_REJECT_HASH: _FILE_REJECT_CONFIG,
     _UPLOAD_SUCCESS_HASH: _UPLOAD_SUCCESS_CONFIG,
     _UPLOAD_ERROR_HASH: _UPLOAD_ERROR_CONFIG,
+    _SUBMIT_HASH: _SUBMIT_CONFIG,
+    _LOGIN_HASH: _LOGIN_CONFIG,
+    _SELECTED_VALUES_CHANGED_HASH: _SELECTED_VALUES_CHANGED_CONFIG,
 }
 
 
@@ -745,6 +767,7 @@ class UidlHandler:
             "checked-changed": (_CHECKED_CHANGED_HASH, _CHECKED_CHANGED_CONFIG),
             "keydown": (_KEYDOWN_HASH, _KEYDOWN_CONFIG),
             "selected-changed": (_SELECTED_CHANGED_HASH, _SELECTED_CHANGED_CONFIG),
+            "selected-values-changed": (_SELECTED_VALUES_CHANGED_HASH, _SELECTED_VALUES_CHANGED_CONFIG),
         }
 
         # Add used constants and replace values with hash references.
