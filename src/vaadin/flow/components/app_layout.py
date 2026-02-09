@@ -50,7 +50,8 @@ class AppLayout(Component):
     def _attach_content(self, component: Component, tree: "StateTree"):
         component._ui = self._ui
         component._parent = self
-        component._attach(tree)
+        if not component._element:
+            component._attach(tree)
         # Content children must NOT have a slot attribute
         self.element.add_child(component.element)
 
