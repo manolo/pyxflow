@@ -198,16 +198,6 @@ class ComponentsDemoView(VerticalLayout):
         self.add(context_menu)
         self.add(self.context_label)
 
-        # --- DateTimePicker ---
-        self.add_section("DateTimePicker")
-
-        dt_form = FormLayout()
-        date_time_picker = DateTimePicker("Meeting date and time")
-        date_time_picker.set_value(datetime.datetime(2025, 6, 15, 14, 30))
-        date_time_picker.set_step(1800)
-        dt_form.add(date_time_picker)
-        self.add(dt_form)
-
         # --- Markdown ---
         self.add_section("Markdown")
 
@@ -350,6 +340,11 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         time_picker.set_step(1800)
         time_picker.set_value(datetime.time(12, 0))
         date_time_form.add(time_picker)
+
+        date_time_picker = DateTimePicker("Meeting date and time")
+        date_time_picker.set_value(datetime.datetime(2025, 6, 15, 14, 30))
+        date_time_picker.set_step(1800)
+        date_time_form.add(date_time_picker)
 
         self.add(date_time_form)
 
