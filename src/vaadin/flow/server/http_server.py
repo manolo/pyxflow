@@ -358,24 +358,16 @@ async def handle_uidl_post(request: web.Request) -> web.Response:
     return web.Response(text="Bad request", status=400)
 
 
-async def run_server(view_class=None, host: str = "localhost", port: int = 8080, debug: bool = False):
+def run_server(host: str = "localhost", port: int = 8080, debug: bool = False, sock=None):
     """Run the Vaadin Flow server.
 
-    Args:
-        view_class: (Deprecated) Use @Route decorator instead.
-                    If provided, registers as fallback for "/" route.
-        host: The host to bind to.
-        port: The port to listen on.
-        debug: Enable verbose UIDL logging.
+    Uses web.run_app() for proper signal handling and graceful shutdown.
+    In dev mode, ``sock`` is a pre-bound listening socket owned by the
+    parent process (avoids EADDRINUSE on reload).
     """
     if debug:
         logging.basicConfig(level=logging.DEBUG, format="%(name)s  %(message)s")
         log.setLevel(logging.DEBUG)
-
-    # Store view class for backwards compatibility
-    if view_class:
-        global _view_class
-        _view_class = view_class
 
     # Show registered routes
     from vaadin.flow.router import get_all_routes
@@ -384,27 +376,12 @@ async def run_server(view_class=None, host: str = "localhost", port: int = 8080,
         print("Registered routes:")
         for path, cls in routes.items():
             print(f"  /{path} -> {cls.__name__}")
-    elif view_class:
-        print(f"Using view: {view_class.__name__} (consider using @Route decorator)")
 
     app = create_app()
-    runner = web.AppRunner(app)
-    await runner.setup()
-    site = web.TCPSite(runner, host, port)
-    try:
-        await site.start()
-    except OSError as e:
-        if e.errno == 48:  # Address already in use
-            print(f"\n  ERROR: Port {port} is already in use.")
-            print(f"  Kill the other process:  lsof -ti :{port} | xargs kill -9\n")
-            return
-        raise
-    print(f"Server running at http://{host}:{port}")
-
-    # Keep running
-    import asyncio
-    while True:
-        await asyncio.sleep(3600)
+    if sock is not None:
+        web.run_app(app, sock=sock)
+    else:
+        web.run_app(app, host=host, port=port, reuse_address=True)
 
 
 # Default view class (for backwards compatibility)
