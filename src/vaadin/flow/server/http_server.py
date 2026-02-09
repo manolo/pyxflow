@@ -20,6 +20,15 @@ _sessions: dict[str, dict[str, Any]] = {}
 # Upload handler registry: resource_id → (session_id, handler_callable)
 _upload_handlers: dict[str, tuple[str, Callable]] = {}
 
+# App package directory (e.g. demo/) — set by FlowApp
+_app_directory: Path | None = None
+
+
+def set_app_directory(directory: Path):
+    """Set the app package directory for serving styles etc."""
+    global _app_directory
+    _app_directory = directory
+
 
 def register_upload_handler(session_id: str, handler: Callable) -> str:
     """Register an upload handler and return its resource_id (UUID)."""
@@ -283,6 +292,7 @@ def create_app() -> web.Application:
     app.router.add_post("/VAADIN/dynamic/resource/{ui_id}/{resource_id}/{name}", handle_upload)
     app.router.add_get("/VAADIN/{path:.*}", handle_static)
     app.router.add_get("/lumo/{path:.*}", handle_lumo)
+    app.router.add_get("/styles/{path:.*}", handle_styles)
     # Catch-all for other routes (e.g., /about) - serve index.html
     app.router.add_get("/{path:.*}", handle_route)
     app.router.add_post("/{path:.*}", handle_route_post)
@@ -299,6 +309,26 @@ async def handle_lumo(request: web.Request) -> web.Response:
         if file_path.is_file():
             content_type = guess_content_type(file_path)
             return web.FileResponse(file_path, headers={"Content-Type": content_type})  # type: ignore[return-value]
+    return web.Response(text="Not found", status=404)
+
+
+async def handle_styles(request: web.Request) -> web.Response:
+    """Handle static file requests for /styles/*.
+
+    Serves CSS files from the app package's styles/ directory
+    (e.g. demo/styles/ when running ``python -m demo``).
+    """
+    if _app_directory is None:
+        return web.Response(text="Not found", status=404)
+    path = request.match_info.get("path", "")
+    file_path = _app_directory / "styles" / path
+    # Security: ensure resolved path stays within styles directory
+    styles_dir = (_app_directory / "styles").resolve()
+    resolved = file_path.resolve()
+    if not str(resolved).startswith(str(styles_dir)):
+        return web.Response(text="Forbidden", status=403)
+    if resolved.is_file() and resolved.suffix == ".css":
+        return web.FileResponse(resolved, headers={"Content-Type": "text/css"})  # type: ignore[return-value]
     return web.Response(text="Not found", status=404)
 
 

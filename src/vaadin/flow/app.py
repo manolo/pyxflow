@@ -74,10 +74,19 @@ def _dev_serve():
 
 
 def _serve(views: str, host: str, port: int, debug: bool):
+    import importlib
+    from pathlib import Path
     from vaadin.flow.router import discover_views
-    from vaadin.flow.server.http_server import run_server
+    from vaadin.flow.server.http_server import run_server, set_app_directory
 
     discover_views(views)
+
+    # Resolve app package directory (e.g. "demo.views" → demo/)
+    package = views.rsplit(".", 1)[0]
+    pkg_mod = importlib.import_module(package)
+    if pkg_mod.__file__:
+        set_app_directory(Path(pkg_mod.__file__).parent)
+
     try:
         asyncio.run(run_server(host=host, port=port, debug=debug))
     except KeyboardInterrupt:

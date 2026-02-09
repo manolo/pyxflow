@@ -181,6 +181,8 @@ class UidlHandler:
         self._pending_execute: list = []  # Execute commands for next response
         self._last_client_id = 0  # Track client's message counter
         self._sent_constants: set[str] = set()  # Track already-sent constant hashes
+        self._pending_dependencies: list[dict] = []  # EAGER deps for next response
+        self._sent_stylesheets: set[str] = set()  # Track sent stylesheet URLs
 
     def handle_init(self, browser_details: dict, initial_route: str = "") -> dict:
         """Handle init request.
@@ -205,6 +207,8 @@ class UidlHandler:
         self._pending_execute = []
         self._last_client_id = 0
         self._sent_constants = set()
+        self._pending_dependencies = []
+        self._sent_stylesheets = set()
         self._initial_route = initial_route  # Store for use in navigation
 
         self._tree._app_id = self._app_id
@@ -452,6 +456,9 @@ class UidlHandler:
             self._view = view
             self._current_route = route
 
+            # Collect stylesheets from view/layout for EAGER dependencies
+            self._collect_stylesheets(view_class, layout_class)
+
         except Exception as e:
             import traceback
             print(f"[UIDL] ERROR creating view: {e}", flush=True)
@@ -543,6 +550,24 @@ class UidlHandler:
         self._pending_execute.append(
             [False, {"@v-node": self._container_node.id}, "return (async function() { this.serverConnected($0)}).apply($1)"]
         )
+
+    def _collect_stylesheets(self, view_class: type, layout_class: type | None):
+        """Collect stylesheets from view and layout classes as EAGER dependencies."""
+        urls: list[str] = []
+        # Layout stylesheets first
+        if layout_class is not None:
+            for url in getattr(layout_class, '_stylesheets', []):
+                if url not in self._sent_stylesheets:
+                    urls.append(url)
+        # View stylesheets
+        for url in getattr(view_class, '_stylesheets', []):
+            if url not in self._sent_stylesheets:
+                urls.append(url)
+        for url in urls:
+            self._pending_dependencies.append(
+                {"type": "STYLESHEET", "url": url, "loadMode": "EAGER"}
+            )
+            self._sent_stylesheets.add(url)
 
     def _find_textfield_nodes(self) -> list[int]:
         """Find all TextField node IDs in the current view."""
@@ -749,6 +774,11 @@ class UidlHandler:
             "constants": constants,
             "changes": changes,
         }
+        # Include EAGER stylesheet dependencies
+        if self._pending_dependencies:
+            response["EAGER"] = self._pending_dependencies
+            self._pending_dependencies = []
+
         # Merge execute commands from both UidlHandler and tree (components)
         tree_execute = self._tree.collect_execute()
         all_execute = self._pending_execute + tree_execute

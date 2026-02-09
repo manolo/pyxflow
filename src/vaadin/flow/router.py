@@ -64,6 +64,25 @@ def Route(path: str = "", page_title: str | None = None, layout: Type["Component
     return decorator
 
 
+def StyleSheet(*urls: str):
+    """Decorator to load CSS stylesheets for a view.
+
+    Usage:
+        @Route("myview")
+        @StyleSheet("styles/my-styles.css")
+        class MyView(VerticalLayout):
+            pass
+
+    Multiple stylesheets can be specified:
+        @StyleSheet("styles/base.css", "styles/theme.css")
+    """
+    def decorator(cls):
+        existing = getattr(cls, '_stylesheets', [])
+        setattr(cls, '_stylesheets', list(urls) + existing)
+        return cls
+    return decorator
+
+
 def PageTitle(title: str):
     """Decorator to set the page title for a view.
 
