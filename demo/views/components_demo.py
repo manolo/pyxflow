@@ -4,8 +4,8 @@ import csv
 import datetime
 from pathlib import Path
 
-from vaadin.flow import Route
-from examples.main_layout import MainLayout
+from vaadin.flow import Menu, Route
+from demo.main_layout import MainLayout
 from vaadin.flow.components import (
     Accordion,
     Button,
@@ -89,6 +89,7 @@ class CrudPerson:
 
 
 @Route("components", page_title="Components Demo", layout=MainLayout)
+@Menu(title="Components", order=2, icon="vaadin:grid-small")
 class ComponentsDemoView(VerticalLayout):
     """View containing ALL components supported by PyFlow.
     Must match the Java AllComponentsView in structure and content."""

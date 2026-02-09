@@ -8,6 +8,7 @@ from vaadin.flow.components import (
     SideNavItem,
     Icon,
 )
+from vaadin.flow.menu import get_menu_entries
 
 
 class MainLayout(AppLayout):
@@ -19,12 +20,9 @@ class MainLayout(AppLayout):
         # Navbar
         self.add_to_navbar(DrawerToggle(), H1("PyFlow"))
 
-        # Drawer with SideNav
+        # Drawer with SideNav — populated from @Menu-annotated routes
         nav = SideNav()
-        nav.add_item(
-            SideNavItem("Home", "/", Icon("vaadin:home")),
-            SideNavItem("About", "/about", Icon("vaadin:info-circle")),
-            SideNavItem("Components", "/components", Icon("vaadin:grid-small")),
-            SideNavItem("Grid", "/grid", Icon("vaadin:table")),
-        )
+        for entry in get_menu_entries():
+            icon = Icon(entry.icon) if entry.icon else None
+            nav.add_item(SideNavItem(entry.title, entry.path, icon))
         self.add_to_drawer(nav)

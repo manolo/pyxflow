@@ -1,11 +1,12 @@
 """About view example - demonstrates multiple routes."""
 
-from vaadin.flow import Route
+from vaadin.flow import Menu, Route
 from vaadin.flow.components import RouterLink, Span, VerticalLayout
-from examples.main_layout import MainLayout
+from demo.main_layout import MainLayout
 
 
 @Route("about", page_title="About", layout=MainLayout)
+@Menu(title="About", order=1, icon="vaadin:info-circle")
 class AboutView(VerticalLayout):
     """Simple about page to test routing."""
 

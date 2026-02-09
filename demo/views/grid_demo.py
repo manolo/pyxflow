@@ -3,8 +3,8 @@
 import csv
 from pathlib import Path
 
-from vaadin.flow import Route
-from examples.main_layout import MainLayout
+from vaadin.flow import Menu, Route
+from demo.main_layout import MainLayout
 from vaadin.flow.components import (
     Button,
     Grid,
@@ -31,6 +31,7 @@ _ALL_PEOPLE = _load_people()
 
 
 @Route("grid", page_title="Grid Demo", layout=MainLayout)
+@Menu(title="Grid", order=3, icon="vaadin:table")
 class GridDemoView(VerticalLayout):
     """View demonstrating advanced Grid features: lazy loading, sorting, multi-select."""
 
