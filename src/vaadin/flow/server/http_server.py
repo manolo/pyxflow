@@ -359,7 +359,14 @@ async def run_server(view_class=None, host: str = "localhost", port: int = 8080,
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, host, port)
-    await site.start()
+    try:
+        await site.start()
+    except OSError as e:
+        if e.errno == 48:  # Address already in use
+            print(f"\n  ERROR: Port {port} is already in use.")
+            print(f"  Kill the other process:  lsof -ti :{port} | xargs kill -9\n")
+            return
+        raise
     print(f"Server running at http://{host}:{port}")
 
     # Keep running
