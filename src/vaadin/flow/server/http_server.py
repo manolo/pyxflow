@@ -329,7 +329,7 @@ async def handle_styles(request: web.Request) -> web.Response:
     if not str(resolved).startswith(str(styles_dir)):
         return web.Response(text="Forbidden", status=403)
     if resolved.is_file() and resolved.suffix == ".css":
-        return web.FileResponse(resolved, headers={"Content-Type": "text/css"})  # type: ignore[return-value]
+        return web.FileResponse(resolved, headers={"Content-Type": "text/css", "Cache-Control": "no-cache"})  # type: ignore[return-value]
     return web.Response(text="Not found", status=404)
 
 
