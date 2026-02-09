@@ -289,12 +289,12 @@ class TestDiscoverViews:
         """After discover_views, get_menu_entries should return @Menu entries."""
         discover_views("demo.views")
         entries = get_menu_entries()
-        assert len(entries) == 4
+        assert len(entries) == 5
         titles = [e.title for e in entries]
-        assert titles == ["About", "Hello", "Components", "Grid"]
+        assert titles == ["About", "Hello", "Components", "Grid", "Master-Detail"]
         # Verify order
         orders = [e.order for e in entries]
-        assert orders == [0, 1, 2, 3]
+        assert orders == [0, 1, 2, 3, 4]
         # Verify icons
         icons = [e.icon for e in entries]
-        assert icons == ["vaadin:info-circle", "vaadin:hand", "vaadin:grid-small", "vaadin:table"]
+        assert icons == ["vaadin:info-circle", "vaadin:hand", "vaadin:grid-small", "vaadin:table", "vaadin:columns"]
