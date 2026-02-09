@@ -43,7 +43,7 @@ cd ../bundle-generator && ./mvnw package jetty:run-war
 vaadin-pyflow/
 ├── src/vaadin/flow/
 │   ├── core/           # StateTree, StateNode, Element, Component
-│   ├── components/     # Button, TextField, Grid, Dialog, etc. (42 components)
+│   ├── components/     # Button, TextField, Grid, Dialog, etc. (49 components)
 │   ├── data/           # Binder, DataProvider, validators, converters
 │   ├── server/         # HTTP server (aiohttp), UIDL handler
 │   └── app.py          # FlowApp entry point

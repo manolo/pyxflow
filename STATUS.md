@@ -1,11 +1,11 @@
 # PyFlow Implementation Status
 
-## Current State: MVP + Routing + Grid (Advanced) + Renderers + AppLayout + Menu System + Visual & Layout + Full UIDL Compatibility
+## Current State: MVP + Routing + Grid (Advanced) + Renderers + AppLayout + Menu System + Visual & Layout + Data & Specialized + Full UIDL Compatibility
 
 **Vaadin version:** 25.0.4
-**Components:** 42 implemented, 7 pending
-**Lines of code:** ~10,700 (core src/), ~26,100 (total with demo + tests)
-**Tests:** 1061 passing
+**Components:** 49 implemented (all Vaadin 25 UI components)
+**Lines of code:** ~12,000 (core src/), ~28,500 (total with demo + tests)
+**Tests:** 1245 passing
 **Last updated:** 2026-02-09
 
 ---
@@ -39,6 +39,8 @@
 - [x] **Grid connector protocol** - `gridConnector.initLazy`, `$connector.set/updateSize/confirm`, `setHeaderRenderer`
 - [x] **Select connector protocol** - `selectConnector.initLazy`, `requestContentUpdate`
 - [x] **ComboBox connector protocol** - `comboBoxConnector.initLazy`, `$connector.set/updateSize/confirm`, filtering
+- [x] **MultiSelectComboBox connector** - Reuses `comboBoxConnector.initLazy`, multi-select with `selectedItems` array
+- [x] **VirtualList connector protocol** - `virtualListConnector.initLazy`, `$connector.set/updateSize`, LitRenderer/ComponentRenderer
 - [x] **DatePicker connector protocol** - `datepickerConnector.initLazy`
 - [x] **TimePicker connector protocol** - `timepickerConnector.initLazy`
 - [x] **MenuBar connector protocol** - `menubarConnector.initLazy`, `contextMenuConnector.generateItemsTree`
@@ -91,6 +93,15 @@
 - [x] Card - Multi-slot container (title, subtitle, media, header-prefix/suffix, footer, content). New in v25
 - [x] Popover - Overlay anchored to target, FlowComponentHost renderer, position, trigger config, open/close/modal
 - [x] MasterDetailLayout - Master/detail slots, size property. New in v25
+- [x] MessageInput - Submit event with message text
+- [x] MessageList - Items JSON property (text, time, userName, userAbbr, userImg, userColorIndex)
+- [x] ListBox - Items as `vaadin-item` children, selected index, value change
+- [x] MultiSelectListBox - Items as children, selectedValues array, multi-select
+- [x] CustomField - Composite field wrapper, children contribute to combined value
+- [x] LoginForm - Login event (username/password), forgot-password event, error property
+- [x] LoginOverlay - Login form in overlay, opened/title/description properties
+- [x] MultiSelectComboBox - Multi-select with chips, comboBoxConnector, data provider, filtering
+- [x] VirtualList - Scrollable list, virtualListConnector, LitRenderer/ComponentRenderer support
 
 ### Component Base Features
 - [x] `setVisible()` / `isVisible()` - Show/hide components
@@ -148,11 +159,9 @@
 
 ## Not Implemented
 
-### Component Inventory (Vaadin 25 — 7 missing components)
+### All Vaadin 25 UI Components Implemented ✓
 
-Vaadin 25 has 72 npm packages. Filtering out infrastructure/themes/internals, there are **7 real UI components** not yet implemented in PyFlow, organized by implementation phase.
-
-Full analysis with complexity, connectors, and dependencies: **`../specs/COMPONENTS.md`**
+All ~49 real UI components from Vaadin 25 are implemented. See `../specs/COMPONENTS.md` for the full inventory.
 
 ### ~~Phase 8 — AppLayout & Prerequisites~~ ✓ DONE
 Icon, DrawerToggle, SideNav/SideNavItem, AppLayout, RouterLayout (`@Route(layout=...)`), layout chain in navigation.
@@ -163,17 +172,8 @@ Icon, DrawerToggle, SideNav/SideNavItem, AppLayout, RouterLayout (`@Route(layout
 ### ~~Phase 10 — Visual & Layout Components~~ ✓ DONE
 Avatar, AvatarGroup, Card, Scroller, Popover, MasterDetailLayout. SplitLayout already done in Phase 9. 85 new tests.
 
-### Phase 11 — Data & Specialized Components
-
-| Component | Tag | Complexity | Notes |
-|---|---|---|---|
-| [ ] **List Box** | `vaadin-list-box` | Medium | Selection with items. Similar to RadioButtonGroup |
-| [ ] **Multi Select Combo Box** | `vaadin-multi-select-combo-box` | High | Extends ComboBox: multi-select, chips, data provider |
-| [ ] **Virtual List** | `vaadin-virtual-list` | High | Data provider integration (like Grid but simpler), renderer |
-| [ ] **Message Input** | `vaadin-message-input` | Low | Text input with submit button |
-| [ ] **Message List** | `vaadin-message-list` | Medium | Property `items` (JSON), timestamp formatting |
-| [ ] **Login Form / Login Overlay** | `vaadin-login-form` | Medium | Form with `login` and `forgot-password` events |
-| [ ] **Custom Field** | `vaadin-custom-field` | Medium-Low | Composite field wrapper, combines children as value |
+### ~~Phase 11 — Data & Specialized Components~~ ✓ DONE
+ListBox, MultiSelectListBox, MultiSelectComboBox, VirtualList, MessageInput, MessageList, LoginForm, LoginOverlay, CustomField. 184 new tests.
 
 ### Protocol / Security
 - [ ] CSRF token validation (actual check)
@@ -206,7 +206,7 @@ Avatar, AvatarGroup, Card, Scroller, Popover, MasterDetailLayout. SplitLayout al
 8. ~~**AppLayout & Prerequisites** - Icon, AppLayout, DrawerToggle, SideNav, RouterLayout interface, `@Route(layout=...)`, layout chain~~ ✓ DONE
 9. ~~**Menu System + High-Value Components** - `@Menu`, get_menu_entries(), Details, Accordion, ContextMenu, DateTimePicker, Markdown~~ ✓ DONE
 10. ~~**Visual & Layout Components** - Avatar, AvatarGroup, Card, Scroller, Popover, MasterDetailLayout~~ ✓ DONE
-11. **Data & Specialized Components** - ListBox, MultiSelectComboBox, VirtualList, MessageInput/List, Login, CustomField
+11. ~~**Data & Specialized Components** - ListBox, MultiSelectComboBox, VirtualList, MessageInput/List, Login, CustomField~~ ✓ DONE
 
 ---
 
