@@ -1,9 +1,7 @@
 """Grid demo view showcasing advanced grid features."""
 
-import csv
-from pathlib import Path
-
 from vaadin.flow import Menu, Route
+from demo.services import people_service
 from demo.main_layout import MainLayout
 from vaadin.flow.components import (
     Button,
@@ -19,15 +17,8 @@ from vaadin.flow.components import (
 )
 
 
-def _load_people() -> list[dict]:
-    """Load people data from CSV."""
-    csv_path = Path(__file__).parent / "people.csv"
-    with open(csv_path, newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
-
-
 # Pre-load for lazy data provider
-_ALL_PEOPLE = _load_people()
+_ALL_PEOPLE = [p.to_dict() for p in people_service.find_all()]
 
 
 @Route("grid", page_title="Grid Demo", layout=MainLayout)

@@ -1,10 +1,9 @@
 """Demo view showcasing all implemented components."""
 
-import csv
 import datetime
-from pathlib import Path
 
 from vaadin.flow import Menu, Route
+from demo.services import people_service
 from demo.main_layout import MainLayout
 from vaadin.flow.components import (
     Accordion,
@@ -425,7 +424,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.add(page_layout)
 
         # --- Shared data for all grids ---
-        people = self._load_people()
+        people = [p.to_dict() for p in people_service.find_all()]
 
         # --- CRUD Master-Detail ---
         self.add_section("CRUD Master-Detail (Binder)")
@@ -669,13 +668,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self._lazy_stats_label = Span(f"{len(self._lazy_data)} items totales (fetches: 0, loaded: 0)")
         self.add(self._lazy_stats_label)
         self.add(lazy_grid)
-
-    @staticmethod
-    def _load_people() -> list[dict]:
-        """Load people data from CSV."""
-        csv_path = Path(__file__).parent / "people.csv"
-        with open(csv_path, newline="", encoding="utf-8") as f:
-            return list(csv.DictReader(f))
 
     def add_section(self, title: str):
         """Add a section header."""
