@@ -43,14 +43,14 @@ cd ../bundle-generator && ./mvnw package jetty:run-war
 vaadin-pyflow/
 ├── src/vaadin/flow/
 │   ├── core/           # StateTree, StateNode, Element, Component
-│   ├── components/     # Button, TextField, Grid, Dialog, etc. (35 components)
+│   ├── components/     # Button, TextField, Grid, Dialog, etc. (42 components)
 │   ├── data/           # Binder, DataProvider, validators, converters
 │   ├── server/         # HTTP server (aiohttp), UIDL handler
 │   └── app.py          # FlowApp entry point
 ├── demo/               # Demo app + __main__.py entry point
 │   ├── views/          # View files (hello_world, about, components, grid, etc.)
 │   └── services/       # PeopleService (data access layer)
-├── tests/              # 962 unit tests
+├── tests/              # 1061 unit tests
 └── STATUS.md           # Implementation progress
 ../bundle-generator/    # Java project → frontend bundle (shared, at root level)
 ```

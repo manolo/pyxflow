@@ -4,8 +4,8 @@
 
 **Vaadin version:** 25.0.4
 **Components:** 42 implemented, 7 pending
-**Lines of code:** ~4,800 (core), ~11,000 (total with demo)
-**Tests:** 1056 passing
+**Lines of code:** ~10,700 (core src/), ~26,100 (total with demo + tests)
+**Tests:** 1061 passing
 **Last updated:** 2026-02-09
 
 ---
@@ -117,6 +117,7 @@
 - [x] Serves index.html from bundle (Vaadin-generated)
 - [x] Lumo theme CSS loading - Extracted from JAR, served at `/lumo/*`, injected in index.html
 - [x] `@StyleSheet` decorator - Load custom CSS via UIDL EAGER dependencies, served from app's `styles/` directory
+- [x] Dev mode (`--dev`) - Auto-reload on Python file changes via watchfiles, socket-in-parent architecture (no EADDRINUSE on reload), file change logging
 
 ### Protocol
 - [x] Init response - appConfig, CSRF, constants (Java-compatible hashes)
@@ -190,7 +191,6 @@ Avatar, AvatarGroup, Card, Scroller, Popover, MasterDetailLayout. SplitLayout al
 - [ ] Session timeout / cleanup
 - [ ] Error handling
 - [ ] Push / WebSocket
-- [ ] Hot reload
 
 ---
 
