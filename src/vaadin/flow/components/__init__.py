@@ -43,6 +43,11 @@ from vaadin.flow.components.context_menu import ContextMenu, ContextMenuItem
 from vaadin.flow.components.date_time_picker import DateTimePicker
 from vaadin.flow.components.markdown import Markdown
 from vaadin.flow.components.split_layout import Orientation, SplitLayout
+from vaadin.flow.components.avatar import Avatar, AvatarGroup, AvatarGroupItem
+from vaadin.flow.components.scroller import Scroller, ScrollDirection
+from vaadin.flow.components.card import Card
+from vaadin.flow.components.popover import Popover, PopoverPosition
+from vaadin.flow.components.master_detail_layout import MasterDetailLayout
 
 __all__ = [
     "Button",
@@ -111,4 +116,13 @@ __all__ = [
     "Markdown",
     "Orientation",
     "SplitLayout",
+    "Avatar",
+    "AvatarGroup",
+    "AvatarGroupItem",
+    "Scroller",
+    "ScrollDirection",
+    "Card",
+    "Popover",
+    "PopoverPosition",
+    "MasterDetailLayout",
 ]

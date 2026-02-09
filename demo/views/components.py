@@ -5,7 +5,11 @@ from demo.services import people_service
 from demo.views.main_layout import MainLayout
 from vaadin.flow.components import (
     Accordion,
+    Avatar,
+    AvatarGroup,
+    AvatarGroupItem,
     Button,
+    Card,
     Checkbox,
     CheckboxGroup,
     ComboBox,
@@ -28,14 +32,19 @@ from vaadin.flow.components import (
     IntegerField,
     LitRenderer,
     Markdown,
+    MasterDetailLayout,
     MenuBar,
     Notification,
     NotificationVariant,
     NumberField,
     PasswordField,
+    Popover,
+    PopoverPosition,
     ProgressBar,
     RadioButtonGroup,
     RouterLink,
+    Scroller,
+    ScrollDirection,
     Select,
     Span,
     Tab,
@@ -426,11 +435,12 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.crud_selected: CrudPerson | None = None
         self.crud_is_new = False
 
-        crud_layout = HorizontalLayout()
-        crud_layout.set_width_full()
+        self.crud_layout = MasterDetailLayout()
+        self.crud_layout.set_width_full()
 
         # Master: Grid
         self.crud_master = VerticalLayout()
+
 
         self.crud_grid = Grid()
         self.crud_grid.set_columns("name", "email", "age", "role", "city", "department")
@@ -443,9 +453,10 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
         self.crud_master.add(self.crud_grid, crud_new_btn)
 
+
+
         # Detail: Form (hidden until selection or new)
         self.crud_detail = VerticalLayout()
-        self.crud_detail.set_width("40%")
         self.crud_detail.set_visible(False)
 
         crud_form = FormLayout()
@@ -495,9 +506,9 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.crud_cancel_confirm.add_confirm_listener(lambda e: self._crud_clear_form())
         self.add(self.crud_cancel_confirm)
 
-        crud_layout.expand(self.crud_master)
-        crud_layout.add(self.crud_master, self.crud_detail)
-        self.add(crud_layout)
+        self.crud_layout.set_master(self.crud_master)
+        self.crud_layout.set_detail(self.crud_detail)
+        self.add(self.crud_layout)
 
         # Binder setup
         self.binder = Binder(CrudPerson)
@@ -654,6 +665,68 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self._lazy_stats_label = Span(f"{len(self._lazy_data)} items totales (fetches: 0, loaded: 0)")
         self.add(self._lazy_stats_label)
         self.add(lazy_grid)
+
+        # --- Avatar ---
+        self.add_section("Avatar")
+
+        avatar1 = Avatar("Sophia Williams")
+        avatar2 = Avatar()
+        avatar2.set_name("Hugo Santos")
+        avatar2.set_abbreviation("HS")
+        avatar2.set_color_index(3)
+        self.add(HorizontalLayout(avatar1, avatar2))
+
+        # --- AvatarGroup ---
+        self.add_section("AvatarGroup")
+
+        avatar_group = AvatarGroup()
+        avatar_group.add(
+            AvatarGroupItem("Sophia Williams"),
+            AvatarGroupItem("Hugo Santos"),
+            AvatarGroupItem("Diana Novak"),
+            AvatarGroupItem("Rashid Traore"),
+        )
+        avatar_group.set_max_items_visible(3)
+        self.add(avatar_group)
+
+        # --- Scroller ---
+        self.add_section("Scroller")
+
+        scroll_content = VerticalLayout()
+        for i in range(1, 21):
+            scroll_content.add(Span(f"Scrollable item {i}"))
+        scroller = Scroller(scroll_content, scroll_direction=ScrollDirection.VERTICAL)
+        scroller.set_height("200px")
+        scroller.set_width("300px")
+        scroller._set_style("flex", "0 0 auto")
+        scroller._set_style("border", "1px solid var(--lumo-contrast-20pct)")
+        self.add(scroller)
+
+        # --- Card ---
+        self.add_section("Card")
+
+        card = Card()
+        card.set_title("Card Title")
+        card.set_subtitle("Card subtitle")
+        card.add(Span("This is the card content area."))
+        card_action = Button("Action")
+        card_action.add_click_listener(lambda e: Notification.show("Card action clicked!", 3000))
+        card.add_to_footer(card_action)
+        self.add(card)
+
+        # --- Popover ---
+        self.add_section("Popover")
+
+        popover_target = Button("Click for Popover")
+        popover = Popover()
+        popover.set_target(popover_target)
+        popover.add(Span("Popover content"))
+        popover.add(Span("Click outside to close"))
+        popover.set_position(PopoverPosition.BOTTOM)
+        popover.set_open_on_click(True)
+        self.add(popover_target)
+        self.add(popover)
+
 
     def add_section(self, title: str):
         self.add(H3(title))

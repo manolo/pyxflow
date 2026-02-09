@@ -260,9 +260,10 @@ def get_index_html() -> str:
                 '<meta charset="UTF-8" />',
                 '<meta charset="UTF-8" />\n  <base href="/">'
             )
-            # Inject Lumo theme CSS
+            # Enable experimental feature flags before bundle loads
             html = html.replace(
                 "</head>",
+                '  <script>window.Vaadin=window.Vaadin||{};window.Vaadin.featureFlags=window.Vaadin.featureFlags||{};window.Vaadin.featureFlags.masterDetailLayoutComponent=true;</script>\n'
                 '  <link rel="stylesheet" type="text/css" href="lumo/lumo.css">\n</head>'
             )
             return html

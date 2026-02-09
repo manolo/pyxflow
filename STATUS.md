@@ -1,11 +1,11 @@
 # PyFlow Implementation Status
 
-## Current State: MVP + Routing + Grid (Advanced) + Renderers + AppLayout + Menu System + Full UIDL Compatibility
+## Current State: MVP + Routing + Grid (Advanced) + Renderers + AppLayout + Menu System + Visual & Layout + Full UIDL Compatibility
 
 **Vaadin version:** 25.0.4
-**Components:** 36 implemented, 13 pending
-**Lines of code:** ~4,500 (core), ~10,500 (total with demo)
-**Tests:** 971 passing
+**Components:** 42 implemented, 7 pending
+**Lines of code:** ~4,800 (core), ~11,000 (total with demo)
+**Tests:** 1056 passing
 **Last updated:** 2026-02-09
 
 ---
@@ -85,6 +85,12 @@
 - [x] ContextMenu - Right-click/long-press menu, contextMenuConnector, hierarchical items, separators
 - [x] DateTimePicker - Combined date+time, datepickerConnector + timepickerConnector, min/max/step
 - [x] Markdown - Renders markdown as HTML, `content` property, new in Vaadin 25
+- [x] Avatar - Name, abbreviation, image, color index
+- [x] AvatarGroup - Item list (JSON property), max items visible
+- [x] Scroller - Scrollable container, scroll direction (vertical/horizontal/both/none)
+- [x] Card - Multi-slot container (title, subtitle, media, header-prefix/suffix, footer, content). New in v25
+- [x] Popover - Overlay anchored to target, FlowComponentHost renderer, position, trigger config, open/close/modal
+- [x] MasterDetailLayout - Master/detail slots, size property. New in v25
 
 ### Component Base Features
 - [x] `setVisible()` / `isVisible()` - Show/hide components
@@ -141,9 +147,9 @@
 
 ## Not Implemented
 
-### Component Inventory (Vaadin 25 — 13 missing components)
+### Component Inventory (Vaadin 25 — 7 missing components)
 
-Vaadin 25 has 72 npm packages. Filtering out infrastructure/themes/internals, there are **13 real UI components** not yet implemented in PyFlow, organized by implementation phase.
+Vaadin 25 has 72 npm packages. Filtering out infrastructure/themes/internals, there are **7 real UI components** not yet implemented in PyFlow, organized by implementation phase.
 
 Full analysis with complexity, connectors, and dependencies: **`../specs/COMPONENTS.md`**
 
@@ -153,17 +159,8 @@ Icon, DrawerToggle, SideNav/SideNavItem, AppLayout, RouterLayout (`@Route(layout
 ### ~~Phase 9 — Menu System + High-Value Components~~ ✓ DONE
 `@Menu` decorator, `get_menu_entries()`, Details, Accordion, ContextMenu, DateTimePicker, Markdown. 90 new tests.
 
-### Phase 10 — Visual & Layout Components
-
-| Component | Tag | Complexity | Notes |
-|---|---|---|---|
-| [ ] **Avatar** | `vaadin-avatar` | Low | Properties: `name`, `abbr`, `img` |
-| [ ] **Avatar Group** | `vaadin-avatar-group` | Low | Property `items` (JSON array), max visible |
-| [ ] **Card** | `vaadin-card` | Low | Container with slots. **New in v25** |
-| [x] **Split Layout** | `vaadin-split-layout` | Medium | Property `splitterPosition`, orientation, resize event. ✓ Already implemented |
-| [ ] **Scroller** | `vaadin-scroller` | Low | Scrollable container. Property `scrollDirection` |
-| [ ] **Popover** | `vaadin-popover` | Medium | Overlay component. Target, trigger, position. Similar to Dialog |
-| [ ] **Master Detail Layout** | `vaadin-master-detail-layout` | Medium | Layout with slots. **New in v25** |
+### ~~Phase 10 — Visual & Layout Components~~ ✓ DONE
+Avatar, AvatarGroup, Card, Scroller, Popover, MasterDetailLayout. SplitLayout already done in Phase 9. 85 new tests.
 
 ### Phase 11 — Data & Specialized Components
 
@@ -208,7 +205,7 @@ Icon, DrawerToggle, SideNav/SideNavItem, AppLayout, RouterLayout (`@Route(layout
 7. ~~**Grid advanced** - Lazy loading, sorting, multi-select, renderers~~ ✓ DONE
 8. ~~**AppLayout & Prerequisites** - Icon, AppLayout, DrawerToggle, SideNav, RouterLayout interface, `@Route(layout=...)`, layout chain~~ ✓ DONE
 9. ~~**Menu System + High-Value Components** - `@Menu`, get_menu_entries(), Details, Accordion, ContextMenu, DateTimePicker, Markdown~~ ✓ DONE
-10. **Visual & Layout Components** - Avatar, Card, SplitLayout, Scroller, Popover, MasterDetailLayout
+10. ~~**Visual & Layout Components** - Avatar, AvatarGroup, Card, Scroller, Popover, MasterDetailLayout~~ ✓ DONE
 11. **Data & Specialized Components** - ListBox, MultiSelectComboBox, VirtualList, MessageInput/List, Login, CustomField
 
 ---
