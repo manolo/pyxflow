@@ -3,7 +3,8 @@
 ## Current State: MVP + Routing + Grid (Advanced) + Renderers + AppLayout + Menu System + Full UIDL Compatibility
 
 **Vaadin version:** 25.0.4
-**Lines of code:** ~4,200
+**Components:** 35 implemented, 14 pending
+**Lines of code:** ~4,500 (core), ~10,500 (total with examples)
 **Tests:** 959 passing
 **Last updated:** 2026-02-09
 
@@ -41,6 +42,7 @@
 - [x] **DatePicker connector protocol** - `datepickerConnector.initLazy`
 - [x] **TimePicker connector protocol** - `timepickerConnector.initLazy`
 - [x] **MenuBar connector protocol** - `menubarConnector.initLazy`, `contextMenuConnector.generateItemsTree`
+- [x] **ContextMenu connector protocol** - `contextMenuConnector.initLazy`, `$connector.generateItems`
 
 ### Components
 - [x] Button - Text, click listener
@@ -137,9 +139,9 @@
 
 ## Not Implemented
 
-### Component Inventory (Vaadin 25 — 10 missing components)
+### Component Inventory (Vaadin 25 — 14 missing components)
 
-Vaadin 25 has 72 npm packages. Filtering out infrastructure/themes/internals, there are **10 real UI components** not yet implemented in PyFlow, organized by implementation phase.
+Vaadin 25 has 72 npm packages. Filtering out infrastructure/themes/internals, there are **14 real UI components** not yet implemented in PyFlow, organized by implementation phase.
 
 Full analysis with complexity, connectors, and dependencies: **`../specs/COMPONENTS.md`**
 
