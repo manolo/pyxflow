@@ -12,8 +12,8 @@ from vaadin.flow.components.horizontal_layout import Alignment
 from demo.views.main_layout import MainLayout
 
 
-@Route("", page_title="Hello World", layout=MainLayout)
-@Menu(title="Home", order=0, icon="vaadin:home")
+@Route("hello", page_title="Hello World", layout=MainLayout)
+@Menu(title="Hello", order=1, icon="vaadin:hand")
 class HelloWorldView(VerticalLayout):
     """Hello World view matching the Java reference implementation."""
 

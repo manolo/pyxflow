@@ -1,10 +1,11 @@
 """Greet view - demonstrates route parameters."""
 
 from vaadin.flow import Route, PageTitle
+from demo.views.main_layout import MainLayout
 from vaadin.flow.components import H2, RouterLink, Span, VerticalLayout
 
 
-@Route("greet/:name")
+@Route("greet/:name", layout=MainLayout)
 @PageTitle("Greeting")
 class GreetView(VerticalLayout):
     """View that greets a user by name from the route parameter."""

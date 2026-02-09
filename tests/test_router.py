@@ -272,8 +272,8 @@ class TestDiscoverViews:
         assert len(imported) > 0
         routes = get_all_routes()
         # At minimum, the example views should be registered
-        assert "" in routes  # HelloWorldView at root
-        assert "about" in routes
+        assert "" in routes  # AboutView at root
+        assert "hello" in routes
         assert "components" in routes
         assert "grid" in routes
 
@@ -291,10 +291,10 @@ class TestDiscoverViews:
         entries = get_menu_entries()
         assert len(entries) == 4
         titles = [e.title for e in entries]
-        assert titles == ["Home", "About", "Components", "Grid"]
+        assert titles == ["About", "Hello", "Components", "Grid"]
         # Verify order
         orders = [e.order for e in entries]
         assert orders == [0, 1, 2, 3]
         # Verify icons
         icons = [e.icon for e in entries]
-        assert icons == ["vaadin:home", "vaadin:info-circle", "vaadin:grid-small", "vaadin:table"]
+        assert icons == ["vaadin:info-circle", "vaadin:hand", "vaadin:grid-small", "vaadin:table"]

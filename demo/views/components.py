@@ -104,8 +104,8 @@ class ComponentsDemoView(VerticalLayout):
         # --- Navigation ---
         self.add_section("Navigation")
 
-        self.add(RouterLink("Go to Hello World", "/"))
-        self.add(RouterLink("Go to About", "/about"))
+        self.add(RouterLink("Go to Hello World", "/hello"))
+        self.add(RouterLink("Go to About", "/"))
         self.add(RouterLink("Go to Greet", "/greet/World"))
 
         # --- Progress ---
