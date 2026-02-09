@@ -39,11 +39,11 @@ class TestDetails:
     def test_summary_text(self, tree):
         d = Details("My Summary")
         d._attach(tree)
-        # Summary text creates a <span slot="summary"> child
+        # Summary text creates a <vaadin-details-summary slot="summary"> child
         children = d.element.node._children
         assert len(children) >= 1
         span_node = children[0]
-        assert span_node.get(Feature.ELEMENT_DATA, "tag") == "span"
+        assert span_node.get(Feature.ELEMENT_DATA, "tag") == "vaadin-details-summary"
         assert span_node.get(Feature.ELEMENT_ATTRIBUTE_MAP, "slot") == "summary"
         # Text node child
         text_node = span_node._children[0]

@@ -96,10 +96,13 @@ class ContextMenu(Component):
         if self._open_on_click:
             self.element.set_property("openOnClick", True)
 
-        # If target is already attached, set it as child in the default slot
-        if self._target and self._target._element:
-            # The target is wrapped inside the context-menu element
-            self.element.node.add_child(self._target.element.node)
+        # Attach and add the target as a child of the context-menu element
+        if self._target:
+            if not self._target._element:
+                self._target._ui = self._ui
+                self._target._parent = self
+                self._target._attach(tree)
+            self.element.add_child(self._target.element)
 
         if self._items:
             self._build_items(tree)

@@ -46,16 +46,16 @@ class Details(Component):
         self.element.add_event_listener("opened-changed", self._handle_opened_changed)
 
     def _attach_summary_text(self, tree: "StateTree"):
-        """Attach a text summary via <span slot='summary'>."""
-        span_node = tree.create_node()
-        span_node.attach()
-        span_node.put(Feature.ELEMENT_DATA, "tag", "span")
-        span_node.put(Feature.ELEMENT_ATTRIBUTE_MAP, "slot", "summary")
+        """Attach a text summary via <vaadin-details-summary slot='summary'>."""
+        summary_node = tree.create_node()
+        summary_node.attach()
+        summary_node.put(Feature.ELEMENT_DATA, "tag", "vaadin-details-summary")
+        summary_node.put(Feature.ELEMENT_ATTRIBUTE_MAP, "slot", "summary")
         text_node = tree.create_node()
         text_node.attach()
         text_node.put(Feature.TEXT_NODE, "text", self._summary)
-        span_node.add_child(text_node)
-        self.element.node.add_child(span_node)
+        summary_node.add_child(text_node)
+        self.element.node.add_child(summary_node)
 
     def _attach_summary_component(self, tree: "StateTree"):
         """Attach a Component as the summary."""
