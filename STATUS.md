@@ -126,7 +126,7 @@
 - [x] UIDL Handler - Init, navigation, events, mSync
 - [x] Page reload support - State reset on init
 - [x] Serves index.html from bundle (Vaadin-generated)
-- [x] Lumo theme CSS loading - Extracted from JAR, served at `/lumo/*`, injected in index.html
+- [x] Lumo/Aura theme CSS - Extracted from JARs, served at `/lumo/*` and `/aura/*`, loaded via `@StyleSheet` on layout
 - [x] `@StyleSheet` decorator - Load custom CSS via UIDL EAGER dependencies, served from app's `styles/` directory
 - [x] Dev mode (`--dev`) - Auto-reload on Python file changes via watchfiles, socket-in-parent architecture (no EADDRINUSE on reload), file change logging
 
@@ -184,7 +184,8 @@ ListBox, MultiSelectListBox, MultiSelectComboBox, VirtualList, MessageInput, Mes
 - [x] Return channels
 
 ### Theme
-- [ ] Aura theme support (alternative to Lumo)
+- [x] Lumo/Aura theme support — user declares `@StyleSheet("lumo/lumo.css")` or `@StyleSheet("aura/aura.css")` on layout; both extracted in bundle
+- [ ] **Optimization:** inject layout `@StyleSheet` as `<link>` in `<head>` to avoid FOUC (currently loaded via UIDL after init)
 - [ ] Theme switching at runtime
 
 ### Server Infrastructure

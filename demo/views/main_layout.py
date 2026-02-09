@@ -10,7 +10,7 @@ from vaadin.flow.components import (
 from vaadin.flow.menu import get_menu_entries
 
 
-@StyleSheet("styles/styles.css")
+@StyleSheet("lumo/lumo.css", "styles/styles.css")
 class MainLayout(AppLayout):
     def __init__(self):
         # Navbar

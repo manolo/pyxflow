@@ -23,7 +23,6 @@ _upload_handlers: dict[str, tuple[str, Callable]] = {}
 # App package directory (e.g. demo/) — set by FlowApp
 _app_directory: Path | None = None
 
-
 def set_app_directory(directory: Path):
     """Set the app package directory for serving styles etc."""
     global _app_directory
@@ -188,6 +187,9 @@ async def handle_upload(request: web.Request) -> web.Response:
     )
 
 
+_BUNDLE_CACHE = "public, max-age=31536000, immutable"
+
+
 async def handle_static(request: web.Request) -> web.Response:
     """Handle static file requests for /VAADIN/*."""
     path = request.match_info.get("path", "")
@@ -198,7 +200,7 @@ async def handle_static(request: web.Request) -> web.Response:
         file_path = bundle_dir / "VAADIN" / path
         if file_path.is_file():
             content_type = guess_content_type(file_path)
-            return web.FileResponse(file_path, headers={"Content-Type": content_type})  # type: ignore[return-value]
+            return web.FileResponse(file_path, headers={"Content-Type": content_type, "Cache-Control": _BUNDLE_CACHE})  # type: ignore[return-value]
 
     return web.Response(text="Not found", status=404)
 
@@ -263,8 +265,7 @@ def get_index_html() -> str:
             # Enable experimental feature flags before bundle loads
             html = html.replace(
                 "</head>",
-                '  <script>window.Vaadin=window.Vaadin||{};window.Vaadin.featureFlags=window.Vaadin.featureFlags||{};window.Vaadin.featureFlags.masterDetailLayoutComponent=true;</script>\n'
-                '  <link rel="stylesheet" type="text/css" href="lumo/lumo.css">\n</head>'
+                '  <script>window.Vaadin=window.Vaadin||{};window.Vaadin.featureFlags=window.Vaadin.featureFlags||{};window.Vaadin.featureFlags.masterDetailLayoutComponent=true;</script>\n</head>'
             )
             return html
 
@@ -292,7 +293,8 @@ def create_app() -> web.Application:
     app.router.add_post("/", handle_uidl_post)
     app.router.add_post("/VAADIN/dynamic/resource/{ui_id}/{resource_id}/{name}", handle_upload)
     app.router.add_get("/VAADIN/{path:.*}", handle_static)
-    app.router.add_get("/lumo/{path:.*}", handle_lumo)
+    app.router.add_get("/lumo/{path:.*}", handle_theme)
+    app.router.add_get("/aura/{path:.*}", handle_theme)
     app.router.add_get("/styles/{path:.*}", handle_styles)
     # Catch-all for other routes (e.g., /about) - serve index.html
     app.router.add_get("/{path:.*}", handle_route)
@@ -301,15 +303,16 @@ def create_app() -> web.Application:
     return app
 
 
-async def handle_lumo(request: web.Request) -> web.Response:
-    """Handle static file requests for /lumo/*."""
+async def handle_theme(request: web.Request) -> web.Response:
+    """Handle static file requests for /lumo/* and /aura/*."""
+    theme = request.path.split("/")[1]  # "lumo" or "aura"
     path = request.match_info.get("path", "")
     bundle_dir = get_bundle_directory()
     if bundle_dir:
-        file_path = bundle_dir / "lumo" / path
+        file_path = bundle_dir / theme / path
         if file_path.is_file():
             content_type = guess_content_type(file_path)
-            return web.FileResponse(file_path, headers={"Content-Type": content_type})  # type: ignore[return-value]
+            return web.FileResponse(file_path, headers={"Content-Type": content_type, "Cache-Control": _BUNDLE_CACHE})  # type: ignore[return-value]
     return web.Response(text="Not found", status=404)
 
 
