@@ -37,6 +37,17 @@ class Binding:
     def field(self):
         return self._field
 
+    def clear(self):
+        """Reset the field to its empty/default value."""
+        field = self._field
+        value = field.get_value()
+        if isinstance(value, bool):
+            field.set_value(False)
+        elif isinstance(value, (int, float)):
+            field.set_value(0)
+        else:
+            field.set_value("")
+
     def read(self, bean):
         """Read value from bean into field."""
         model_value = self._getter(bean)
@@ -219,10 +230,14 @@ class Binder(Generic[T]):
         for listener in self._status_listeners:
             listener()
 
-    def read_bean(self, bean: T):
-        """Populate all fields from the bean."""
-        for binding in self._bindings:
-            binding.read(bean)
+    def read_bean(self, bean: T | None):
+        """Populate all fields from the bean, or clear them if None."""
+        if bean is None:
+            for binding in self._bindings:
+                binding.clear()
+        else:
+            for binding in self._bindings:
+                binding.read(bean)
         self._take_snapshot()
 
     def write_bean(self, bean: T):

@@ -180,14 +180,4 @@ class MasterDetailView(Div):
 
     def _populate_form(self, value: SamplePerson | None):
         self.sample_person = value
-        if value:
-            self.binder.read_bean(value)
-        else:
-            self.first_name.set_value("")
-            self.last_name.set_value("")
-            self.email.set_value("")
-            self.phone.set_value("")
-            self.date_of_birth.set_value("")
-            self.occupation.set_value("")
-            self.role.set_value("")
-            self.important.set_value(False)
+        self.binder.read_bean(value)
