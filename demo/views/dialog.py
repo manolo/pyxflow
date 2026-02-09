@@ -12,8 +12,6 @@ from vaadin.flow.components import (
 
 @Route("dialog-demo", page_title="Dialog Demo")
 class DialogDemoView(VerticalLayout):
-    """Demo view for Dialog component."""
-
     def __init__(self):
         # Header to identify the view + working component
         self.add(Span("=== DialogDemoView ==="))
@@ -34,7 +32,6 @@ class DialogDemoView(VerticalLayout):
         self.add(self.dialog)
 
     def _open_dialog(self, event):
-        """Open the dialog."""
         self.dialog.open()
         new_status = Span("Status: Dialog opened")
         self.add(new_status)

@@ -12,8 +12,6 @@ from vaadin.flow.menu import get_menu_entries
 
 
 class MainLayout(AppLayout):
-    """Persistent application layout with navbar and drawer navigation."""
-
     def __init__(self):
         # Navbar
         self.add_to_navbar(DrawerToggle(), H1("PyFlow"))

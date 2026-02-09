@@ -297,4 +297,4 @@ class TestDiscoverViews:
         assert orders == [0, 1, 2, 3, 4]
         # Verify icons
         icons = [e.icon for e in entries]
-        assert icons == ["vaadin:info-circle", "vaadin:hand", "vaadin:grid-small", "vaadin:table", "vaadin:columns"]
+        assert icons == ["vaadin:info-circle", "vaadin:hand", "vaadin:grid-small", "vaadin:table", "vaadin:split-h"]

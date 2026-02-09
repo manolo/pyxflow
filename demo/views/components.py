@@ -67,8 +67,6 @@ from vaadin.flow.data import (
 
 
 class CrudPerson:
-    """Data model for the CRUD demo section."""
-
     _next_id = 1
 
     def __init__(self, name="", email="", age=0, role="", city="", department=""):
@@ -90,9 +88,6 @@ class CrudPerson:
 @Route("components", page_title="Components Demo", layout=MainLayout)
 @Menu(title="Components", order=2, icon="vaadin:grid-small")
 class ComponentsDemoView(VerticalLayout):
-    """View containing ALL components supported by PyFlow.
-    Must match the Java AllComponentsView in structure and content."""
-
     def __init__(self):
         self.click_count = 0
 
@@ -663,11 +658,9 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.add(lazy_grid)
 
     def add_section(self, title: str):
-        """Add a section header."""
         self.add(H3(title))
 
     def on_grid_select(self, event):
-        """Handle grid selection."""
         item = event.get("item")
         if item:
             self.grid_selection_label.set_text(f"Selected: {item['name']}")
@@ -675,72 +668,57 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
             self.grid_selection_label.set_text("Selected: (none)")
 
     def on_button_click(self, event):
-        """Handle button click."""
         self.click_count += 1
         self.click_label.set_text(f"Click count: {self.click_count}")
 
     def open_dialog(self, event):
-        """Open the dialog."""
         self.dialog.open()
 
     def show_notification(self, event):
-        """Show a basic notification."""
         Notification.show("This is a notification!", 3000, Notification.Position.BOTTOM_CENTER)
 
     def show_success(self, event):
-        """Show a success notification."""
         n = Notification.show("Operation successful!", 3000, Notification.Position.TOP_CENTER)
         n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
 
     def show_error(self, event):
-        """Show an error notification."""
         n = Notification.show("Something went wrong!", 5000, Notification.Position.MIDDLE)
         n.add_theme_variants(NotificationVariant.LUMO_ERROR)
 
     def on_lit_edit(self, item):
-        """Handle LitRenderer edit button click."""
         self.lit_renderer_label.set_text(f"LitRenderer action: Edit {item['name']}")
 
     def create_action_buttons(self, item):
-        """Create action buttons for ComponentRenderer."""
         btn = Button(f"View {item['name']}")
         btn.add_click_listener(lambda e, i=item: self.on_comp_view(i))
         return btn
 
     def on_comp_view(self, item):
-        """Handle ComponentRenderer view button click."""
         self.comp_renderer_label.set_text(f"ComponentRenderer action: View {item['name']}")
 
     def on_tab_selected(self, event_data):
-        """Handle tab selection."""
         idx = event_data.get("selectedIndex", 0)
         if 0 <= idx < len(self.tab_list):
             self.tabs_label.set_text(f"Selected tab: {self.tab_list[idx].get_label()}")
 
     def on_menu_click(self, name):
-        """Handle menu item click."""
         self.menu_label.set_text(f"Menu action: {name}")
 
     def on_upload_received(self, filename, mime_type, data):
-        """Handle file upload."""
         self.upload_label.set_text(f"Uploaded: {filename} ({len(data)} bytes)")
 
     def on_upload_succeeded(self, event_data):
-        """Handle upload success event."""
         pass
 
     def on_shortcut(self, source):
-        """Handle shortcut from any component."""
         self.shortcut_label.set_text(f"Shortcut: {source}")
 
     # --- DataProvider methods ---
 
     def _dp_update_label(self):
-        """Update the filter field label with current item count."""
         self.dp_filter.set_label(f"Filter by name (Items: {self.dp.size(Query())})")
 
     def _dp_on_filter(self, event):
-        """Filter DataProvider by name."""
         text = self.dp_filter.get_value().lower()
         if text:
             self.dp.set_filter(lambda item, t=text: t in item["name"].lower())
@@ -749,7 +727,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self._dp_update_label()
 
     def _dp_on_add(self, event):
-        """Add a person to the DataProvider."""
         self.dp_add_counter += 1
         self.dp.add_item({
             "name": f"New Person {self.dp_add_counter}",
@@ -759,7 +736,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self._dp_update_label()
 
     def _dp_on_remove(self, event):
-        """Remove the last person from the DataProvider."""
         if self.dp.items:
             self.dp.remove_item(self.dp.items[-1])
             self._dp_update_label()

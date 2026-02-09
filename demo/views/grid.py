@@ -24,8 +24,6 @@ _ALL_PEOPLE = [p.to_dict() for p in people_service.find_all()]
 @Route("grid", page_title="Grid Demo", layout=MainLayout)
 @Menu(title="Grid", order=3, icon="vaadin:table")
 class GridDemoView(VerticalLayout):
-    """View demonstrating advanced Grid features: lazy loading, sorting, multi-select."""
-
     def __init__(self):
         self.set_height_full()
 
@@ -56,7 +54,6 @@ class GridDemoView(VerticalLayout):
         self.add(self.lazy_status)
 
     def _lazy_fetch(self, offset, limit, sort_orders):
-        """Lazy data provider - fetches a page of data."""
         self.fetch_count += 1
 
         items = _ALL_PEOPLE[:]

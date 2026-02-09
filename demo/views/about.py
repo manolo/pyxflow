@@ -8,8 +8,6 @@ from demo.views.main_layout import MainLayout
 @Route("", page_title="About", layout=MainLayout)
 @Menu(title="About", order=0, icon="vaadin:info-circle")
 class AboutView(VerticalLayout):
-    """About page — default view."""
-
     def __init__(self):
         self.add(Span("About PyFlow"))
         self.add(Span("Python implementation of Vaadin Flow"))
