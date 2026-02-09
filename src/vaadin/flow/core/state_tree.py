@@ -1,6 +1,11 @@
 """StateTree - manages the server-side component tree."""
 
-from typing import Callable
+from typing import Callable, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from vaadin.flow.core.component import Component
+    from vaadin.flow.core.element import Element
+    from vaadin.flow.core.state_node import StateNode
 
 
 class StateTree:

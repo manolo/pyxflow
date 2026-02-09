@@ -335,8 +335,9 @@ class Binder(Generic[T]):
             raise ValueError("bean_type required for bind_instance_fields")
 
         # Get bean property names
-        if hasattr(self._bean_type, "__dataclass_fields__"):
-            bean_props = set(self._bean_type.__dataclass_fields__.keys())
+        dc_fields = getattr(self._bean_type, "__dataclass_fields__", None)
+        if dc_fields is not None:
+            bean_props = set(dc_fields.keys())
         elif hasattr(self._bean_type, "__annotations__"):
             bean_props = set(self._bean_type.__annotations__.keys())
         else:

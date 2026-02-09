@@ -25,10 +25,10 @@ def Menu(title: str | None = None, order: int = 0, icon: str | None = None, excl
         exclude: If True, the view is excluded from menu generation.
     """
     def decorator(cls: Type["Component"]) -> Type["Component"]:
-        cls._menu_title = title
-        cls._menu_order = order
-        cls._menu_icon = icon
-        cls._menu_exclude = exclude
+        setattr(cls, '_menu_title', title)
+        setattr(cls, '_menu_order', order)
+        setattr(cls, '_menu_icon', icon)
+        setattr(cls, '_menu_exclude', exclude)
         return cls
     return decorator
 

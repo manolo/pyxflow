@@ -17,7 +17,7 @@ class Details(Component):
 
     _tag = "vaadin-details"
 
-    def __init__(self, summary=None, *content: Component):
+    def __init__(self, summary: "str | Component | None" = None, *content: Component):
         super().__init__()
         self._summary = summary  # str or Component
         self._content: list[Component] = list(content)
@@ -59,6 +59,7 @@ class Details(Component):
 
     def _attach_summary_component(self, tree: "StateTree"):
         """Attach a Component as the summary."""
+        assert isinstance(self._summary, Component)
         comp = self._summary
         comp._ui = self._ui
         comp._parent = self
@@ -75,7 +76,7 @@ class Details(Component):
             return self._summary
         return None
 
-    def set_summary(self, summary):
+    def set_summary(self, summary: "str | Component | None"):
         """Set the summary (string or Component)."""
         self._summary = summary
 

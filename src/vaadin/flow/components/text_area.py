@@ -79,14 +79,14 @@ class TextArea(Component):
         if self._element:
             self.element.set_property("minlength", min_length)
 
-    def set_min_height(self, min_height: str):
+    def set_min_height(self, min_height: str | None):
         """Set minimum height (e.g., '100px')."""
-        if self._element:
+        if self._element and min_height:
             self.element.get_style().set("min-height", min_height)
 
-    def set_max_height(self, max_height: str):
+    def set_max_height(self, max_height: str | None):
         """Set maximum height (e.g., '200px')."""
-        if self._element:
+        if self._element and max_height:
             self.element.get_style().set("max-height", max_height)
 
     def add_value_change_listener(self, listener: Callable):

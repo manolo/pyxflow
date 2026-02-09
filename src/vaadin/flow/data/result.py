@@ -37,13 +37,13 @@ class Result(Generic[T]):
     def value(self) -> T:
         if not self._ok:
             raise ValueError("Cannot get value from error result")
-        return self._value
+        return self._value  # type: ignore[return-value]
 
     @property
     def message(self) -> str:
         if self._ok:
             raise ValueError("Cannot get message from ok result")
-        return self._message
+        return self._message  # type: ignore[return-value]
 
 
 class ValidationResult:
@@ -75,4 +75,4 @@ class ValidationResult:
     def message(self) -> str:
         if self._ok:
             raise ValueError("Cannot get message from ok result")
-        return self._message
+        return self._message  # type: ignore[return-value]

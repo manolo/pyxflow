@@ -162,12 +162,12 @@ class IntegerField(NumberField):
         super()._attach(tree)
 
     @property
-    def value(self) -> Optional[int]:
+    def value(self) -> Optional[int]:  # type: ignore[override]
         """Get the current value as integer."""
         return self._int_value
 
     @value.setter
-    def value(self, val: Optional[int]):
+    def value(self, val: Optional[int]):  # type: ignore[override]
         """Set the value."""
         self._int_value = val
         self._value = float(val) if val is not None else None
@@ -181,7 +181,7 @@ class IntegerField(NumberField):
         """Get the current value as integer."""
         return self._int_value
 
-    def set_value(self, value: Optional[int]):
+    def set_value(self, value: Optional[int]):  # type: ignore[override]
         """Set the value."""
         self.value = value
 

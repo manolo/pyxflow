@@ -170,7 +170,7 @@ class _GridSelectionColumn:
         })
 
         # Register in tree._components so publishedEventHandler dispatch works
-        tree._components[self._node.id] = self
+        tree._components[self._node.id] = self  # type: ignore[assignment]
 
         return self._node
 
@@ -458,6 +458,7 @@ class Grid(Component):
 
         # 3. setHeaderRenderer for each column
         for col in self._columns:
+            assert col._node is not None
             col_ref = {"@v-node": col._node.id}
             show_sorter = "true" if col._sortable else "false"
             sorter_path = f"'{col.internal_id}'" if col._sortable else "null"
@@ -488,6 +489,7 @@ class Grid(Component):
     def _setup_renderer(self, tree: "StateTree", col: Column):
         """Set up a renderer on a column (called during _attach)."""
         renderer = col._renderer
+        assert col._node is not None
         grid_ref = {"@v-node": self.element.node_id}
         col_ref = {"@v-node": col._node.id}
 
@@ -534,7 +536,7 @@ class Grid(Component):
                 "index": 0,
                 "addNodes": [container_node.id],
             })
-            renderer._container_node = container_node
+            renderer._container_node = container_node  # type: ignore[assignment]
 
             # appId must match the client registry key ("ROOT"), not the full
             # app ID ("ROOT-NNNNNNN"), because getNode() looks up
@@ -578,7 +580,7 @@ class Grid(Component):
 
     def _push_data(self):
         """Push item data to the client via execute commands."""
-        tree = self._element._tree
+        tree = self.element._tree
         grid_ref = {"@v-node": self.element.node_id}
 
         # Apply sorting
@@ -634,6 +636,7 @@ class Grid(Component):
     def _add_renderer_data(self, tree: "StateTree", col: Column, connector_item: dict, item: dict, key: str):
         """Add renderer-specific data to a connector item."""
         renderer = col._renderer
+        assert renderer is not None
         ns = renderer._namespace
 
         if isinstance(renderer, LitRenderer):
@@ -646,6 +649,7 @@ class Grid(Component):
                 component = renderer._factory(item)
                 component._attach(tree)
                 # Add as regular child of the container div
+                assert renderer._container_node is not None
                 renderer._container_node.add_child(component.element.node)
                 renderer._components[key] = component
             component = renderer._components[key]
@@ -672,7 +676,7 @@ class Grid(Component):
         """Send sorter direction updates to the client."""
         if not self._element:
             return
-        tree = self._element._tree
+        tree = self.element._tree
         grid_ref = {"@v-node": self.element.node_id}
         directions = []
         for order in self._sort_orders:
@@ -691,7 +695,7 @@ class Grid(Component):
             return
         if not self._data_provider and not self._data_provider_obj:
             return
-        tree = self._element._tree
+        tree = self.element._tree
         grid_ref = {"@v-node": self.element.node_id}
 
         if self._data_provider_obj:
@@ -700,6 +704,7 @@ class Grid(Component):
             items = dp.fetch(query)
             total = dp.size(Query(sort_orders=self._sort_orders))
         else:
+            assert self._data_provider is not None
             items, total = self._data_provider(offset, limit, self._sort_orders)
         self._data_provider_size = total
 
@@ -742,7 +747,7 @@ class Grid(Component):
         """Select all items (internal, called by selection column)."""
         self._selected_keys = set(self._key_to_item.keys())
         if self._selection_column:
-            self._selection_column._update_select_all_state(self._element._tree)
+            self._selection_column._update_select_all_state(self.element._tree)
         self._push_data()
         self._fire_selection_event()
 
@@ -750,7 +755,7 @@ class Grid(Component):
         """Deselect all items (internal, called by selection column)."""
         self._selected_keys.clear()
         if self._selection_column:
-            self._selection_column._update_select_all_state(self._element._tree)
+            self._selection_column._update_select_all_state(self.element._tree)
         self._push_data()
         self._fire_selection_event()
 
@@ -767,25 +772,29 @@ class Grid(Component):
 
     # --- Client-callable methods (called via publishedEventHandler RPC) ---
 
-    def select(self, key: str):
-        """Called by client when user selects an item."""
+    def select(self, key: str | None):
+        """Select an item by key, or deselect if None."""
+        if key is None:
+            self.deselect(None)
+            return
         item = self._key_to_item.get(key)
         if self._selection_mode == SelectionMode.MULTI:
             self._selected_keys.add(key)
             if self._selection_column:
-                self._selection_column._update_select_all_state(self._element._tree)
+                self._selection_column._update_select_all_state(self.element._tree)
             self._fire_selection_event()
         else:
             self._selected_item = item
             for listener in self._selection_listeners:
                 listener({"item": item})
 
-    def deselect(self, key: str):
+    def deselect(self, key: str | None):
         """Called by client when user deselects an item."""
         if self._selection_mode == SelectionMode.MULTI:
-            self._selected_keys.discard(key)
+            if key is not None:
+                self._selected_keys.discard(key)
             if self._selection_column:
-                self._selection_column._update_select_all_state(self._element._tree)
+                self._selection_column._update_select_all_state(self.element._tree)
             self._fire_selection_event()
         else:
             self._selected_item = None

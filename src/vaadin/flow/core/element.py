@@ -68,7 +68,7 @@ class Element:
         """Remove an attribute."""
         self._node.remove(Feature.ELEMENT_ATTRIBUTE_MAP, name)
 
-    def add_event_listener(self, event_type: str, listener: Callable, hash_key: str = None):
+    def add_event_listener(self, event_type: str, listener: Callable, hash_key: str | None = None):
         """Add an event listener.
 
         Args:

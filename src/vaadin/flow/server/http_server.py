@@ -153,10 +153,11 @@ async def handle_upload(request: web.Request) -> web.Response:
                 part = await reader.next()
                 if part is None:
                     break
-                if part.filename:
-                    data = await part.read()
-                    mime_type = part.headers.get("Content-Type", "application/octet-stream")
-                    handler(part.filename, mime_type, data)
+                if not hasattr(part, 'filename') or not part.filename:  # type: ignore[union-attr]
+                    continue
+                data = await part.read()  # type: ignore[union-attr]
+                mime_type = part.headers.get("Content-Type", "application/octet-stream")
+                handler(part.filename, mime_type, data)  # type: ignore[union-attr]
         else:
             # Raw body upload (vaadin-upload default)
             data = await request.read()
@@ -188,7 +189,7 @@ async def handle_static(request: web.Request) -> web.Response:
         file_path = bundle_dir / "VAADIN" / path
         if file_path.is_file():
             content_type = guess_content_type(file_path)
-            return web.FileResponse(file_path, headers={"Content-Type": content_type})
+            return web.FileResponse(file_path, headers={"Content-Type": content_type})  # type: ignore[return-value]
 
     return web.Response(text="Not found", status=404)
 
@@ -297,7 +298,7 @@ async def handle_lumo(request: web.Request) -> web.Response:
         file_path = bundle_dir / "lumo" / path
         if file_path.is_file():
             content_type = guess_content_type(file_path)
-            return web.FileResponse(file_path, headers={"Content-Type": content_type})
+            return web.FileResponse(file_path, headers={"Content-Type": content_type})  # type: ignore[return-value]
     return web.Response(text="Not found", status=404)
 
 

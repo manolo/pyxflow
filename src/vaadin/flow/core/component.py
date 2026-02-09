@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from vaadin.flow.core.element import Element
 
 if TYPE_CHECKING:
+    from vaadin.flow.core.element import Style
     from vaadin.flow.core.keys import Key
     from vaadin.flow.core.state_tree import StateTree
 
@@ -405,7 +406,7 @@ class Component:
         # Register click event on element if attached and not already registered
         if self._element and not getattr(self, "_click_event_registered", False):
             self._click_event_registered = True
-            self._element.add_event_listener("click", self._dispatch_click)
+            self.element.add_event_listener("click", self._dispatch_click)
 
     def _dispatch_click(self, event_data: dict):
         """Dispatch click event to base click listeners."""
@@ -435,7 +436,7 @@ class Component:
 
         # Register keydown event listener with the ENTER hash
         # The uidl_handler will dispatch keydown → click for this component
-        self._element.add_event_listener("keydown", lambda e: None, hash_key=_KEYDOWN_HASH)
+        self.element.add_event_listener("keydown", lambda e: None, hash_key=_KEYDOWN_HASH)
 
     # --- HasStyle shortcut ---
 

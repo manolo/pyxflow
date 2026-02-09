@@ -54,12 +54,12 @@ def Route(path: str = "", page_title: str | None = None, layout: Type["Component
         _routes[normalized_path] = (cls, page_title, param_names, regex, layout)
 
         # Store route info on the class for introspection
-        cls._route_path = normalized_path
+        setattr(cls, '_route_path', normalized_path)
         # Only set _page_title from @Route if explicitly provided
         if page_title is not None:
-            cls._page_title = page_title
+            setattr(cls, '_page_title', page_title)
         elif not hasattr(cls, '_page_title'):
-            cls._page_title = None
+            setattr(cls, '_page_title', None)
         return cls
     return decorator
 
@@ -76,7 +76,7 @@ def PageTitle(title: str):
             pass
     """
     def decorator(cls: Type["Component"]) -> Type["Component"]:
-        cls._page_title = title
+        setattr(cls, '_page_title', title)
         return cls
     return decorator
 

@@ -66,7 +66,7 @@ class Notification(Component):
     _OPENED_CHANGED_HASH = "uqvzCy8jAQc="
 
     def __init__(self, text: str = "", duration: int = 0,
-                 position: "Notification.Position" = None,
+                 position: "Notification.Position | None" = None,
                  assertive: bool = False):
         super().__init__()
         self._text = text
@@ -302,7 +302,7 @@ class Notification(Component):
 
     @staticmethod
     def show(text: str, duration: int = 5000,
-             position: "Notification.Position" = None,
+             position: "Notification.Position | None" = None,
              assertive: bool = False) -> "Notification":
         """Show a text notification.
 

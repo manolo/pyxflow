@@ -2,11 +2,12 @@
 
 import random
 import secrets
-from typing import TYPE_CHECKING, Any
+from typing import Any, TYPE_CHECKING
 
 from vaadin.flow.core.state_node import Feature
 
 if TYPE_CHECKING:
+    from vaadin.flow.core.component import Component
     from vaadin.flow.core.state_tree import StateTree
 
 
@@ -169,14 +170,14 @@ class UidlHandler:
         self._csrf_token = secrets.token_hex(16)
         self._app_id = f"ROOT-{random.randint(1000000, 9999999)}"
         self._initialized = False
-        self._view = None
-        self._layout = None  # Persistent layout instance for RouterLayout
-        self._layout_class = None  # Class of current layout
-        self._current_route = None  # Track current route for re-navigation
+        self._view: Any = None
+        self._layout: Any = None  # Persistent layout instance for RouterLayout
+        self._layout_class: type | None = None  # Class of current layout
+        self._current_route: str | None = None  # Track current route for re-navigation
 
         # Node references
-        self._body_node = None
-        self._container_node = None
+        self._body_node: Any = None
+        self._container_node: Any = None
         self._pending_execute: list = []  # Execute commands for next response
         self._last_client_id = 0  # Track client's message counter
         self._sent_constants: set[str] = set()  # Track already-sent constant hashes
@@ -286,7 +287,7 @@ class UidlHandler:
         for change in changes:
             self._tree.add_change(change)
 
-    def handle_uidl(self, payload: dict) -> dict:
+    def handle_uidl(self, payload: dict[str, Any]) -> dict:
         """Handle UIDL request.
 
         Returns UIDL response with changes.
@@ -305,7 +306,7 @@ class UidlHandler:
         # Collect changes and build response
         return self._build_response()
 
-    def _process_rpc(self, rpc_list: list[dict]):
+    def _process_rpc(self, rpc_list: list[dict[str, Any]]):
         """Process RPC calls from client."""
         from vaadin.flow.components.notification import _set_current_tree
         _set_current_tree(self._tree)
@@ -319,17 +320,17 @@ class UidlHandler:
                 elif rpc_type == "publishedEventHandler":
                     self._handle_published_event(rpc)
                 elif rpc_type == "channel":
-                    node_id = rpc.get("node")
-                    channel_id = rpc.get("channel")
+                    node_id: int = rpc["node"]
+                    channel_id: int = rpc["channel"]
                     args = rpc.get("args", [])
                     self._tree.handle_return_channel(node_id, channel_id, args)
         finally:
             _set_current_tree(None)
 
-    def _handle_event(self, rpc: dict):
+    def _handle_event(self, rpc: dict[str, Any]):
         """Handle event RPC."""
-        node_id = rpc.get("node")
-        event_type = rpc.get("event")
+        node_id: int = rpc["node"]
+        event_type: str = rpc["event"]
         event_data = rpc.get("data", {})
 
         if event_type == "ui-navigate":
@@ -429,7 +430,7 @@ class UidlHandler:
                     layout._attach(self._tree)
 
                     view = self._create_view(view_class, params, ui)
-                    layout.show_router_layout_content(view)
+                    layout.show_router_layout_content(view)  # type: ignore[attr-defined]
 
                     self._container_node.add_child(layout.element.node)
                     self._layout = layout
@@ -470,7 +471,7 @@ class UidlHandler:
         # Build execute commands
         self._setup_execute_commands(page_title, is_first_navigation)
 
-    def _create_view(self, view_class, params: dict, ui) -> "Component":
+    def _create_view(self, view_class: type, params: dict, ui: Any) -> Any:
         """Create and attach a view instance."""
         view = view_class()
         view._ui = ui
@@ -652,11 +653,11 @@ class UidlHandler:
             if element:
                 element.fire_event("keydown", event_data)
 
-    def _handle_msync(self, rpc: dict):
+    def _handle_msync(self, rpc: dict[str, Any]):
         """Handle property sync RPC."""
-        node_id = rpc.get("node")
+        node_id: int = rpc["node"]
         feature = rpc.get("feature")
-        prop = rpc.get("property")
+        prop: str = rpc["property"]
         value = rpc.get("value")
 
         node = self._tree.get_node(node_id)
@@ -671,13 +672,13 @@ class UidlHandler:
             if component:
                 component._sync_property(prop, value)
 
-    def _handle_published_event(self, rpc: dict):
+    def _handle_published_event(self, rpc: dict[str, Any]):
         """Handle publishedEventHandler RPC (client-callable methods).
 
         Dispatches to the component method named by templateEventMethodName.
         Used by Dialog (handleClientClose), Grid (select, deselect, etc.).
         """
-        node_id = rpc.get("node")
+        node_id: int = rpc["node"]
         method_name = rpc.get("templateEventMethodName")
         args = rpc.get("templateEventMethodArgs", [])
 

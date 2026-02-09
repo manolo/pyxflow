@@ -15,13 +15,14 @@ if TYPE_CHECKING:
 class ContextMenuItem:
     """A menu item in a ContextMenu."""
 
-    def __init__(self, text: str = "", click_listener: Callable = None):
+    def __init__(self, text: str = "", click_listener: Callable | None = None):
         self._text = text
         self._click_listener = click_listener
         self._children: list["ContextMenuItem"] = []
         self._enabled = True
         self._checkable = False
         self._checked = False
+        self._is_separator = False
         self._node = None
 
     def get_sub_menu(self) -> "ContextSubMenu":
@@ -58,7 +59,7 @@ class ContextSubMenu:
     def __init__(self, parent: ContextMenuItem):
         self._parent = parent
 
-    def add_item(self, text: str, click_listener: Callable = None) -> ContextMenuItem:
+    def add_item(self, text: str, click_listener: Callable | None = None) -> ContextMenuItem:
         item = ContextMenuItem(text, click_listener)
         self._parent._children.append(item)
         return item
@@ -66,7 +67,7 @@ class ContextSubMenu:
     def add_separator(self):
         """Add a separator (hr) item."""
         sep = ContextMenuItem()
-        sep._is_separator = True
+        sep._is_separator = True  # noqa: already declared in __init__
         self._parent._children.append(sep)
 
     def get_items(self) -> list[ContextMenuItem]:
@@ -84,7 +85,7 @@ class ContextMenu(Component):
 
     _tag = "vaadin-context-menu"
 
-    def __init__(self, target: Component = None):
+    def __init__(self, target: Component | None = None):
         super().__init__()
         self._target = target
         self._items: list[ContextMenuItem] = []
@@ -198,7 +199,7 @@ class ContextMenu(Component):
 
             item_node.put(Feature.ELEMENT_PROPERTY_MAP, "_containerNodeId", sub_container.id)
 
-    def add_item(self, text: str, click_listener: Callable = None) -> ContextMenuItem:
+    def add_item(self, text: str, click_listener: Callable | None = None) -> ContextMenuItem:
         """Add a root-level menu item."""
         item = ContextMenuItem(text, click_listener)
         self._items.append(item)
@@ -207,7 +208,7 @@ class ContextMenu(Component):
     def add_separator(self):
         """Add a separator between items."""
         sep = ContextMenuItem()
-        sep._is_separator = True
+        sep._is_separator = True  # noqa: already declared in __init__
         self._items.append(sep)
 
     def get_items(self) -> list[ContextMenuItem]:

@@ -2,7 +2,7 @@
 
 import json
 from enum import Enum
-from typing import TYPE_CHECKING, Union
+from typing import Any, TYPE_CHECKING, Union
 
 from vaadin.flow.core.component import Component
 
@@ -42,7 +42,7 @@ class ResponsiveStep:
 
     def to_json(self) -> dict:
         """Serialize to a dict for the responsiveSteps property."""
-        result = {"columns": self._columns}
+        result: dict[str, Any] = {"columns": self._columns}
         if self._min_width is not None:
             result["minWidth"] = self._min_width
         if self._labels_position is not None:
@@ -352,7 +352,7 @@ class FormLayout(Component):
         if self._element:
             self.element.set_property("autoResponsive", auto_responsive)
 
-    def is_auto_responsive(self) -> bool | None:
+    def is_auto_responsive(self) -> bool:
         """Get whether auto-responsive mode is enabled."""
         if self._element:
             return self.element.get_property("autoResponsive", False)
@@ -363,7 +363,7 @@ class FormLayout(Component):
         if self._element:
             self.element.set_property("autoRows", auto_rows)
 
-    def is_auto_rows(self) -> bool | None:
+    def is_auto_rows(self) -> bool:
         """Get whether auto-rows mode is enabled."""
         if self._element:
             return self.element.get_property("autoRows", False)
@@ -407,7 +407,7 @@ class FormLayout(Component):
         if self._element:
             self.element.set_property("expandColumns", expand)
 
-    def is_expand_columns(self) -> bool | None:
+    def is_expand_columns(self) -> bool:
         """Get whether columns expand."""
         if self._element:
             return self.element.get_property("expandColumns", False)
@@ -418,7 +418,7 @@ class FormLayout(Component):
         if self._element:
             self.element.set_property("expandFields", expand)
 
-    def is_expand_fields(self) -> bool | None:
+    def is_expand_fields(self) -> bool:
         """Get whether fields expand."""
         if self._element:
             return self.element.get_property("expandFields", False)
@@ -429,8 +429,8 @@ class FormLayout(Component):
         if self._element:
             self.element.set_property("labelsAside", aside)
 
-    def is_labels_aside(self) -> bool | None:
+    def is_labels_aside(self) -> bool:
         """Get whether labels are positioned aside."""
         if self._element:
             return self.element.get_property("labelsAside")
-        return None
+        return False

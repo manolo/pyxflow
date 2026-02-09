@@ -154,16 +154,16 @@ class Dialog(Component):
         """Get the dialog header title."""
         return self._header_title
 
-    def set_width(self, width: str):
+    def set_width(self, width: str | None):
         """Set the dialog width (e.g., '400px', '50%')."""
         self._width = width
-        if self._element:
+        if self._element and width:
             self.element.get_style().set("--vaadin-dialog-overlay-width", width)
 
-    def set_height(self, height: str):
+    def set_height(self, height: str | None):
         """Set the dialog height (e.g., '300px', '50%')."""
         self._height = height
-        if self._element:
+        if self._element and height:
             self.element.get_style().set("--vaadin-dialog-overlay-height", height)
 
     def add_open_listener(self, listener: Callable):

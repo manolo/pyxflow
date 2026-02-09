@@ -137,7 +137,7 @@ class ListDataProvider(DataProvider[T, None]):
                 prop = order.column.property_name
                 reverse = order.direction == SortDirection.DESCENDING
                 if result and isinstance(result[0], dict):
-                    result = sorted(result, key=lambda x, p=prop: x.get(p, ""), reverse=reverse)
+                    result = sorted(result, key=lambda x, p=prop: x.get(p, ""), reverse=reverse)  # type: ignore[union-attr]
                 else:
                     result = sorted(result, key=lambda x, p=prop: getattr(x, p, ""), reverse=reverse)
 

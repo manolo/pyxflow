@@ -15,7 +15,7 @@ class SubMenu:
     def __init__(self, parent: "MenuItem"):
         self._parent = parent
 
-    def add_item(self, text: str, click_listener: Callable = None) -> "MenuItem":
+    def add_item(self, text: str, click_listener: Callable | None = None) -> "MenuItem":
         """Add an item to this submenu."""
         item = MenuItem(text, click_listener)
         self._parent._children.append(item)
@@ -33,7 +33,7 @@ class MenuItem:
     vaadin-menu-bar-item element in the UIDL tree.
     """
 
-    def __init__(self, text: str = "", click_listener: Callable = None):
+    def __init__(self, text: str = "", click_listener: Callable | None = None):
         self._text = text
         self._click_listener = click_listener
         self._children: list["MenuItem"] = []
@@ -181,13 +181,13 @@ class MenuBar(Component):
             item_node.put(Feature.ELEMENT_ATTRIBUTE_MAP, "disabled", "")
 
         # Store node reference for event handling
-        item._node = item_node
+        item._node = item_node  # type: ignore[assignment]
 
         # Register click listener if provided
         if item._click_listener:
             el = _ItemElement(item_node, tree)
             el._listeners["click"] = [item._click_listener]
-            tree.register_element(el)
+            tree.register_element(el)  # type: ignore[arg-type]
             # Register click event in Feature 4 so FlowClient sends click events
             item_node.put(Feature.ELEMENT_LISTENER_MAP, "click", True)
 
@@ -208,7 +208,7 @@ class MenuBar(Component):
             # Store container node ID so the connector can find submenu items
             item_node.put(Feature.ELEMENT_PROPERTY_MAP, "_containerNodeId", sub_container.id)
 
-    def add_item(self, text: str, click_listener: Callable = None) -> MenuItem:
+    def add_item(self, text: str, click_listener: Callable | None = None) -> MenuItem:
         """Add a root-level menu item."""
         item = MenuItem(text, click_listener)
         self._items.append(item)
