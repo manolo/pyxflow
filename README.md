@@ -29,6 +29,15 @@ if __name__ == "__main__":
     asyncio.run(run_server(HelloWorldView, port=8080))
 ```
 
+## Demos
+
+```bash
+python -m demo
+# http://localhost:8088
+```
+
+See [demo/](demo/) for the demo views.
+
 ## Development
 
 ```bash

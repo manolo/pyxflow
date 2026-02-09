@@ -4,7 +4,7 @@
 
 **Vaadin version:** 25.0.4
 **Components:** 35 implemented, 14 pending
-**Lines of code:** ~4,500 (core), ~10,500 (total with examples)
+**Lines of code:** ~4,500 (core), ~10,500 (total with demo)
 **Tests:** 959 passing
 **Last updated:** 2026-02-09
 
@@ -216,7 +216,7 @@ Icon, DrawerToggle, SideNav/SideNavItem, AppLayout, RouterLayout (`@Route(layout
 ```bash
 cd /Users/manolo/Github/platform/python/vaadin-pyflow
 source .venv/bin/activate
-python run.py
+python -m demo
 # Open http://localhost:8088
 ```
 

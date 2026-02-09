@@ -13,7 +13,7 @@
 
 ```bash
 # Run the app
-source .venv/bin/activate && python run.py
+source .venv/bin/activate && python -m demo
 # http://localhost:8088
 
 # Run tests
@@ -38,9 +38,10 @@ vaadin-pyflow/
 │   ├── components/     # Button, TextField, Grid, Dialog, etc. (25 components)
 │   ├── data/           # Binder, DataProvider, validators, converters
 │   └── server/         # HTTP server (aiohttp), UIDL handler
-├── examples/           # HelloWorldView, AboutView, ComponentsDemoView
+├── demo/               # Demo app + __main__.py entry point
+│   ├── views/          # View files (hello_world, about, components_demo, etc.)
+│   └── main_layout.py  # Shared AppLayout
 ├── tests/              # 959 unit tests
-├── run.py              # Entry point
 └── STATUS.md           # Implementation progress
 ../bundle-generator/    # Java project → frontend bundle (shared, at root level)
 ```
@@ -71,7 +72,7 @@ vaadin-pyflow/
 5. Export in `components/__init__.py`
 6. Add tests in `tests/`
 7. **Keep demos in sync** — Update BOTH:
-   - Python: `examples/components_demo.py` (`ComponentsDemoView`)
+   - Python: `demo/views/components_demo.py` (`ComponentsDemoView`)
    - Java: `../bundle-generator/src/main/java/com/vaadin/pyflow/AllComponentsView.java`
    These MUST mirror each other. The Java view drives bundle generation — if a web component isn't used there, it won't be in the bundle.
 8. Regenerate bundle: `cd ../bundle-generator && ./generate-bundle.sh`
