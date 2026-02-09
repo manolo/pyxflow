@@ -48,7 +48,7 @@ class Column:
     def __init__(self, internal_id: str, property_name: str, header: str = ""):
         self._internal_id = internal_id
         self._property_name = property_name
-        self._header = header or property_name
+        self._header = header or property_name.replace("_", " ").title()
         self._width = None
         self._flex_grow = None
         self._auto_width = False
@@ -228,6 +228,22 @@ class Grid(Component):
         self._data_provider_obj: DataProvider | None = None
         self._data_provider_listener_unsub: Callable | None = None
         self._data_provider_size: int = 0
+
+    def set_columns(self, *property_names: str) -> list["Column"]:
+        """Set columns from property names, auto-generating Title Case headers.
+
+        Removes any existing columns first.
+
+        Usage::
+
+            grid.set_columns("name", "email", "role")
+            # equivalent to:
+            # grid.add_column("name", header="Name")
+            # grid.add_column("email", header="Email")
+            # grid.add_column("role", header="Role")
+        """
+        self._columns.clear()
+        return [self.add_column(name) for name in property_names]
 
     def add_column(self, arg: "str | Renderer", header: str = "") -> Column:
         """Add a column to the grid.

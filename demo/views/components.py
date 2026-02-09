@@ -442,12 +442,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.crud_master = VerticalLayout()
 
         self.crud_grid = Grid()
-        self.crud_grid.add_column("name", header="Name").set_auto_width(True)
-        self.crud_grid.add_column("email", header="Email").set_auto_width(True)
-        self.crud_grid.add_column("age", header="Age")
-        self.crud_grid.add_column("role", header="Role")
-        self.crud_grid.add_column("city", header="City").set_auto_width(True)
-        self.crud_grid.add_column("department", header="Department")
+        self.crud_grid.set_columns("name", "email", "age", "role", "city", "department")
         self.crud_grid.add_selection_listener(self._crud_on_select)
         self._crud_refresh_grid()
 

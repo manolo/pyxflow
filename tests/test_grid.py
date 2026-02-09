@@ -21,7 +21,7 @@ class TestColumn:
 
     def test_default_header(self):
         col = Column("col0", "email")
-        assert col.get_header() == "email"
+        assert col.get_header() == "Email"
 
     def test_fluent_api(self):
         col = Column("col0", "name", "Name")
