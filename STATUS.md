@@ -5,7 +5,7 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~12,000 (core src/), ~28,500 (total with demo + tests)
-**Tests:** 1297 passing
+**Tests:** 1305 passing
 **Last updated:** 2026-02-10
 
 ---
@@ -195,8 +195,12 @@ Atmosphere WebSocket protocol, `UI.access()` / `UI.push()` API, push sender coro
 
 ### Theme
 - [x] Lumo/Aura theme support — user declares `@StyleSheet("lumo/lumo.css")` or `@StyleSheet("aura/aura.css")` on layout; both extracted in bundle
+- [x] **Runtime theme switching** — `UI.set_theme(theme, variant)` swaps theme CSS and dark/light mode at runtime
+  - Lumo dark: `<html theme="dark">` attribute (CSS selector `[theme~="dark"]`)
+  - Aura dark: `<html style="color-scheme: dark">` (native CSS property)
+  - Removes all stale theme links before adding new one (no CSS conflicts)
+- [x] **Theme-agnostic CSS** — Demo styles use `--vaadin-*` base properties (shared by Lumo/Aura) with `--lumo-*` fallbacks
 - [ ] **Optimization:** inject layout `@StyleSheet` as `<link>` in `<head>` to avoid FOUC (currently loaded via UIDL after init)
-- [ ] Theme switching at runtime
 
 ### Server Infrastructure
 - [x] Heartbeat handler (`v-r=heartbeat`) — keeps session alive, prevents 403 after idle

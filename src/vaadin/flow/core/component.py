@@ -492,27 +492,38 @@ class UI:
         Args:
             theme: "lumo" or "aura".
             variant: "light" or "dark".
+
+        Lumo dark uses ``theme="dark"`` attribute on ``<html>``.
+        Aura dark uses the native ``color-scheme: dark`` CSS property.
         """
         new_href = self._THEME_CSS[theme]
         other_href = self._THEME_CSS["aura" if theme == "lumo" else "lumo"]
-        theme_attr = variant if variant == "dark" else ""
+        is_dark = "1" if variant == "dark" else ""
+        is_lumo = "1" if theme == "lumo" else ""
 
+        # Remove ALL theme links (both lumo and aura) then add the new one.
+        # Lumo: theme="dark" attr, Aura: color-scheme CSS property.
         js = (
             "return (async function() {"
-            "  var old = document.querySelector("
-            "    'link[rel=stylesheet][href*=\"' + $0 + '\"]'"
-            "  );"
-            "  if (old) old.href = $1;"
-            "  else {"
-            "    var l = document.createElement('link');"
-            "    l.rel = 'stylesheet'; l.href = $1;"
-            "    document.head.appendChild(l);"
+            "  var h = document.documentElement;"
+            "  document.querySelectorAll("
+            "    'link[rel=stylesheet][href*=\"' + $0 + '\"],"
+            "     link[rel=stylesheet][href*=\"' + $1 + '\"]'"
+            "  ).forEach(function(l) { l.remove(); });"
+            "  var l = document.createElement('link');"
+            "  l.rel = 'stylesheet'; l.href = $1;"
+            "  document.head.appendChild(l);"
+            "  if ($3) {"
+            "    h.removeAttribute('theme');"
+            "    h.style.colorScheme = '';"
+            "    if ($2) h.setAttribute('theme', 'dark');"
+            "  } else {"
+            "    h.removeAttribute('theme');"
+            "    h.style.colorScheme = $2 ? 'dark' : 'light';"
             "  }"
-            "  if ($2) document.documentElement.setAttribute('theme', $2);"
-            "  else document.documentElement.removeAttribute('theme');"
             "})()"
         )
-        self._tree.queue_execute([other_href, new_href, theme_attr, js])
+        self._tree.queue_execute([other_href, new_href, is_dark, is_lumo, js])
 
     def set_theme_variant(self, variant: str) -> None:
         """Switch only the color variant (light/dark) without changing the theme.

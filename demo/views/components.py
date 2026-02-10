@@ -125,7 +125,22 @@ class ComponentsDemoView(VerticalLayout):
             lambda e: self.login_label.set_text("Forgot password clicked")
         )
         section.add(login_form)
-        section.add(self.login_label)        
+        section.add(self.login_label)
+
+        # --- Theme Selector (ListBox) ---
+        section = self.add_section("ListBox")
+        list_box = ListBox()
+        list_box.set_items("Lumo Light", "Lumo Dark", "Aura Light", "Aura Dark")
+        list_box.set_value("Lumo Light")
+        def _on_theme_selected(e):
+            value = e['value']
+            if not value:
+                return
+            parts = value.lower().split()
+            self._ui.set_theme(parts[0], parts[1])
+        list_box.add_value_change_listener(_on_theme_selected)
+        section.add(Span("Select Theme"))
+        section.add(list_box)
 
         # --- Progress ---
         section = self.add_section("ProgressBar")
@@ -141,9 +156,9 @@ class ComponentsDemoView(VerticalLayout):
         section.add(progress_indeterminate)
 
         # --- Navigation ---
-        section = self.add_section("Navigation", "col-span-2")
+        section = self.add_section("Navigation")
 
-        navigation = HorizontalLayout()
+        navigation = VerticalLayout()
 
         navigation.add(RouterLink("Go to Hello World", "/hello"))
         navigation.add(RouterLink("Go to About", "/"))
@@ -252,9 +267,9 @@ class ComponentsDemoView(VerticalLayout):
 
         self.context_label = Span("Context action: (none)")
         context_target = Span("Right-click here for context menu")
-        context_target._set_style("padding", "var(--lumo-space-s)")
-        context_target._set_style("background", "var(--lumo-primary-color-10pct)")
-        context_target._set_style("border-radius", "var(--lumo-border-radius-m)")
+        context_target._set_style("padding", "var(--vaadin-padding-s, var(--lumo-space-s, 0.5rem))")
+        context_target._set_style("background", "var(--vaadin-background-container, var(--lumo-primary-color-10pct, rgba(0, 100, 200, 0.1)))")
+        context_target._set_style("border-radius", "var(--vaadin-radius-m, var(--lumo-border-radius-m, 8px))")
 
         context_menu = ContextMenu(context_target)
         context_menu.add_item("View", lambda e: self.context_label.set_text("Context action: View"))
@@ -459,17 +474,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         selection_form.add(checkbox_group)
         section.add(selection_form)
 
-
-        section = self.add_section("ListBox")
-        list_box = ListBox()
-        list_box.set_items("Item 1", "Item 2", "Item 3", "Item 4")
-        list_box_label = Span("ListBox selected: (none)")
-        list_box.add_value_change_listener(
-            lambda e: list_box_label.set_text(f"ListBox selected: {e['value']}")
-        )
-        section.add(list_box)
-        section.add(list_box_label)
-
         section = self.add_section("MultiSelectListBox")
         multi_list_box = MultiSelectListBox()
         multi_list_box.set_items("Option A", "Option B", "Option C", "Option D")
@@ -503,8 +507,8 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         header_div = Header("Header")
         header_div.set_width("100%")
         header_div.set_height("60px")
-        header_div._set_style("background-color", "var(--lumo-primary-color)")
-        header_div._set_style("color", "var(--lumo-primary-contrast-color)")
+        header_div._set_style("background-color", "var(--vaadin-focus-ring-color, var(--lumo-primary-color, #006af5))")
+        header_div._set_style("color", "#fff")
         header_div._set_style("display", "flex")
         header_div._set_style("align-items", "center")
         header_div._set_style("justify-content", "center")
@@ -512,23 +516,23 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         footer_div = Footer("Footer")
         footer_div.set_width("100%")
         footer_div.set_height("50px")
-        footer_div._set_style("background-color", "var(--lumo-contrast-20pct)")
-        footer_div._set_style("color", "var(--lumo-body-text-color)")
+        footer_div._set_style("background-color", "var(--vaadin-background-container-strong, var(--lumo-contrast-20pct, rgba(0, 0, 0, 0.2)))")
+        footer_div._set_style("color", "var(--vaadin-text-color, var(--lumo-body-text-color, inherit))")
         footer_div._set_style("display", "flex")
         footer_div._set_style("align-items", "center")
         footer_div._set_style("justify-content", "center")
 
         nav_div = Div("Navigation")
         nav_div.set_width("25%")
-        nav_div._set_style("background-color", "var(--lumo-primary-color-10pct)")
+        nav_div._set_style("background-color", "var(--vaadin-background-container, var(--lumo-primary-color-10pct, rgba(0, 100, 200, 0.1)))")
         nav_div._set_style("display", "flex")
         nav_div._set_style("align-items", "center")
         nav_div._set_style("justify-content", "center")
 
         content_div = Div("Content")
         content_div.set_width("75%")
-        content_div._set_style("background-color", "var(--lumo-contrast-5pct)")
-        content_div._set_style("color", "var(--lumo-body-text-color)")
+        content_div._set_style("background-color", "var(--vaadin-background-container, var(--lumo-contrast-5pct, rgba(0, 0, 0, 0.05)))")
+        content_div._set_style("color", "var(--vaadin-text-color, var(--lumo-body-text-color, inherit))")
         content_div._set_style("display", "flex")
         content_div._set_style("align-items", "center")
         content_div._set_style("justify-content", "center")
@@ -810,7 +814,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         scroller.set_height("200px")
         scroller.set_width("300px")
         scroller._set_style("flex", "none")
-        scroller._set_style("border", "1px solid var(--lumo-contrast-20pct)")
+        scroller._set_style("border", "1px solid var(--vaadin-border-color, var(--lumo-contrast-20pct, rgba(0, 0, 0, 0.2)))")
         section.add(scroller)
 
         # --- Card ---
@@ -842,7 +846,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
             md_master.add(md_btn)
         md_layout.set_master(md_master)
         md_layout.set_height("250px")
-        md_layout._set_style("border", "1px solid var(--lumo-contrast-20pct)")
+        md_layout._set_style("border", "1px solid var(--vaadin-border-color, var(--lumo-contrast-20pct, rgba(0, 0, 0, 0.2)))")
         section.add(md_layout)
 
         # --- MessageInput + MessageList ---
@@ -867,9 +871,9 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.vl_label = Span("VirtualList: click an item")
         virtual_list.set_renderer(
             LitRenderer.of(
-                '<div style="display:flex;align-items:center;padding:var(--lumo-space-xs) var(--lumo-space-s);border-bottom:1px solid var(--lumo-contrast-10pct);cursor:pointer" @click="${handleClick}">'
-                '<vaadin-avatar name="${item.name}" style="margin-right:var(--lumo-space-s)"></vaadin-avatar>'
-                '<div><strong>${item.name}</strong><br/><small style="color:var(--lumo-secondary-text-color)">${item.city} — ${item.role}</small></div>'
+                '<div style="display:flex;align-items:center;padding:var(--vaadin-padding-xs,0.25rem) var(--vaadin-padding-s,0.5rem);border-bottom:1px solid var(--vaadin-border-color-secondary,rgba(0,0,0,0.1));cursor:pointer" @click="${handleClick}">'
+                '<vaadin-avatar name="${item.name}" style="margin-right:var(--vaadin-gap-s,0.5rem)"></vaadin-avatar>'
+                '<div><strong>${item.name}</strong><br/><small style="color:var(--vaadin-text-color-secondary,rgba(0,0,0,0.6))">${item.city} — ${item.role}</small></div>'
                 '</div>'
             )
             .with_property("name", lambda x: x["name"])
@@ -881,8 +885,8 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         virtual_list.set_height("300px")
         virtual_list._set_style("flex", "none")
         virtual_list._set_style("overflow", "auto")
-        virtual_list._set_style("border", "1px solid var(--lumo-contrast-20pct)")
-        virtual_list._set_style("border-radius", "var(--lumo-border-radius-m)")
+        virtual_list._set_style("border", "1px solid var(--vaadin-border-color, var(--lumo-contrast-20pct, rgba(0, 0, 0, 0.2)))")
+        virtual_list._set_style("border-radius", "var(--vaadin-radius-m, var(--lumo-border-radius-m, 8px))")
         section.add(virtual_list)
         section.add(self.vl_label)
 

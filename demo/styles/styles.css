@@ -6,33 +6,33 @@
 
 .master-detail-view .editor {
   flex-grow: 1;
-  padding: var(--lumo-space-l);
+  padding: var(--vaadin-padding-l, var(--lumo-space-l, 1.5rem));
   overflow-y: auto;
 }
 
 .master-detail-view .editor vaadin-checkbox {
-  padding-top: var(--lumo-space-m);
+  padding-top: var(--vaadin-padding-m, var(--lumo-space-m, 1rem));
 }
 
 .master-detail-view .button-layout {
   width: 100%;
   flex-wrap: wrap;
-  background-color: var(--lumo-contrast-5pct);
-  padding-bottom: var(--lumo-space-s);
-  padding-top: var(--lumo-space-s);
-  padding-left: var(--lumo-space-l);
-  padding-right: var(--lumo-space-l);
-  gap: var(--lumo-space-m);
+  background-color: var(--vaadin-background-container, var(--lumo-contrast-5pct, rgba(0, 0, 0, 0.05)));
+  padding-bottom: var(--vaadin-padding-s, var(--lumo-space-s, 0.5rem));
+  padding-top: var(--vaadin-padding-s, var(--lumo-space-s, 0.5rem));
+  padding-left: var(--vaadin-padding-l, var(--lumo-space-l, 1.5rem));
+  padding-right: var(--vaadin-padding-l, var(--lumo-space-l, 1.5rem));
+  gap: var(--vaadin-gap-m, var(--lumo-space-m, 1rem));
 }
 
 /* Dashboard grid layout */
 .components-view {
   display: grid !important;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  grid-gap: var(--lumo-space-m);
-  padding: var(--lumo-space-l);
+  grid-gap: var(--vaadin-gap-m, var(--lumo-space-m, 1rem));
+  padding: var(--vaadin-padding-l, var(--lumo-space-l, 1.5rem));
   box-sizing: border-box;
-  background-color: var(--lumo-shade-5pct);
+  background-color: var(--vaadin-background-container, var(--lumo-shade-5pct, rgba(0, 0, 0, 0.05)));
   grid-auto-flow: dense;
   align-content: start;
   align-items: stretch !important;
@@ -41,19 +41,19 @@
 .components-view .component {
   display: flex;
   flex-direction: column;
-  gap: var(--lumo-space-s);
-  box-shadow: 0 0 0 1px var(--lumo-contrast-10pct);
-  border-radius: var(--lumo-border-radius-s);
-  background-color: var(--lumo-base-color);
-  padding: var(--lumo-space-m);
+  gap: var(--vaadin-gap-s, var(--lumo-space-s, 0.5rem));
+  box-shadow: 0 0 0 1px var(--vaadin-border-color-secondary, var(--lumo-contrast-10pct, rgba(0, 0, 0, 0.1)));
+  border-radius: var(--vaadin-radius-s, var(--lumo-border-radius-s, 4px));
+  background-color: var(--vaadin-background-color, var(--lumo-base-color, #fff));
+  padding: var(--vaadin-padding-m, var(--lumo-space-m, 1rem));
   box-sizing: border-box;
   overflow: hidden;
 }
 
 .components-view .component > h3 {
   margin: 0;
-  color: var(--lumo-secondary-text-color);
-  font-size: var(--lumo-font-size-s);
+  color: var(--vaadin-text-color-secondary, var(--lumo-secondary-text-color, rgba(0, 0, 0, 0.6)));
+  font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -84,11 +84,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--lumo-base-color);
+  background: var(--vaadin-background-color, var(--lumo-base-color, #fff));
   box-shadow:
-    0 4px 16px var(--lumo-shade-20pct),
-    inset 0 2px 4px var(--lumo-shade-5pct);
-  border: 3px solid var(--lumo-contrast-10pct);
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 3px solid var(--vaadin-border-color-secondary, var(--lumo-contrast-10pct, rgba(0, 0, 0, 0.1)));
 }
 
 .sw-time {
@@ -100,7 +100,7 @@
   font-size: 3rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: var(--lumo-body-text-color);
+  color: var(--vaadin-text-color, var(--lumo-body-text-color, inherit));
   min-width: 2ch;
   text-align: center;
 }
@@ -108,12 +108,12 @@
 .sw-sep {
   font-size: 2.5rem;
   font-weight: 300;
-  color: var(--lumo-secondary-text-color);
+  color: var(--vaadin-text-color-secondary, var(--lumo-secondary-text-color, rgba(0, 0, 0, 0.6)));
   margin: 0 2px;
 }
 
 .sw-buttons {
-  gap: var(--lumo-space-m) !important;
+  gap: var(--vaadin-gap-m, var(--lumo-space-m, 1rem)) !important;
   justify-content: center !important;
 }
 
@@ -123,4 +123,3 @@
   border-radius: 50%;
   --lumo-button-size: 48px;
 }
-
