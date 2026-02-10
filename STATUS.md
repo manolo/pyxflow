@@ -5,7 +5,7 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~12,000 (core src/), ~28,500 (total with demo + tests)
-**Tests:** 1246 passing
+**Tests:** 1257 passing
 **Last updated:** 2026-02-10
 
 ---

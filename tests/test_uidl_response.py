@@ -430,6 +430,260 @@ class TestResponseWithNoChanges:
         assert isinstance(response["changes"], list)
 
 
+class TestSyncIdValidation:
+    """Test SyncId mismatch triggers resync."""
+
+    @pytest.fixture
+    def session(self):
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init_response = handler.handle_init({})
+        csrf = init_response["appConfig"]["uidl"]["Vaadin-Security-Key"]
+        return {"handler": handler, "csrf": csrf}
+
+    def test_wrong_sync_id_triggers_resync(self, session):
+        """SyncId mismatch should return resynchronize response."""
+        payload = {
+            "csrfToken": session["csrf"],
+            "rpc": [],
+            "syncId": 999,  # Wrong syncId (expected 0)
+            "clientId": 0,
+        }
+        response = session["handler"].handle_uidl(payload)
+        assert response.get("resynchronize") is True
+
+    def test_resync_does_not_increment_sync_id(self, session):
+        """Resync response should not change the server's syncId."""
+        # Send valid request first
+        payload = {
+            "csrfToken": session["csrf"],
+            "rpc": [],
+            "syncId": 0,
+            "clientId": 0,
+        }
+        resp1 = session["handler"].handle_uidl(payload)
+        sync_id_after = resp1["syncId"]  # Should be 1
+
+        # Send with wrong syncId
+        payload2 = {
+            "csrfToken": session["csrf"],
+            "rpc": [],
+            "syncId": 999,
+            "clientId": 1,
+        }
+        resync = session["handler"].handle_uidl(payload2)
+        assert resync.get("resynchronize") is True
+        assert resync["syncId"] == sync_id_after  # Unchanged
+
+
+class TestClientIdValidation:
+    """Test ClientId validation and duplicate detection."""
+
+    @pytest.fixture
+    def session(self):
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init_response = handler.handle_init({})
+        csrf = init_response["appConfig"]["uidl"]["Vaadin-Security-Key"]
+        return {"handler": handler, "csrf": csrf}
+
+    def test_wrong_client_id_triggers_resync(self, session):
+        """ClientId mismatch (not duplicate) should trigger resync."""
+        payload = {
+            "csrfToken": session["csrf"],
+            "rpc": [],
+            "syncId": 0,
+            "clientId": 5,  # Expected 0
+        }
+        response = session["handler"].handle_uidl(payload)
+        assert response.get("resynchronize") is True
+
+    def test_duplicate_client_id_returns_cached(self, session):
+        """Duplicate clientId should return the previous response."""
+        # Send first request (clientId 0)
+        payload = {
+            "csrfToken": session["csrf"],
+            "rpc": [],
+            "syncId": 0,
+            "clientId": 0,
+        }
+        resp1 = session["handler"].handle_uidl(payload)
+        assert "resynchronize" not in resp1
+
+        # Resend with same clientId (duplicate)
+        payload2 = {
+            "csrfToken": session["csrf"],
+            "rpc": [],
+            "syncId": resp1["syncId"],
+            "clientId": 0,  # Same as before → duplicate
+        }
+        resp2 = session["handler"].handle_uidl(payload2)
+        # Should return cached response, not a resync
+        assert resp2 is resp1
+
+
+class TestResynchronize:
+    """Test explicit resynchronize request from client."""
+
+    @pytest.fixture
+    def session(self):
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init_response = handler.handle_init({})
+        csrf = init_response["appConfig"]["uidl"]["Vaadin-Security-Key"]
+        return {"handler": handler, "csrf": csrf}
+
+    def test_client_resync_flag(self, session):
+        """Client setting resynchronize=true should get resync response."""
+        payload = {
+            "csrfToken": session["csrf"],
+            "rpc": [],
+            "syncId": 0,
+            "clientId": 0,
+            "resynchronize": True,
+        }
+        response = session["handler"].handle_uidl(payload)
+        assert response.get("resynchronize") is True
+        assert response["changes"] == []
+        assert response["constants"] == {}
+
+    def test_resync_response_has_correct_ids(self, session):
+        """Resync response should have current syncId and expected clientId."""
+        # First do a valid request to advance the IDs
+        payload = {
+            "csrfToken": session["csrf"],
+            "rpc": [],
+            "syncId": 0,
+            "clientId": 0,
+        }
+        resp1 = session["handler"].handle_uidl(payload)
+
+        # Request resync
+        payload2 = {
+            "csrfToken": session["csrf"],
+            "rpc": [],
+            "syncId": resp1["syncId"],
+            "clientId": 1,
+            "resynchronize": True,
+        }
+        resync = session["handler"].handle_uidl(payload2)
+        assert resync["syncId"] == resp1["syncId"]  # Not incremented
+        assert resync.get("resynchronize") is True
+
+
+class TestOverlayClientKey:
+    """Test that overlay execute commands use 'ROOT' (client key), not full appId."""
+
+    @pytest.fixture
+    def handler_with_dialog(self):
+        """Create handler that navigates to a view with a Dialog."""
+        from vaadin.flow.components.dialog import Dialog
+        from vaadin.flow.components.span import Span
+        from vaadin.flow.components import VerticalLayout
+        from vaadin.flow.router import Route
+
+        # Register a temporary view with a Dialog
+        @Route("_test_dialog_key")
+        class TestDialogView(VerticalLayout):
+            def __init__(self):
+                super().__init__()
+                self.dialog = Dialog()
+                self.dialog.add(Span("Hello"))
+                self.dialog.set_opened(True)
+                self.add(self.dialog)
+
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init_response = handler.handle_init({})
+        csrf = init_response["appConfig"]["uidl"]["Vaadin-Security-Key"]
+
+        payload = {
+            "csrfToken": csrf,
+            "rpc": [{
+                "type": "event",
+                "node": 1,
+                "event": "ui-navigate",
+                "data": {"route": "_test_dialog_key", "query": "", "appShellTitle": "",
+                         "historyState": {"idx": 0}, "trigger": ""}
+            }],
+            "syncId": 0,
+            "clientId": 0,
+        }
+        response = handler.handle_uidl(payload)
+
+        # Clean up route registry
+        from vaadin.flow.router import _routes
+        _routes.pop("_test_dialog_key", None)
+
+        return handler, response
+
+    def test_dialog_setChildNodes_uses_root_key(self, handler_with_dialog):
+        """Dialog renderer should pass 'ROOT' to FlowComponentHost.setChildNodes."""
+        handler, response = handler_with_dialog
+        execute = response.get("execute", [])
+
+        # Find commands with FlowComponentHost.setChildNodes
+        fch_cmds = [cmd for cmd in execute if "setChildNodes" in cmd[-1]]
+        assert len(fch_cmds) > 0, "Should have FlowComponentHost.setChildNodes commands"
+
+        for cmd in fch_cmds:
+            # First arg should be "ROOT" (client key), not "ROOT-1234567"
+            assert cmd[0] == "ROOT", f"Expected 'ROOT', got '{cmd[0]}'"
+            assert "-" not in cmd[0], "Client key should not contain hyphen"
+
+    @pytest.fixture
+    def handler_with_notification(self):
+        """Create handler that navigates to a view with a Notification."""
+        from vaadin.flow.components.notification import Notification
+        from vaadin.flow.components.span import Span
+        from vaadin.flow.components import VerticalLayout
+        from vaadin.flow.router import Route
+
+        @Route("_test_notif_key")
+        class TestNotifView(VerticalLayout):
+            def __init__(self):
+                super().__init__()
+                self.notif = Notification()
+                self.notif.add(Span("Alert"))
+                self.notif.set_opened(True)
+                self.add(self.notif)
+
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init_response = handler.handle_init({})
+        csrf = init_response["appConfig"]["uidl"]["Vaadin-Security-Key"]
+
+        payload = {
+            "csrfToken": csrf,
+            "rpc": [{
+                "type": "event",
+                "node": 1,
+                "event": "ui-navigate",
+                "data": {"route": "_test_notif_key", "query": "", "appShellTitle": "",
+                         "historyState": {"idx": 0}, "trigger": ""}
+            }],
+            "syncId": 0,
+            "clientId": 0,
+        }
+        response = handler.handle_uidl(payload)
+
+        from vaadin.flow.router import _routes
+        _routes.pop("_test_notif_key", None)
+
+        return handler, response
+
+    def test_notification_setChildNodes_uses_root_key(self, handler_with_notification):
+        """Notification renderer should pass 'ROOT' to FlowComponentHost.setChildNodes."""
+        handler, response = handler_with_notification
+        execute = response.get("execute", [])
+
+        fch_cmds = [cmd for cmd in execute if "setChildNodes" in cmd[-1]]
+        assert len(fch_cmds) > 0, "Should have FlowComponentHost.setChildNodes commands"
+
+        for cmd in fch_cmds:
+            assert cmd[0] == "ROOT", f"Expected 'ROOT', got '{cmd[0]}'"
+
+
 class TestInitResponseUidl:
     """Test UIDL structure in init response."""
 

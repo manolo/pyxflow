@@ -100,3 +100,39 @@ class TestSessionManagement(AioHTTPTestCase):
         )
         # Should reject - either 403 or error in response
         assert resp.status == 403 or resp.status == 200  # May return error in body
+
+
+class TestHeartbeat(AioHTTPTestCase):
+    """Test heartbeat endpoint keeps sessions alive."""
+
+    async def get_application(self):
+        from vaadin.flow.server.http_server import create_app
+        return create_app()
+
+    @unittest_run_loop
+    async def test_heartbeat_without_session_returns_403(self):
+        """Heartbeat without valid session should return 403."""
+        resp = await self.client.request("POST", "/?v-r=heartbeat")
+        assert resp.status == 403
+
+    @unittest_run_loop
+    async def test_heartbeat_with_session_returns_200(self):
+        """Heartbeat with valid session should return 200."""
+        # Establish session via init
+        init_resp = await self.client.request("GET", "/?v-r=init&location=&query=")
+        assert init_resp.status == 200
+
+        # Send heartbeat (session cookie is maintained by test client)
+        resp = await self.client.request("POST", "/?v-r=heartbeat")
+        assert resp.status == 200
+
+    @unittest_run_loop
+    async def test_heartbeat_on_subroute_returns_200(self):
+        """Heartbeat on sub-route (e.g. /about?v-r=heartbeat) should work."""
+        # Establish session via init on sub-route
+        init_resp = await self.client.request("GET", "/about?v-r=init&location=about&query=")
+        assert init_resp.status == 200
+
+        # Send heartbeat on sub-route
+        resp = await self.client.request("POST", "/about?v-r=heartbeat")
+        assert resp.status == 200
