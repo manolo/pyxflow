@@ -71,3 +71,56 @@
     grid-row: span 2 / span 2;
 }
 
+/* Stopwatch */
+.sw-view {
+  padding: 3em;
+  align-items: center;
+}
+
+.sw-circle {
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--lumo-base-color);
+  box-shadow:
+    0 4px 16px var(--lumo-shade-20pct),
+    inset 0 2px 4px var(--lumo-shade-5pct);
+  border: 3px solid var(--lumo-contrast-10pct);
+}
+
+.sw-time {
+  align-items: baseline;
+  justify-content: center;
+}
+
+.sw-digit {
+  font-size: 3rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--lumo-body-text-color);
+  min-width: 2ch;
+  text-align: center;
+}
+
+.sw-sep {
+  font-size: 2.5rem;
+  font-weight: 300;
+  color: var(--lumo-secondary-text-color);
+  margin: 0 2px;
+}
+
+.sw-buttons {
+  gap: var(--lumo-space-m) !important;
+  justify-content: center !important;
+}
+
+.sw-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  --lumo-button-size: 48px;
+}
+

@@ -291,7 +291,7 @@ class TestDiscoverViews:
         entries = get_menu_entries()
         assert len(entries) == 6
         titles = [e.title for e in entries]
-        assert titles == ["About", "Hello", "Components", "Grid", "Master-Detail", "Push Demo"]
+        assert titles == ["About", "Hello", "Components", "Grid", "Master-Detail", "Stopwatch"]
         # Verify order
         orders = [e.order for e in entries]
         assert orders == [0, 1, 2, 3, 4, 10]

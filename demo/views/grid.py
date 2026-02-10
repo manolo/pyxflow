@@ -24,12 +24,7 @@ _ALL_PEOPLE = [p.to_dict() for p in people_service.find_all()]
 class GridDemoView(VerticalLayout):
     def __init__(self):
         self.set_height_full()
-
-        self.add(H2("Grid Advanced Features Demo"))
-
-        # --- Lazy Loading Grid ---
-        self.add(H3("Lazy Loading (200 rows, page size 20)"))
-        self.add(Span("Data is fetched on demand as you scroll. Check server logs for fetch calls."))
+        self.add(Span("Data is fetched on demand as you scroll."))
 
         self.grid = Grid()
         self.grid.add_column("name", header="Name").set_auto_width(True).set_sortable(True)
