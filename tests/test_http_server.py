@@ -1,5 +1,6 @@
 """HTTP Server Foundation Tests."""
 
+import time
 import pytest
 import aiohttp
 from aiohttp import web
@@ -163,3 +164,58 @@ class TestHeartbeat(AioHTTPTestCase):
         # Send heartbeat on sub-route
         resp = await self.client.request("POST", "/about?v-r=heartbeat")
         assert resp.status == 200
+
+
+class TestSessionCleanup:
+    """Test session expiry and cleanup (pure function tests, no HTTP)."""
+
+    def setup_method(self):
+        """Clear global session state before each test."""
+        from vaadin.flow.server.http_server import _sessions, _upload_handlers
+        _sessions.clear()
+        _upload_handlers.clear()
+
+    def teardown_method(self):
+        """Clear global session state after each test."""
+        from vaadin.flow.server.http_server import _sessions, _upload_handlers
+        _sessions.clear()
+        _upload_handlers.clear()
+
+    def test_expired_session_is_cleaned_up(self):
+        """Sessions idle longer than SESSION_TIMEOUT are removed."""
+        from vaadin.flow.server.http_server import (
+            _sessions, _cleanup_expired_sessions, SESSION_TIMEOUT,
+        )
+        _sessions["old-session"] = {
+            "last_activity": time.monotonic() - SESSION_TIMEOUT - 1,
+        }
+        _cleanup_expired_sessions()
+        assert "old-session" not in _sessions
+
+    def test_active_session_not_cleaned(self):
+        """Sessions with recent activity are kept."""
+        from vaadin.flow.server.http_server import (
+            _sessions, _cleanup_expired_sessions,
+        )
+        _sessions["active-session"] = {
+            "last_activity": time.monotonic(),
+        }
+        _cleanup_expired_sessions()
+        assert "active-session" in _sessions
+
+    def test_upload_handlers_cleaned_with_session(self):
+        """Upload handlers belonging to expired sessions are also removed."""
+        from vaadin.flow.server.http_server import (
+            _sessions, _upload_handlers, _cleanup_expired_sessions,
+            SESSION_TIMEOUT,
+        )
+        _sessions["expired-sess"] = {
+            "last_activity": time.monotonic() - SESSION_TIMEOUT - 1,
+        }
+        _upload_handlers["upload-1"] = ("expired-sess", lambda: None)
+        _upload_handlers["upload-2"] = ("other-sess", lambda: None)
+
+        _cleanup_expired_sessions()
+
+        assert "upload-1" not in _upload_handlers
+        assert "upload-2" in _upload_handlers

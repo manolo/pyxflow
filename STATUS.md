@@ -192,7 +192,7 @@ ListBox, MultiSelectListBox, MultiSelectComboBox, VirtualList, MessageInput, Mes
 
 ### Server Infrastructure
 - [x] Heartbeat handler (`v-r=heartbeat`) — keeps session alive, prevents 403 after idle
-- [ ] Session timeout / cleanup
+- [x] Session timeout / cleanup (30min idle, background sweep every 60s)
 - [ ] Error handling
 - [ ] Push / WebSocket
 

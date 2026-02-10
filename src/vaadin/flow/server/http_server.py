@@ -1,8 +1,10 @@
 """HTTP Server for Vaadin Flow."""
 
+import asyncio
 import json
 import logging
 import secrets
+import time
 import uuid
 from pathlib import Path
 from typing import Any, Callable
@@ -13,6 +15,8 @@ from vaadin.flow.server.uidl_handler import UidlHandler
 from vaadin.flow.core.state_tree import StateTree
 
 log = logging.getLogger("vaadin.flow")
+
+SESSION_TIMEOUT = 1800  # 30 minutes (matches Java servlet default)
 
 # Session storage (in-memory for now)
 _sessions: dict[str, dict[str, Any]] = {}
@@ -41,6 +45,7 @@ def get_or_create_session(request: web.Request) -> tuple[str, dict[str, Any]]:
     session_id = request.cookies.get("JSESSIONID")
 
     if session_id and session_id in _sessions:
+        _sessions[session_id]["last_activity"] = time.monotonic()
         return session_id, _sessions[session_id]
 
     # Create new session
@@ -54,6 +59,7 @@ def get_or_create_session(request: web.Request) -> tuple[str, dict[str, Any]]:
         "tree": tree,
         "handler": handler,
         "initialized": False,
+        "last_activity": time.monotonic(),
     }
     _sessions[session_id] = session
     return session_id, session
@@ -124,6 +130,8 @@ async def handle_uidl(request: web.Request) -> web.Response:
             {"error": "Invalid CSRF token"},
             status=403
         )
+
+    session["last_activity"] = time.monotonic()
 
     # Process UIDL
     log.debug("RPC: %s", payload.get("rpc", []))
@@ -288,9 +296,48 @@ def get_index_html() -> str:
 """
 
 
+def _cleanup_expired_sessions():
+    """Remove sessions that have been idle longer than SESSION_TIMEOUT."""
+    now = time.monotonic()
+    expired = [
+        sid for sid, session in _sessions.items()
+        if now - session.get("last_activity", 0) > SESSION_TIMEOUT
+    ]
+    if not expired:
+        return
+    for sid in expired:
+        del _sessions[sid]
+    # Clean upload handlers belonging to expired sessions
+    expired_set = set(expired)
+    stale_uploads = [
+        rid for rid, (sid, _) in _upload_handlers.items()
+        if sid in expired_set
+    ]
+    for rid in stale_uploads:
+        del _upload_handlers[rid]
+    log.info("Cleaned up %d expired session(s)", len(expired))
+
+
+async def _session_cleanup_ctx(app: web.Application):
+    """Background task that periodically cleans expired sessions."""
+    async def _run():
+        while True:
+            await asyncio.sleep(60)
+            _cleanup_expired_sessions()
+
+    task = asyncio.create_task(_run())
+    yield
+    task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        pass
+
+
 def create_app() -> web.Application:
     """Create the aiohttp application."""
     app = web.Application()
+    app.cleanup_ctx.append(_session_cleanup_ctx)
 
     # Routes
     app.router.add_get("/", handle_root)
@@ -356,6 +403,7 @@ async def handle_heartbeat(request: web.Request) -> web.Response:
     session_id = request.cookies.get("JSESSIONID")
     if not session_id or session_id not in _sessions:
         return web.Response(status=403)
+    _sessions[session_id]["last_activity"] = time.monotonic()
     return web.Response(status=200)
 
 
