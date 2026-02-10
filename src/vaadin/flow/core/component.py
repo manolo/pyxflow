@@ -483,3 +483,50 @@ class UI:
     def push(self):
         """Manually push pending changes to client."""
         self._tree.notify_push()
+
+    def set_theme(self, theme: str, variant: str = "light") -> None:
+        """Switch theme and color variant at runtime.
+
+        Replaces the current theme stylesheet and sets the variant attribute.
+
+        Args:
+            theme: Theme.LUMO or Theme.AURA.
+            variant: Theme.LIGHT or Theme.DARK.
+        """
+        from vaadin.flow.theme import Theme
+        new_href = Theme.THEMES[theme]
+        other_href = Theme.THEMES[Theme.AURA if theme == Theme.LUMO else Theme.LUMO]
+        theme_attr = variant if variant == Theme.DARK else ""
+
+        js = (
+            "return (async function() {"
+            "  var old = document.querySelector("
+            "    'link[rel=stylesheet][href*=\"' + $0 + '\"]'"
+            "  );"
+            "  if (old) old.href = $1;"
+            "  else {"
+            "    var l = document.createElement('link');"
+            "    l.rel = 'stylesheet'; l.href = $1;"
+            "    document.head.appendChild(l);"
+            "  }"
+            "  if ($2) document.documentElement.setAttribute('theme', $2);"
+            "  else document.documentElement.removeAttribute('theme');"
+            "})()"
+        )
+        self._tree.queue_execute([other_href, new_href, theme_attr, js])
+
+    def set_theme_variant(self, variant: str) -> None:
+        """Switch only the color variant (light/dark) without changing the theme.
+
+        Args:
+            variant: Theme.LIGHT or Theme.DARK.
+        """
+        from vaadin.flow.theme import Theme
+        theme_attr = variant if variant == Theme.DARK else ""
+        js = (
+            "return (async function() {"
+            "  if ($0) document.documentElement.setAttribute('theme', $0);"
+            "  else document.documentElement.removeAttribute('theme');"
+            "})()"
+        )
+        self._tree.queue_execute([theme_attr, js])
