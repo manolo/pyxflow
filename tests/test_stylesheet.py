@@ -67,9 +67,11 @@ class TestStyleSheetUidl:
         handler = UidlHandler(tree)
         init_response = handler.handle_init({})
         csrf = init_response["appConfig"]["uidl"]["Vaadin-Security-Key"]
-        return handler, csrf
+        return handler, csrf, {"sync_id": 0, "client_id": 0}
 
-    def _navigate(self, handler, csrf, route=""):
+    def _navigate(self, handler, csrf, route="", state=None):
+        sync_id = state["sync_id"] if state else 0
+        client_id = state["client_id"] if state else 0
         payload = {
             "csrfToken": csrf,
             "rpc": [{
@@ -78,10 +80,14 @@ class TestStyleSheetUidl:
                 "event": "ui-navigate",
                 "data": {"route": route},
             }],
-            "syncId": 0,
-            "clientId": 0,
+            "syncId": sync_id,
+            "clientId": client_id,
         }
-        return handler.handle_uidl(payload)
+        response = handler.handle_uidl(payload)
+        if state is not None:
+            state["sync_id"] = response["syncId"]
+            state["client_id"] = client_id + 1
+        return response
 
     def test_eager_deps_in_navigation_response(self):
         """Navigation to view with @StyleSheet should include EAGER deps."""
@@ -90,8 +96,8 @@ class TestStyleSheetUidl:
         class StyledView(VerticalLayout):
             pass
 
-        handler, csrf = self._make_session()
-        response = self._navigate(handler, csrf)
+        handler, csrf, state = self._make_session()
+        response = self._navigate(handler, csrf, state=state)
 
         assert "EAGER" in response
         assert len(response["EAGER"]) == 1
@@ -106,8 +112,8 @@ class TestStyleSheetUidl:
         class PlainView(VerticalLayout):
             pass
 
-        handler, csrf = self._make_session()
-        response = self._navigate(handler, csrf)
+        handler, csrf, state = self._make_session()
+        response = self._navigate(handler, csrf, state=state)
 
         assert "EAGER" not in response
 
@@ -123,12 +129,12 @@ class TestStyleSheetUidl:
         class ViewB(VerticalLayout):
             pass
 
-        handler, csrf = self._make_session()
-        resp1 = self._navigate(handler, csrf, "")
+        handler, csrf, state = self._make_session()
+        resp1 = self._navigate(handler, csrf, "", state=state)
         assert "EAGER" in resp1
 
         # Navigate to second view with same stylesheet
-        resp2 = self._navigate(handler, csrf, "other")
+        resp2 = self._navigate(handler, csrf, "other", state=state)
         # Should not resend
         assert "EAGER" not in resp2
 
@@ -146,8 +152,8 @@ class TestStyleSheetUidl:
         class StyledView(VerticalLayout):
             pass
 
-        handler, csrf = self._make_session()
-        response = self._navigate(handler, csrf)
+        handler, csrf, state = self._make_session()
+        response = self._navigate(handler, csrf, state=state)
 
         assert "EAGER" in response
         urls = [d["url"] for d in response["EAGER"]]

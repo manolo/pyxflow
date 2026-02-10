@@ -205,6 +205,8 @@ class UidlHandler:
         self._sent_constants: set[str] = set()  # Track already-sent constant hashes
         self._pending_dependencies: list[dict] = []  # EAGER deps for next response
         self._sent_stylesheets: set[str] = set()  # Track sent stylesheet URLs
+        self._last_processed_client_id = -1  # Last successfully processed clientId
+        self._last_response: dict | None = None  # Cached for duplicate detection
 
     def handle_init(self, browser_details: dict, initial_route: str = "") -> dict:
         """Handle init request.
@@ -231,6 +233,8 @@ class UidlHandler:
         self._sent_constants = set()
         self._pending_dependencies = []
         self._sent_stylesheets = set()
+        self._last_processed_client_id = -1
+        self._last_response = None
         self._initial_route = initial_route  # Store for use in navigation
 
         self._tree._app_id = self._app_id
@@ -316,13 +320,32 @@ class UidlHandler:
     def handle_uidl(self, payload: dict[str, Any]) -> dict:
         """Handle UIDL request.
 
-        Returns UIDL response with changes.
+        Validates syncId and clientId before processing RPCs.
+        Returns UIDL response with changes, or a resync response on mismatch.
         """
-        # Validate syncId - client should send the last syncId it received
-        client_sync_id = payload.get("syncId", 0)
-        client_client_id = payload.get("clientId", 0)
+        client_sync_id = payload.get("syncId", -1)
+        client_client_id = payload.get("clientId", -1)
+        expected_client_id = self._last_processed_client_id + 1
 
-        # Track the client's message count
+        # Client requests resync
+        if payload.get("resynchronize"):
+            return self._build_resync_response()
+
+        # SyncId mismatch → resync
+        if client_sync_id != -1 and client_sync_id != self._sync_id:
+            return self._build_resync_response()
+
+        # ClientId validation
+        if client_client_id != -1 and client_client_id != expected_client_id:
+            if client_client_id == self._last_processed_client_id and self._last_response:
+                # Duplicate request → return cached response
+                return self._last_response
+            else:
+                # Out of sync → resync
+                return self._build_resync_response()
+
+        # Valid → update tracking and process
+        self._last_processed_client_id = expected_client_id
         self._last_client_id = client_client_id
 
         # Process RPC calls
@@ -738,6 +761,16 @@ class UidlHandler:
             if method and callable(method):
                 method(*args)
 
+    def _build_resync_response(self) -> dict:
+        """Build a resynchronize response (no state change, no syncId increment)."""
+        return {
+            "syncId": self._sync_id,
+            "clientId": self._last_processed_client_id + 1,
+            "resynchronize": True,
+            "changes": [],
+            "constants": {},
+        }
+
     def _build_response(self) -> dict:
         """Build UIDL response."""
         changes = self._tree.collect_changes()
@@ -808,4 +841,5 @@ class UidlHandler:
         if all_execute:
             response["execute"] = all_execute
         self._pending_execute = []
+        self._last_response = response
         return response

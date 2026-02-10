@@ -60,7 +60,7 @@ class TestCompleteFlow:
                 {"type": "event", "node": tf_node, "event": "change", "data": {}}
             ],
             "syncId": sync_id,
-            "clientId": 0,
+            "clientId": 1,
         })
 
         # 5. Click button
@@ -68,7 +68,7 @@ class TestCompleteFlow:
             "csrfToken": csrf,
             "rpc": [{"type": "event", "node": btn_node, "event": "click", "data": {}}],
             "syncId": sync_id + 1,
-            "clientId": 0,
+            "clientId": 2,
         })
 
         # Verify Notification was created

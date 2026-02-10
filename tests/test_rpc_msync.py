@@ -291,7 +291,7 @@ class TestMultipleSyncs:
                 "value": "First"
             }],
             "syncId": session["sync_id"],
-            "clientId": 0,
+            "clientId": session["client_id"],
         }
         response1 = session["handler"].handle_uidl(payload1)
 
@@ -310,7 +310,7 @@ class TestMultipleSyncs:
                 "value": "Second"
             }],
             "syncId": response1["syncId"],
-            "clientId": 1,
+            "clientId": session["client_id"] + 1,
         }
         session["handler"].handle_uidl(payload2)
 
@@ -444,7 +444,7 @@ class TestSyncEdgeCases:
                 "value": "Initial"
             }],
             "syncId": session["sync_id"],
-            "clientId": 0,
+            "clientId": session["client_id"],
         }
         response1 = session["handler"].handle_uidl(payload1)
 
@@ -459,7 +459,7 @@ class TestSyncEdgeCases:
                 "value": ""
             }],
             "syncId": response1["syncId"],
-            "clientId": 1,
+            "clientId": session["client_id"] + 1,
         }
         session["handler"].handle_uidl(payload2)
 

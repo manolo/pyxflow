@@ -158,7 +158,7 @@ class TestValueSync:
                 "data": {}
             }],
             "syncId": session["sync_id"] + 1,
-            "clientId": session["client_id"],
+            "clientId": session["client_id"] + 1,
         }
         response = session["handler"].handle_uidl(click_payload)
         changes = response.get("changes", [])

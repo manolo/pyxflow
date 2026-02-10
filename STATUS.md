@@ -178,10 +178,10 @@ Avatar, AvatarGroup, Card, Scroller, Popover, MasterDetailLayout. SplitLayout al
 ListBox, MultiSelectListBox, MultiSelectComboBox, VirtualList, MessageInput, MessageList, LoginForm, LoginOverlay, CustomField. 184 new tests.
 
 ### Protocol / Security
-- [ ] CSRF token validation (actual check)
-- [ ] ClientId validation (duplicate detection)
-- [ ] SyncId validation (out-of-sync detection)
-- [ ] Resynchronize flag support
+- [x] CSRF token validation (actual check) — validated in `http_server.py`
+- [x] ClientId validation (duplicate detection)
+- [x] SyncId validation (out-of-sync detection)
+- [x] Resynchronize flag support
 - [ ] `@ClientCallable` methods
 - [x] Return channels
 
