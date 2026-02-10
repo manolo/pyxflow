@@ -1,11 +1,11 @@
 # PyFlow Implementation Status
 
-## Current State: MVP + Routing + Grid (Advanced) + Renderers + AppLayout + Menu System + Visual & Layout + Data & Specialized + Full UIDL Compatibility
+## Current State: All 49 Components + WebSocket Push + Full UIDL Compatibility
 
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~12,000 (core src/), ~28,500 (total with demo + tests)
-**Tests:** 1259 passing
+**Tests:** 1262 passing
 **Last updated:** 2026-02-10
 
 ---
@@ -131,10 +131,12 @@
 - [x] Lumo/Aura theme CSS - Extracted from JARs, served at `/lumo/*` and `/aura/*`, loaded via `@StyleSheet` on layout
 - [x] `@StyleSheet` decorator - Load custom CSS via UIDL EAGER dependencies, served from app's `styles/` directory
 - [x] Dev mode (`--dev`) - Auto-reload on Python file changes via watchfiles, socket-in-parent architecture (no EADDRINUSE on reload), file change logging
+- [x] WebSocket Push - Atmosphere protocol, `GET /VAADIN/push` endpoint, push sender coroutine, `UI.access()` / `UI.push()` API
 
 ### Protocol
-- [x] Init response - appConfig, CSRF, constants (Java-compatible hashes)
+- [x] Init response - appConfig, pushScript, CSRF, constants (Java-compatible hashes)
 - [x] UIDL response - syncId, changes, execute
+- [x] Push response - `meta.async`, Atmosphere length-prefix format
 - [x] RPC: event - click, change, ui-navigate, keydown
 - [x] RPC: mSync - Property sync from client
 - [x] RPC: publishedEventHandler - Generic dispatch to any component method (Dialog close, Grid select/deselect)
@@ -177,6 +179,9 @@ Avatar, AvatarGroup, Card, Scroller, Popover, MasterDetailLayout. SplitLayout al
 ### ~~Phase 11 — Data & Specialized Components~~ ✓ DONE
 ListBox, MultiSelectListBox, MultiSelectComboBox, VirtualList, MessageInput, MessageList, LoginForm, LoginOverlay, CustomField. 184 new tests.
 
+### ~~Phase 12 — WebSocket Push~~ ✓ DONE
+Atmosphere WebSocket protocol, `UI.access()` / `UI.push()` API, push sender coroutine, push demo view. See `../specs/PROTOCOL.md` § WebSocket Push.
+
 ### Protocol / Security
 - [x] CSRF token validation (actual check) — validated in `http_server.py`
 - [x] ClientId validation (duplicate detection)
@@ -194,7 +199,7 @@ ListBox, MultiSelectListBox, MultiSelectComboBox, VirtualList, MessageInput, Mes
 - [x] Heartbeat handler (`v-r=heartbeat`) — keeps session alive, prevents 403 after idle
 - [x] Session timeout / cleanup (30min idle, background sweep every 60s)
 - [ ] Error handling
-- [ ] Push / WebSocket
+- [x] Push / WebSocket — Atmosphere protocol, `UI.access()` / `UI.push()` API, push demo view
 
 ---
 
@@ -211,6 +216,7 @@ ListBox, MultiSelectListBox, MultiSelectComboBox, VirtualList, MessageInput, Mes
 9. ~~**Menu System + High-Value Components** - `@Menu`, get_menu_entries(), Details, Accordion, ContextMenu, DateTimePicker, Markdown~~ ✓ DONE
 10. ~~**Visual & Layout Components** - Avatar, AvatarGroup, Card, Scroller, Popover, MasterDetailLayout~~ ✓ DONE
 11. ~~**Data & Specialized Components** - ListBox, MultiSelectComboBox, VirtualList, MessageInput/List, Login, CustomField~~ ✓ DONE
+12. ~~**WebSocket Push** - Atmosphere protocol, `UI.access()` / `UI.push()`, push sender, push demo~~ ✓ DONE
 
 ---
 
