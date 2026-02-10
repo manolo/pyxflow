@@ -484,19 +484,18 @@ class UI:
         """Manually push pending changes to client."""
         self._tree.notify_push()
 
+    _THEME_CSS = {"lumo": "lumo/lumo.css", "aura": "aura/aura.css"}
+
     def set_theme(self, theme: str, variant: str = "light") -> None:
         """Switch theme and color variant at runtime.
 
-        Replaces the current theme stylesheet and sets the variant attribute.
-
         Args:
-            theme: Theme.LUMO or Theme.AURA.
-            variant: Theme.LIGHT or Theme.DARK.
+            theme: "lumo" or "aura".
+            variant: "light" or "dark".
         """
-        from vaadin.flow.theme import Theme
-        new_href = Theme.THEMES[theme]
-        other_href = Theme.THEMES[Theme.AURA if theme == Theme.LUMO else Theme.LUMO]
-        theme_attr = variant if variant == Theme.DARK else ""
+        new_href = self._THEME_CSS[theme]
+        other_href = self._THEME_CSS["aura" if theme == "lumo" else "lumo"]
+        theme_attr = variant if variant == "dark" else ""
 
         js = (
             "return (async function() {"
@@ -519,10 +518,9 @@ class UI:
         """Switch only the color variant (light/dark) without changing the theme.
 
         Args:
-            variant: Theme.LIGHT or Theme.DARK.
+            variant: "light" or "dark".
         """
-        from vaadin.flow.theme import Theme
-        theme_attr = variant if variant == Theme.DARK else ""
+        theme_attr = variant if variant == "dark" else ""
         js = (
             "return (async function() {"
             "  if ($0) document.documentElement.setAttribute('theme', $0);"
