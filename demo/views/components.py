@@ -113,28 +113,8 @@ class ComponentsDemoView(VerticalLayout):
         self.add_class_name("components-view")
         self.click_count = 0
 
-        # Header
-        self.add(H2("PyFlow Components Demo"))
-
-        # --- Progress ---
-        self.add_section("ProgressBar")
-
-        progress = HorizontalLayout()
-        progress.set_width_full()
-        progress_bar = ProgressBar()
-        progress_bar.set_value(0.6)
-        progress.add(Span("(60%)"))
-        progress.add(progress_bar)
-
-        progress_indeterminate = ProgressBar()
-        progress_indeterminate.set_indeterminate(True)
-        progress.add(Span("(indeterminate)"))
-        progress.add(progress_indeterminate)       
-
-        self.add(progress) 
-
         # --- LoginForm ---
-        self.add_section("LoginForm")
+        section = self.add_section("LoginForm", "tall")
 
         login_form = LoginForm()
         self.login_label = Span("Login status: (none)")
@@ -144,12 +124,24 @@ class ComponentsDemoView(VerticalLayout):
         login_form.add_forgot_password_listener(
             lambda e: self.login_label.set_text("Forgot password clicked")
         )
-        self.add(login_form)
-        self.add(self.login_label)
+        section.add(login_form)
+        section.add(self.login_label)        
 
+        # --- Progress ---
+        section = self.add_section("ProgressBar")
+
+        progress_bar = ProgressBar()
+        progress_bar.set_value(0.6)
+        section.add(Span("(60%)"))
+        section.add(progress_bar)
+
+        progress_indeterminate = ProgressBar()
+        progress_indeterminate.set_indeterminate(True)
+        section.add(Span("(indeterminate)"))
+        section.add(progress_indeterminate)
 
         # --- Navigation ---
-        self.add_section("Navigation")
+        section = self.add_section("Navigation", "col-span-2")
 
         navigation = HorizontalLayout()
 
@@ -157,10 +149,33 @@ class ComponentsDemoView(VerticalLayout):
         navigation.add(RouterLink("Go to About", "/"))
         navigation.add(RouterLink("Go to Greet", "/greet/World"))
 
-        self.add(navigation)
+        section.add(navigation)
+
+        # --- Avatar ---
+        section = self.add_section("Avatar")
+
+        avatar1 = Avatar("Sophia Williams")
+        avatar2 = Avatar()
+        avatar2.set_name("Hugo Santos")
+        avatar2.set_abbreviation("HS")
+        avatar2.set_color_index(3)
+        section.add(HorizontalLayout(avatar1, avatar2))
+
+        # --- AvatarGroup ---
+        section = self.add_section("AvatarGroup")
+
+        avatar_group = AvatarGroup()
+        avatar_group.add(
+            AvatarGroupItem("Sophia Williams"),
+            AvatarGroupItem("Hugo Santos"),
+            AvatarGroupItem("Diana Novak"),
+            AvatarGroupItem("Rashid Traore"),
+        )
+        avatar_group.set_max_items_visible(3)
+        section.add(avatar_group)
 
         # --- Tabs ---
-        self.add_section("Tabs")
+        section = self.add_section("Tabs")
 
         tab1 = Tab("Tab 1")
         tab2 = Tab("Tab 2")
@@ -170,19 +185,19 @@ class ComponentsDemoView(VerticalLayout):
         tabs.add_selected_change_listener(self.on_tab_selected)
         self.tabs = tabs
         self.tab_list = [tab1, tab2, tab3]
-        self.add(tabs)
-        self.add(self.tabs_label)
+        section.add(tabs)
+        section.add(self.tabs_label)
 
         # --- TabSheet ---
-        self.add_section("TabSheet")
+        section = self.add_section("TabSheet")
 
         tab_sheet = TabSheet()
         tab_sheet.add("Dashboard", Span("Dashboard content"))
         tab_sheet.add("Settings", Span("Settings content"))
-        self.add(tab_sheet)
+        section.add(tab_sheet)
 
         # --- MenuBar ---
-        self.add_section("MenuBar")
+        section = self.add_section("MenuBar")
 
         menu_bar = MenuBar()
         self.menu_label = Span("Menu action: (none)")
@@ -192,22 +207,35 @@ class ComponentsDemoView(VerticalLayout):
         edit_item = menu_bar.add_item("Edit")
         edit_item.get_sub_menu().add_item("Undo", lambda e: self.menu_label.set_text("Menu action: Undo"))
         menu_bar.add_item("Help", lambda e: self.menu_label.set_text("Menu action: Help"))
-        self.add(menu_bar)
-        self.add(self.menu_label)
+        section.add(menu_bar)
+        section.add(self.menu_label)
+
+        # --- Popover ---
+        section = self.add_section("Popover")
+
+        popover_target = Button("Click for Popover")
+        popover = Popover()
+        popover.set_target(popover_target)
+        popover.add(Span("Popover content"))
+        popover.add(Span("Click outside to close"))
+        popover.set_position(PopoverPosition.BOTTOM)
+        popover.set_open_on_click(True)
+        section.add(popover_target)
+        section.add(popover)
 
         # --- Details ---
-        self.add_section("Details")
+        section = self.add_section("Details")
 
         details1 = Details("Contact information",
-            Span("Sophia Williams — sophia.williams@company.com — (501) 555-9128"))
+            Span("Sophia Williams — (501) 555-9128"))
         details1.set_opened(True)
-        self.add(details1)
+        section.add(details1)
 
         details2 = Details("Billing address", Span("4027 Amber Lake Canyon, Springfield"))
-        self.add(details2)
+        section.add(details2)
 
         # --- Accordion ---
-        self.add_section("Accordion")
+        section = self.add_section("Accordion", "col-span-2")
 
         accordion = Accordion()
         accordion.add("Personal information",
@@ -217,15 +245,15 @@ class ComponentsDemoView(VerticalLayout):
         accordion.add("Payment method",
             Span("Visa ending in 1234"))
         accordion.open(0)
-        self.add(accordion)
+        section.add(accordion)
 
         # --- ContextMenu ---
-        self.add_section("ContextMenu")
+        section = self.add_section("ContextMenu")
 
         self.context_label = Span("Context action: (none)")
         context_target = Span("Right-click here for context menu")
-        context_target._set_style("padding", "var(--lumo-space-m)")
-        context_target._set_style("background", "var(--lumo-contrast-5pct)")
+        context_target._set_style("padding", "var(--lumo-space-s)")
+        context_target._set_style("background", "var(--lumo-primary-color-10pct)")
         context_target._set_style("border-radius", "var(--lumo-border-radius-m)")
 
         context_menu = ContextMenu(context_target)
@@ -233,11 +261,11 @@ class ComponentsDemoView(VerticalLayout):
         context_menu.add_item("Edit", lambda e: self.context_label.set_text("Context action: Edit"))
         context_menu.add_separator()
         context_menu.add_item("Delete", lambda e: self.context_label.set_text("Context action: Delete"))
-        self.add(context_menu)
-        self.add(self.context_label)
+        section.add(context_menu)
+        section.add(self.context_label)
 
         # --- Markdown ---
-        self.add_section("Markdown")
+        section = self.add_section("Markdown", "col-span-2")
 
         markdown = Markdown("""
 ## Rich Text Formatting
@@ -257,10 +285,10 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
 [Visit Vaadin website](https://vaadin.com)
 """)
-        self.add(markdown)
+        section.add(markdown)
 
         # --- Buttons & Actions ---
-        self.add_section("Buttons & Actions")
+        section = self.add_section("Buttons & Actions", "col-span-3")
 
         button = Button("Click Me!")
         button.add_theme_name("primary")
@@ -281,18 +309,18 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         error_btn.add_theme_name("error", "primary")
         error_btn.add_click_listener(self.show_error)
 
-        test_error_btn = Button("Test Error")
+        test_error_btn = Button("Throw Server Error")
         test_error_btn.add_theme_name("error", "tertiary")
         test_error_btn.add_click_listener(self.trigger_error)
 
         button_row = HorizontalLayout()
         button_row.add(button, dialog_btn, notification_btn, success_btn, error_btn, test_error_btn)
-        self.add(button_row)
+        section.add(button_row)
 
         self.click_label = Span("Click count: 0")
-        self.add(self.click_label)
+        section.add(self.click_label)
 
-        # Dialog (hidden initially)
+        # Dialog (hidden initially — overlay, not a visible card)
         self.dialog = Dialog()
         self.dialog.set_header_title("Sample Dialog")
         self.dialog.add(Span("This is a dialog with some content."))
@@ -300,7 +328,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.add(self.dialog)
 
         # --- Component Features ---
-        self.add_section("Component Features")
+        section = self.add_section("Component Features", "col-span-2")
 
         features_form = FormLayout()
 
@@ -313,17 +341,17 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         tooltip_field.set_tooltip_text("Hover to see this tooltip")
         features_form.add(tooltip_field)
 
-        self.add(features_form)
+        section.add(features_form)
 
         shortcut_label = Span("Shortcut: (none)")
         self.shortcut_label = shortcut_label
         shortcut_btn = Button("Press Enter (shortcut)")
         shortcut_btn.add_click_shortcut(Key.ENTER)
         shortcut_btn.add_click_listener(lambda e: self.shortcut_label.set_text("Shortcut: Button"))
-        self.add(HorizontalLayout(shortcut_btn, shortcut_label))
+        section.add(HorizontalLayout(shortcut_btn, shortcut_label))
 
         # --- Text Input Fields ---
-        self.add_section("Text Input Fields")
+        section = self.add_section("Text Input Fields", "col-span-2")
 
         text_form = FormLayout()
 
@@ -351,17 +379,10 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         text_area.set_max_rows(4)
         text_form.add(text_area)
 
-        upload = Upload()
-        self.upload_label = Span("Upload status: (none)")
-        upload.set_receiver(self.on_upload_received)
-        upload.add_succeeded_listener(self.on_upload_succeeded)
-        text_form.add(upload)
-
-        self.add(text_form)
-        self.add(self.upload_label)
+        section.add(text_form)
 
         # --- Numeric Fields ---
-        self.add_section("Numeric Fields")
+        section = self.add_section("Numeric Fields")
 
         numeric_form = FormLayout()
 
@@ -376,10 +397,10 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         integer_field.set_step(5)
         numeric_form.add(integer_field)
 
-        self.add(numeric_form)
+        section.add(numeric_form)
 
-        # --- Date & Time ---
-        self.add_section("Date & Time")
+        # --- Date, Time & Upload ---
+        section = self.add_section("Date, Time & Upload", "col-span-2")
 
         date_time_form = FormLayout()
 
@@ -397,10 +418,17 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         date_time_picker.set_step(1800)
         date_time_form.add(date_time_picker)
 
-        self.add(date_time_form)
+        upload = Upload()
+        upload_label = Span("Upload status: (none)")
+        upload.set_receiver(self.on_upload_received)
+        upload.add_succeeded_listener(self.on_upload_succeeded)
+        date_time_form.add(upload)
+
+        section.add(date_time_form)
+        date_time_form.add(upload_label)
 
         # --- Selection Components ---
-        self.add_section("Selection Components")
+        section = self.add_section("Selection Components", "col-span-2")
 
         selection_form = FormLayout()
 
@@ -429,32 +457,33 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         checkbox_group = CheckboxGroup("CheckboxGroup")
         checkbox_group.set_items("Item X", "Item Y", "Item Z")
         selection_form.add(checkbox_group)
+        section.add(selection_form)
 
+
+        section = self.add_section("ListBox")
         list_box = ListBox()
         list_box.set_items("Item 1", "Item 2", "Item 3", "Item 4")
-        self.list_box_label = Span("ListBox selected: (none)")
+        list_box_label = Span("ListBox selected: (none)")
         list_box.add_value_change_listener(
-            lambda e: self.list_box_label.set_text(f"ListBox selected: {e['value']}")
+            lambda e: list_box_label.set_text(f"ListBox selected: {e['value']}")
         )
-        selection_form.add(list_box)
+        section.add(list_box)
+        section.add(list_box_label)
 
+        section = self.add_section("MultiSelectListBox")
         multi_list_box = MultiSelectListBox()
         multi_list_box.set_items("Option A", "Option B", "Option C", "Option D")
-        self.multi_list_box_label = Span("MultiSelectListBox selected: (none)")
+        multi_list_box_label = Span("MultiSelectListBox selected: (none)")
         multi_list_box.add_value_change_listener(
-            lambda e: self.multi_list_box_label.set_text(
+            lambda e: multi_list_box_label.set_text(
                 f"MultiSelectListBox selected: {', '.join(sorted(e['value']))}" if e['value'] else "MultiSelectListBox selected: (none)"
             )
         )
-        selection_form.add(multi_list_box)
-
-        selection_form.add(self.list_box_label)
-        selection_form.add(self.multi_list_box_label)
-
-        self.add(selection_form)
+        section.add(multi_list_box)
+        section.add(multi_list_box_label)
 
         # --- Custom Fields ---
-        self.add_section("Custom Fields")
+        section = self.add_section("Custom Fields")
 
         custom_form = FormLayout()
 
@@ -466,10 +495,10 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         custom_field.add(prefix, number)
         custom_form.add(custom_field)
 
-        self.add(custom_form)
+        section.add(custom_form)
 
         # --- FlexLayout ---
-        self.add_section("FlexLayout")
+        section = self.add_section("FlexLayout", "col-span-2")
 
         header_div = Header("Header")
         header_div.set_width("100%")
@@ -509,36 +538,17 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
         page_layout = FlexLayout(header_div, middle, footer_div)
         page_layout.set_flex_direction(FlexDirection.COLUMN)
-        page_layout.set_width("50%")
+        page_layout.set_width("100%")
         page_layout.set_height("300px")
         page_layout.expand(middle)
 
-        self.add(page_layout)
-
-        # --- Icon, DrawerToggle, SideNav (for bundle inclusion) ---
-        self.add_section("Icon / SideNav")
-
-        home_icon = Icon("vaadin:home")
-        self.add(home_icon)
-
-        drawer_toggle = DrawerToggle()
-        self.add(drawer_toggle)
-
-        side_nav = SideNav()
-        side_nav.set_label("Navigation")
-        side_nav.add_item(SideNavItem("Home", "/", Icon("vaadin:home")))
-        side_nav.add_item(SideNavItem("About", "/", Icon("vaadin:info-circle")))
-        parent_item = SideNavItem("Settings")
-        parent_item.add_item(SideNavItem("General", "/settings/general"))
-        parent_item.add_item(SideNavItem("Security", "/settings/security"))
-        side_nav.add_item(parent_item)
-        self.add(side_nav)
+        section.add(page_layout)
 
         # --- Shared data for all grids ---
         people = [p.to_dict() for p in people_service.find_all()]
 
         # --- CRUD Master-Detail ---
-        self.add_section("CRUD Master-Detail (Binder)")
+        section = self.add_section("CRUD Master-Detail (Binder)", "col-span-3")
 
         self.crud_people = [CrudPerson.from_dict(p) for p in people]
         crud_roles = sorted({p["role"] for p in people})
@@ -596,7 +606,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
         self.crud_layout.set_master(self.crud_master)
         # Detail starts as None — master gets full width
-        self.add(self.crud_layout)
+        section.add(self.crud_layout)
 
         # Binder setup
         self.binder = Binder(CrudPerson)
@@ -629,7 +639,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
             .as_required("Department is required") \
             .bind(lambda p: p.department, lambda p, v: setattr(p, 'department', v))
 
-        # ConfirmDialog for delete
+        # ConfirmDialog for delete (overlay — not a visible card)
         self.crud_confirm = ConfirmDialog()
         self.crud_confirm.set_header("Confirm Delete")
         self.crud_confirm.set_text("Are you sure you want to delete this person?")
@@ -639,7 +649,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.crud_confirm.add_confirm_listener(self._crud_do_delete)
         self.add(self.crud_confirm)
 
-        # ConfirmDialog for cancel with unsaved changes
+        # ConfirmDialog for cancel with unsaved changes (overlay)
         self.crud_cancel_confirm = ConfirmDialog()
         self.crud_cancel_confirm.set_header("Unsaved changes")
         self.crud_cancel_confirm.set_text("You have unsaved changes. Discard them?")
@@ -650,7 +660,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.add(self.crud_cancel_confirm)
 
         # --- Grid ---
-        self.add_section("Grid")
+        section = self.add_section("Grid", "col-span-2")
 
         grid = Grid()
         grid.add_column("name", header="Name").set_auto_width(True).set_sortable(True)
@@ -662,11 +672,11 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         grid.set_items(people)
         self.grid_selection_label = Span("Selected: (none)")
         grid.add_selection_listener(self.on_grid_select)
-        self.add(grid)
-        self.add(self.grid_selection_label)
+        section.add(grid)
+        section.add(self.grid_selection_label)
 
         # --- Grid with LitRenderer ---
-        self.add_section("Grid with LitRenderer")
+        section = self.add_section("Grid with LitRenderer", "col-span-2")
 
         lit_grid = Grid()
         lit_grid.add_column(
@@ -689,11 +699,11 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
             header="Actions",
         )
         lit_grid.set_items(people)
-        self.add(lit_grid)
-        self.add(self.lit_renderer_label)
+        section.add(lit_grid)
+        section.add(self.lit_renderer_label)
 
         # --- Grid with ComponentRenderer ---
-        self.add_section("Grid with ComponentRenderer")
+        section = self.add_section("Grid with ComponentRenderer", "col-span-2")
 
         comp_grid = Grid()
         comp_grid.add_column("name", header="Name").set_auto_width(True)
@@ -704,11 +714,11 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
             header="Actions",
         )
         comp_grid.set_items(people)
-        self.add(comp_grid)
-        self.add(self.comp_renderer_label)
+        section.add(comp_grid)
+        section.add(self.comp_renderer_label)
 
         # --- Grid with ListDataProvider ---
-        self.add_section("Grid with ListDataProvider")
+        section = self.add_section("Grid with ListDataProvider", "col-span-2")
 
         dp_items = list(people)
         self.dp = ListDataProvider(dp_items)
@@ -733,11 +743,11 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         dp_controls = HorizontalLayout()
         dp_controls.set_default_vertical_component_alignment(Alignment.BASELINE)
         dp_controls.add(self.dp_filter, dp_add_btn, dp_remove_btn)
-        self.add(dp_controls)
-        self.add(dp_grid)
+        section.add(dp_controls)
+        section.add(dp_grid)
 
         # --- Grid with Lazy DataProvider ---
-        self.add_section("Grid with Lazy DataProvider")
+        section = self.add_section("Grid with Lazy DataProvider", "col-span-2", "tall")
 
         # Simulate a large dataset (1000 items) served lazily
         self._lazy_data = [
@@ -768,34 +778,30 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         lazy_grid.set_data_provider(lazy_dp)
 
         self._lazy_stats_label = Span(f"{len(self._lazy_data)} items totales (fetches: 0, loaded: 0)")
-        self.add(self._lazy_stats_label)
-        self.add(lazy_grid)
+        section.add(self._lazy_stats_label)
+        section.add(lazy_grid)
 
-        # --- Avatar ---
-        self.add_section("Avatar")
+        # --- Icon, DrawerToggle, SideNav (for bundle inclusion) ---
+        section = self.add_section("Icon / SideNav")
 
-        avatar1 = Avatar("Sophia Williams")
-        avatar2 = Avatar()
-        avatar2.set_name("Hugo Santos")
-        avatar2.set_abbreviation("HS")
-        avatar2.set_color_index(3)
-        self.add(HorizontalLayout(avatar1, avatar2))
+        home_icon = Icon("vaadin:home")
+        section.add(home_icon)
 
-        # --- AvatarGroup ---
-        self.add_section("AvatarGroup")
+        drawer_toggle = DrawerToggle()
+        section.add(drawer_toggle)
 
-        avatar_group = AvatarGroup()
-        avatar_group.add(
-            AvatarGroupItem("Sophia Williams"),
-            AvatarGroupItem("Hugo Santos"),
-            AvatarGroupItem("Diana Novak"),
-            AvatarGroupItem("Rashid Traore"),
-        )
-        avatar_group.set_max_items_visible(3)
-        self.add(avatar_group)
+        side_nav = SideNav()
+        side_nav.set_label("Navigation")
+        side_nav.add_item(SideNavItem("Home", "/", Icon("vaadin:home")))
+        side_nav.add_item(SideNavItem("About", "/", Icon("vaadin:info-circle")))
+        parent_item = SideNavItem("Settings")
+        parent_item.add_item(SideNavItem("General", "/settings/general"))
+        parent_item.add_item(SideNavItem("Security", "/settings/security"))
+        side_nav.add_item(parent_item)
+        section.add(side_nav)
 
         # --- Scroller ---
-        self.add_section("Scroller")
+        section = self.add_section("Scroller")
 
         scroll_content = VerticalLayout()
         for i in range(1, 21):
@@ -805,33 +811,20 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         scroller.set_width("300px")
         scroller._set_style("flex", "none")
         scroller._set_style("border", "1px solid var(--lumo-contrast-20pct)")
-        self.add(scroller)
+        section.add(scroller)
 
         # --- Card ---
-        self.add_section("Card")
+        section = self.add_section("Card")
 
         card = Card()
         card.set_title("Card Title")
         card.set_subtitle("Card subtitle")
         card.add(Span("This is the card content area."))
         card.add_to_footer(Button("Action"))
-        self.add(card)
-
-        # --- Popover ---
-        self.add_section("Popover")
-
-        popover_target = Button("Click for Popover")
-        popover = Popover()
-        popover.set_target(popover_target)
-        popover.add(Span("Popover content"))
-        popover.add(Span("Click outside to close"))
-        popover.set_position(PopoverPosition.BOTTOM)
-        popover.set_open_on_click(True)
-        self.add(popover_target)
-        self.add(popover)
+        section.add(card)
 
         # --- MasterDetailLayout ---
-        self.add_section("MasterDetailLayout")
+        section = self.add_section("MasterDetailLayout", "col-span-2")
 
         md_layout = MasterDetailLayout()
         md_master = VerticalLayout()
@@ -850,24 +843,24 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         md_layout.set_master(md_master)
         md_layout.set_height("250px")
         md_layout._set_style("border", "1px solid var(--lumo-contrast-20pct)")
-        self.add(md_layout)
+        section.add(md_layout)
 
         # --- MessageInput + MessageList ---
-        self.add_section("MessageInput + MessageList")
+        section = self.add_section("MessageInput + MessageList", "col-span-2")
 
         self.message_list = MessageList()
         self.messages = [
             MessageListItem("Hello! How can I help?", user_name="Assistant"),
         ]
         self.message_list.set_items(*self.messages)
-        self.add(self.message_list)
+        section.add(self.message_list)
 
         message_input = MessageInput()
         message_input.add_submit_listener(self._on_message_submit)
-        self.add(message_input)
+        section.add(message_input)
 
         # --- VirtualList ---
-        self.add_section("VirtualList")
+        section = self.add_section("VirtualList", "col-span-2")
 
         virtual_list = VirtualList()
         virtual_items = [{"name": f"Person {i}", "city": f"City {i % 20}", "role": f"Role {i % 5}"} for i in range(200)]
@@ -890,15 +883,22 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         virtual_list._set_style("overflow", "auto")
         virtual_list._set_style("border", "1px solid var(--lumo-contrast-20pct)")
         virtual_list._set_style("border-radius", "var(--lumo-border-radius-m)")
-        self.add(virtual_list)
-        self.add(self.vl_label)
+        section.add(virtual_list)
+        section.add(self.vl_label)
 
     def _on_message_submit(self, event):
         self.messages.append(MessageListItem(event["value"], user_name="You"))
         self.message_list.set_items(*self.messages)
 
-    def add_section(self, title: str):
-        self.add(H3(title))
+    def add_section(self, title: str, *class_names: str) -> Div:
+        """Create a dashboard card. Returns the card Div to add content to."""
+        card = Div()
+        card.add_class_name("component")
+        for cn in class_names:
+            card.add_class_name(cn)
+        card.add(H3(title))
+        self.add(card)
+        return card
 
     def on_grid_select(self, event):
         item = event.get("item")
