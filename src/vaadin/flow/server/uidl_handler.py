@@ -392,7 +392,7 @@ class UidlHandler:
         from vaadin.flow.components.notification import Notification, NotificationVariant
         n = Notification("An internal error has occurred. Please contact the administrator.")
         n.position = Notification.Position.MIDDLE
-        n.duration = 0  # persistent until dismissed
+        n.duration = 5000
         n.add_theme_variants(NotificationVariant.LUMO_ERROR)
         n.open()
 
