@@ -101,9 +101,13 @@ async def handle_uidl(request: web.Request) -> web.Response:
     session_id = request.cookies.get("JSESSIONID")
 
     if not session_id or session_id not in _sessions:
-        return web.json_response(
-            {"error": "Invalid session"},
-            status=403
+        # Return session-expired JSON (HTTP 200) so FlowClient reloads the page.
+        # Java Flow does the same — the client checks meta.sessionExpired, calls
+        # handleSessionExpiredError(null), and since sessExpMsg has all-null fields
+        # it triggers window.location.reload().
+        return web.Response(
+            text='for(;;);[{"meta":{"sessionExpired":true}}]',
+            content_type="application/json"
         )
 
     session = _sessions[session_id]

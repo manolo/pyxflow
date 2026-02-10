@@ -102,6 +102,33 @@ class TestSessionManagement(AioHTTPTestCase):
         assert resp.status == 403 or resp.status == 200  # May return error in body
 
 
+class TestSessionExpired(AioHTTPTestCase):
+    """Test session-expired response triggers client reload."""
+
+    async def get_application(self):
+        from vaadin.flow.server.http_server import create_app
+        return create_app()
+
+    @unittest_run_loop
+    async def test_uidl_without_session_returns_session_expired_json(self):
+        """UIDL without session should return meta.sessionExpired JSON (not 403)."""
+        payload = {"csrfToken": "x", "rpc": [], "syncId": 0, "clientId": 0}
+        resp = await self.client.request("POST", "/?v-r=uidl", json=payload)
+        assert resp.status == 200
+        text = await resp.text()
+        assert '"sessionExpired":true' in text
+        assert text.startswith("for(;;);")
+
+    @unittest_run_loop
+    async def test_uidl_without_session_on_subroute(self):
+        """UIDL on sub-route without session should also return session expired."""
+        payload = {"csrfToken": "x", "rpc": [], "syncId": 0, "clientId": 0}
+        resp = await self.client.request("POST", "/about?v-r=uidl", json=payload)
+        assert resp.status == 200
+        text = await resp.text()
+        assert '"sessionExpired":true' in text
+
+
 class TestHeartbeat(AioHTTPTestCase):
     """Test heartbeat endpoint keeps sessions alive."""
 
