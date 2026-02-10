@@ -1,8 +1,11 @@
 """UIDL Protocol Handler."""
 
+import logging
 import random
 import secrets
 from typing import Any, TYPE_CHECKING
+
+log = logging.getLogger("vaadin.flow")
 
 from vaadin.flow.core.state_node import Feature
 
@@ -365,20 +368,33 @@ class UidlHandler:
         _set_current_tree(self._tree)
         try:
             for rpc in rpc_list:
-                rpc_type = rpc.get("type")
-                if rpc_type == "event":
-                    self._handle_event(rpc)
-                elif rpc_type == "mSync":
-                    self._handle_msync(rpc)
-                elif rpc_type == "publishedEventHandler":
-                    self._handle_published_event(rpc)
-                elif rpc_type == "channel":
-                    node_id: int = rpc["node"]
-                    channel_id: int = rpc["channel"]
-                    args = rpc.get("args", [])
-                    self._tree.handle_return_channel(node_id, channel_id, args)
+                try:
+                    rpc_type = rpc.get("type")
+                    if rpc_type == "event":
+                        self._handle_event(rpc)
+                    elif rpc_type == "mSync":
+                        self._handle_msync(rpc)
+                    elif rpc_type == "publishedEventHandler":
+                        self._handle_published_event(rpc)
+                    elif rpc_type == "channel":
+                        node_id: int = rpc["node"]
+                        channel_id: int = rpc["channel"]
+                        args = rpc.get("args", [])
+                        self._tree.handle_return_channel(node_id, channel_id, args)
+                except Exception:
+                    log.exception("Error processing RPC: %s", rpc.get("type", "unknown"))
+                    self._show_error_notification()
         finally:
             _set_current_tree(None)
+
+    def _show_error_notification(self):
+        """Show an error notification in the UI after an unhandled exception."""
+        from vaadin.flow.components.notification import Notification, NotificationVariant
+        n = Notification("An internal error has occurred. Please contact the administrator.")
+        n.position = Notification.Position.MIDDLE
+        n.duration = 0  # persistent until dismissed
+        n.add_theme_variants(NotificationVariant.LUMO_ERROR)
+        n.open()
 
     def _handle_event(self, rpc: dict[str, Any]):
         """Handle event RPC."""
@@ -509,10 +525,9 @@ class UidlHandler:
             self._collect_stylesheets(view_class, layout_class)
 
         except Exception as e:
-            import traceback
-            print(f"[UIDL] ERROR creating view: {e}", flush=True)
-            traceback.print_exc()
+            log.exception("Error creating view: %s", e)
             self._view = None
+            self._show_error_notification()
             return
         finally:
             _set_current_tree(None)

@@ -5,7 +5,7 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~12,000 (core src/), ~28,500 (total with demo + tests)
-**Tests:** 1272 passing
+**Tests:** 1278 passing
 **Last updated:** 2026-02-10
 
 ---
@@ -198,7 +198,7 @@ Atmosphere WebSocket protocol, `UI.access()` / `UI.push()` API, push sender coro
 ### Server Infrastructure
 - [x] Heartbeat handler (`v-r=heartbeat`) — keeps session alive, prevents 403 after idle
 - [x] Session timeout / cleanup (30min idle, background sweep every 60s)
-- [ ] Error handling
+- [x] Error handling — Per-RPC try/except, error Notification to user, navigation error feedback, push sender broad catch
 - [x] Push / WebSocket — Atmosphere protocol, `UI.access()` / `UI.push()` API, push demo view, reconnect resilience
 
 ---

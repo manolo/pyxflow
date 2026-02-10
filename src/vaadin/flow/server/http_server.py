@@ -286,27 +286,34 @@ async def _push_sender(ws: web.WebSocketResponse, session: dict):
         if ws.closed:
             break
 
-        # Build UIDL response with pending changes
-        response_data = handler._build_response()
+        try:
+            # Build UIDL response with pending changes
+            response_data = handler._build_response()
 
-        # Only send if there are actual changes or execute commands
-        if not response_data.get("changes") and not response_data.get("execute"):
-            log.debug("Push: no changes, skipping (syncId=%s)", response_data.get("syncId"))
-            continue
+            # Only send if there are actual changes or execute commands
+            if not response_data.get("changes") and not response_data.get("execute"):
+                log.debug("Push: no changes, skipping (syncId=%s)", response_data.get("syncId"))
+                continue
 
-        # Mark as async push (not a response to an HTTP request).
-        # Without this, FlowClient calls endRequest() which throws
-        # IllegalStateException when no request is active.
-        response_data["meta"] = {"async": True}
+            # Mark as async push (not a response to an HTTP request).
+            # Without this, FlowClient calls endRequest() which throws
+            # IllegalStateException when no request is active.
+            response_data["meta"] = {"async": True}
 
-        response_json = json.dumps(response_data)
-        message = f"for(;;);[{response_json}]"
-        # Atmosphere trackMessageLength format: <length>|<message>
-        prefixed = f"{len(message)}|{message}"
+            response_json = json.dumps(response_data)
+            message = f"for(;;);[{response_json}]"
+            # Atmosphere trackMessageLength format: <length>|<message>
+            prefixed = f"{len(message)}|{message}"
+        except Exception:
+            log.exception("Error in push sender")
+            break
         try:
             await ws.send_str(prefixed)
         except (ConnectionResetError, ConnectionError):
-            session["pending_push"] = prefixed  # Buffer for reconnect
+            session["pending_push"] = prefixed
+            break
+        except Exception:
+            log.exception("Error in push sender")
             break
 
 
