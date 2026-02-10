@@ -664,13 +664,26 @@ class Grid(Component):
                 self._items = dp.fetch(query)
                 self._push_data()
             else:
+                self._reset_connector()
                 self._key_to_item.clear()
                 self._fetch_and_push(0, self._page_size)
         elif self._data_provider:
+            self._reset_connector()
             self._key_to_item.clear()
             self._fetch_and_push(0, self._page_size)
         else:
             self._push_data()
+
+    def _reset_connector(self):
+        """Reset the client-side connector cache so it re-requests data."""
+        if not self._element:
+            return
+        tree = self.element._tree
+        grid_ref = {"@v-node": self.element.node_id}
+        tree.queue_execute([
+            grid_ref,
+            "return $0.$connector.reset()",
+        ])
 
     def _update_sorter_directions(self):
         """Send sorter direction updates to the client."""
