@@ -39,6 +39,8 @@ class Accordion(Component):
 
         if self._opened_index is not None:
             self.element.set_property("opened", self._opened_index)
+            if 0 <= self._opened_index < len(self._panels):
+                self._panels[self._opened_index].set_opened(True)
 
         self.element.add_event_listener("opened-changed", self._handle_opened_changed)
 
@@ -66,6 +68,8 @@ class Accordion(Component):
         self._opened_index = index
         if self._element:
             self.element.set_property("opened", index)
+            if 0 <= index < len(self._panels):
+                self._panels[index].set_opened(True)
 
     def close(self):
         """Close all panels."""
