@@ -191,6 +191,7 @@ class UidlHandler:
         self._client_id = 0
         self._csrf_token = secrets.token_hex(16)
         self._app_id = f"ROOT-{random.randint(1000000, 9999999)}"
+        self._client_key = self._app_id.split("-")[0]  # "ROOT" — client registry key
         self._initialized = False
         self._view: Any = None
         self._layout: Any = None  # Persistent layout instance for RouterLayout
@@ -561,7 +562,7 @@ class UidlHandler:
                 [{"@v-node": dialog_node_id}, "return (async function() { Vaadin.FlowComponentHost.patchVirtualContainer(this) }).apply($0)"]
             )
             self._pending_execute.append(
-                [self._app_id, {"@v-node": dialog_node_id}, "return (async function() { this.renderer = (root) => Vaadin.FlowComponentHost.setChildNodes($0, this.virtualChildNodeIds, root) }).apply($1)"]
+                [self._client_key, {"@v-node": dialog_node_id}, "return (async function() { this.renderer = (root) => Vaadin.FlowComponentHost.setChildNodes($0, this.virtualChildNodeIds, root) }).apply($1)"]
             )
             self._pending_execute.append(
                 [{"@v-node": dialog_node_id}, "return (async function() { this.requestContentUpdate() }).apply($0)"]
@@ -658,7 +659,7 @@ class UidlHandler:
                 )
                 # Set up the renderer
                 self._pending_execute.append(
-                    [self._app_id, {"@v-node": node_id}, "return (async function() { this.renderer = (root) => Vaadin.FlowComponentHost.setChildNodes($0, this.virtualChildNodeIds, root) }).apply($1)"]
+                    [self._client_key, {"@v-node": node_id}, "return (async function() { this.renderer = (root) => Vaadin.FlowComponentHost.setChildNodes($0, this.virtualChildNodeIds, root) }).apply($1)"]
                 )
                 # Request content update
                 self._pending_execute.append(
@@ -689,7 +690,7 @@ class UidlHandler:
                 )
                 # 3. Set renderer - uses text property or FlowComponentHost for children
                 self._pending_execute.append(
-                    [self._app_id, {"@v-node": node_id}, "return (async function() { this.renderer = (root) => {  if (this.text) {    root.textContent = this.text;  } else {    Vaadin.FlowComponentHost.setChildNodes($0, this.virtualChildNodeIds, root)  }}}).apply($1)"]
+                    [self._client_key, {"@v-node": node_id}, "return (async function() { this.renderer = (root) => {  if (this.text) {    root.textContent = this.text;  } else {    Vaadin.FlowComponentHost.setChildNodes($0, this.virtualChildNodeIds, root)  }}}).apply($1)"]
                 )
                 # 4. Request content update AFTER setting renderer
                 self._pending_execute.append(
