@@ -277,8 +277,11 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         error_btn = Button("Error Notification")
         error_btn.add_click_listener(self.show_error)
 
+        test_error_btn = Button("Test Error")
+        test_error_btn.add_click_listener(self.trigger_error)
+
         button_row = HorizontalLayout()
-        button_row.add(button, dialog_btn, notification_btn, success_btn, error_btn)
+        button_row.add(button, dialog_btn, notification_btn, success_btn, error_btn, test_error_btn)
         self.add(button_row)
         self.click_label = Span("Click count: 0")
         self.add(self.click_label)
@@ -902,6 +905,9 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
     def show_error(self, event):
         n = Notification.show("Something went wrong!", 5000, Notification.Position.MIDDLE)
         n.add_theme_variants(NotificationVariant.LUMO_ERROR)
+
+    def trigger_error(self, event):
+        raise RuntimeError("Test error from click listener")
 
     def on_lit_edit(self, item):
         self.lit_renderer_label.set_text(f"LitRenderer action: Edit {item['name']}")
