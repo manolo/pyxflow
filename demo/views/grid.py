@@ -7,8 +7,6 @@ from demo.services import people_service
 from demo.views.main_layout import MainLayout
 from vaadin.flow.components import (
     Grid,
-    H2,
-    H3,
     SortDirection,
     Span,
     VerticalLayout,
