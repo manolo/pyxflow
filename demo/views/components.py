@@ -516,10 +516,23 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.add(page_layout)
 
         # --- Icon, DrawerToggle, SideNav (for bundle inclusion) ---
-        self.add_section("Icon")
+        self.add_section("Icon / SideNav")
 
         home_icon = Icon("vaadin:home")
         self.add(home_icon)
+
+        drawer_toggle = DrawerToggle()
+        self.add(drawer_toggle)
+
+        side_nav = SideNav()
+        side_nav.set_label("Navigation")
+        side_nav.add_item(SideNavItem("Home", "/", Icon("vaadin:home")))
+        side_nav.add_item(SideNavItem("About", "/", Icon("vaadin:info-circle")))
+        parent_item = SideNavItem("Settings")
+        parent_item.add_item(SideNavItem("General", "/settings/general"))
+        parent_item.add_item(SideNavItem("Security", "/settings/security"))
+        side_nav.add_item(parent_item)
+        self.add(side_nav)
 
         # --- Shared data for all grids ---
         people = [p.to_dict() for p in people_service.find_all()]
