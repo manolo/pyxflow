@@ -57,10 +57,8 @@ class Paragraph(_TextComponent):
     _tag = "p"
 
 
-class Div(_TextComponent):
-    """HTML <div> element — supports both text content and child components."""
-
-    _tag = "div"
+class HtmlContainer(_TextComponent):
+    """Base for HTML container elements that support both text and child components."""
 
     def __init__(self, text: str = ""):
         super().__init__(text)
@@ -93,3 +91,21 @@ class Div(_TextComponent):
                 component._parent = None
                 if self._element:
                     self.element.remove_child(component.element)
+
+
+class Div(HtmlContainer):
+    """HTML <div> element — supports both text content and child components."""
+
+    _tag = "div"
+
+
+class Header(HtmlContainer):
+    """HTML <header> element."""
+
+    _tag = "header"
+
+
+class Footer(HtmlContainer):
+    """HTML <footer> element."""
+
+    _tag = "footer"

@@ -52,9 +52,11 @@
 - [x] IntegerField - Integer input with min/max/step
 - [x] NumberField - Numeric input with min/max/step
 - [x] TextArea - Multi-line text input with placeholder
-- [x] TextField - Label, value, change event, mSync
+- [x] TextField - Label, value, change event, mSync, clearButtonVisible, placeholder, prefix component slot
 - [x] Span - Text content
-- [x] Div - Simple `<div>` with text content
+- [x] Div - Simple `<div>` with text content (extends HtmlContainer)
+- [x] Header - HTML `<header>` container (extends HtmlContainer)
+- [x] Footer - HTML `<footer>` container (extends HtmlContainer)
 - [x] VerticalLayout - Theme, add children, padding/spacing/margin, expand, horizontal component alignment
 - [x] HorizontalLayout - Theme, add children, margin/spacing, expand, vertical component alignment
 - [x] FlexLayout - Pure CSS Flexbox `<div>`: flex-direction, flex-wrap, justify-content, align-items/self/content, flex-grow/shrink/basis, order, expand
@@ -94,7 +96,7 @@
 - [x] Popover - Overlay anchored to target, FlowComponentHost renderer, position, trigger config, open/close/modal
 - [x] MasterDetailLayout - Master/detail slots, size property. New in v25
 - [x] MessageInput - Submit event with message text
-- [x] MessageList - Items JSON property (text, time, userName, userAbbr, userImg, userColorIndex)
+- [x] MessageList - Items JSON property (text, time, userName, userAbbr, userImg, userColorIndex), markdown rendering
 - [x] ListBox - Items as `vaadin-item` children, selected index, value change
 - [x] MultiSelectListBox - Items as children, selectedValues array, multi-select
 - [x] CustomField - Composite field wrapper, children contribute to combined value

@@ -66,9 +66,12 @@ class MessageList(Component):
 
     def __init__(self):
         self._items: list[MessageListItem] = []
+        self._markdown: bool = False
 
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
+        if self._markdown:
+            self.element.set_property("markdown", True)
         self._push_items()
 
     def _push_items(self):
@@ -84,3 +87,9 @@ class MessageList(Component):
 
     def get_items(self) -> list[MessageListItem]:
         return list(self._items)
+
+    def set_markdown(self, enabled: bool):
+        """Enable or disable markdown rendering in messages."""
+        self._markdown = enabled
+        if self._element:
+            self.element.set_property("markdown", enabled)

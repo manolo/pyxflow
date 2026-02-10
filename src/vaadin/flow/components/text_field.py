@@ -1,8 +1,11 @@
 """TextField component."""
 
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
 from vaadin.flow.core.component import Component
+
+if TYPE_CHECKING:
+    from vaadin.flow.core.state_tree import StateTree
 
 
 class TextField(Component):
@@ -14,6 +17,9 @@ class TextField(Component):
         super().__init__()
         self._label = label
         self._value = ""
+        self._clear_button_visible: bool = False
+        self._placeholder: str = ""
+        self._prefix_component: Component | None = None
         self._change_listeners: list[Callable] = []
 
     def _attach(self, tree):
@@ -24,6 +30,12 @@ class TextField(Component):
             self.element.set_property("label", self._label)
         self.element.set_property("value", self._value)
         self.element.set_property("manualValidation", True)
+        if self._clear_button_visible:
+            self.element.set_property("clearButtonVisible", True)
+        if self._placeholder:
+            self.element.set_property("placeholder", self._placeholder)
+        if self._prefix_component:
+            self._attach_prefix(tree)
         self.element.add_event_listener("change", self._handle_change)
 
     @property
@@ -71,6 +83,34 @@ class TextField(Component):
         self._value = event_data.get("value", self._value)
         for listener in self._change_listeners:
             listener(event_data)
+
+    def set_clear_button_visible(self, visible: bool):
+        """Show or hide the clear button."""
+        self._clear_button_visible = visible
+        if self._element:
+            self.element.set_property("clearButtonVisible", visible)
+
+    def set_placeholder(self, text: str):
+        """Set the placeholder text."""
+        self._placeholder = text
+        if self._element:
+            self.element.set_property("placeholder", text)
+
+    def set_prefix_component(self, component: Component):
+        """Set a prefix component (e.g. Icon) in the 'prefix' slot."""
+        self._prefix_component = component
+        if self._element:
+            self._attach_prefix(self._element._tree)
+
+    def _attach_prefix(self, tree: "StateTree"):
+        """Attach the prefix component with slot='prefix'."""
+        comp = self._prefix_component
+        if comp and not comp._element:
+            comp._ui = self._ui
+            comp._parent = self
+            comp._attach(tree)
+            comp.element.set_attribute("slot", "prefix")
+            self.element.add_child(comp.element)
 
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""
