@@ -63,6 +63,7 @@ def get_or_create_session(request: web.Request) -> tuple[str, dict[str, Any]]:
         "last_activity": time.monotonic(),
         "push_ws": None,
         "push_sender_task": None,
+        "pending_push": None,
     }
     _sessions[session_id] = session
     return session_id, session
@@ -216,6 +217,15 @@ async def handle_push(request: web.Request) -> web.Response:
     if push_id != getattr(handler, "_push_id", None):
         return web.Response(status=403)
 
+    # Cancel existing push sender if reconnecting
+    old_task = session.get("push_sender_task")
+    if old_task and not old_task.done():
+        old_task.cancel()
+        try:
+            await old_task
+        except asyncio.CancelledError:
+            pass
+
     ws = web.WebSocketResponse()
     await ws.prepare(request)
 
@@ -260,6 +270,15 @@ async def _push_sender(ws: web.WebSocketResponse, session: dict):
     tree: StateTree = session["tree"]
     handler: UidlHandler = session["handler"]
 
+    # Replay any buffered message from a previous failed connection
+    pending = session.pop("pending_push", None)
+    if pending:
+        try:
+            await ws.send_str(pending)
+        except (ConnectionResetError, ConnectionError):
+            session["pending_push"] = pending
+            return
+
     while not ws.closed:
         await tree._push_event.wait()
         tree._push_event.clear()
@@ -287,6 +306,7 @@ async def _push_sender(ws: web.WebSocketResponse, session: dict):
         try:
             await ws.send_str(prefixed)
         except (ConnectionResetError, ConnectionError):
+            session["pending_push"] = prefixed  # Buffer for reconnect
             break
 
 

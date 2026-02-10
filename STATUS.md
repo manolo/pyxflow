@@ -5,7 +5,7 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~12,000 (core src/), ~28,500 (total with demo + tests)
-**Tests:** 1262 passing
+**Tests:** 1272 passing
 **Last updated:** 2026-02-10
 
 ---
@@ -131,7 +131,7 @@
 - [x] Lumo/Aura theme CSS - Extracted from JARs, served at `/lumo/*` and `/aura/*`, loaded via `@StyleSheet` on layout
 - [x] `@StyleSheet` decorator - Load custom CSS via UIDL EAGER dependencies, served from app's `styles/` directory
 - [x] Dev mode (`--dev`) - Auto-reload on Python file changes via watchfiles, socket-in-parent architecture (no EADDRINUSE on reload), file change logging
-- [x] WebSocket Push - Atmosphere protocol, `GET /VAADIN/push` endpoint, push sender coroutine, `UI.access()` / `UI.push()` API
+- [x] WebSocket Push - Atmosphere protocol, `GET /VAADIN/push` endpoint, push sender coroutine, `UI.access()` / `UI.push()` API, reconnect resilience (pending message buffer)
 
 ### Protocol
 - [x] Init response - appConfig, pushScript, CSRF, constants (Java-compatible hashes)
@@ -199,7 +199,7 @@ Atmosphere WebSocket protocol, `UI.access()` / `UI.push()` API, push sender coro
 - [x] Heartbeat handler (`v-r=heartbeat`) — keeps session alive, prevents 403 after idle
 - [x] Session timeout / cleanup (30min idle, background sweep every 60s)
 - [ ] Error handling
-- [x] Push / WebSocket — Atmosphere protocol, `UI.access()` / `UI.push()` API, push demo view
+- [x] Push / WebSocket — Atmosphere protocol, `UI.access()` / `UI.push()` API, push demo view, reconnect resilience
 
 ---
 
