@@ -5,8 +5,8 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~12,000 (core src/), ~28,500 (total with demo + tests)
-**Tests:** 1245 passing
-**Last updated:** 2026-02-09
+**Tests:** 1246 passing
+**Last updated:** 2026-02-10
 
 ---
 
@@ -191,6 +191,7 @@ ListBox, MultiSelectListBox, MultiSelectComboBox, VirtualList, MessageInput, Mes
 - [ ] Theme switching at runtime
 
 ### Server Infrastructure
+- [x] Heartbeat handler (`v-r=heartbeat`) — keeps session alive, prevents 403 after idle
 - [ ] Session timeout / cleanup
 - [ ] Error handling
 - [ ] Push / WebSocket

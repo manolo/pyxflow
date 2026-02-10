@@ -347,17 +347,31 @@ async def handle_route(request: web.Request) -> web.Response:
     return web.Response(text=html, content_type="text/html")
 
 
+async def handle_heartbeat(request: web.Request) -> web.Response:
+    """Handle POST /?v-r=heartbeat - keep session alive."""
+    session_id = request.cookies.get("JSESSIONID")
+    if not session_id or session_id not in _sessions:
+        return web.Response(status=403)
+    return web.Response(status=200)
+
+
 async def handle_route_post(request: web.Request) -> web.Response:
     """Handle POST for any route."""
-    if request.query.get("v-r") == "uidl":
+    vr = request.query.get("v-r")
+    if vr == "uidl":
         return await handle_uidl(request)
+    if vr == "heartbeat":
+        return await handle_heartbeat(request)
     return web.Response(text="Bad request", status=400)
 
 
 async def handle_uidl_post(request: web.Request) -> web.Response:
     """Handle POST / with v-r=uidl query param."""
-    if request.query.get("v-r") == "uidl":
+    vr = request.query.get("v-r")
+    if vr == "uidl":
         return await handle_uidl(request)
+    if vr == "heartbeat":
+        return await handle_heartbeat(request)
     return web.Response(text="Bad request", status=400)
 
 
