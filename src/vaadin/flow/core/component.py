@@ -441,6 +441,12 @@ class Component:
         # The uidl_handler will dispatch keydown → click for this component
         self.element.add_event_listener("keydown", lambda e: None, hash_key=_KEYDOWN_HASH)
 
+    # --- UI access ---
+
+    def get_ui(self) -> "UI | None":
+        """Get the UI this component belongs to."""
+        return self._ui
+
     # --- HasStyle shortcut ---
 
     def get_style(self) -> "Style":
@@ -464,3 +470,16 @@ class UI:
         self._root = component
         component._ui = self
         component._attach(self._tree)
+
+    def access(self, callback):
+        """Execute callback and push changes to client.
+
+        Use this to modify UI from background tasks/coroutines.
+        The callback runs synchronously, then pending changes are pushed.
+        """
+        callback()
+        self._tree.notify_push()
+
+    def push(self):
+        """Manually push pending changes to client."""
+        self._tree.notify_push()

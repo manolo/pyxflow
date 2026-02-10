@@ -253,6 +253,8 @@ class UidlHandler:
         # Track these as sent so they won't be resent in UIDL responses
         self._sent_constants.update(constants.keys())
 
+        self._push_id = secrets.token_hex(16)
+
         return {
             "appConfig": {
                 "productionMode": True,
@@ -266,11 +268,12 @@ class UidlHandler:
                     "clientId": self._client_id,
                     "syncId": self._sync_id,
                     "Vaadin-Security-Key": self._csrf_token,
-                    "Vaadin-Push-ID": secrets.token_hex(16),
+                    "Vaadin-Push-ID": self._push_id,
                     "constants": constants,
                     "changes": changes,
                 },
             },
+            "pushScript": "VAADIN/static/push/vaadinPush.js",
             "errors": None,
         }
 
@@ -299,7 +302,7 @@ class UidlHandler:
         # Node 1 push config
         changes.append({"node": 1, "type": "put", "key": "pushServletMapping", "feat": 5, "value": "/"})
         changes.append({"node": 1, "type": "put", "key": "alwaysXhrToServer", "feat": 5, "value": True})
-        changes.append({"node": 1, "type": "put", "key": "pushMode", "feat": 5, "value": "DISABLED"})
+        changes.append({"node": 1, "type": "put", "key": "pushMode", "feat": 5, "value": "AUTOMATIC"})
         changes.append({"node": 1, "type": "put", "key": "parameters", "feat": 5, "nodeValue": 2})
 
         # Node 2: push parameters

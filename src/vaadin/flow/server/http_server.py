@@ -9,6 +9,7 @@ import uuid
 from pathlib import Path
 from typing import Any, Callable
 
+import aiohttp
 from aiohttp import web
 
 from vaadin.flow.server.uidl_handler import UidlHandler
@@ -60,6 +61,8 @@ def get_or_create_session(request: web.Request) -> tuple[str, dict[str, Any]]:
         "handler": handler,
         "initialized": False,
         "last_activity": time.monotonic(),
+        "push_ws": None,
+        "push_sender_task": None,
     }
     _sessions[session_id] = session
     return session_id, session
@@ -199,6 +202,94 @@ async def handle_upload(request: web.Request) -> web.Response:
     )
 
 
+async def handle_push(request: web.Request) -> web.Response:
+    """Handle WebSocket push connection (Atmosphere protocol)."""
+    session_id = request.cookies.get("JSESSIONID")
+    if not session_id or session_id not in _sessions:
+        return web.Response(status=403)
+
+    session = _sessions[session_id]
+    handler: UidlHandler = session["handler"]
+
+    # Validate push ID
+    push_id = request.query.get("v-pushId", "")
+    if push_id != getattr(handler, "_push_id", None):
+        return web.Response(status=403)
+
+    ws = web.WebSocketResponse()
+    await ws.prepare(request)
+
+    # Send Atmosphere protocol handshake with trackMessageLength format:
+    # <length>|<UUID>|<heartbeat_interval_ms>|<heartbeat_padding_char>
+    atmo_uuid = str(uuid.uuid4())
+    handshake_data = f"{atmo_uuid}|30000|X"
+    await ws.send_str(f"{len(handshake_data)}|{handshake_data}")
+
+    session["push_ws"] = ws
+    session["last_activity"] = time.monotonic()
+
+    tree: StateTree = session["tree"]
+
+    # Start push sender task
+    sender_task = asyncio.create_task(_push_sender(ws, session))
+    session["push_sender_task"] = sender_task
+
+    try:
+        async for msg in ws:
+            if msg.type == aiohttp.WSMsgType.TEXT:
+                if msg.data == "X":
+                    # Atmosphere heartbeat
+                    session["last_activity"] = time.monotonic()
+                    continue
+            elif msg.type in (aiohttp.WSMsgType.ERROR, aiohttp.WSMsgType.CLOSE):
+                break
+    finally:
+        sender_task.cancel()
+        try:
+            await sender_task
+        except asyncio.CancelledError:
+            pass
+        session["push_ws"] = None
+        session["push_sender_task"] = None
+
+    return ws
+
+
+async def _push_sender(ws: web.WebSocketResponse, session: dict):
+    """Coroutine that waits for push signals and sends UIDL over WebSocket."""
+    tree: StateTree = session["tree"]
+    handler: UidlHandler = session["handler"]
+
+    while not ws.closed:
+        await tree._push_event.wait()
+        tree._push_event.clear()
+
+        if ws.closed:
+            break
+
+        # Build UIDL response with pending changes
+        response_data = handler._build_response()
+
+        # Only send if there are actual changes or execute commands
+        if not response_data.get("changes") and not response_data.get("execute"):
+            log.debug("Push: no changes, skipping (syncId=%s)", response_data.get("syncId"))
+            continue
+
+        # Mark as async push (not a response to an HTTP request).
+        # Without this, FlowClient calls endRequest() which throws
+        # IllegalStateException when no request is active.
+        response_data["meta"] = {"async": True}
+
+        response_json = json.dumps(response_data)
+        message = f"for(;;);[{response_json}]"
+        # Atmosphere trackMessageLength format: <length>|<message>
+        prefixed = f"{len(message)}|{message}"
+        try:
+            await ws.send_str(prefixed)
+        except (ConnectionResetError, ConnectionError):
+            break
+
+
 _BUNDLE_CACHE = "public, max-age=31536000, immutable"
 
 
@@ -213,6 +304,14 @@ async def handle_static(request: web.Request) -> web.Response:
         if file_path.is_file():
             content_type = guess_content_type(file_path)
             return web.FileResponse(file_path, headers={"Content-Type": content_type, "Cache-Control": _BUNDLE_CACHE})  # type: ignore[return-value]
+
+    # Fallback: serve push scripts from flow-push module
+    if path.startswith("static/push/"):
+        push_base = Path(__file__).parents[5] / "flow" / "flow-push" / "target" / "classes" / "META-INF" / "resources" / "VAADIN"
+        push_file = push_base / path
+        if push_file.is_file():
+            content_type = guess_content_type(push_file)
+            return web.FileResponse(push_file, headers={"Content-Type": content_type, "Cache-Control": _BUNDLE_CACHE})  # type: ignore[return-value]
 
     return web.Response(text="Not found", status=404)
 
@@ -343,6 +442,7 @@ def create_app() -> web.Application:
     app.router.add_get("/", handle_root)
     app.router.add_post("/", handle_uidl_post)
     app.router.add_post("/VAADIN/dynamic/resource/{ui_id}/{resource_id}/{name}", handle_upload)
+    app.router.add_get("/VAADIN/push", handle_push)
     app.router.add_get("/VAADIN/{path:.*}", handle_static)
     app.router.add_get("/lumo/{path:.*}", handle_theme)
     app.router.add_get("/aura/{path:.*}", handle_theme)

@@ -94,11 +94,11 @@ class TestInitialNodes:
         )
         assert listener is not None, "Body should have ui-navigate listener"
 
-    def test_push_mode_disabled(self, init_changes):
-        """Push mode should be disabled."""
+    def test_push_mode_automatic(self, init_changes):
+        """Push mode should be AUTOMATIC."""
         push = next(
             (c for c in init_changes
-             if c.get("key") == "pushMode" and c.get("value") == "DISABLED"),
+             if c.get("key") == "pushMode" and c.get("value") == "AUTOMATIC"),
             None
         )
-        assert push is not None, "Push mode should be DISABLED"
+        assert push is not None, "Push mode should be AUTOMATIC"
