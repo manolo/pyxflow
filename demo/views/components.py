@@ -289,27 +289,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         button_row.add(button, dialog_btn, notification_btn, success_btn, error_btn, test_error_btn)
         self.add(button_row)
 
-        # Second row: contrast, small, large variants
-        contrast_btn = Button("Contrast")
-        contrast_btn.add_theme_name("contrast")
-
-        small_btn = Button("Small")
-        small_btn.add_theme_name("small")
-
-        large_btn = Button("Large")
-        large_btn.add_theme_name("large")
-
-        primary_contrast_btn = Button("Primary Contrast")
-        primary_contrast_btn.add_theme_name("primary", "contrast")
-
-        tertiary_inline_btn = Button("Tertiary Inline")
-        tertiary_inline_btn.add_theme_name("tertiary-inline")
-
-        button_row2 = HorizontalLayout()
-        button_row2.set_default_vertical_component_alignment(Alignment.BASELINE)
-        button_row2.add(contrast_btn, small_btn, large_btn, primary_contrast_btn, tertiary_inline_btn)
-        self.add(button_row2)
-
         self.click_label = Span("Click count: 0")
         self.add(self.click_label)
 
