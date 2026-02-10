@@ -167,7 +167,8 @@ class TestReNavigation:
         changes2 = r2.get("changes", [])
 
         # Should have a splice-remove (old view) and splice-add (new view)
-        splice_changes = [c for c in changes2 if c.get("type") == "splice" and c.get("node") == 3]
+        container_id = handler._container_node.id
+        splice_changes = [c for c in changes2 if c.get("type") == "splice" and c.get("node") == container_id]
         has_remove = any("remove" in c for c in splice_changes)
         has_add = any("addNodes" in c for c in splice_changes)
         assert has_remove, "Should remove old view from container"

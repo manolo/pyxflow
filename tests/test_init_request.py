@@ -56,6 +56,13 @@ class TestAppConfig:
 class TestInitialNodes:
     """Test initial node structure from init."""
 
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        from vaadin.flow.router import clear_app_shell
+        clear_app_shell()
+        yield
+        clear_app_shell()
+
     @pytest.fixture
     def init_changes(self):
         """Get changes from init response."""
@@ -94,11 +101,11 @@ class TestInitialNodes:
         )
         assert listener is not None, "Body should have ui-navigate listener"
 
-    def test_push_mode_automatic(self, init_changes):
-        """Push mode should be AUTOMATIC."""
+    def test_no_push_by_default(self, init_changes):
+        """Push mode should NOT be present without @AppShell @Push."""
         push = next(
             (c for c in init_changes
-             if c.get("key") == "pushMode" and c.get("value") == "AUTOMATIC"),
+             if c.get("key") == "pushMode"),
             None
         )
-        assert push is not None, "Push mode should be AUTOMATIC"
+        assert push is None, "Push should not be configured without @AppShell @Push"

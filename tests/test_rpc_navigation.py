@@ -485,10 +485,11 @@ class TestNavigationContainerStructure:
         response = session["handler"].handle_uidl(payload)
         changes = response.get("changes", [])
 
-        # Should have splice to container (node 3)
+        # Should have splice to container node
+        container_id = session["handler"]._container_node.id
         container_splice = next(
             (c for c in changes
-             if c.get("node") == 3 and
+             if c.get("node") == container_id and
              c.get("type") == "splice" and
              c.get("feat") == Feature.ELEMENT_CHILDREN_LIST),
             None

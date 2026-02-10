@@ -257,8 +257,28 @@ class UidlHandler:
         self._sent_constants.update(constants.keys())
 
         self._push_id = secrets.token_hex(16)
+        push_enabled = self._is_push_enabled()
 
-        return {
+        # Build inner UIDL dict
+        uidl_data = {
+            "clientId": self._client_id,
+            "syncId": self._sync_id,
+            "Vaadin-Security-Key": self._csrf_token,
+            "Vaadin-Push-ID": self._push_id,
+            "constants": constants,
+            "changes": changes,
+        }
+
+        # AppShell stylesheets → included in init UIDL as EAGER dependencies
+        from vaadin.flow.router import get_app_shell
+        app_shell = get_app_shell()
+        if app_shell:
+            sheets = getattr(app_shell, '_stylesheets', [])
+            if sheets:
+                uidl_data["EAGER"] = [{"type": "STYLESHEET", "url": u, "loadMode": "EAGER"} for u in sheets]
+                self._sent_stylesheets.update(sheets)
+
+        response = {
             "appConfig": {
                 "productionMode": True,
                 "v-uiId": 0,
@@ -267,22 +287,27 @@ class UidlHandler:
                 "heartbeatInterval": 300,
                 "maxMessageSuspendTimeout": 5000,
                 "sessExpMsg": {"caption": None, "message": None, "url": None},
-                "uidl": {
-                    "clientId": self._client_id,
-                    "syncId": self._sync_id,
-                    "Vaadin-Security-Key": self._csrf_token,
-                    "Vaadin-Push-ID": self._push_id,
-                    "constants": constants,
-                    "changes": changes,
-                },
+                "uidl": uidl_data,
             },
-            "pushScript": "VAADIN/static/push/vaadinPush.js",
             "errors": None,
         }
+
+        # Only include pushScript if push is enabled
+        if push_enabled:
+            response["pushScript"] = "VAADIN/static/push/vaadinPush.js"
+
+        return response
+
+    def _is_push_enabled(self) -> bool:
+        """Check if push is enabled via @AppShell @Push."""
+        from vaadin.flow.router import get_app_shell
+        app_shell = get_app_shell()
+        return getattr(app_shell, '_push_enabled', False) if app_shell else False
 
     def _create_initial_nodes(self):
         """Create the initial node structure matching Java Flow exactly."""
         app_num = self._app_id.split("-")[1]
+        push_enabled = self._is_push_enabled()
 
         # Node 1: body (UI root) - no attach for root node
         self._body_node = self._tree.create_node()
@@ -299,26 +324,38 @@ class UidlHandler:
         changes.append({"node": 1, "type": "put", "key": "ui-leave-navigation", "feat": 4, "value": _UI_LEAVE_NAVIGATION_HASH})
         changes.append({"node": 1, "type": "put", "key": "ui-refresh", "feat": 4, "value": _UI_REFRESH_HASH})
 
-        # Node 1 virtual children splice (node 3)
-        changes.append({"node": 1, "type": "splice", "feat": 24, "index": 0, "addNodes": [3]})
+        # Container node ID depends on whether push nodes are present
+        if push_enabled:
+            # Node 1 virtual children splice (node 3)
+            changes.append({"node": 1, "type": "splice", "feat": 24, "index": 0, "addNodes": [3]})
 
-        # Node 1 push config
-        changes.append({"node": 1, "type": "put", "key": "pushServletMapping", "feat": 5, "value": "/"})
-        changes.append({"node": 1, "type": "put", "key": "alwaysXhrToServer", "feat": 5, "value": True})
-        changes.append({"node": 1, "type": "put", "key": "pushMode", "feat": 5, "value": "AUTOMATIC"})
-        changes.append({"node": 1, "type": "put", "key": "parameters", "feat": 5, "nodeValue": 2})
+            # Node 1 push config
+            changes.append({"node": 1, "type": "put", "key": "pushServletMapping", "feat": 5, "value": "/"})
+            changes.append({"node": 1, "type": "put", "key": "alwaysXhrToServer", "feat": 5, "value": True})
+            changes.append({"node": 1, "type": "put", "key": "pushMode", "feat": 5, "value": "AUTOMATIC"})
+            changes.append({"node": 1, "type": "put", "key": "parameters", "feat": 5, "nodeValue": 2})
 
-        # Node 2: push parameters
-        params_node = self._tree.create_node()  # This will be node 2
-        changes.append({"node": 2, "type": "attach"})
-        changes.append({"node": 2, "type": "put", "key": "fallbackTransport", "feat": 6, "value": "long-polling"})
-        changes.append({"node": 2, "type": "put", "key": "transport", "feat": 6, "value": "websocket"})
+            # Node 2: push parameters
+            params_node = self._tree.create_node()  # This will be node 2
+            changes.append({"node": 2, "type": "attach"})
+            changes.append({"node": 2, "type": "put", "key": "fallbackTransport", "feat": 6, "value": "long-polling"})
+            changes.append({"node": 2, "type": "put", "key": "transport", "feat": 6, "value": "websocket"})
 
-        # Node 3: flow-container
-        self._container_node = self._tree.create_node()  # This will be node 3
-        changes.append({"node": 3, "type": "attach"})
-        changes.append({"node": 3, "type": "put", "key": "payload", "feat": 0, "value": {"type": "@id", "payload": self._app_id}})
-        changes.append({"node": 3, "type": "put", "key": "tag", "feat": 0, "value": f"flow-container-root-{app_num}"})
+            # Node 3: flow-container
+            self._container_node = self._tree.create_node()  # This will be node 3
+            changes.append({"node": 3, "type": "attach"})
+            changes.append({"node": 3, "type": "put", "key": "payload", "feat": 0, "value": {"type": "@id", "payload": self._app_id}})
+            changes.append({"node": 3, "type": "put", "key": "tag", "feat": 0, "value": f"flow-container-root-{app_num}"})
+        else:
+            # No push — container is node 2 (no push parameter node)
+            # Node 1 virtual children splice (node 2)
+            changes.append({"node": 1, "type": "splice", "feat": 24, "index": 0, "addNodes": [2]})
+
+            # Node 2: flow-container
+            self._container_node = self._tree.create_node()  # This will be node 2
+            changes.append({"node": 2, "type": "attach"})
+            changes.append({"node": 2, "type": "put", "key": "payload", "feat": 0, "value": {"type": "@id", "payload": self._app_id}})
+            changes.append({"node": 2, "type": "put", "key": "tag", "feat": 0, "value": f"flow-container-root-{app_num}"})
 
         # Add all changes
         for change in changes:

@@ -9,6 +9,7 @@ from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 
 from vaadin.flow.server.http_server import _sessions
+from vaadin.flow.router import AppShell, Push, clear_app_shell
 
 
 class PushTestBase(AioHTTPTestCase):
@@ -20,11 +21,17 @@ class PushTestBase(AioHTTPTestCase):
 
     def setUp(self):
         _sessions.clear()
+        # Register @AppShell @Push so push is enabled
+        @AppShell
+        @Push
+        class _TestAppShell:
+            pass
         super().setUp()
 
     def tearDown(self):
         super().tearDown()
         _sessions.clear()
+        clear_app_shell()
 
     async def _init_session(self):
         """Init a session and return (push_id, csrf_token)."""

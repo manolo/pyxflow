@@ -517,7 +517,7 @@ class TestNodeReferences:
         changes = session_with_view["changes"]
 
         # Get all node IDs (from attaches or implicit nodes like body)
-        all_nodes = {1, 2, 3}  # Initial nodes: body, params, container
+        all_nodes = {1}  # body is always node 1 (implicit root)
         for change in changes:
             if change.get("type") == "attach":
                 all_nodes.add(change.get("node"))

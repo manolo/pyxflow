@@ -5,7 +5,7 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~12,000 (core src/), ~28,500 (total with demo + tests)
-**Tests:** 1278 passing
+**Tests:** 1297 passing
 **Last updated:** 2026-02-10
 
 ---
@@ -47,7 +47,7 @@
 - [x] **ContextMenu connector protocol** - `contextMenuConnector.initLazy`, `$connector.generateItems`
 
 ### Components
-- [x] Button - Text, click listener
+- [x] Button - Text, click listener, icon (prefix slot)
 - [x] Checkbox - Label, checked, indeterminate, value change
 - [x] IntegerField - Integer input with min/max/step
 - [x] NumberField - Numeric input with min/max/step
@@ -158,6 +158,9 @@
 - [x] `@Route(layout=...)` - RouterLayout support, layout chain in navigation, layout reuse on same-layout routes
 - [x] `@Menu(title, order, icon)` - Decorator for automatic menu generation
 - [x] `get_menu_entries()` - Collects @Menu routes, filters required params, sorts by order/path
+- [x] `@AppShell` - Global app configuration class (single place for @Push, @StyleSheet)
+- [x] `@Push` - Opt-in WebSocket push (conditional pushScript, push nodes in init)
+- [x] AppShell `@StyleSheet` - Stylesheets loaded in init response (before any navigation)
 
 ---
 

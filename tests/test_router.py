@@ -2,7 +2,7 @@
 
 import pytest
 
-from vaadin.flow.router import Route, PageTitle, match_route, get_view_class, get_page_title, get_all_routes, clear_routes, discover_views
+from vaadin.flow.router import Route, PageTitle, match_route, get_view_class, get_page_title, get_all_routes, clear_routes, discover_views, AppShell, Push, get_app_shell, clear_app_shell
 from vaadin.flow.menu import get_menu_entries
 from vaadin.flow.components import VerticalLayout
 
@@ -263,8 +263,10 @@ class TestDiscoverViews:
     @pytest.fixture(autouse=True)
     def setup(self):
         clear_routes()
+        clear_app_shell()
         yield
         clear_routes()
+        clear_app_shell()
 
     def test_discover_views_registers_routes(self):
         """discover_views should import all modules and trigger @Route registration."""
@@ -298,3 +300,97 @@ class TestDiscoverViews:
         # Verify icons
         icons = [e.icon for e in entries]
         assert icons == ["vaadin:info-circle", "vaadin:hand", "vaadin:grid-small", "vaadin:table", "vaadin:split-h", "vaadin:timer"]
+
+    def test_discover_views_registers_app_shell(self):
+        """discover_views should register @AppShell from MainLayout."""
+        discover_views("demo.views")
+        app_shell = get_app_shell()
+        assert app_shell is not None
+        assert app_shell.__name__ == "MainLayout"
+        assert getattr(app_shell, '_push_enabled', False) is True
+        assert "lumo/lumo.css" in getattr(app_shell, '_stylesheets', [])
+        assert "styles/styles.css" in getattr(app_shell, '_stylesheets', [])
+
+
+class TestAppShellDecorator:
+    """Test @AppShell decorator."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        clear_app_shell()
+        yield
+        clear_app_shell()
+
+    def test_app_shell_registers_class(self):
+        """@AppShell should register the class globally."""
+        @AppShell
+        class MyShell:
+            pass
+
+        assert get_app_shell() is MyShell
+
+    def test_app_shell_returns_class(self):
+        """@AppShell should return the original class."""
+        @AppShell
+        class MyShell:
+            pass
+
+        assert MyShell.__name__ == "MyShell"
+
+    def test_clear_app_shell(self):
+        """clear_app_shell should reset the registered class."""
+        @AppShell
+        class MyShell:
+            pass
+
+        assert get_app_shell() is not None
+        clear_app_shell()
+        assert get_app_shell() is None
+
+    def test_no_app_shell_by_default(self):
+        """get_app_shell should return None if nothing registered."""
+        assert get_app_shell() is None
+
+
+class TestPushDecorator:
+    """Test @Push decorator."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        clear_app_shell()
+        yield
+        clear_app_shell()
+
+    def test_push_sets_flag(self):
+        """@Push should set _push_enabled on the class."""
+        @Push
+        class MyShell:
+            pass
+
+        assert MyShell._push_enabled is True
+
+    def test_no_push_by_default(self):
+        """Classes without @Push should not have _push_enabled."""
+        class MyShell:
+            pass
+
+        assert not getattr(MyShell, '_push_enabled', False)
+
+    def test_app_shell_with_push(self):
+        """@AppShell @Push should set both registration and push flag."""
+        @AppShell
+        @Push
+        class MyShell:
+            pass
+
+        assert get_app_shell() is MyShell
+        assert MyShell._push_enabled is True
+
+    def test_app_shell_without_push(self):
+        """@AppShell without @Push should have push disabled."""
+        @AppShell
+        class MyShell:
+            pass
+
+        assert get_app_shell() is MyShell
+        assert not getattr(MyShell, '_push_enabled', False)

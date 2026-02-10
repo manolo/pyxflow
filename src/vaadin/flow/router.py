@@ -13,6 +13,9 @@ _RouteEntry = tuple[Type["Component"], str | None, list[str], re.Pattern | None,
 # Global route registry: normalized_path -> route entry
 _routes: dict[str, _RouteEntry] = {}
 
+# Global AppShell class (set by @AppShell decorator)
+_app_shell: type | None = None
+
 
 def Route(path: str = "", page_title: str | None = None, layout: Type["Component"] | None = None):
     """Decorator to register a view class for a route.
@@ -81,6 +84,50 @@ def StyleSheet(*urls: str):
         setattr(cls, '_stylesheets', list(urls) + existing)
         return cls
     return decorator
+
+
+def AppShell(cls):
+    """Decorator to mark a class as the global app configuration.
+
+    Only one class can be decorated with @AppShell per application.
+    Use alongside @Push and @StyleSheet for global config.
+
+    Usage:
+        @AppShell
+        @Push
+        @StyleSheet("styles/styles.css")
+        class MyAppShell:
+            pass
+    """
+    global _app_shell
+    _app_shell = cls
+    return cls
+
+
+def Push(cls):
+    """Decorator to enable WebSocket push on the AppShell.
+
+    Without @Push, push is disabled (no pushScript sent, no WS connection).
+
+    Usage:
+        @AppShell
+        @Push
+        class MyAppShell:
+            pass
+    """
+    cls._push_enabled = True
+    return cls
+
+
+def get_app_shell() -> type | None:
+    """Get the registered AppShell class, or None."""
+    return _app_shell
+
+
+def clear_app_shell():
+    """Clear the registered AppShell. Useful for testing."""
+    global _app_shell
+    _app_shell = None
 
 
 def PageTitle(title: str):

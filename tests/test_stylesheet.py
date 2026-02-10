@@ -2,7 +2,7 @@
 
 import pytest
 
-from vaadin.flow.router import Route, StyleSheet, clear_routes
+from vaadin.flow.router import Route, StyleSheet, AppShell, Push, clear_routes, clear_app_shell
 from vaadin.flow.components import VerticalLayout
 from vaadin.flow.server.uidl_handler import UidlHandler
 from vaadin.flow.core.state_tree import StateTree
@@ -59,8 +59,10 @@ class TestStyleSheetUidl:
     @pytest.fixture(autouse=True)
     def setup(self):
         clear_routes()
+        clear_app_shell()
         yield
         clear_routes()
+        clear_app_shell()
 
     def _make_session(self):
         tree = StateTree()
@@ -159,3 +161,173 @@ class TestStyleSheetUidl:
         urls = [d["url"] for d in response["EAGER"]]
         assert "styles/layout.css" in urls
         assert "styles/view.css" in urls
+
+
+class TestAppShellStylesheets:
+    """Test that @AppShell stylesheets appear in init response."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        clear_routes()
+        clear_app_shell()
+        yield
+        clear_routes()
+        clear_app_shell()
+
+    def test_app_shell_stylesheets_in_init(self):
+        """@AppShell @StyleSheet should include EAGER deps in init UIDL."""
+        @AppShell
+        @StyleSheet("styles/global.css")
+        class MyShell:
+            pass
+
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init_response = handler.handle_init({})
+        uidl = init_response["appConfig"]["uidl"]
+
+        assert "EAGER" in uidl
+        assert len(uidl["EAGER"]) == 1
+        dep = uidl["EAGER"][0]
+        assert dep["type"] == "STYLESHEET"
+        assert dep["url"] == "styles/global.css"
+        assert dep["loadMode"] == "EAGER"
+
+    def test_app_shell_multiple_stylesheets(self):
+        """Multiple stylesheets on AppShell should all appear in init."""
+        @AppShell
+        @StyleSheet("lumo/lumo.css", "styles/app.css")
+        class MyShell:
+            pass
+
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init_response = handler.handle_init({})
+        uidl = init_response["appConfig"]["uidl"]
+
+        assert "EAGER" in uidl
+        urls = [d["url"] for d in uidl["EAGER"]]
+        assert "lumo/lumo.css" in urls
+        assert "styles/app.css" in urls
+
+    def test_app_shell_stylesheets_not_resent_on_navigation(self):
+        """Stylesheets sent in init should not be resent on navigation."""
+        @AppShell
+        @StyleSheet("styles/global.css")
+        class MyShell:
+            pass
+
+        @Route("")
+        @StyleSheet("styles/global.css")  # Same as AppShell
+        class MyView(VerticalLayout):
+            pass
+
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init_response = handler.handle_init({})
+        csrf = init_response["appConfig"]["uidl"]["Vaadin-Security-Key"]
+
+        # Navigate — should NOT resend styles/global.css
+        payload = {
+            "csrfToken": csrf,
+            "rpc": [{"type": "event", "node": 1, "event": "ui-navigate", "data": {"route": ""}}],
+            "syncId": 0,
+            "clientId": 0,
+        }
+        response = handler.handle_uidl(payload)
+        assert "EAGER" not in response
+
+    def test_no_eager_in_init_without_app_shell(self):
+        """Init should not have EAGER if no @AppShell is registered."""
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init_response = handler.handle_init({})
+        uidl = init_response["appConfig"]["uidl"]
+
+        assert "EAGER" not in uidl
+
+
+class TestConditionalPush:
+    """Test that push config is conditional on @AppShell @Push."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        clear_routes()
+        clear_app_shell()
+        yield
+        clear_routes()
+        clear_app_shell()
+
+    def test_no_push_script_without_push(self):
+        """Init should not include pushScript without @Push."""
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init_response = handler.handle_init({})
+
+        assert "pushScript" not in init_response
+
+    def test_push_script_with_push(self):
+        """Init should include pushScript with @AppShell @Push."""
+        @AppShell
+        @Push
+        class MyShell:
+            pass
+
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init_response = handler.handle_init({})
+
+        assert "pushScript" in init_response
+        assert init_response["pushScript"] == "VAADIN/static/push/vaadinPush.js"
+
+    def test_push_mode_in_changes_with_push(self):
+        """Push mode AUTOMATIC should be in init changes when @Push is set."""
+        @AppShell
+        @Push
+        class MyShell:
+            pass
+
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init_response = handler.handle_init({})
+        changes = init_response["appConfig"]["uidl"]["changes"]
+
+        push_change = next(
+            (c for c in changes if c.get("key") == "pushMode" and c.get("value") == "AUTOMATIC"),
+            None
+        )
+        assert push_change is not None
+
+    def test_no_push_mode_without_push(self):
+        """Push mode should NOT be in init changes without @Push."""
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init_response = handler.handle_init({})
+        changes = init_response["appConfig"]["uidl"]["changes"]
+
+        push_change = next(
+            (c for c in changes if c.get("key") == "pushMode"),
+            None
+        )
+        assert push_change is None
+
+    def test_container_node_id_without_push(self):
+        """Without push, container should be node 2 (no push params node)."""
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        handler.handle_init({})
+
+        assert handler._container_node.id == 2
+
+    def test_container_node_id_with_push(self):
+        """With push, container should be node 3 (push params at node 2)."""
+        @AppShell
+        @Push
+        class MyShell:
+            pass
+
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        handler.handle_init({})
+
+        assert handler._container_node.id == 3
