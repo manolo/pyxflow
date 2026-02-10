@@ -22,6 +22,7 @@ from vaadin.flow.components import (
     Dialog,
     Div,
     DrawerToggle,
+    Footer,
     EmailField,
     FlexDirection,
     FlexLayout,
@@ -29,6 +30,7 @@ from vaadin.flow.components import (
     Grid,
     H2,
     H3,
+    Header,
     HorizontalLayout,
     Icon,
     IntegerField,
@@ -460,7 +462,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         # --- FlexLayout ---
         self.add_section("FlexLayout")
 
-        header_div = Div("Header")
+        header_div = Header("Header")
         header_div.set_width("100%")
         header_div.set_height("60px")
         header_div._set_style("background-color", "var(--lumo-primary-color)")
@@ -469,7 +471,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         header_div._set_style("align-items", "center")
         header_div._set_style("justify-content", "center")
 
-        footer_div = Div("Footer")
+        footer_div = Footer("Footer")
         footer_div.set_width("100%")
         footer_div.set_height("50px")
         footer_div._set_style("background-color", "var(--lumo-contrast-20pct)")
