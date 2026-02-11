@@ -5,7 +5,7 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~12,000 (core src/), ~28,500 (total with demo + tests)
-**Tests:** 1305 passing
+**Tests:** 1304 passing
 **Last updated:** 2026-02-10
 
 ---
@@ -36,6 +36,7 @@
 - [x] **FlowComponentHost** - Virtual children renderer for Dialog/Overlay components
 - [x] **publishedEventHandler** - Client-callable methods via Feature 19 (`CLIENT_DELEGATE_HANDLERS`)
 - [x] **Server-client state sync** - `_pending_server_change` flag absorbs echoes from server-initiated property changes
+- [x] **Client-side validation** - Field components use native web component validation (pattern, allowedCharPattern, required); `manualValidation` removed
 - [x] **Grid connector protocol** - `gridConnector.initLazy`, `$connector.set/updateSize/confirm`, `setHeaderRenderer`
 - [x] **Select connector protocol** - `selectConnector.initLazy`, `requestContentUpdate`
 - [x] **ComboBox connector protocol** - `comboBoxConnector.initLazy`, `$connector.set/updateSize/confirm`, filtering
@@ -52,7 +53,7 @@
 - [x] IntegerField - Integer input with min/max/step
 - [x] NumberField - Numeric input with min/max/step
 - [x] TextArea - Multi-line text input with placeholder
-- [x] TextField - Label, value, change event, mSync, clearButtonVisible, placeholder, prefix component slot
+- [x] TextField - Label, value, change event, mSync, clearButtonVisible, placeholder, prefix component slot, errorMessage, pattern, allowedCharPattern
 - [x] Span - Text content
 - [x] Div - Simple `<div>` with text content (extends HtmlContainer)
 - [x] Header - HTML `<header>` container (extends HtmlContainer)
