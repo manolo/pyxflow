@@ -112,6 +112,10 @@ class FlowApp:
                     proc.kill()
                     proc.wait(timeout=1)
 
+        # Track mtimes to ignore metadata-only events (macOS FSEvents
+        # fires for extended attribute changes like "last opened date")
+        file_mtimes: dict[str, float] = {}
+
         proc = start_child()
         try:
             for changes in watchfiles.watch(
@@ -119,9 +123,18 @@ class FlowApp:
                 watch_filter=watchfiles.PythonFilter(),
                 debounce=1600,
             ):
-                paths = sorted(
-                    os.path.relpath(p, watch_dir) for _, p in changes
-                )
+                actually_changed = []
+                for _, p in changes:
+                    try:
+                        mtime = os.path.getmtime(p)
+                    except OSError:
+                        mtime = 0
+                    if file_mtimes.get(p) != mtime:
+                        file_mtimes[p] = mtime
+                        actually_changed.append(os.path.relpath(p, watch_dir))
+                if not actually_changed:
+                    continue
+                paths = sorted(actually_changed)
                 print(f"  Reloading because files modified: {', '.join(paths)}", flush=True)
                 stop_child(proc)
                 proc = start_child()
@@ -134,9 +147,12 @@ class FlowApp:
 
 def _dev_serve():
     """Entry point for dev-mode child process (reads config from env)."""
-    cfg = json.loads(os.environ["_PYFLOW_APP"])
-    _serve(cfg["views"], cfg["host"], cfg["port"], cfg["debug"],
-           socket_fd=cfg.get("socket_fd"))
+    try:
+        cfg = json.loads(os.environ["_PYFLOW_APP"])
+        _serve(cfg["views"], cfg["host"], cfg["port"], cfg["debug"],
+               socket_fd=cfg.get("socket_fd"))
+    except KeyboardInterrupt:
+        pass
 
 
 def _serve(views: str, host: str, port: int, debug: bool, socket_fd: int | None = None):
