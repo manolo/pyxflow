@@ -19,6 +19,8 @@ class TextField(Component):
         self._value = ""
         self._clear_button_visible: bool = False
         self._placeholder: str = ""
+        self._pattern: str = ""
+        self._allowed_char_pattern: str = ""
         self._prefix_component: Component | None = None
         self._change_listeners: list[Callable] = []
 
@@ -34,6 +36,10 @@ class TextField(Component):
             self.element.set_property("clearButtonVisible", True)
         if self._placeholder:
             self.element.set_property("placeholder", self._placeholder)
+        if self._pattern:
+            self.element.set_property("pattern", self._pattern)
+        if self._allowed_char_pattern:
+            self.element.set_property("allowedCharPattern", self._allowed_char_pattern)
         if self._prefix_component:
             self._attach_prefix(tree)
         self.element.add_event_listener("change", self._handle_change)
@@ -66,11 +72,13 @@ class TextField(Component):
 
     def set_pattern(self, pattern: str):
         """Set the regular expression pattern for validation."""
+        self._pattern = pattern
         if self._element:
             self.element.set_property("pattern", pattern)
 
     def set_allowed_char_pattern(self, pattern: str):
         """Set the pattern for allowed characters (blocks input of non-matching chars)."""
+        self._allowed_char_pattern = pattern
         if self._element:
             self.element.set_property("allowedCharPattern", pattern)
 
