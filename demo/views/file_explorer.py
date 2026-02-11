@@ -1,9 +1,7 @@
 import pathlib
 
 from vaadin.flow import Menu, Route
-from vaadin.flow.components import (
-    Button, HorizontalLayout, Span, TreeGrid, VerticalLayout,
-)
+from vaadin.flow.components import Button, TreeGrid, VerticalLayout
 from demo.views.main_layout import MainLayout
 
 
@@ -47,25 +45,26 @@ class FileExplorerView(VerticalLayout):
     def __init__(self):
         self.set_height_full()
 
-        header = HorizontalLayout()
-        header.add(Span("Browsing: demo/"))
-        self._status = Span("")
-        refresh_btn = Button("Refresh")
-        refresh_btn.add_click_listener(lambda e: self._load_data())
-        header.add(refresh_btn, self._status)
-        self.add(header)
-
         self.tree_grid = TreeGrid()
-        self.tree_grid.add_hierarchy_column(lambda item: item.get("name", ""), header="Name")
+        self._name_col = self.tree_grid.add_hierarchy_column(
+            lambda item: item.get("name", ""), header="Name",
+        )
         self.tree_grid.add_column("size", header="Size").set_auto_width(True)
         self.tree_grid.add_column("type", header="Type").set_auto_width(True)
 
+        # Extra header row spanning all columns
+        header_row = self.tree_grid.prepend_header_row()
+        header_row.join(*self.tree_grid.columns).set_text("Browsing: demo/")
+
         self._load_data()
 
-        self.add(self.tree_grid)
+        refresh_btn = Button("Refresh")
+        refresh_btn.add_click_listener(lambda e: self._load_data())
+
+        self.add(refresh_btn, self.tree_grid)
         self.expand(self.tree_grid)
 
     def _load_data(self):
         root_items = _scan_dir(_DEMO_ROOT)
         self.tree_grid.set_items(root_items, children_provider=_get_children)
-        self._status.set_text(f"{len(root_items)} entries")
+        self._name_col.set_footer_text(f"{len(root_items)} entries")

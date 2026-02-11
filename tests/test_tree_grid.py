@@ -2,7 +2,7 @@
 
 import pytest
 
-from vaadin.flow.components.grid import TreeGrid, Column
+from vaadin.flow.components.grid import TreeGrid, Column, HeaderRow, HeaderCell, ColumnGroup
 from vaadin.flow.components.renderer import LitRenderer
 from vaadin.flow.core.state_tree import StateTree
 from vaadin.flow.core.state_node import Feature
@@ -299,3 +299,180 @@ class TestTreeGridAdditionalColumns:
         # Non-hierarchy column should have its data
         assert items_data[0][col.internal_id] == "Folder"
         assert items_data[1][col.internal_id] == "file"
+
+
+class TestColumnFooter:
+
+    def test_set_footer_text(self):
+        tg = TreeGrid()
+        col = tg.add_hierarchy_column(lambda item: item["name"])
+        col.set_footer_text("5 entries")
+        assert col._footer_text == "5 entries"
+
+    def test_footer_text_default_none(self):
+        tg = TreeGrid()
+        col = tg.add_column("name")
+        assert col._footer_text is None
+
+    def test_footer_text_returns_self(self):
+        col = Column("c0", "name")
+        result = col.set_footer_text("test")
+        assert result is col
+
+    def test_footer_renderer_in_attach(self):
+        tg = TreeGrid()
+        col = tg.add_hierarchy_column(lambda item: item["name"])
+        col.set_footer_text("2 entries")
+        tg.add_column("type", header="Type")
+        tg.set_items(ROOT_ITEMS, children_provider=children_provider)
+
+        tree = StateTree()
+        tg._attach(tree)
+        tree.collect_changes()
+        executes = tree.collect_execute()
+
+        footer_calls = [e for e in executes if "setFooterRenderer" in str(e)]
+        assert len(footer_calls) == 1
+        assert footer_calls[0][2] == "2 entries"
+
+
+class TestHeaderRow:
+
+    def test_prepend_header_row(self):
+        tg = TreeGrid()
+        tg.add_hierarchy_column(lambda item: item["name"])
+        row = tg.prepend_header_row()
+        assert isinstance(row, HeaderRow)
+
+    def test_join_returns_header_cell(self):
+        tg = TreeGrid()
+        col1 = tg.add_hierarchy_column(lambda item: item["name"])
+        col2 = tg.add_column("type")
+        row = tg.prepend_header_row()
+        cell = row.join(col1, col2)
+        assert isinstance(cell, HeaderCell)
+
+    def test_join_creates_column_group(self):
+        tg = TreeGrid()
+        col1 = tg.add_hierarchy_column(lambda item: item["name"])
+        col2 = tg.add_column("type")
+        row = tg.prepend_header_row()
+        row.join(col1, col2)
+        assert len(tg._column_groups) == 1
+        assert tg._column_groups[0]._columns == [col1, col2]
+
+    def test_set_text_on_header_cell(self):
+        tg = TreeGrid()
+        col1 = tg.add_hierarchy_column(lambda item: item["name"])
+        col2 = tg.add_column("type")
+        row = tg.prepend_header_row()
+        cell = row.join(col1, col2)
+        result = cell.set_text("Browsing: demo/")
+        assert result is cell
+        assert tg._column_groups[0]._header_text == "Browsing: demo/"
+
+    def test_columns_property(self):
+        tg = TreeGrid()
+        col1 = tg.add_hierarchy_column(lambda item: item["name"])
+        col2 = tg.add_column("type")
+        cols = tg.columns
+        assert cols == [col1, col2]
+        # Should be a copy
+        cols.append(Column("x", "x"))
+        assert len(tg.columns) == 2
+
+
+class TestColumnGroupAttach:
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_attach_with_column_group(self, tree):
+        """Column group creates vaadin-grid-column-group node."""
+        tg = TreeGrid()
+        col1 = tg.add_hierarchy_column(lambda item: item["name"], header="Name")
+        col2 = tg.add_column("type", header="Type")
+        tg.set_items(ROOT_ITEMS, children_provider=children_provider)
+
+        row = tg.prepend_header_row()
+        row.join(col1, col2).set_text("All Files")
+
+        tg._attach(tree)
+        changes = tree.collect_changes()
+
+        # Should have a column-group tag
+        group_tags = [c for c in changes
+                      if c.get("key") == "tag" and c.get("value") == "vaadin-grid-column-group"]
+        assert len(group_tags) == 1
+
+    def test_group_header_renderer_executed(self, tree):
+        """setHeaderRenderer called on the column group."""
+        tg = TreeGrid()
+        col1 = tg.add_hierarchy_column(lambda item: item["name"], header="Name")
+        col2 = tg.add_column("type", header="Type")
+        tg.set_items(ROOT_ITEMS, children_provider=children_provider)
+
+        row = tg.prepend_header_row()
+        row.join(col1, col2).set_text("All Files")
+
+        tg._attach(tree)
+        tree.collect_changes()
+        executes = tree.collect_execute()
+
+        header_calls = [e for e in executes if "setHeaderRenderer" in str(e)]
+        # 1 for the group + 2 for individual columns
+        assert len(header_calls) == 3
+        # First call should be the group header
+        assert header_calls[0][2] == "All Files"
+
+    def test_columns_are_children_of_group(self, tree):
+        """Columns wrapped by a group should be spliced as children of the group, not the grid."""
+        tg = TreeGrid()
+        col1 = tg.add_hierarchy_column(lambda item: item["name"], header="Name")
+        col2 = tg.add_column("type", header="Type")
+        tg.set_items(ROOT_ITEMS, children_provider=children_provider)
+
+        row = tg.prepend_header_row()
+        row.join(col1, col2).set_text("Header")
+
+        tg._attach(tree)
+        changes = tree.collect_changes()
+
+        # The grid node should have the group as child, not the columns directly
+        grid_node_id = tg.element.node_id
+        grid_splices = [c for c in changes
+                        if c.get("type") == "splice" and c.get("node") == grid_node_id
+                        and c.get("feat") == Feature.ELEMENT_CHILDREN_LIST]
+
+        # Collect all node ids added as children of the grid
+        grid_child_ids = []
+        for s in grid_splices:
+            grid_child_ids.extend(s.get("addNodes", []))
+
+        # The column group node should be a child of the grid
+        group_node_id = tg._column_groups[0]._node.id
+        assert group_node_id in grid_child_ids
+
+        # Individual column nodes should NOT be direct children of the grid
+        assert col1._node.id not in grid_child_ids
+        assert col2._node.id not in grid_child_ids
+
+    def test_footer_with_column_group(self, tree):
+        """Footer and header group work together."""
+        tg = TreeGrid()
+        col1 = tg.add_hierarchy_column(lambda item: item["name"], header="Name")
+        col2 = tg.add_column("type", header="Type")
+        col1.set_footer_text("2 items")
+        tg.set_items(ROOT_ITEMS, children_provider=children_provider)
+
+        row = tg.prepend_header_row()
+        row.join(col1, col2).set_text("Header")
+
+        tg._attach(tree)
+        tree.collect_changes()
+        executes = tree.collect_execute()
+
+        footer_calls = [e for e in executes if "setFooterRenderer" in str(e)]
+        assert len(footer_calls) == 1
+        assert footer_calls[0][2] == "2 items"

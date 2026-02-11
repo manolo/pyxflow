@@ -5,7 +5,7 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~13,200 (core src/), ~32,200 (total with demo + tests)
-**Tests:** 1370 passing
+**Tests:** 1383 passing
 **Last updated:** 2026-02-11
 
 ---
@@ -26,7 +26,9 @@
 - [x] **publishedEventHandler** - Client-callable methods via Feature 19 (`CLIENT_DELEGATE_HANDLERS`)
 - [x] **Server-client state sync** - `_pending_server_change` flag absorbs echoes from server-initiated property changes
 - [x] **Client-side validation** - Field components use native web component validation (pattern, allowedCharPattern, required); `manualValidation` removed
-- [x] **Grid connector protocol** - `gridConnector.initLazy`, `$connector.set/updateSize/confirm`, `setHeaderRenderer`
+- [x] **Grid connector protocol** - `gridConnector.initLazy`, `$connector.set/updateSize/confirm`, `setHeaderRenderer`, `setFooterRenderer`
+- [x] **Grid header rows** - `prepend_header_row()`, `HeaderRow.join()` creates `<vaadin-grid-column-group>` for spanning headers
+- [x] **Grid column footers** - `Column.set_footer_text()` renders footer via `setFooterRenderer`
 - [x] **TreeGrid** - Hierarchical Grid with expand/collapse, inline treeGridConnector overrides (no bundle rebuild)
 - [x] **Select connector protocol** - `selectConnector.initLazy`, `requestContentUpdate`
 - [x] **ComboBox connector protocol** - `comboBoxConnector.initLazy`, `$connector.set/updateSize/confirm`, filtering
@@ -61,7 +63,7 @@
 - [x] RadioButtonGroup - Radio button selection
 - [x] CheckboxGroup - Multiple checkbox selection
 - [x] FormLayout - Responsive steps, colspan, FormItem (label slot), FormRow, auto-responsive, CSS custom properties
-- [x] Grid - Columns (path, header, width, flexGrow, autoWidth, resizable, sortable), in-memory data push, single/multi selection, sorting, lazy loading/DataProvider, column reordering, LitRenderer, ComponentRenderer
+- [x] Grid - Columns (path, header, width, flexGrow, autoWidth, resizable, sortable), in-memory data push, single/multi selection, sorting, lazy loading/DataProvider, column reordering, LitRenderer, ComponentRenderer, header rows (column groups), column footers
 - [x] ConfirmDialog - Confirm/cancel/reject actions, header/message/button text, theme, cancelable/rejectable
 - [x] ComboBox - Filtered dropdown, data push protocol, item label generator, custom value support
 - [x] DatePicker - Date selection with calendar overlay, min/max, connector init

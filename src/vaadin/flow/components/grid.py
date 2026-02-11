@@ -58,6 +58,7 @@ class Column:
         self._element = None
         self._node = None
         self._renderer: Renderer | None = None
+        self._footer_text: str | None = None
 
     @property
     def internal_id(self) -> str:
@@ -119,6 +120,11 @@ class Column:
         self._renderer = renderer
         return self
 
+    def set_footer_text(self, text: str) -> "Column":
+        """Set the column footer text."""
+        self._footer_text = text
+        return self
+
     def _create_element(self, tree: "StateTree"):
         """Create the vaadin-grid-column state node."""
         self._node = tree.create_node()
@@ -138,6 +144,47 @@ class Column:
         if self._resizable:
             self._node.put(Feature.ELEMENT_PROPERTY_MAP, "resizable", True)
         return self._node
+
+
+class ColumnGroup:
+    """Wraps columns in <vaadin-grid-column-group> for joined headers."""
+
+    def __init__(self, columns: list[Column]):
+        self._columns = columns
+        self._header_text: str | None = None
+        self._node = None
+
+    def _create_element(self, tree: "StateTree"):
+        """Create the vaadin-grid-column-group state node."""
+        self._node = tree.create_node()
+        self._node.attach()
+        self._node.put(Feature.ELEMENT_DATA, "tag", "vaadin-grid-column-group")
+        return self._node
+
+
+class HeaderCell:
+    """A cell in a header row, backed by a ColumnGroup."""
+
+    def __init__(self, column_group: ColumnGroup):
+        self._column_group = column_group
+
+    def set_text(self, text: str) -> "HeaderCell":
+        """Set the text content of this header cell."""
+        self._column_group._header_text = text
+        return self
+
+
+class HeaderRow:
+    """Extra header row above default column headers."""
+
+    def __init__(self, grid: "Grid"):
+        self._grid = grid
+
+    def join(self, *columns: Column) -> HeaderCell:
+        """Join columns under a single header cell spanning all of them."""
+        group = ColumnGroup(list(columns))
+        self._grid._column_groups.append(group)
+        return HeaderCell(group)
 
 
 class _GridSelectionColumn:
@@ -230,6 +277,8 @@ class Grid(Component):
         self._selection_mode = SelectionMode.SINGLE
         self._selection_column: _GridSelectionColumn | None = None
         self._selected_keys: set[str] = set()
+        # Header rows / column groups
+        self._column_groups: list[ColumnGroup] = []
         # Lazy loading
         self._data_provider: Callable | None = None
         self._data_provider_obj: DataProvider | None = None
@@ -273,6 +322,15 @@ class Grid(Component):
             column = Column(internal_id, arg, header)
         self._columns.append(column)
         return column
+
+    @property
+    def columns(self) -> list[Column]:
+        """Get the list of columns."""
+        return list(self._columns)
+
+    def prepend_header_row(self) -> HeaderRow:
+        """Add an extra header row above the default column headers."""
+        return HeaderRow(self)
 
     def set_items(self, items):
         """Set the data items (in-memory mode).
@@ -422,10 +480,37 @@ class Grid(Component):
             sel_node = self._selection_column._create_element(tree)
             self.element.node.add_child(sel_node)
 
-        # Create column elements as children of the grid
+        # Create column elements
         for col in self._columns:
-            col_node = col._create_element(tree)
-            self.element.node.add_child(col_node)
+            col._create_element(tree)
+
+        if self._column_groups:
+            # Build column-to-group mapping
+            col_to_group: dict[int, ColumnGroup] = {}
+            for group in self._column_groups:
+                for c in group._columns:
+                    col_to_group[id(c)] = group
+
+            # Create group nodes and add grouped columns as their children
+            for group in self._column_groups:
+                group._create_element(tree)
+                for c in group._columns:
+                    group._node.add_child(c._node)
+
+            # Add groups and ungrouped columns to the grid in column order
+            added_groups: set[int] = set()
+            for col in self._columns:
+                group = col_to_group.get(id(col))
+                if group:
+                    if id(group) not in added_groups:
+                        self.element.node.add_child(group._node)
+                        added_groups.add(id(group))
+                else:
+                    self.element.node.add_child(col._node)
+        else:
+            # No groups — all columns directly on grid
+            for col in self._columns:
+                self.element.node.add_child(col._node)
 
         # Register client-callable methods via Feature 19
         client_methods = [
@@ -456,7 +541,16 @@ class Grid(Component):
             f"return (async function() {{ if (this.$connector) this.$connector.setSelectionMode('{self._selection_mode.value}') }}).apply($0)",
         ])
 
-        # 3. setHeaderRenderer for each column
+        # 3. setHeaderRenderer for column groups (spanning header)
+        for group in self._column_groups:
+            if group._header_text and group._node:
+                group_ref = {"@v-node": group._node.id}
+                tree.queue_execute([
+                    grid_ref, group_ref, group._header_text,
+                    "return $0.$connector.setHeaderRenderer($1, { content: $2 })",
+                ])
+
+        # 3a. setHeaderRenderer for each column
         for col in self._columns:
             assert col._node is not None
             col_ref = {"@v-node": col._node.id}
@@ -467,7 +561,16 @@ class Grid(Component):
                 f"return $0.$connector.setHeaderRenderer($1, {{ content: $2, showSorter: {show_sorter}, sorterPath: {sorter_path} }})",
             ])
 
-        # 3b. Set up renderers for columns that have one
+        # 3b. setFooterRenderer for columns with footer text
+        for col in self._columns:
+            if col._footer_text:
+                col_ref = {"@v-node": col._node.id}
+                tree.queue_execute([
+                    grid_ref, col_ref, col._footer_text,
+                    "return $0.$connector.setFooterRenderer($1, { content: $2 })",
+                ])
+
+        # 3c. Set up renderers for columns that have one
         for col in self._columns:
             if col._renderer:
                 self._setup_renderer(tree, col)
