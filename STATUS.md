@@ -206,6 +206,8 @@ Atmosphere WebSocket protocol, `UI.access()` / `UI.push()` API, push sender coro
 
 ### Pending
 - [x] `@ClientCallable` methods — Decorator, Feature 19 auto-registration, promise resolution/rejection
+- [ ] `@PWA` annotation — Activate `sw.js` from bundle, custom icons/manifest. Bundle-generator app may need `@PWA` annotation; server needs to serve `manifest.json` with configurable app name/icons
+- [ ] Security (`--secure` flag) — Login screen based on local config, restrict listening interfaces (localhost vs 0.0.0.0), HTTPS/TLS support
 
 ---
 
