@@ -531,7 +531,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
         content_div = Div("Content")
         content_div.set_width("75%")
-        content_div._set_style("background-color", "var(--vaadin-background-container)")
+        content_div._set_style("background-color", "var(--vaadin-background-color)")
         content_div._set_style("color", "var(--vaadin-text-color)")
         content_div._set_style("display", "flex")
         content_div._set_style("align-items", "center")
