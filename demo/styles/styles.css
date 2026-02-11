@@ -18,10 +18,7 @@
   width: 100%;
   flex-wrap: wrap;
   background-color: var(--vaadin-background-container);
-  padding-bottom: var(--vaadin-padding-s);
-  padding-top: var(--vaadin-padding-s);
-  padding-left: var(--vaadin-padding-l);
-  padding-right: var(--vaadin-padding-l);
+  padding: var(--vaadin-padding-s) var(--vaadin-padding-l);
   gap: var(--vaadin-gap-m);
 }
 
@@ -70,7 +67,7 @@
 
 .components-view .component.tall {
     height: 100%;
-    grid-row: span 2 / span 2;
+    grid-row: span 2;
 }
 
 /* Stopwatch */
@@ -123,5 +120,4 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  --lumo-button-size: 48px;
 }
