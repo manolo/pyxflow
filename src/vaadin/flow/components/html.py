@@ -93,6 +93,40 @@ class HtmlContainer(_TextComponent):
                     self.element.remove_child(component.element)
 
 
+class Image(Component):
+    """HTML <img> element with src and alt attributes."""
+
+    _tag = "img"
+
+    def __init__(self, src: str = "", alt: str = ""):
+        super().__init__()
+        self._src = src
+        self._alt = alt
+
+    def _attach(self, tree: "StateTree"):
+        super()._attach(tree)
+        if self._src:
+            self.element.set_attribute("src", self._src)
+        if self._alt:
+            self.element.set_attribute("alt", self._alt)
+
+    def set_src(self, src: str):
+        self._src = src
+        if self._element:
+            self.element.set_attribute("src", src)
+
+    def get_src(self) -> str:
+        return self._src
+
+    def set_alt(self, alt: str):
+        self._alt = alt
+        if self._element:
+            self.element.set_attribute("alt", alt)
+
+    def get_alt(self) -> str:
+        return self._alt
+
+
 class Div(HtmlContainer):
     """HTML <div> element — supports both text content and child components."""
 

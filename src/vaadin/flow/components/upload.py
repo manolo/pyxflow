@@ -31,6 +31,13 @@ _UPLOAD_ERROR_CONFIG = {
 }
 
 
+# file-remove: captures event.detail.file.name
+_FILE_REMOVE_HASH = "F6Wh0NdCR9A="
+_FILE_REMOVE_CONFIG = {
+    "event.detail.file.name": False,
+}
+
+
 class Upload(Component):
     """A file upload component.
 
@@ -52,6 +59,7 @@ class Upload(Component):
         self._succeeded_listeners: list[Callable] = []
         self._failed_listeners: list[Callable] = []
         self._file_rejected_listeners: list[Callable] = []
+        self._file_removed_listeners: list[Callable] = []
         self._resource_id: str | None = None
 
     def set_receiver(self, callback: Callable):
@@ -125,6 +133,10 @@ class Upload(Component):
         """Add a listener for rejected files (client-side validation)."""
         self._file_rejected_listeners.append(listener)
 
+    def add_file_removed_listener(self, listener: Callable):
+        """Add a listener for when a file is removed from the upload list."""
+        self._file_removed_listeners.append(listener)
+
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
 
@@ -163,6 +175,9 @@ class Upload(Component):
         self.element.add_event_listener(
             "upload-error", self._on_upload_error, hash_key=_UPLOAD_ERROR_HASH
         )
+        self.element.add_event_listener(
+            "file-remove", self._on_file_remove, hash_key=_FILE_REMOVE_HASH
+        )
 
     def _find_session_id(self) -> str:
         """Find the session ID that owns this tree."""
@@ -190,4 +205,9 @@ class Upload(Component):
     def _on_upload_error(self, event_data: dict):
         """Handle upload-error event from client."""
         for listener in self._failed_listeners:
+            listener(event_data)
+
+    def _on_file_remove(self, event_data: dict):
+        """Handle file-remove event from client."""
+        for listener in self._file_removed_listeners:
             listener(event_data)

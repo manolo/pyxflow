@@ -150,6 +150,12 @@ _UPLOAD_ERROR_CONFIG = {
     "element.files": False,
 }
 
+# file-remove: captures event.detail.file.name
+_FILE_REMOVE_HASH = "F6Wh0NdCR9A="
+_FILE_REMOVE_CONFIG = {
+    "event.detail.file.name": False,
+}
+
 # Submit event configuration (MessageInput: event.detail.value)
 _SUBMIT_HASH = "6cdZ3Qcd5ng="
 _SUBMIT_CONFIG = {
@@ -179,6 +185,7 @@ _HASH_TO_CONFIG = {
     _FILE_REJECT_HASH: _FILE_REJECT_CONFIG,
     _UPLOAD_SUCCESS_HASH: _UPLOAD_SUCCESS_CONFIG,
     _UPLOAD_ERROR_HASH: _UPLOAD_ERROR_CONFIG,
+    _FILE_REMOVE_HASH: _FILE_REMOVE_CONFIG,
     _SUBMIT_HASH: _SUBMIT_CONFIG,
     _LOGIN_HASH: _LOGIN_CONFIG,
     _SELECTED_VALUES_CHANGED_HASH: _SELECTED_VALUES_CHANGED_CONFIG,
