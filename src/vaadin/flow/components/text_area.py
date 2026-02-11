@@ -3,9 +3,10 @@
 from typing import Callable
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.mixins import HasValidation, HasRequired
 
 
-class TextArea(Component):
+class TextArea(HasValidation, HasRequired, Component):
     """A multi-line text input component."""
 
     _tag = "vaadin-text-area"
@@ -19,8 +20,6 @@ class TextArea(Component):
 
     def _attach(self, tree):
         super()._attach(tree)
-        # Set properties in the order expected by Java Flow
-        self.element.set_property("invalid", False)
         if self._label:
             self.element.set_property("label", self._label)
         if self._placeholder:

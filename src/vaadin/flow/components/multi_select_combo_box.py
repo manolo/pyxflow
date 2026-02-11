@@ -3,6 +3,7 @@
 from typing import Callable, Generic, TypeVar, Optional, Set, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.mixins import HasValidation, HasRequired
 from vaadin.flow.core.state_node import Feature
 from vaadin.flow.data.provider import DataProvider, Query
 
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
 T = TypeVar('T')
 
 
-class MultiSelectComboBox(Component, Generic[T]):
+class MultiSelectComboBox(HasValidation, HasRequired, Component, Generic[T]):
     """A combo box with multi-select support.
 
     Allows users to select multiple values from a filtered dropdown.
@@ -35,7 +36,6 @@ class MultiSelectComboBox(Component, Generic[T]):
         self._value: Set[T] = set()
         self._placeholder = ""
         self._page_size = 50
-        self._required = False
         self._item_label_generator: Optional[Callable[[T], str]] = None
         self._change_listeners: list[Callable] = []
         self._update_id = 0
@@ -45,7 +45,6 @@ class MultiSelectComboBox(Component, Generic[T]):
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
 
-        self.element.set_property("invalid", False)
         if self._label:
             self.element.set_property("label", self._label)
         if self._placeholder:
@@ -54,8 +53,6 @@ class MultiSelectComboBox(Component, Generic[T]):
         self.element.set_property("itemIdPath", "key")
         self.element.set_property("itemValuePath", "key")
         self.element.set_property("itemLabelPath", "label")
-        if self._required:
-            self.element.set_property("required", True)
 
         # Register client-callable methods via Feature 19
         tree.add_change({
@@ -222,9 +219,7 @@ class MultiSelectComboBox(Component, Generic[T]):
             self.element.set_property("pageSize", page_size)
 
     def set_required(self, required: bool):
-        self._required = required
-        if self._element:
-            self.element.set_property("required", required)
+        self.set_required_indicator_visible(required)
 
     def set_item_label_generator(self, generator: Callable[[T], str]):
         self._item_label_generator = generator

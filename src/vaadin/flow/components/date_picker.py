@@ -4,9 +4,10 @@ import datetime
 from typing import Callable, Optional
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.mixins import HasValidation, HasRequired
 
 
-class DatePicker(Component):
+class DatePicker(HasValidation, HasRequired, Component):
     """A date picker component.
 
     Allows users to select a date from a calendar overlay.
@@ -22,12 +23,10 @@ class DatePicker(Component):
         self._placeholder = ""
         self._min: Optional[datetime.date] = None
         self._max: Optional[datetime.date] = None
-        self._required = False
         self._change_listeners: list[Callable] = []
 
     def _attach(self, tree):
         super()._attach(tree)
-        self.element.set_property("invalid", False)
         if self._label:
             self.element.set_property("label", self._label)
         if self._placeholder:
@@ -40,8 +39,6 @@ class DatePicker(Component):
             self.element.set_property("min", self._min.isoformat())
         if self._max is not None:
             self.element.set_property("max", self._max.isoformat())
-        if self._required:
-            self.element.set_property("required", True)
         # Init connector
         el_ref = {"@v-node": self.element.node.id}
         tree.queue_execute([
@@ -92,9 +89,7 @@ class DatePicker(Component):
             self.element.set_property("max", max_date.isoformat() if max_date else "")
 
     def set_required(self, required: bool):
-        self._required = required
-        if self._element:
-            self.element.set_property("required", required)
+        self.set_required_indicator_visible(required)
 
     def add_value_change_listener(self, listener: Callable):
         self._change_listeners.append(listener)

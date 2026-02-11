@@ -3,9 +3,10 @@
 from typing import Callable
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.mixins import HasValidation, HasRequired
 
 
-class EmailField(Component):
+class EmailField(HasValidation, HasRequired, Component):
     """An email input field component.
 
     Email Field is an extension of Text Field that accepts only email
@@ -19,20 +20,16 @@ class EmailField(Component):
         self._label = label
         self._value = ""
         self._placeholder = ""
-        self._error_message = ""
         self._clear_button_visible = False
         self._change_listeners: list[Callable] = []
 
     def _attach(self, tree):
         super()._attach(tree)
-        self.element.set_property("invalid", False)
         if self._label:
             self.element.set_property("label", self._label)
         self.element.set_property("value", self._value)
         if self._placeholder:
             self.element.set_property("placeholder", self._placeholder)
-        if self._error_message:
-            self.element.set_property("errorMessage", self._error_message)
         if self._clear_button_visible:
             self.element.set_property("clearButtonVisible", True)
         self.element.add_event_listener("change", self._handle_change)
@@ -76,16 +73,6 @@ class EmailField(Component):
     def get_placeholder(self) -> str:
         """Get the placeholder text."""
         return self._placeholder
-
-    def set_error_message(self, message: str):
-        """Set the error message shown when invalid."""
-        self._error_message = message
-        if self._element:
-            self.element.set_property("errorMessage", message)
-
-    def get_error_message(self) -> str:
-        """Get the error message."""
-        return self._error_message
 
     def set_clear_button_visible(self, visible: bool):
         """Set whether the clear button is visible."""

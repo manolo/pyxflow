@@ -3,12 +3,13 @@
 from typing import TYPE_CHECKING, Callable
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.mixins import HasValidation, HasRequired
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
 
 
-class TextField(Component):
+class TextField(HasValidation, HasRequired, Component):
     """A text field component."""
 
     _tag = "vaadin-text-field"
@@ -21,14 +22,11 @@ class TextField(Component):
         self._placeholder: str = ""
         self._pattern: str = ""
         self._allowed_char_pattern: str = ""
-        self._error_message: str = ""
         self._prefix_component: Component | None = None
         self._change_listeners: list[Callable] = []
 
     def _attach(self, tree):
         super()._attach(tree)
-        # Set properties in the order expected by Java Flow
-        self.element.set_property("invalid", False)
         if self._label:
             self.element.set_property("label", self._label)
         self.element.set_property("value", self._value)
@@ -40,8 +38,6 @@ class TextField(Component):
             self.element.set_property("pattern", self._pattern)
         if self._allowed_char_pattern:
             self.element.set_property("allowedCharPattern", self._allowed_char_pattern)
-        if self._error_message:
-            self.element.set_property("errorMessage", self._error_message)
         if self._prefix_component:
             self._attach_prefix(tree)
         self.element.add_event_listener("change", self._handle_change)
@@ -83,16 +79,6 @@ class TextField(Component):
         self._allowed_char_pattern = pattern
         if self._element:
             self.element.set_property("allowedCharPattern", pattern)
-
-    def set_error_message(self, message: str):
-        """Set the error message shown when the field is invalid."""
-        self._error_message = message
-        if self._element:
-            self.element.set_property("errorMessage", message)
-
-    def get_error_message(self) -> str:
-        """Get the error message."""
-        return self._error_message
 
     def add_value_change_listener(self, listener: Callable):
         """Add a value change listener."""

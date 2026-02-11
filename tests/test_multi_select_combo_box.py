@@ -197,7 +197,7 @@ class TestMultiSelectComboBox:
     def test_set_required(self):
         cb = MultiSelectComboBox()
         cb.set_required(True)
-        assert cb._required is True
+        assert cb.is_required_indicator_visible() is True
 
     def test_set_required_on_attach(self, tree):
         cb = MultiSelectComboBox()

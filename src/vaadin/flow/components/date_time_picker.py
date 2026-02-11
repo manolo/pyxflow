@@ -4,9 +4,10 @@ import datetime
 from typing import Callable, Optional
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.mixins import HasValidation, HasRequired
 
 
-class DateTimePicker(Component):
+class DateTimePicker(HasValidation, HasRequired, Component):
     """A date-time picker component.
 
     Combines DatePicker and TimePicker into a single field.
@@ -25,12 +26,10 @@ class DateTimePicker(Component):
         self._min: Optional[datetime.datetime] = None
         self._max: Optional[datetime.datetime] = None
         self._step: Optional[int] = None
-        self._required = False
         self._change_listeners: list[Callable] = []
 
     def _attach(self, tree):
         super()._attach(tree)
-        self.element.set_property("invalid", False)
         if self._label:
             self.element.set_property("label", self._label)
         if self._date_placeholder:
@@ -47,8 +46,6 @@ class DateTimePicker(Component):
             self.element.set_property("max", self._format_datetime(self._max))
         if self._step is not None:
             self.element.set_property("step", self._step)
-        if self._required:
-            self.element.set_property("required", True)
         # Init connectors for internal date-picker and time-picker sub-fields
         el_ref = {"@v-node": self.element.node.id}
         tree.queue_execute([
@@ -130,9 +127,7 @@ class DateTimePicker(Component):
                 self.element.set_property("step", step)
 
     def set_required(self, required: bool):
-        self._required = required
-        if self._element:
-            self.element.set_property("required", required)
+        self.set_required_indicator_visible(required)
 
     def add_value_change_listener(self, listener: Callable):
         self._change_listeners.append(listener)

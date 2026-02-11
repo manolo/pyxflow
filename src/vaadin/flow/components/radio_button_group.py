@@ -3,12 +3,13 @@
 from typing import Callable, Generic, TypeVar, Optional
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.mixins import HasValidation, HasRequired
 from vaadin.flow.core.state_node import Feature
 
 T = TypeVar('T')
 
 
-class RadioButtonGroup(Component, Generic[T]):
+class RadioButtonGroup(HasValidation, HasRequired, Component, Generic[T]):
     """A radio button group component.
 
     Allows users to select one value among multiple choices.

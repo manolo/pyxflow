@@ -63,8 +63,7 @@ class TestDatePicker:
         values = [c for c in changes if c.get("key") == "value"]
         assert any(c["value"] == "2025-03-14" for c in values)
 
-        invalid = [c for c in changes if c.get("key") == "invalid"]
-        assert any(c["value"] is False for c in invalid)
+        # invalid=False is no longer sent (web component default is already False)
 
     def test_connector_init(self, tree):
         dp = DatePicker()

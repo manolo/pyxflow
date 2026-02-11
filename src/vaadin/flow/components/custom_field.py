@@ -3,12 +3,13 @@
 from typing import Callable, Optional, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.mixins import HasValidation, HasRequired
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
 
 
-class CustomField(Component):
+class CustomField(HasValidation, HasRequired, Component):
     """A field wrapper that composes a value from its children.
 
     CustomField allows you to group multiple input fields into a single
@@ -31,8 +32,6 @@ class CustomField(Component):
         self._children: list[Component] = []
         self._value: str = ""
         self._change_listeners: list[Callable] = []
-        self._invalid = False
-        self._error_message = ""
         self._helper_text_val = ""
 
     def _attach(self, tree: "StateTree"):
@@ -41,10 +40,6 @@ class CustomField(Component):
             self.element.set_property("label", self._label)
         if self._helper_text_val:
             self.element.set_property("helperText", self._helper_text_val)
-        if self._error_message:
-            self.element.set_property("errorMessage", self._error_message)
-        if self._invalid:
-            self.element.set_property("invalid", True)
 
         # Attach children
         for child in self._children:
@@ -77,22 +72,6 @@ class CustomField(Component):
 
     def get_helper_text(self) -> str:
         return self._helper_text_val
-
-    def set_error_message(self, message: str):
-        self._error_message = message
-        if self._element:
-            self.element.set_property("errorMessage", message)
-
-    def get_error_message(self) -> str:
-        return self._error_message
-
-    def set_invalid(self, invalid: bool):
-        self._invalid = invalid
-        if self._element:
-            self.element.set_property("invalid", invalid)
-
-    def is_invalid(self) -> bool:
-        return self._invalid
 
     def get_value(self) -> str:
         return self._value

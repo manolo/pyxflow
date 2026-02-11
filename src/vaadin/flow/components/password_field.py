@@ -3,9 +3,10 @@
 from typing import Callable
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.mixins import HasValidation, HasRequired
 
 
-class PasswordField(Component):
+class PasswordField(HasValidation, HasRequired, Component):
     """A password input field component.
 
     The input is masked by default. The masking can be toggled using
@@ -24,7 +25,6 @@ class PasswordField(Component):
 
     def _attach(self, tree):
         super()._attach(tree)
-        self.element.set_property("invalid", False)
         if self._label:
             self.element.set_property("label", self._label)
         self.element.set_property("value", self._value)

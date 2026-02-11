@@ -3,9 +3,10 @@
 from typing import Callable, Optional
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.mixins import HasValidation, HasRequired
 
 
-class NumberField(Component):
+class NumberField(HasValidation, HasRequired, Component):
     """A number input field component."""
 
     _tag = "vaadin-number-field"
@@ -23,7 +24,6 @@ class NumberField(Component):
 
     def _attach(self, tree):
         super()._attach(tree)
-        self.element.set_property("invalid", False)
         if self._label:
             self.element.set_property("label", self._label)
         if self._placeholder:

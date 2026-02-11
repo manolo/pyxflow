@@ -5,7 +5,7 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~13,200 (core src/), ~32,200 (total with demo + tests)
-**Tests:** 1383 passing
+**Tests:** 1567 passing
 **Last updated:** 2026-02-11
 
 ---
@@ -108,6 +108,11 @@
 - [x] `setTooltipText()` / `getTooltipText()` - Tooltips via `<vaadin-tooltip>` child
 - [x] `addClickShortcut(Key)` - Keyboard shortcuts (keydown→click dispatch)
 
+### Field Mixins
+- [x] `HasValidation` mixin - `set_invalid()`, `is_invalid()`, `set_error_message()`, `get_error_message()` on all 14 field components + CustomField
+- [x] `HasRequired` mixin - `set_required_indicator_visible()`, `is_required_indicator_visible()` on all 14 field components + CustomField + Checkbox
+- [x] Deferred buffering - Values set before attach are buffered in `_pending_properties` and flushed on attach
+
 ### Data Binding
 - [x] Binder - Fluent API (`for_field().with_validator().with_converter().bind()`), `read_bean`, `write_bean`, `set_bean` (auto two-way sync), `is_dirty()` dirty tracking
 - [x] Validators - `required`, `min_length`, `max_length`, `pattern`, `value_range`, `positive`, `email`
@@ -195,7 +200,6 @@ Atmosphere WebSocket protocol, `UI.access()` / `UI.push()` API, push sender coro
 
 ### Pending
 - [x] `@ClientCallable` methods — Decorator, Feature 19 auto-registration, promise resolution/rejection
-- [ ] **Optimization:** inject layout `@StyleSheet` as `<link>` in `<head>` to avoid FOUC (currently loaded via UIDL after init)
 
 ---
 

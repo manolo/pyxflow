@@ -4,9 +4,10 @@ import datetime
 from typing import Callable, Optional
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.mixins import HasValidation, HasRequired
 
 
-class TimePicker(Component):
+class TimePicker(HasValidation, HasRequired, Component):
     """A time picker component.
 
     Allows users to select a time from a dropdown overlay.
@@ -23,12 +24,10 @@ class TimePicker(Component):
         self._min: Optional[datetime.time] = None
         self._max: Optional[datetime.time] = None
         self._step: Optional[int] = None
-        self._required = False
         self._change_listeners: list[Callable] = []
 
     def _attach(self, tree):
         super()._attach(tree)
-        self.element.set_property("invalid", False)
         if self._label:
             self.element.set_property("label", self._label)
         if self._placeholder:
@@ -43,8 +42,6 @@ class TimePicker(Component):
             self.element.set_property("max", self._format_time(self._max))
         if self._step is not None:
             self.element.set_property("step", self._step)
-        if self._required:
-            self.element.set_property("required", True)
         # Init connector
         el_ref = {"@v-node": self.element.node.id}
         tree.queue_execute([
@@ -119,9 +116,7 @@ class TimePicker(Component):
                 self.element.set_property("step", step)
 
     def set_required(self, required: bool):
-        self._required = required
-        if self._element:
-            self.element.set_property("required", required)
+        self.set_required_indicator_visible(required)
 
     def add_value_change_listener(self, listener: Callable):
         self._change_listeners.append(listener)
