@@ -384,6 +384,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         text_form.add(email_field)
 
         phone_field = TextField("Phone")
+        phone_field.set_placeholder("+1 (555) 123-4567")
         phone_field.set_pattern("^[+]?[\\(]?[0-9]{3}[\\)]?[\\-]?[0-9]{3}[\\-]?[0-9]{4,6}$")
         phone_field.set_allowed_char_pattern("[0-9()+-]");
         text_form.add(phone_field)
