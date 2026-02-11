@@ -31,7 +31,6 @@ class TextField(Component):
         if self._label:
             self.element.set_property("label", self._label)
         self.element.set_property("value", self._value)
-        self.element.set_property("manualValidation", True)
         if self._clear_button_visible:
             self.element.set_property("clearButtonVisible", True)
         if self._placeholder:

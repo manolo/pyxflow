@@ -35,7 +35,6 @@ class EmailField(Component):
             self.element.set_property("errorMessage", self._error_message)
         if self._clear_button_visible:
             self.element.set_property("clearButtonVisible", True)
-        self.element.set_property("manualValidation", True)
         self.element.add_event_listener("change", self._handle_change)
 
     @property

@@ -66,9 +66,6 @@ class TestDatePicker:
         invalid = [c for c in changes if c.get("key") == "invalid"]
         assert any(c["value"] is False for c in invalid)
 
-        manual_val = [c for c in changes if c.get("key") == "manualValidation"]
-        assert any(c["value"] is True for c in manual_val)
-
     def test_connector_init(self, tree):
         dp = DatePicker()
         dp._attach(tree)

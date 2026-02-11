@@ -35,7 +35,6 @@ class NumberField(Component):
             self.element.set_property("max", self._max)
         if self._step is not None:
             self.element.set_property("step", self._step)
-        self.element.set_property("manualValidation", True)
         self.element.add_event_listener("change", self._handle_change)
 
     @property

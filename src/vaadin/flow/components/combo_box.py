@@ -53,8 +53,6 @@ class ComboBox(Component, Generic[T]):
             self.element.set_property("allowCustomValue", True)
         if self._required:
             self.element.set_property("required", True)
-        self.element.set_property("manualValidation", True)
-
         # Register client-callable methods via Feature 19
         tree.add_change({
             "node": self.element.node_id,

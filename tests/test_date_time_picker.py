@@ -116,11 +116,6 @@ class TestDateTimePicker:
         assert dtp.get_value() is None
         assert dtp.element.get_property("value") == ""
 
-    def test_manual_validation(self, tree):
-        dtp = DateTimePicker()
-        dtp._attach(tree)
-        assert dtp.element.get_property("manualValidation") is True
-
     def test_connector_init(self, tree):
         """DateTimePicker initializes both datepicker and timepicker connectors."""
         dtp = DateTimePicker()

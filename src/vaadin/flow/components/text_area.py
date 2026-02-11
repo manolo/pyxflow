@@ -26,7 +26,6 @@ class TextArea(Component):
         if self._placeholder:
             self.element.set_property("placeholder", self._placeholder)
         self.element.set_property("value", self._value)
-        self.element.set_property("manualValidation", True)
         self.element.add_event_listener("change", self._handle_change)
 
     @property

@@ -31,7 +31,6 @@ class PasswordField(Component):
         if self._placeholder:
             self.element.set_property("placeholder", self._placeholder)
         self.element.set_property("revealButtonHidden", not self._reveal_button_visible)
-        self.element.set_property("manualValidation", True)
         self.element.add_event_listener("change", self._handle_change)
 
     @property

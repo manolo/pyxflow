@@ -42,8 +42,6 @@ class DatePicker(Component):
             self.element.set_property("max", self._max.isoformat())
         if self._required:
             self.element.set_property("required", True)
-        self.element.set_property("manualValidation", True)
-
         # Init connector
         el_ref = {"@v-node": self.element.node.id}
         tree.queue_execute([
