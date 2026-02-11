@@ -226,7 +226,8 @@ class TestSelect:
         events = []
         select.add_value_change_listener(lambda e: events.append(e))
 
-        select._handle_value_changed({"value": "Y"})
+        # Value arrives via mSync (_sync_property), not event handler
+        select._sync_property("value", "Y")
 
         assert len(events) == 1
         assert select.get_value() == "Y"
@@ -240,6 +241,37 @@ class TestSelect:
 
         # Label should be generated
         assert select._get_item_label(1) == "Option: 1"
+
+    def test_event_handler_does_not_overwrite_synced_value(self, tree):
+        """_handle_value_changed must not overwrite value set by _sync_property.
+
+        Regression test: in a real RPC batch, mSync sets the value first,
+        then the event fires with empty data. The event handler must be a
+        no-op so it doesn't reset the value to None.
+        """
+        select = Select()
+        select.set_items("A", "B", "C")
+        select._attach(tree)
+
+        # Simulate RPC batch: mSync first, then event
+        select._sync_property("value", "B")
+        select._handle_value_changed({})  # empty event_data
+
+        assert select.get_value() == "B"  # must NOT be None
+
+    def test_sync_property_fires_listener_only_on_change(self, tree):
+        """_sync_property should not fire listeners when value hasn't changed."""
+        select = Select()
+        select.set_items("A", "B")
+        select._attach(tree)
+
+        events = []
+        select.add_value_change_listener(lambda e: events.append(e))
+
+        select._sync_property("value", "A")
+        select._sync_property("value", "A")  # same value again
+
+        assert len(events) == 1  # only one event fired
 
 
 class TestRadioButtonGroup:
@@ -282,10 +314,39 @@ class TestRadioButtonGroup:
         events = []
         group.add_value_change_listener(lambda e: events.append(e))
 
-        group._handle_value_changed({"value": "Z"})
+        # Value arrives via mSync (_sync_property), not event handler
+        group._sync_property("value", "Z")
 
         assert len(events) == 1
         assert group.get_value() == "Z"
+
+    def test_event_handler_does_not_overwrite_synced_value(self, tree):
+        """_handle_value_changed must not overwrite value set by _sync_property.
+
+        Regression test: mSync sets value, then event fires with empty data.
+        """
+        group = RadioButtonGroup()
+        group.set_items("A", "B", "C")
+        group._attach(tree)
+
+        group._sync_property("value", "B")
+        group._handle_value_changed({})
+
+        assert group.get_value() == "B"
+
+    def test_sync_property_fires_listener_only_on_change(self, tree):
+        """_sync_property should not fire listeners when value hasn't changed."""
+        group = RadioButtonGroup()
+        group.set_items("A", "B")
+        group._attach(tree)
+
+        events = []
+        group.add_value_change_listener(lambda e: events.append(e))
+
+        group._sync_property("value", "A")
+        group._sync_property("value", "A")
+
+        assert len(events) == 1
 
 
 class TestCheckboxGroup:
@@ -328,10 +389,39 @@ class TestCheckboxGroup:
         events = []
         group.add_value_change_listener(lambda e: events.append(e))
 
-        group._handle_value_changed({"value": ["X", "Z"]})
+        # Value arrives via mSync (_sync_property), not event handler
+        group._sync_property("value", ["X", "Z"])
 
         assert len(events) == 1
         assert group.get_value() == {"X", "Z"}
+
+    def test_event_handler_does_not_overwrite_synced_value(self, tree):
+        """_handle_value_changed must not overwrite value set by _sync_property.
+
+        Regression test: mSync sets value, then event fires with empty data.
+        """
+        group = CheckboxGroup()
+        group.set_items("A", "B", "C")
+        group._attach(tree)
+
+        group._sync_property("value", ["A", "C"])
+        group._handle_value_changed({})
+
+        assert group.get_value() == {"A", "C"}
+
+    def test_sync_property_fires_listener_only_on_change(self, tree):
+        """_sync_property should not fire listeners when value hasn't changed."""
+        group = CheckboxGroup()
+        group.set_items("A", "B")
+        group._attach(tree)
+
+        events = []
+        group.add_value_change_listener(lambda e: events.append(e))
+
+        group._sync_property("value", ["A"])
+        group._sync_property("value", ["A"])
+
+        assert len(events) == 1
 
     def test_empty_value(self):
         """Empty value is an empty set."""

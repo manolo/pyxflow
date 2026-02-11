@@ -107,22 +107,17 @@ class CheckboxGroup(HasValidation, HasRequired, Component, Generic[T]):
         self._change_listeners.append(listener)
 
     def _handle_value_changed(self, event_data: dict):
-        """Handle value-changed event from client."""
-        value_list = event_data.get("value", [])
-        # Find items that match the labels
-        self._value = set()
-        for value_str in value_list:
-            for item in self._items:
-                if self._get_item_label(item) == value_str:
-                    self._value.add(item)
-                    break
+        """Handle value-changed event from client.
 
-        for listener in self._change_listeners:
-            listener(event_data)
+        Value arrives via _sync_property (mSync), not event_data.
+        This handler is a no-op — change listeners fire from _sync_property.
+        """
+        pass
 
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""
         if name == "value":
+            old_value = self._value.copy()
             # value is a list of labels
             self._value = set()
             if isinstance(value, list):
@@ -131,3 +126,7 @@ class CheckboxGroup(HasValidation, HasRequired, Component, Generic[T]):
                         if self._get_item_label(item) == value_str:
                             self._value.add(item)
                             break
+            # Fire change listeners
+            if self._value != old_value:
+                for listener in self._change_listeners:
+                    listener({"value": self._value})
