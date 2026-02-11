@@ -145,6 +145,46 @@ class FlowApp:
             srv_sock.close()
 
 
+def main():
+    """CLI entry point: ``vaadin <app_module> [--dev] [--debug]``."""
+    if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
+        print("Usage: vaadin <app_module> [--dev] [--debug] [--port PORT] [--host HOST]")
+        print()
+        print("  app_module  Python module with views (e.g. demo.views)")
+        print("  --dev       Auto-reload on source changes")
+        print("  --debug     Verbose UIDL protocol logging")
+        print("  --port N    Server port (default: 8080)")
+        print("  --host H    Server host (default: localhost)")
+        sys.exit(0)
+
+    views = sys.argv[1]
+    args = sys.argv[2:]
+
+    port = 8080
+    host = "localhost"
+    if "--port" in args:
+        idx = args.index("--port")
+        port = int(args[idx + 1])
+        args = args[:idx] + args[idx + 2:]
+    if "--host" in args:
+        idx = args.index("--host")
+        host = args[idx + 1]
+        args = args[:idx] + args[idx + 2:]
+
+    debug = "--debug" in args
+    dev = "--dev" in args
+
+    if dev:
+        # Reuse FlowApp dev mode
+        app = FlowApp.__new__(FlowApp)
+        app._views = views
+        app._port = port
+        app._host = host
+        app._run_dev(debug)
+    else:
+        _serve(views, host, port, debug)
+
+
 def _dev_serve():
     """Entry point for dev-mode child process (reads config from env)."""
     try:

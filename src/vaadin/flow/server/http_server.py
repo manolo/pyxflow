@@ -350,15 +350,15 @@ def get_bundle_directory() -> Path | None:
     It is generated from a reference Java Vaadin application.
 
     Search order:
-    1. ./bundle/ in the project root (recommended)
-    2. ../my-hello/target/... (development fallback)
+    1. Package-internal bundle (inside installed package)
+    2. ./bundle/ in the project root (development override)
     """
     # Check common locations (in priority order)
     candidates = [
-        # Project-local bundle (recommended)
+        # Package-internal bundle (ships inside the wheel)
+        Path(__file__).parents[1] / "bundle",
+        # Project-local bundle (development override)
         Path.cwd() / "bundle",
-        # Development: my-hello reference app
-        Path(__file__).parents[5] / "my-hello" / "target" / "classes" / "META-INF" / "VAADIN" / "webapp",
     ]
 
     for candidate in candidates:

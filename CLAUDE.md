@@ -117,8 +117,7 @@ browser_take_screenshot → visual check
 
 ## Bundle Location
 
-PyFlow serves the production bundle from:
-```
-../bundle-generator/target/ → extracted to bundle/
-```
-Generate with: `cd ../bundle-generator && ./generate-bundle.sh`
+The bundle lives inside the package at `src/vaadin/flow/bundle/` so it ships with the wheel.
+At runtime, `get_bundle_directory()` finds it via `Path(__file__).parents[1] / "bundle"`.
+
+To regenerate: `cd ../bundle-generator && ./generate-bundle.sh`, then copy output to `src/vaadin/flow/bundle/`.

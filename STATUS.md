@@ -198,6 +198,12 @@ ListBox, MultiSelectListBox, MultiSelectComboBox, VirtualList, MessageInput, Mes
 ### ~~Phase 12 — WebSocket Push~~ ✓ DONE
 Atmosphere WebSocket protocol, `UI.access()` / `UI.push()` API, push sender coroutine, push demo view. See `../specs/PROTOCOL.md` § WebSocket Push.
 
+### Packaging
+- [x] PyPI-ready wheel — `pip install vaadin-pyflow` or `pip install git+https://github.com/manolo/vaadin-pyflow.git`
+- [x] Bundle inside package — `src/vaadin/flow/bundle/` ships in wheel (1.5 MB compressed)
+- [x] CLI entry point — `vaadin <app_module> [--dev] [--debug] [--port N]`
+- [x] Apache 2.0 LICENSE file
+
 ### Pending
 - [x] `@ClientCallable` methods — Decorator, Feature 19 auto-registration, promise resolution/rejection
 

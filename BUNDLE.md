@@ -4,8 +4,10 @@ PyFlow reuses Vaadin's frontend infrastructure (FlowClient, web components, Lumo
 
 ## What's in the Bundle
 
+The bundle lives inside the Python package at `src/vaadin/flow/bundle/` so it ships with the wheel.
+
 ```
-bundle/
+src/vaadin/flow/bundle/
 ├── index.html                     # Entry point HTML
 ├── VAADIN/build/
 │   ├── indexhtml-*.js              # Entry point, initializes FlowClient
@@ -14,11 +16,14 @@ bundle/
 │   ├── generated-flow-imports-*.js # ALL web components (~3.7MB)
 │   ├── commonjsHelpers-*.js        # CommonJS compatibility
 │   └── *.br                        # Brotli-compressed versions
-└── lumo/                           # Lumo theme CSS (from vaadin-lumo-theme JAR)
-    ├── lumo.css                    # Main theme (224KB) - colors, typography, icons
-    ├── utility.css                 # Utility classes (34KB, optional)
-    └── presets/
-        └── compact.css             # Compact preset (566B, optional)
+├── lumo/                           # Lumo theme CSS (from vaadin-lumo-theme JAR)
+│   ├── lumo.css                    # Main theme (224KB) - colors, typography, icons
+│   ├── utility.css                 # Utility classes (34KB, optional)
+│   └── presets/
+│       └── compact.css             # Compact preset (566B, optional)
+└── aura/                           # Aura theme CSS
+    ├── aura.css                    # Aura theme styles
+    └── fonts/                      # Aura fonts (InstrumentSans)
 ```
 
 ### Theme CSS
@@ -64,7 +69,7 @@ We use the **unoptimized** version (single file, no code splitting) for simplici
 │                       PyFlow Server                              │
 ├─────────────────────────────────────────────────────────────────┤
 │  - Generates index.html                                         │
-│  - Serves bundle/VAADIN/* static files                          │
+│  - Serves VAADIN/* static files from package bundle              │
 │  - Handles UIDL protocol (init, events, sync)                   │
 │  - Manages StateTree (server-side component state)              │
 └─────────────────────────────────────────────────────────────────┘
@@ -83,16 +88,16 @@ curl -LO "https://repo1.maven.org/maven2/com/vaadin/vaadin-prod-bundle/25.0.4/va
 # Extract the unoptimized bundle
 unzip -o vaadin-prod-bundle-25.0.4.jar "vaadin-prod-bundle-unoptimized/webapp/VAADIN/build/*" -d extracted
 
-# Copy to PyFlow
+# Copy to PyFlow (bundle lives inside the package)
 cd /path/to/vaadin-pyflow
-rm -rf bundle/VAADIN/build/*
-cp /tmp/extracted/vaadin-prod-bundle-unoptimized/webapp/VAADIN/build/* bundle/VAADIN/build/
+rm -rf src/vaadin/flow/bundle/VAADIN/build/*
+cp /tmp/extracted/vaadin-prod-bundle-unoptimized/webapp/VAADIN/build/* src/vaadin/flow/bundle/VAADIN/build/
 ```
 
 ### Verify
 
 ```bash
-ls bundle/VAADIN/build/
+ls src/vaadin/flow/bundle/VAADIN/build/
 # Should show: FlowClient-*.js, indexhtml-*.js, generated-flow-imports-*.js, etc.
 ```
 
