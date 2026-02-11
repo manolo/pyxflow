@@ -400,6 +400,13 @@ def get_index_html() -> str:
                 '<meta charset="UTF-8" />',
                 '<meta charset="UTF-8" />\n  <base href="/">'
             )
+            # Prevent document-level scrolling — AppLayout handles its own
+            # internal scroll.  Without this the browser can scroll the
+            # <html> element past the layout, leaving a white gap.
+            html = html.replace(
+                "margin: 0;",
+                "margin: 0;\n      overflow: hidden;"
+            )
             # Enable experimental feature flags before bundle loads
             html = html.replace(
                 "</head>",
