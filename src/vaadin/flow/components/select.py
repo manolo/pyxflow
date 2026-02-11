@@ -165,11 +165,14 @@ class Select(HasValidation, HasRequired, Component, Generic[T]):
         if name == "value":
             old_value = self._value
             # Find the item that matches this label
-            self._value = None
+            matched = None
             for item in self._items:
                 if self._get_item_label(item) == value:
-                    self._value = item
+                    matched = item
                     break
+            # If no item matched and value is empty, preserve "" (deselected)
+            # to stay consistent with Binding.clear() which sets value to "".
+            self._value = matched if matched is not None else (value if value == "" else None)
             # Fire change listeners
             if self._value != old_value:
                 for listener in self._change_listeners:
