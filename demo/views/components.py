@@ -26,6 +26,7 @@ from vaadin.flow.components import (
     EmailField,
     FlexDirection,
     FlexLayout,
+    FlexWrap,
     FormLayout,
     Grid,
     H2,
@@ -33,6 +34,7 @@ from vaadin.flow.components import (
     Header,
     HorizontalLayout,
     Icon,
+    Image,
     IntegerField,
     LitRenderer,
     Markdown,
@@ -280,7 +282,7 @@ class ComponentsDemoView(VerticalLayout):
         section.add(self.context_label)
 
         # --- Markdown ---
-        section = self.add_section("Markdown", "col-span-2")
+        section = self.add_section("Markdown", "col-span-2", "tall")
 
         markdown = Markdown("""
 ## Rich Text Formatting
@@ -366,7 +368,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         section.add(HorizontalLayout(shortcut_btn, shortcut_label))
 
         # --- Text Input Fields ---
-        section = self.add_section("Text Input Fields", "col-span-2")
+        section = self.add_section("Text Input Fields", "col-span-2", "tall")
 
         text_form = FormLayout()
 
@@ -417,8 +419,8 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
         section.add(numeric_form)
 
-        # --- Date, Time & Upload ---
-        section = self.add_section("Date, Time & Upload", "col-span-2")
+        # --- Date & Time ---
+        section = self.add_section("Date & Time", "col-span-2", "tall")
 
         date_time_form = FormLayout()
 
@@ -445,18 +447,27 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         custom_field.add(prefix, number)
         date_time_form.add(custom_field)
 
-
-        upload = Upload()
-        upload_label = Span("Upload status: (none)")
-        upload.set_receiver(self.on_upload_received)
-        upload.add_succeeded_listener(self.on_upload_succeeded)
-        date_time_form.add(upload)
-
         section.add(date_time_form)
-        date_time_form.add(upload_label)
+
+        # --- Upload / Card ---
+        section = self.add_section("Upload / Card", "col-span-2")
+
+        self.upload = Upload()
+        self.upload.set_accepted_file_types("image/*")
+        self.upload_cards = {}  # filename -> Card
+        self.upload.set_receiver(self.on_upload_received)
+        self.upload.add_succeeded_listener(self.on_upload_succeeded)
+        self.upload.add_file_removed_listener(self.on_upload_file_removed)
+
+        self.upload_gallery = FlexLayout()
+        self.upload_gallery.set_flex_wrap(FlexWrap.WRAP)
+        self.upload_gallery._set_style("gap", "var(--vaadin-gap-m)")
+
+        section.add(self.upload)
+        section.add(self.upload_gallery)
 
         # --- Selection Components ---
-        section = self.add_section("Selection Components", "col-span-2")
+        section = self.add_section("Selection Components", "col-span-2", "tall")
 
         selection_form = FormLayout()
 
@@ -816,16 +827,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         scroller._set_style("border", "1px solid var(--vaadin-border-color)")
         section.add(scroller)
 
-        # --- Card ---
-        section = self.add_section("Card")
-
-        card = Card()
-        card.set_title("Card Title")
-        card.set_subtitle("Card subtitle")
-        card.add(Span("This is the card content area."))
-        card.add_to_footer(Button("Action"))
-        section.add(card)
-
         # --- MasterDetailLayout ---
         section = self.add_section("MasterDetailLayout", "col-span-2")
 
@@ -948,10 +949,46 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
             self.tabs_label.set_text(f"Selected tab: {self.tab_list[idx].get_label()}")
 
     def on_upload_received(self, filename, mime_type, data):
-        self.upload_label.set_text(f"Uploaded: {filename} ({len(data)} bytes)")
+        import base64
+        size_kb = len(data) / 1024
+        b64 = base64.b64encode(data).decode("ascii")
+        img = Image(f"data:{mime_type};base64,{b64}", filename)
+        card = Card()
+        card.add_theme_name("stretch-media")
+        card.set_media(img)
+        title_div = Div(filename)
+        title_div._set_style("overflow", "hidden")
+        title_div._set_style("text-overflow", "ellipsis")
+        title_div._set_style("white-space", "nowrap")
+        card.set_title(title_div)
+        card.set_subtitle(f"{size_kb:.1f} KB")
+        delete_btn = Button(icon=Icon("vaadin:trash"))
+        delete_btn.add_theme_name("icon", "tertiary", "small", "error")
+        delete_btn.add_click_listener(lambda e, fn=filename: self._delete_upload_card(fn))
+        card.set_header_suffix(delete_btn)
+        card.set_width("250px")
+        self.upload_cards[filename] = card
+        self.upload_gallery.add(card)
 
     def on_upload_succeeded(self, event_data):
         pass
+
+    def on_upload_file_removed(self, event_data):
+        filename = event_data.get("event.detail.file.name", "")
+        self._remove_upload_card(filename)
+
+    def _delete_upload_card(self, filename: str):
+        self._remove_upload_card(filename)
+        # Remove file from upload component's client-side file list
+        self.upload.element._tree.queue_execute([
+            {"@v-node": self.upload.element.node_id},
+            f"return (async function(){{ $0.files = $0.files.filter(f => f.name !== '{filename.replace(chr(39), chr(92)+chr(39))}') }}).apply($0)"
+        ])
+
+    def _remove_upload_card(self, filename: str):
+        card = self.upload_cards.pop(filename, None)
+        if card:
+            self.upload_gallery.remove(card)
 
     # --- DataProvider methods ---
 
