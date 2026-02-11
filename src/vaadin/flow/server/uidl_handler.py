@@ -829,11 +829,16 @@ class UidlHandler:
         """Handle publishedEventHandler RPC (client-callable methods).
 
         Dispatches to the component method named by templateEventMethodName.
-        Used by Dialog (handleClientClose), Grid (select, deselect, etc.).
+        Used by Dialog (handleClientClose), Grid (select, deselect, etc.),
+        and user-defined @ClientCallable methods.
+
+        When `promise` >= 0, the client expects a return value. The result
+        is sent back via the internal `}p` promise-resolution method.
         """
         node_id: int = rpc["node"]
         method_name = rpc.get("templateEventMethodName")
         args = rpc.get("templateEventMethodArgs", [])
+        promise_id = rpc.get("promise", -1)
 
         component = self._tree.get_component(node_id)
         if component and method_name:
@@ -842,7 +847,23 @@ class UidlHandler:
             py_name = re.sub(r'([A-Z])', r'_\1', method_name).lower().lstrip('_')
             method = getattr(component, py_name, None)
             if method and callable(method):
-                method(*args)
+                if promise_id == -1:
+                    # Fire-and-forget (no return value expected)
+                    method(*args)
+                else:
+                    # Client expects a return value via promise resolution
+                    try:
+                        result = method(*args)
+                        component.element.execute_js(
+                            "this.$server['}p']($0, true, $1)",
+                            promise_id, result
+                        )
+                    except Exception:
+                        component.element.execute_js(
+                            "this.$server['}p']($0, false)",
+                            promise_id
+                        )
+                        raise
 
     def _build_resync_response(self) -> dict:
         """Build a resynchronize response (no state change, no syncId increment)."""

@@ -13,6 +13,15 @@ if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
 
 
+def ClientCallable(func):
+    """Mark a component method as callable from client-side JavaScript.
+
+    Client code can call: this.$server.methodName(arg1, arg2)
+    """
+    func._client_callable = True
+    return func
+
+
 class Component:
     """Base class for all UI components.
 
@@ -106,6 +115,27 @@ class Component:
             for script, args in pending_js:
                 self._element.execute_js(script, *args)
             del self._pending_execute_js
+        # Auto-register @ClientCallable methods in Feature 19
+        self._register_client_callable_methods(tree)
+
+    def _register_client_callable_methods(self, tree: "StateTree"):
+        """Register @ClientCallable methods in Feature 19 (CLIENT_DELEGATE_HANDLERS)."""
+        from vaadin.flow.core.state_node import Feature
+        callable_methods = []
+        seen = set()
+        for cls in type(self).__mro__:
+            for name, method in cls.__dict__.items():
+                if name not in seen and callable(method) and getattr(method, '_client_callable', False):
+                    callable_methods.append(name)
+                    seen.add(name)
+        if callable_methods:
+            tree.add_change({
+                "node": self._element.node_id,
+                "type": "splice",
+                "feat": Feature.CLIENT_DELEGATE_HANDLERS,
+                "index": 0,
+                "add": callable_methods,
+            })
 
     def get_element(self) -> Element:
         """Get the element (public API)."""
