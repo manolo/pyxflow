@@ -307,9 +307,9 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         # --- Buttons & Actions ---
         section = self.add_section("Buttons & Actions", "col-span-3")
 
-        button = Button("Click Me!")
-        button.add_theme_name("primary")
-        button.add_click_listener(self.on_button_click)
+        self.click_button = Button("Clicked: 0")
+        self.click_button.add_theme_name("primary")
+        self.click_button.add_click_listener(self.on_button_click)
 
         dialog_btn = Button("Open Dialog")
         dialog_btn.add_click_listener(self.open_dialog)
@@ -331,11 +331,8 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         test_error_btn.add_click_listener(self.trigger_error)
 
         button_row = HorizontalLayout()
-        button_row.add(button, dialog_btn, notification_btn, success_btn, error_btn, test_error_btn)
+        button_row.add(self.click_button, dialog_btn, notification_btn, success_btn, error_btn, test_error_btn)
         section.add(button_row)
-
-        self.click_label = Span("Click count: 0")
-        section.add(self.click_label)
 
         # Dialog (hidden initially — overlay, not a visible card)
         self.dialog = Dialog()
@@ -562,7 +559,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         people = [p.to_dict() for p in people_service.find_all()]
 
         # --- CRUD Master-Detail ---
-        section = self.add_section("CRUD Master-Detail (Binder)", "col-span-3")
+        section = self.add_section("CRUD Master-Detail (Binder)", "col-span-3", "tall")
 
         self.crud_people = [CrudPerson.from_dict(p) for p in people]
         crud_roles = sorted({p["role"] for p in people})
@@ -576,6 +573,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
         # Master: Grid
         self.crud_master = VerticalLayout()
+        self.crud_master.set_height_full()
 
         self.crud_grid = Grid()
         self.crud_grid.set_columns("name", "email", "age", "role", "city", "department")
@@ -913,20 +911,20 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
     def on_button_click(self, event):
         self.click_count += 1
-        self.click_label.set_text(f"Click count: {self.click_count}")
+        self.click_button.set_text(f"Clicked: {self.click_count}")
 
     def open_dialog(self, event):
         self.dialog.open()
 
     def show_notification(self, event):
-        Notification.show("This is a notification!", 3000, Notification.Position.BOTTOM_CENTER)
+        Notification.show("This is a notification!", 3000, Notification.Position.BOTTOM_START)
 
     def show_success(self, event):
-        n = Notification.show("Operation successful!", 3000, Notification.Position.TOP_CENTER)
+        n = Notification.show("Operation successful!", 3000, Notification.Position.TOP_END)
         n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
 
     def show_error(self, event):
-        n = Notification.show("Something went wrong!", 5000, Notification.Position.MIDDLE)
+        n = Notification.show("Something went wrong!", 5000, Notification.Position.BOTTOM_CENTER)
         n.add_theme_variants(NotificationVariant.LUMO_ERROR)
 
     def trigger_error(self, event):
