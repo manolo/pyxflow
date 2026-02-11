@@ -128,6 +128,8 @@ class ComponentsDemoView(VerticalLayout):
         )
         section.add(login_form)
         section.add(self.login_label)
+        login_form.element.execute_js(
+            "setTimeout(() => document.activeElement?.blur(), 0)")
 
         # --- Theme Selector (ListBox) ---
         section = self.add_section("ListBox")
