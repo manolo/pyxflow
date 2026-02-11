@@ -410,7 +410,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         numeric_form.add(number_field)
 
         integer_field = IntegerField("IntegerField")
-        integer_field.set_value(42)
+        integer_field.set_value(40)
         integer_field.set_step(5)
         numeric_form.add(integer_field)
 
