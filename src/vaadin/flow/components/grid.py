@@ -55,6 +55,7 @@ class Column:
         self._auto_width = False
         self._resizable = False
         self._sortable = False
+        self._text_align: str | None = None
         self._element = None
         self._node = None
         self._renderer: Renderer | None = None
@@ -115,6 +116,13 @@ class Column:
         self._sortable = sortable
         return self
 
+    def set_text_align(self, align: str) -> "Column":
+        """Set column text alignment ('start', 'center', 'end')."""
+        self._text_align = align
+        if self._node:
+            self._node.put(Feature.ELEMENT_PROPERTY_MAP, "textAlign", align)
+        return self
+
     def set_renderer(self, renderer: Renderer) -> "Column":
         """Set a renderer for this column."""
         self._renderer = renderer
@@ -143,6 +151,8 @@ class Column:
             self._node.put(Feature.ELEMENT_PROPERTY_MAP, "autoWidth", True)
         if self._resizable:
             self._node.put(Feature.ELEMENT_PROPERTY_MAP, "resizable", True)
+        if self._text_align:
+            self._node.put(Feature.ELEMENT_PROPERTY_MAP, "textAlign", self._text_align)
         return self._node
 
 

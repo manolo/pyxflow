@@ -9,6 +9,17 @@ _DEMO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 _MAX_DEPTH = 3
 
 
+def _format_size(size_bytes: int) -> str:
+    """Format file size with Spanish locale (dot=thousands, comma=decimal)."""
+    if size_bytes < 1024:
+        return f"{size_bytes} B"
+    if size_bytes >= 512 * 1024:
+        value = size_bytes / (1024 * 1024)
+        return f"{value:,.2f} MB".replace(",", "X").replace(".", ",").replace("X", ".")
+    value = size_bytes / 1024
+    return f"{value:,.2f} KB".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
 def _scan_dir(path: pathlib.Path) -> list[dict]:
     """Scan a directory and return sorted entries (dirs first, then files)."""
     try:
@@ -21,7 +32,7 @@ def _scan_dir(path: pathlib.Path) -> list[dict]:
             continue
         items.append({
             "name": entry.name,
-            "size": entry.stat().st_size if entry.is_file() else "",
+            "size": _format_size(entry.stat().st_size) if entry.is_file() else "",
             "type": "Folder" if entry.is_dir() else entry.suffix or "file",
             "_path": str(entry),
         })
@@ -49,7 +60,7 @@ class FileExplorerView(VerticalLayout):
         self._name_col = self.tree_grid.add_hierarchy_column(
             lambda item: item.get("name", ""), header="Name",
         )
-        self.tree_grid.add_column("size", header="Size").set_auto_width(True)
+        self.tree_grid.add_column("size", header="Size").set_auto_width(True).set_text_align("end")
         self.tree_grid.add_column("type", header="Type").set_auto_width(True)
 
         # Extra header row spanning all columns

@@ -350,7 +350,8 @@ All components inherit from `Component` which provides:
 | `columns` property / `prepend_header_row` | [x] |
 | `HeaderRow.join(*columns)` → `ColumnGroup` / `HeaderCell.set_text` | [x] |
 | `set_all_rows_visible` | [ ] |
-| Column: `frozen` / `frozen_to_end` / `text_align` / `visible` / `key` | [ ] |
+| Column: `set_text_align` | [x] |
+| Column: `frozen` / `frozen_to_end` / `visible` / `key` | [ ] |
 | `get_column_by_key` / `remove_column` | [ ] |
 | `set_item_details_renderer` / `set_details_visible` | [ ] |
 | `append_header_row` / `append_footer_row` / `get_header_rows` | [ ] |
