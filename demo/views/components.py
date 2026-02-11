@@ -508,6 +508,27 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         section.add(multi_list_box)
         section.add(multi_list_box_label)
 
+        # --- MasterDetailLayout ---
+        section = self.add_section("MasterDetailLayout", "col-span-2")
+
+        md_layout = MasterDetailLayout()
+        md_master = VerticalLayout()
+        for i in range(1, 4):
+            md_btn = Button(f"Item {i}")
+            def on_md_click(e, idx=i, layout=md_layout):
+                detail = VerticalLayout()
+                detail.add(H3(f"Item {idx}"))
+                detail.add(Span(f"Details for item {idx}."))
+                close_btn = Button("Close")
+                close_btn.add_click_listener(lambda ev, l=layout: l.set_detail(None))
+                detail.add(close_btn)
+                layout.set_detail(detail)
+            md_btn.add_click_listener(on_md_click)
+            md_master.add(md_btn)
+        md_layout.set_master(md_master)
+        md_layout.set_height("250px")
+        md_layout._set_style("border", "1px solid var(--vaadin-border-color)")
+        section.add(md_layout)
 
         # --- FlexLayout ---
         section = self.add_section("FlexLayout", "col-span-2")
@@ -545,6 +566,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         content_div._set_style("align-items", "center")
         content_div._set_style("justify-content", "center")
 
+
         middle = FlexLayout(nav_div, content_div)
         middle.set_width("100%")
 
@@ -559,8 +581,8 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         # --- Shared data for all grids ---
         people = [p.to_dict() for p in people_service.find_all()]
 
-        # --- CRUD Master-Detail ---
-        section = self.add_section("CRUD Master-Detail (Binder)", "col-span-3", "tall")
+        # --- MasterDetail & Binder ---
+        section = self.add_section("MasterDetail & Binder", "col-span-3", "tall")
 
         self.crud_people = [CrudPerson.from_dict(p) for p in people]
         crud_roles = sorted({p["role"] for p in people})
@@ -825,28 +847,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         scroller._set_style("flex", "none")
         scroller._set_style("border", "1px solid var(--vaadin-border-color)")
         section.add(scroller)
-
-        # --- MasterDetailLayout ---
-        section = self.add_section("MasterDetailLayout", "col-span-2")
-
-        md_layout = MasterDetailLayout()
-        md_master = VerticalLayout()
-        for i in range(1, 4):
-            md_btn = Button(f"Item {i}")
-            def on_md_click(e, idx=i, layout=md_layout):
-                detail = VerticalLayout()
-                detail.add(H3(f"Item {idx}"))
-                detail.add(Span(f"Details for item {idx}."))
-                close_btn = Button("Close")
-                close_btn.add_click_listener(lambda ev, l=layout: l.set_detail(None))
-                detail.add(close_btn)
-                layout.set_detail(detail)
-            md_btn.add_click_listener(on_md_click)
-            md_master.add(md_btn)
-        md_layout.set_master(md_master)
-        md_layout.set_height("250px")
-        md_layout._set_style("border", "1px solid var(--vaadin-border-color)")
-        section.add(md_layout)
 
         # --- MessageInput + MessageList ---
         section = self.add_section("MessageInput + MessageList", "col-span-2")
