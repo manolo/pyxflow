@@ -1,16 +1,16 @@
+import os
 import pathlib
+import subprocess
+import sys
 
 from vaadin.flow import Menu, Route
 from vaadin.flow.components import Button, TreeGrid, VerticalLayout
+from vaadin.flow.core.component import ClientCallable
 from demo.views.main_layout import MainLayout
 
-
 _DEMO_ROOT = pathlib.Path(__file__).resolve().parent.parent
-_MAX_DEPTH = 3
-
 
 def _format_size(size_bytes: int) -> str:
-    """Format file size with Spanish locale (dot=thousands, comma=decimal)."""
     if size_bytes < 1024:
         return f"{size_bytes} B"
     if size_bytes >= 512 * 1024:
@@ -21,7 +21,6 @@ def _format_size(size_bytes: int) -> str:
 
 
 def _scan_dir(path: pathlib.Path) -> list[dict]:
-    """Scan a directory and return sorted entries (dirs first, then files)."""
     try:
         entries = sorted(path.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower()))
     except PermissionError:
@@ -40,13 +39,10 @@ def _scan_dir(path: pathlib.Path) -> list[dict]:
 
 
 def _get_children(item: dict) -> list[dict]:
-    """Children provider: returns directory contents up to MAX_DEPTH."""
     p = pathlib.Path(item["_path"])
     if not p.is_dir():
         return []
     depth = len(p.relative_to(_DEMO_ROOT).parts)
-    if depth >= _MAX_DEPTH:
-        return []
     return _scan_dir(p)
 
 
@@ -74,6 +70,35 @@ class FileExplorerView(VerticalLayout):
 
         self.add(refresh_btn, self.tree_grid)
         self.expand(self.tree_grid)
+
+    def _attach(self, tree):
+        super()._attach(tree)
+        # Register dblclick → $server.open(key) after grid is attached
+        view_ref = {"@v-node": self.element.node_id}
+        grid_ref = {"@v-node": self.tree_grid.element.node_id}
+        tree.queue_execute([
+            view_ref, grid_ref,
+            "return (function() {"
+            "  $1.addEventListener('dblclick', function(e) {"
+            "    var ctx = $1.getEventContext(e);"
+            "    if (ctx && ctx.item) { $0.$server.open(ctx.item.key); }"
+            "  });"
+            "}).apply(null)",
+        ])
+
+    @ClientCallable
+    def open(self, key):
+        item = self.tree_grid._key_to_item.get(str(key))
+        if not item:
+            return
+        path = item.get("_path", "")
+        print(f"opening {os.path.relpath(path)}")
+        if sys.platform == "darwin":
+            subprocess.Popen(["open", path])
+        elif sys.platform == "win32":
+            os.startfile(path)
+        else:
+            subprocess.Popen(["xdg-open", path])
 
     def _load_data(self):
         root_items = _scan_dir(_DEMO_ROOT)
