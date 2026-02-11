@@ -194,3 +194,22 @@ class TestMasterDetailLayout:
         layout._attach(tree)
         layout.set_force_overlay(True)
         assert layout.element.node.get(Feature.ELEMENT_PROPERTY_MAP, "forceOverlay") is True
+
+    def test_duplicate_set_detail_deduplicates_execute(self, tree):
+        """Multiple set_detail calls in same cycle only send one _setDetail command.
+
+        This matches Java's pendingDetailsUpdate.cancelExecution() behavior.
+        Prevents duplicate _setDetail commands from cancelling each other's
+        View Transition animation.
+        """
+        layout = MasterDetailLayout()
+        layout._attach(tree)
+        layout.set_detail(Span("Detail"))
+        tree.collect_execute()  # clear
+
+        # Call set_detail(None) twice (simulates recursive event handler)
+        layout.set_detail(None)
+        layout.set_detail(None)
+        execute = tree.collect_execute()
+        set_detail_cmds = [cmd for cmd in execute if "_setDetail" in str(cmd)]
+        assert len(set_detail_cmds) == 1  # only one, not two

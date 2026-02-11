@@ -32,6 +32,7 @@ class MasterDetailLayout(Component):
         self._master: Component | None = None
         self._detail: Component | None = None
         self._has_initialized = False
+        self._pending_detail_cmd: list | None = None
 
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
@@ -88,21 +89,35 @@ class MasterDetailLayout(Component):
             })
 
     def _update_details(self):
-        """Call the web component's _setDetail() for DOM placement and animation."""
+        """Call the web component's _setDetail() for DOM placement and animation.
+
+        Like Java's ``updateDetails()``, cancels any previous pending
+        ``_setDetail`` command so that only the latest one is sent.
+        This prevents duplicate commands (e.g. from recursive event
+        handlers) from cancelling each other's View Transition animation.
+        """
         tree = self._element._tree
+        # Cancel previous pending command (Java: pendingDetailsUpdate.cancelExecution())
+        if self._pending_detail_cmd is not None:
+            try:
+                tree._pending_execute.remove(self._pending_detail_cmd)
+            except ValueError:
+                pass  # Already collected
         self_ref = {"@v-node": self.element.node_id}
         skip_transition = not self._has_initialized
         if self._detail and self._detail._element:
             detail_ref = {"@v-node": self._detail.element.node_id}
-            tree.queue_execute([
+            cmd = [
                 self_ref, detail_ref, skip_transition,
                 "return $0._setDetail($1, $2)"
-            ])
+            ]
         else:
-            tree.queue_execute([
+            cmd = [
                 self_ref, skip_transition,
                 "return $0._setDetail(null, $1)"
-            ])
+            ]
+        tree.queue_execute(cmd)
+        self._pending_detail_cmd = cmd
 
     def set_master(self, component: Component):
         """Set the master (list/overview) component."""
