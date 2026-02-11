@@ -18,6 +18,7 @@ class NumberField(Component):
         self._min: Optional[float] = None
         self._max: Optional[float] = None
         self._step: Optional[float] = None
+        self._step_buttons_visible: bool = False
         self._change_listeners: list[Callable] = []
 
     def _attach(self, tree):
@@ -35,6 +36,8 @@ class NumberField(Component):
             self.element.set_property("max", self._max)
         if self._step is not None:
             self.element.set_property("step", self._step)
+        if self._step_buttons_visible:
+            self.element.set_property("stepButtonsVisible", True)
         self.element.add_event_listener("change", self._handle_change)
 
     @property
@@ -112,6 +115,7 @@ class NumberField(Component):
 
     def set_step_buttons_visible(self, visible: bool):
         """Show or hide the step buttons."""
+        self._step_buttons_visible = visible
         if self._element:
             self.element.set_property("stepButtonsVisible", visible)
 
