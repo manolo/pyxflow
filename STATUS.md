@@ -5,7 +5,7 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~13,200 (core src/), ~32,200 (total with demo + tests)
-**Tests:** 1573 passing
+**Tests:** 1591 passing
 **Last updated:** 2026-02-11
 
 ---
@@ -114,7 +114,7 @@
 - [x] Deferred buffering - Values set before attach are buffered in `_pending_properties` and flushed on attach
 
 ### Data Binding
-- [x] Binder - Fluent API (`for_field().with_validator().with_converter().bind()`), `read_bean`, `write_bean`, `set_bean` (auto two-way sync), `is_dirty()` dirty tracking
+- [x] Binder - Fluent API (`for_field().with_validator().with_converter().bind()`), `read_bean`, `write_bean`, `set_bean` (auto two-way sync), `is_dirty()` dirty tracking with mSync-safe Select handling
 - [x] Validators - `required`, `min_length`, `max_length`, `pattern`, `value_range`, `positive`, `email`
 - [x] Converters - `string_to_int`, `string_to_float`, custom `Converter(to_model, to_presentation)`
 - [x] ValidationError - Raised by `write_bean()` with error results

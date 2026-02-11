@@ -50,7 +50,7 @@ vaadin-pyflow/
 ├── demo/               # Demo app + __main__.py entry point
 │   ├── views/          # View files (hello_world, about, components, grid, etc.)
 │   └── services/       # PeopleService (data access layer)
-├── tests/              # 1309 unit tests
+├── tests/              # 1591 unit tests
 └── STATUS.md           # Implementation progress
 ../bundle-generator/    # Java project → frontend bundle (shared, at root level)
 ```
