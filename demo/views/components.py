@@ -431,10 +431,20 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         time_picker.set_value(datetime.time(12, 0))
         date_time_form.add(time_picker)
 
-        date_time_picker = DateTimePicker("Meeting date and time")
+        date_time_picker = DateTimePicker("DateTimePicker")
         date_time_picker.set_value(datetime.datetime(2025, 6, 15, 14, 30))
         date_time_picker.set_step(1800)
         date_time_form.add(date_time_picker)
+
+        custom_field = CustomField("Custom Field")
+        prefix = Select("Prefix")
+        prefix.set_items("+1", "+34", "+44", "+358")
+        prefix.set_value("+34")
+        number = NumberField("Number")
+        number._set_style("flex-grow", "1")
+        custom_field.add(prefix, number)
+        date_time_form.add(custom_field)
+
 
         upload = Upload()
         upload_label = Span("Upload status: (none)")
@@ -489,20 +499,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         section.add(multi_list_box)
         section.add(multi_list_box_label)
 
-        # --- Custom Fields ---
-        section = self.add_section("Custom Fields")
-
-        custom_form = FormLayout()
-
-        custom_field = CustomField("Phone")
-        prefix = Select()
-        prefix.set_items("+1", "+44", "+358")
-        prefix.set_width("100px")
-        number = TextField("Phone number")
-        custom_field.add(prefix, number)
-        custom_form.add(custom_field)
-
-        section.add(custom_form)
 
         # --- FlexLayout ---
         section = self.add_section("FlexLayout", "col-span-2")

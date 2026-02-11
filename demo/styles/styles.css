@@ -70,6 +70,13 @@
     grid-row: span 2;
 }
 
+/* CustomField: children side by side */
+vaadin-custom-field::part(input-fields) {
+  display: flex;
+  align-items: baseline;
+  gap: var(--vaadin-gap-s);
+}
+
 /* Stopwatch */
 .sw-view {
   padding: 3em;
