@@ -3,6 +3,7 @@
 from typing import TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.core.state_node import Feature
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -13,6 +14,10 @@ class MasterDetailLayout(Component):
 
     The master area shows a list/overview, and the detail area shows
     details of a selected item. The detail can overlay on small screens.
+
+    The detail component is added as a **virtual child** (Feature 24) so
+    that the web component's ``_setDetail(element, skipTransition)``
+    method manages DOM placement and View Transition animation.
 
     Usage::
 
@@ -30,50 +35,63 @@ class MasterDetailLayout(Component):
 
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
+        # Default overlay mode = drawer (Java constructor does setOverlayMode(DRAWER))
+        self.element.set_property("stackOverlay", False)
+
         if self._master:
-            self._attach_child(self._master, tree)
+            self._attach_master(self._master, tree)
         if self._detail:
-            self._attach_child(self._detail, tree, slot="detail")
-            self._call_set_detail(skip_transition=True)
+            self._add_virtual_child(self._detail, tree)
+        self._update_details()
         self._has_initialized = True
 
-    def _attach_child(self, component: Component, tree: "StateTree", slot: str | None = None):
+    def _attach_master(self, component: Component, tree: "StateTree"):
+        """Attach master as regular child (Feature 2, default slot)."""
         component._ui = self._ui
         component._parent = self
         component._attach(tree)
-        if slot:
-            component.element.set_attribute("slot", slot)
         self.element.add_child(component.element)
 
-    def set_master(self, component: Component):
-        """Set the master (list/overview) component."""
-        if self._master and self._element:
-            self.element.remove_child(self._master.element)
-        self._master = component
-        if self._element:
-            self._attach_child(component, self._element._tree)
+    def _add_virtual_child(self, component: Component, tree: "StateTree"):
+        """Add a component as a virtual child (Feature 24).
 
-    def get_master(self) -> Component | None:
-        return self._master
+        Virtual children are tracked by the state tree but NOT placed in
+        the DOM by the protocol.  The web component's ``_setDetail()``
+        handles DOM placement and animation.
+        """
+        if not component._element:
+            component._ui = self._ui
+            component._parent = self
+            component._attach(tree)
+        # Mark as in-memory virtual child (required by FlowClient)
+        component.element._node.put(
+            Feature.ELEMENT_DATA, "payload", {"type": "inMemory"}
+        )
+        # Splice into Feature 24 of the layout
+        tree.add_change({
+            "node": self.element.node_id,
+            "type": "splice",
+            "feat": Feature.VIRTUAL_CHILDREN_LIST,
+            "index": 0,
+            "addNodes": [component.element.node_id],
+        })
 
-    def set_detail(self, component: Component | None):
-        """Set the detail component. Pass None to hide the detail area."""
-        if self._detail and self._element:
-            self.element.remove_child(self._detail.element)
-        self._detail = component
-        if self._element and component:
-            if component._element:
-                # Already attached — just re-add as child
-                self.element.add_child(component.element)
-            else:
-                self._attach_child(component, self._element._tree, slot="detail")
-        if self._element:
-            self._call_set_detail(skip_transition=not self._has_initialized)
+    def _remove_virtual_child(self):
+        """Remove the current detail from virtual children (Feature 24)."""
+        if self._detail and self._detail._element:
+            self._element._tree.add_change({
+                "node": self.element.node_id,
+                "type": "splice",
+                "feat": Feature.VIRTUAL_CHILDREN_LIST,
+                "index": 0,
+                "remove": 1,
+            })
 
-    def _call_set_detail(self, skip_transition: bool = False):
-        """Call the web component's _setDetail() for animation."""
+    def _update_details(self):
+        """Call the web component's _setDetail() for DOM placement and animation."""
         tree = self._element._tree
         self_ref = {"@v-node": self.element.node_id}
+        skip_transition = not self._has_initialized
         if self._detail and self._detail._element:
             detail_ref = {"@v-node": self._detail.element.node_id}
             tree.queue_execute([
@@ -86,8 +104,74 @@ class MasterDetailLayout(Component):
                 "return $0._setDetail(null, $1)"
             ])
 
+    def set_master(self, component: Component):
+        """Set the master (list/overview) component."""
+        if self._master and self._element:
+            self.element.remove_child(self._master.element)
+        self._master = component
+        if self._element:
+            self._attach_master(component, self._element._tree)
+
+    def get_master(self) -> Component | None:
+        return self._master
+
+    def set_detail(self, component: Component | None):
+        """Set the detail component. Pass None to hide the detail area.
+
+        The detail is added as a virtual child (Feature 24) so that
+        ``_setDetail()`` can manage DOM placement with animation.
+        """
+        # Remove previous detail from virtual children
+        if self._detail and self._element and self._detail._element:
+            self._remove_virtual_child()
+
+        self._detail = component
+
+        if self._element and component:
+            self._add_virtual_child(component, self._element._tree)
+
+        if self._element:
+            self._update_details()
+
     def get_detail(self) -> Component | None:
         return self._detail
+
+    def set_animation_enabled(self, enabled: bool):
+        """Set whether layout animation is enabled."""
+        if self._element:
+            self.element.set_property("noAnimation", not enabled)
+        else:
+            if not hasattr(self, "_pending_properties"):
+                self._pending_properties = {}
+            self._pending_properties["noAnimation"] = not enabled
+
+    def is_animation_enabled(self) -> bool:
+        """Check if layout animation is enabled (default: True)."""
+        if self._element:
+            return not self.element.node.get(
+                Feature.ELEMENT_PROPERTY_MAP, "noAnimation", False
+            )
+        pending = getattr(self, "_pending_properties", {})
+        return not pending.get("noAnimation", False)
+
+    def set_overlay_mode(self, mode: str):
+        """Set the overlay mode ('drawer' or 'stack')."""
+        stack = mode == "stack"
+        if self._element:
+            self.element.set_property("stackOverlay", stack)
+        else:
+            if not hasattr(self, "_pending_properties"):
+                self._pending_properties = {}
+            self._pending_properties["stackOverlay"] = stack
+
+    def set_force_overlay(self, force: bool):
+        """Set whether overlay mode is enforced."""
+        if self._element:
+            self.element.set_property("forceOverlay", force)
+        else:
+            if not hasattr(self, "_pending_properties"):
+                self._pending_properties = {}
+            self._pending_properties["forceOverlay"] = force
 
     def set_detail_size(self, size: str):
         """Set the detail area size (e.g., '400px', '250px')."""

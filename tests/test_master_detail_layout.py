@@ -2,7 +2,6 @@
 
 import pytest
 from vaadin.flow.components import MasterDetailLayout, Span
-from vaadin.flow.components.grid import Grid
 from vaadin.flow.core.state_tree import StateTree
 from vaadin.flow.core.state_node import Feature
 
@@ -41,8 +40,9 @@ class TestMasterDetailLayout:
         layout._attach(tree)
         assert layout.get_detail() is detail
         assert detail._element is not None
-        assert detail.element.get_attribute("slot") == "detail"
         assert detail._parent is layout
+        # Detail is a virtual child (Feature 24), not a regular child
+        assert detail.element.node.get(Feature.ELEMENT_DATA, "payload") == {"type": "inMemory"}
 
     def test_set_master_after_attach(self, tree):
         layout = MasterDetailLayout()
@@ -58,7 +58,8 @@ class TestMasterDetailLayout:
         detail = Span("Detail")
         layout.set_detail(detail)
         assert detail._element is not None
-        assert detail.element.get_attribute("slot") == "detail"
+        # Virtual child — payload marks it as in-memory
+        assert detail.element.node.get(Feature.ELEMENT_DATA, "payload") == {"type": "inMemory"}
 
     def test_replace_master(self, tree):
         layout = MasterDetailLayout()
@@ -79,8 +80,9 @@ class TestMasterDetailLayout:
         layout.set_detail(new)
         assert layout.get_detail() is new
         assert new._element is not None
+        assert new.element.node.get(Feature.ELEMENT_DATA, "payload") == {"type": "inMemory"}
 
-    def test_both_slots(self, tree):
+    def test_both_master_and_detail(self, tree):
         layout = MasterDetailLayout()
         master = Span("M")
         detail = Span("D")
@@ -88,18 +90,107 @@ class TestMasterDetailLayout:
         layout.set_detail(detail)
         layout._attach(tree)
         assert master.element.get_attribute("slot") is None  # default slot
-        assert detail.element.get_attribute("slot") == "detail"
-        # Both should be children of the layout
-        assert len(layout.element.node._children) == 2
+        # Master is in Feature 2 (regular child), detail is in Feature 24 (virtual child)
+        assert len(layout.element.node._children) == 1  # only master
 
     def test_set_detail_none_hides(self, tree):
-        """Setting detail to None removes the detail child."""
+        """Setting detail to None removes the virtual child."""
         layout = MasterDetailLayout()
         layout._attach(tree)
         detail = Span("Detail")
         layout.set_detail(detail)
         assert layout.get_detail() is detail
-        assert len(layout.element.node._children) == 1
         layout.set_detail(None)
         assert layout.get_detail() is None
-        assert len(layout.element.node._children) == 0
+
+    def test_set_detail_queues_execute(self, tree):
+        """_setDetail() is called via execute command for animation."""
+        layout = MasterDetailLayout()
+        layout._attach(tree)
+        tree.collect_execute()  # clear pending
+
+        detail = Span("Detail")
+        layout.set_detail(detail)
+        execute = tree.collect_execute()
+        # Should have a _setDetail call
+        assert any("_setDetail" in str(cmd) for cmd in execute)
+
+    def test_initial_attach_skips_transition(self, tree):
+        """First _setDetail call uses skipTransition=True."""
+        layout = MasterDetailLayout()
+        detail = Span("Detail")
+        layout.set_detail(detail)
+        layout._attach(tree)
+        execute = tree.collect_execute()
+        # Find the _setDetail command
+        set_detail_cmd = [cmd for cmd in execute if "_setDetail" in str(cmd)]
+        assert len(set_detail_cmd) == 1
+        # skipTransition is the third positional arg (True)
+        assert set_detail_cmd[0][2] is True
+
+    def test_subsequent_set_detail_animates(self, tree):
+        """After initial attach, _setDetail uses skipTransition=False."""
+        layout = MasterDetailLayout()
+        layout._attach(tree)
+        tree.collect_execute()  # clear init commands
+
+        detail = Span("Detail")
+        layout.set_detail(detail)
+        execute = tree.collect_execute()
+        set_detail_cmd = [cmd for cmd in execute if "_setDetail" in str(cmd)]
+        assert len(set_detail_cmd) == 1
+        # skipTransition is the third positional arg (False = animate)
+        assert set_detail_cmd[0][2] is False
+
+    def test_set_detail_none_calls_set_detail_null(self, tree):
+        """Setting detail to None sends _setDetail(null, ...) for close animation."""
+        layout = MasterDetailLayout()
+        layout._attach(tree)
+        layout.set_detail(Span("Detail"))
+        tree.collect_execute()  # clear
+
+        layout.set_detail(None)
+        execute = tree.collect_execute()
+        set_detail_cmd = [cmd for cmd in execute if "_setDetail" in str(cmd)]
+        assert len(set_detail_cmd) == 1
+        assert "null" in set_detail_cmd[0][-1]  # script contains null
+
+    def test_default_overlay_mode(self, tree):
+        """Default overlay mode is drawer (stackOverlay=False)."""
+        layout = MasterDetailLayout()
+        layout._attach(tree)
+        assert layout.element.node.get(Feature.ELEMENT_PROPERTY_MAP, "stackOverlay") is False
+
+    def test_set_animation_enabled(self, tree):
+        layout = MasterDetailLayout()
+        layout._attach(tree)
+        assert layout.is_animation_enabled()
+        layout.set_animation_enabled(False)
+        assert not layout.is_animation_enabled()
+        assert layout.element.node.get(Feature.ELEMENT_PROPERTY_MAP, "noAnimation") is True
+
+    def test_set_overlay_mode(self, tree):
+        layout = MasterDetailLayout()
+        layout._attach(tree)
+        layout.set_overlay_mode("stack")
+        assert layout.element.node.get(Feature.ELEMENT_PROPERTY_MAP, "stackOverlay") is True
+        layout.set_overlay_mode("drawer")
+        assert layout.element.node.get(Feature.ELEMENT_PROPERTY_MAP, "stackOverlay") is False
+
+    def test_set_detail_size(self, tree):
+        layout = MasterDetailLayout()
+        layout.set_detail_size("400px")
+        layout._attach(tree)
+        assert layout.element.node.get(Feature.ELEMENT_PROPERTY_MAP, "detailSize") == "400px"
+
+    def test_set_master_min_size(self, tree):
+        layout = MasterDetailLayout()
+        layout.set_master_min_size("450px")
+        layout._attach(tree)
+        assert layout.element.node.get(Feature.ELEMENT_PROPERTY_MAP, "masterMinSize") == "450px"
+
+    def test_set_force_overlay(self, tree):
+        layout = MasterDetailLayout()
+        layout._attach(tree)
+        layout.set_force_overlay(True)
+        assert layout.element.node.get(Feature.ELEMENT_PROPERTY_MAP, "forceOverlay") is True
