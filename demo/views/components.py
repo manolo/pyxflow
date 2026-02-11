@@ -1049,15 +1049,15 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
     def _crud_on_save(self, event):
         if self.crud_selected is None:
-            Notification.show("Select a person or click New first", 3000, Notification.Position.MIDDLE)
+            Notification.show("Select a person or click New first", 3000, Notification.Position.BOTTOM_START)
             return
         if not self.binder.is_dirty():
-            Notification.show("No changes to save", 3000, Notification.Position.MIDDLE)
+            Notification.show("No changes to save", 3000, Notification.Position.BOTTOM_START)
             return
         try:
             self.binder.write_bean(self.crud_selected)
         except ValidationError:
-            n = Notification.show("Please fix the errors in the form", 3000, Notification.Position.MIDDLE)
+            n = Notification.show("Please fix the errors in the form", 3000, Notification.Position.BOTTOM_START)
             n.add_theme_variants(NotificationVariant.LUMO_ERROR)
             return
         if self.crud_is_new:
@@ -1065,12 +1065,12 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
             self.crud_is_new = False
         self._crud_refresh_grid()
         self.binder.read_bean(self.crud_selected)
-        n = Notification.show(f"Saved: {self.crud_selected.name}", 3000, Notification.Position.MIDDLE)
+        n = Notification.show(f"Saved: {self.crud_selected.name}", 3000, Notification.Position.BOTTOM_START)
         n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
 
     def _crud_on_delete(self, event):
         if self.crud_selected is None or self.crud_is_new:
-            Notification.show("Select a person to delete", 3000, Notification.Position.MIDDLE)
+            Notification.show("Select a person to delete", 3000, Notification.Position.BOTTOM_START)
             return
         self.crud_confirm.set_text(f"Are you sure you want to delete {self.crud_selected.name}?")
         self.crud_confirm.open()
@@ -1082,7 +1082,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.crud_people = [p for p in self.crud_people if p.id != self.crud_selected.id]
         self._crud_refresh_grid()
         self._crud_clear_form()
-        n = Notification.show(f"Deleted: {name}", 3000, Notification.Position.MIDDLE)
+        n = Notification.show(f"Deleted: {name}", 3000, Notification.Position.BOTTOM_START)
         n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
 
     def _crud_on_cancel(self, event):
