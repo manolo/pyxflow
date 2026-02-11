@@ -267,9 +267,9 @@ class ComponentsDemoView(VerticalLayout):
 
         self.context_label = Span("Context action: (none)")
         context_target = Span("Right-click here for context menu")
-        context_target._set_style("padding", "var(--vaadin-padding-s, var(--lumo-space-s, 0.5rem))")
-        context_target._set_style("background", "var(--vaadin-background-container, var(--lumo-primary-color-10pct, rgba(0, 100, 200, 0.1)))")
-        context_target._set_style("border-radius", "var(--vaadin-radius-m, var(--lumo-border-radius-m, 8px))")
+        context_target._set_style("padding", "var(--vaadin-padding-s)")
+        context_target._set_style("background", "var(--vaadin-background-container)")
+        context_target._set_style("border-radius", "var(--vaadin-radius-m)")
 
         context_menu = ContextMenu(context_target)
         context_menu.add_item("View", lambda e: self.context_label.set_text("Context action: View"))
@@ -507,7 +507,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         header_div = Header("Header")
         header_div.set_width("100%")
         header_div.set_height("60px")
-        header_div._set_style("background-color", "var(--vaadin-focus-ring-color, var(--lumo-primary-color, #006af5))")
+        header_div._set_style("background-color", "var(--vaadin-focus-ring-color)")
         header_div._set_style("color", "#fff")
         header_div._set_style("display", "flex")
         header_div._set_style("align-items", "center")
@@ -516,23 +516,23 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         footer_div = Footer("Footer")
         footer_div.set_width("100%")
         footer_div.set_height("50px")
-        footer_div._set_style("background-color", "var(--vaadin-background-container-strong, var(--lumo-contrast-20pct, rgba(0, 0, 0, 0.2)))")
-        footer_div._set_style("color", "var(--vaadin-text-color, var(--lumo-body-text-color, inherit))")
+        footer_div._set_style("background-color", "var(--vaadin-background-container-strong)")
+        footer_div._set_style("color", "var(--vaadin-text-color)")
         footer_div._set_style("display", "flex")
         footer_div._set_style("align-items", "center")
         footer_div._set_style("justify-content", "center")
 
         nav_div = Div("Navigation")
         nav_div.set_width("25%")
-        nav_div._set_style("background-color", "var(--vaadin-background-container, var(--lumo-primary-color-10pct, rgba(0, 100, 200, 0.1)))")
+        nav_div._set_style("background-color", "var(--vaadin-background-container)")
         nav_div._set_style("display", "flex")
         nav_div._set_style("align-items", "center")
         nav_div._set_style("justify-content", "center")
 
         content_div = Div("Content")
         content_div.set_width("75%")
-        content_div._set_style("background-color", "var(--vaadin-background-container, var(--lumo-contrast-5pct, rgba(0, 0, 0, 0.05)))")
-        content_div._set_style("color", "var(--vaadin-text-color, var(--lumo-body-text-color, inherit))")
+        content_div._set_style("background-color", "var(--vaadin-background-container)")
+        content_div._set_style("color", "var(--vaadin-text-color)")
         content_div._set_style("display", "flex")
         content_div._set_style("align-items", "center")
         content_div._set_style("justify-content", "center")
@@ -814,7 +814,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         scroller.set_height("200px")
         scroller.set_width("300px")
         scroller._set_style("flex", "none")
-        scroller._set_style("border", "1px solid var(--vaadin-border-color, var(--lumo-contrast-20pct, rgba(0, 0, 0, 0.2)))")
+        scroller._set_style("border", "1px solid var(--vaadin-border-color)")
         section.add(scroller)
 
         # --- Card ---
@@ -846,7 +846,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
             md_master.add(md_btn)
         md_layout.set_master(md_master)
         md_layout.set_height("250px")
-        md_layout._set_style("border", "1px solid var(--vaadin-border-color, var(--lumo-contrast-20pct, rgba(0, 0, 0, 0.2)))")
+        md_layout._set_style("border", "1px solid var(--vaadin-border-color)")
         section.add(md_layout)
 
         # --- MessageInput + MessageList ---
@@ -871,9 +871,9 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.vl_label = Span("VirtualList: click an item")
         virtual_list.set_renderer(
             LitRenderer.of(
-                '<div style="display:flex;align-items:center;padding:var(--vaadin-padding-xs,0.25rem) var(--vaadin-padding-s,0.5rem);border-bottom:1px solid var(--vaadin-border-color-secondary,rgba(0,0,0,0.1));cursor:pointer" @click="${handleClick}">'
-                '<vaadin-avatar name="${item.name}" style="margin-right:var(--vaadin-gap-s,0.5rem)"></vaadin-avatar>'
-                '<div><strong>${item.name}</strong><br/><small style="color:var(--vaadin-text-color-secondary,rgba(0,0,0,0.6))">${item.city} — ${item.role}</small></div>'
+                '<div style="display:flex;align-items:center;padding:var(--vaadin-padding-xs) var(--vaadin-padding-s);border-bottom:1px solid var(--vaadin-border-color-secondary);cursor:pointer" @click="${handleClick}">'
+                '<vaadin-avatar name="${item.name}" style="margin-right:var(--vaadin-gap-s)"></vaadin-avatar>'
+                '<div><strong>${item.name}</strong><br/><small style="color:var(--vaadin-text-color-secondary)">${item.city} — ${item.role}</small></div>'
                 '</div>'
             )
             .with_property("name", lambda x: x["name"])
@@ -885,8 +885,8 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         virtual_list.set_height("300px")
         virtual_list._set_style("flex", "none")
         virtual_list._set_style("overflow", "auto")
-        virtual_list._set_style("border", "1px solid var(--vaadin-border-color, var(--lumo-contrast-20pct, rgba(0, 0, 0, 0.2)))")
-        virtual_list._set_style("border-radius", "var(--vaadin-radius-m, var(--lumo-border-radius-m, 8px))")
+        virtual_list._set_style("border", "1px solid var(--vaadin-border-color)")
+        virtual_list._set_style("border-radius", "var(--vaadin-radius-m)")
         section.add(virtual_list)
         section.add(self.vl_label)
 
