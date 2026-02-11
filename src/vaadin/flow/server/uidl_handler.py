@@ -1,5 +1,8 @@
 """UIDL Protocol Handler."""
 
+import base64
+import hashlib
+import json
 import logging
 import random
 import secrets
@@ -17,17 +20,28 @@ if TYPE_CHECKING:
 # =============================================================================
 # Event Listener Configurations
 # =============================================================================
-# These configurations and hashes are captured from Java Flow to ensure
-# exact protocol compatibility. The hashes are computed by Java using SHA-256
-# of the JSON string representation, taking the first 64 bits and Base64 encoding.
+# Event hashes are computed dynamically using the same algorithm as Java Flow:
+#   base64(sha256(BOM + json.encode('utf-16-be'))[:8])
+# where BOM = b'\xfe\xff' (UTF-16 BE byte order mark).
 #
-# IMPORTANT: The exact hash values from Java are used here instead of computing
-# them dynamically, because the JSON serialization order affects the hash.
+# The hash is just a constant pool key — the client stores whatever config
+# we send alongside it. So computed hashes are fully compatible.
 # =============================================================================
 
+
+def compute_event_hash(config: dict) -> str:
+    """Compute the event hash for a given config dict.
+
+    Uses the same algorithm as Java Flow: SHA-256 of the JSON string
+    encoded as UTF-16 BE with BOM prefix, taking the first 8 bytes
+    and Base64 encoding them.
+    """
+    json_str = json.dumps(config, separators=(",", ":"))
+    data = b'\xfe\xff' + json_str.encode('utf-16-be')
+    return base64.b64encode(hashlib.sha256(data).digest()[:8]).decode()
+
+
 # Click event configuration (for buttons, etc.)
-# Hash captured from Java Flow: F8oCtNArLiI=
-_CLICK_HASH = "F8oCtNArLiI="
 _CLICK_CONFIG = {
     "event.shiftKey": False,
     "event.metaKey": False,
@@ -40,30 +54,28 @@ _CLICK_CONFIG = {
     "event.screenY": False,
     "event.screenX": False
 }
+_CLICK_HASH = compute_event_hash(_CLICK_CONFIG)
 
 # Change event configuration (for text fields, etc.)
 # The '}' prefix means "sync this property with server"
-# Hash captured from Java Flow: Fg73o1qebBo=
-_CHANGE_HASH = "Fg73o1qebBo="
 _CHANGE_CONFIG = {
     "}value": False
 }
+_CHANGE_HASH = compute_event_hash(_CHANGE_CONFIG)
 
 # Opened-changed event configuration (for dialogs, dropdowns)
-_OPENED_CHANGED_HASH = "t7mULTj4JVU="  # Placeholder - capture from Java if needed
 _OPENED_CHANGED_CONFIG = {
     "}opened": False
 }
+_OPENED_CHANGED_HASH = compute_event_hash(_OPENED_CHANGED_CONFIG)
 
 # Checked-changed event configuration (for checkboxes)
-_CHECKED_CHANGED_HASH = "azhwx/bqd+0="  # Placeholder - capture from Java if needed
 _CHECKED_CHANGED_CONFIG = {
     "}checked": False
 }
+_CHECKED_CHANGED_HASH = compute_event_hash(_CHECKED_CHANGED_CONFIG)
 
 # Keydown event configuration (Enter key handling)
-# Hash captured from Java Flow: OSoHnU3SjNg=
-_KEYDOWN_HASH = "OSoHnU3SjNg="
 _KEYDOWN_CONFIG = {
     "event.shiftKey": False,
     "event.metaKey": False,
@@ -76,30 +88,39 @@ _KEYDOWN_CONFIG = {
     "event.location": False,
     "event.altKey": False
 }
+_KEYDOWN_HASH = compute_event_hash(_KEYDOWN_CONFIG)
 
-# Notification closed event
-# Hash captured from Java Flow: vIpODLLAUDo=
-_CLOSED_HASH = "vIpODLLAUDo="
+# Closed event (empty config — no event data needed)
 _CLOSED_CONFIG = {}
-
-# Notification opened-changed event (different hash from Dialog's opened-changed)
-# Hash captured from Java Flow: uqvzCy8jAQc=
-_NOTIFICATION_OPENED_CHANGED_HASH = "uqvzCy8jAQc="
-_NOTIFICATION_OPENED_CHANGED_CONFIG = {
-    "}opened": False
-}
+_CLOSED_HASH = compute_event_hash(_CLOSED_CONFIG)
 
 # Selected-changed event configuration (for Tabs, ListBox)
-_SELECTED_CHANGED_HASH = "RiYMkfOpMJU="
 _SELECTED_CHANGED_CONFIG = {
     "}selected": False
 }
+_SELECTED_CHANGED_HASH = compute_event_hash(_SELECTED_CHANGED_CONFIG)
 
 # Selected-values-changed event configuration (for MultiSelectListBox)
-_SELECTED_VALUES_CHANGED_HASH = "NfDcIkUtPrY="
 _SELECTED_VALUES_CHANGED_CONFIG = {
     "}selectedValues": False
 }
+_SELECTED_VALUES_CHANGED_HASH = compute_event_hash(_SELECTED_VALUES_CHANGED_CONFIG)
+
+# Value-changed event configuration (for Select, CheckboxGroup, RadioButtonGroup, etc.)
+_VALUE_CHANGED_CONFIG = {
+    "}value": False
+}
+_VALUE_CHANGED_HASH = compute_event_hash(_VALUE_CHANGED_CONFIG)
+
+# Selected-items-changed event configuration (for MultiSelectComboBox)
+_SELECTED_ITEMS_CHANGED_CONFIG = {
+    "}selectedItems": False
+}
+_SELECTED_ITEMS_CHANGED_HASH = compute_event_hash(_SELECTED_ITEMS_CHANGED_CONFIG)
+
+# Splitter-dragend event configuration (for SplitLayout)
+_SPLITTER_DRAGEND_CONFIG = {}
+_SPLITTER_DRAGEND_HASH = compute_event_hash(_SPLITTER_DRAGEND_CONFIG)
 
 # =============================================================================
 # UI Navigation Event Configurations
@@ -107,8 +128,6 @@ _SELECTED_VALUES_CHANGED_CONFIG = {
 # These are registered on the body element for client-side navigation.
 
 # UI navigate event - triggered when the user navigates to a new route
-# Hash captured from Java Flow: msDV4SvCysE=
-_UI_NAVIGATE_HASH = "msDV4SvCysE="
 _UI_NAVIGATE_CONFIG = {
     "route": False,
     "appShellTitle": False,
@@ -116,58 +135,57 @@ _UI_NAVIGATE_CONFIG = {
     "trigger": False,
     "historyState": False
 }
+_UI_NAVIGATE_HASH = compute_event_hash(_UI_NAVIGATE_CONFIG)
 
 # UI leave navigation event - triggered when leaving a route
-# Hash captured from Java Flow: i2nDWhpwLZE=
-_UI_LEAVE_NAVIGATION_HASH = "i2nDWhpwLZE="
 _UI_LEAVE_NAVIGATION_CONFIG = {
     "route": False,
     "query": False
 }
+_UI_LEAVE_NAVIGATION_HASH = compute_event_hash(_UI_LEAVE_NAVIGATION_CONFIG)
 
 # UI refresh event - triggered on page refresh
-# Hash captured from Java Flow: 18ACma10cDE=
-_UI_REFRESH_HASH = "18ACma10cDE="
 _UI_REFRESH_CONFIG = {
     "fullRefresh": False
 }
+_UI_REFRESH_HASH = compute_event_hash(_UI_REFRESH_CONFIG)
 
 
-# Upload event configurations (hashes captured from Java Flow)
-_FILE_REJECT_HASH = "0dtnkjBiKGk="
+# Upload event configurations
 _FILE_REJECT_CONFIG = {
     "event.detail.file.name": False,
     "event.detail.error": False,
 }
+_FILE_REJECT_HASH = compute_event_hash(_FILE_REJECT_CONFIG)
 
-_UPLOAD_SUCCESS_HASH = "RwCOyvcoKgk="
 _UPLOAD_SUCCESS_CONFIG = {
     "element.files": False,
 }
+_UPLOAD_SUCCESS_HASH = compute_event_hash(_UPLOAD_SUCCESS_CONFIG)
 
-_UPLOAD_ERROR_HASH = "RwCOyvcoKgk="
 _UPLOAD_ERROR_CONFIG = {
     "element.files": False,
 }
+_UPLOAD_ERROR_HASH = compute_event_hash(_UPLOAD_ERROR_CONFIG)
 
 # file-remove: captures event.detail.file.name
-_FILE_REMOVE_HASH = "F6Wh0NdCR9A="
 _FILE_REMOVE_CONFIG = {
     "event.detail.file.name": False,
 }
+_FILE_REMOVE_HASH = compute_event_hash(_FILE_REMOVE_CONFIG)
 
 # Submit event configuration (MessageInput: event.detail.value)
-_SUBMIT_HASH = "6cdZ3Qcd5ng="
 _SUBMIT_CONFIG = {
     "event.detail.value": False,
 }
+_SUBMIT_HASH = compute_event_hash(_SUBMIT_CONFIG)
 
 # Login event configuration (LoginForm: event.detail.username + event.detail.password)
-_LOGIN_HASH = "S9QZwwCzxQA="
 _LOGIN_CONFIG = {
     "event.detail.password": False,
     "event.detail.username": False,
 }
+_LOGIN_HASH = compute_event_hash(_LOGIN_CONFIG)
 
 
 # Reverse lookup: hash → config for all known event hashes.
@@ -180,7 +198,6 @@ _HASH_TO_CONFIG = {
     _CHECKED_CHANGED_HASH: _CHECKED_CHANGED_CONFIG,
     _KEYDOWN_HASH: _KEYDOWN_CONFIG,
     _CLOSED_HASH: _CLOSED_CONFIG,
-    _NOTIFICATION_OPENED_CHANGED_HASH: _NOTIFICATION_OPENED_CHANGED_CONFIG,
     _SELECTED_CHANGED_HASH: _SELECTED_CHANGED_CONFIG,
     _FILE_REJECT_HASH: _FILE_REJECT_CONFIG,
     _UPLOAD_SUCCESS_HASH: _UPLOAD_SUCCESS_CONFIG,
@@ -189,6 +206,9 @@ _HASH_TO_CONFIG = {
     _SUBMIT_HASH: _SUBMIT_CONFIG,
     _LOGIN_HASH: _LOGIN_CONFIG,
     _SELECTED_VALUES_CHANGED_HASH: _SELECTED_VALUES_CHANGED_CONFIG,
+    _VALUE_CHANGED_HASH: _VALUE_CHANGED_CONFIG,
+    _SELECTED_ITEMS_CHANGED_HASH: _SELECTED_ITEMS_CHANGED_CONFIG,
+    _SPLITTER_DRAGEND_HASH: _SPLITTER_DRAGEND_CONFIG,
 }
 
 
@@ -864,6 +884,9 @@ class UidlHandler:
             "keydown": (_KEYDOWN_HASH, _KEYDOWN_CONFIG),
             "selected-changed": (_SELECTED_CHANGED_HASH, _SELECTED_CHANGED_CONFIG),
             "selected-values-changed": (_SELECTED_VALUES_CHANGED_HASH, _SELECTED_VALUES_CHANGED_CONFIG),
+            "value-changed": (_VALUE_CHANGED_HASH, _VALUE_CHANGED_CONFIG),
+            "selected-items-changed": (_SELECTED_ITEMS_CHANGED_HASH, _SELECTED_ITEMS_CHANGED_CONFIG),
+            "splitter-dragend": (_SPLITTER_DRAGEND_HASH, _SPLITTER_DRAGEND_CONFIG),
         }
 
         # Add used constants and replace values with hash references.

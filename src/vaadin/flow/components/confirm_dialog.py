@@ -3,12 +3,10 @@
 from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.server.uidl_handler import _CLOSED_HASH
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
-
-# Reuse the empty-config hash already registered in uidl_handler
-_CLOSED_HASH = "vIpODLLAUDo="
 
 
 class ConfirmDialog(Component):
@@ -188,18 +186,24 @@ class ConfirmDialog(Component):
     def _on_confirm(self, event_data: dict):
         """Handle confirm event from client."""
         self._opened = False
+        if self._element:
+            self.element.set_property("opened", False)
         for listener in self._confirm_listeners:
             listener(event_data)
 
     def _on_cancel(self, event_data: dict):
         """Handle cancel event from client."""
         self._opened = False
+        if self._element:
+            self.element.set_property("opened", False)
         for listener in self._cancel_listeners:
             listener(event_data)
 
     def _on_reject(self, event_data: dict):
         """Handle reject event from client."""
         self._opened = False
+        if self._element:
+            self.element.set_property("opened", False)
         for listener in self._reject_listeners:
             listener(event_data)
 

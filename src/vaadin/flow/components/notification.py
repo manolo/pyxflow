@@ -6,6 +6,7 @@ from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
+from vaadin.flow.server.uidl_handler import _CLOSED_HASH, _OPENED_CHANGED_HASH
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -61,10 +62,6 @@ class Notification(Component):
         BOTTOM_END = "bottom-end"
         BOTTOM_STRETCH = "bottom-stretch"
 
-    # Notification-specific event hashes (different from Dialog)
-    _CLOSED_HASH = "vIpODLLAUDo="
-    _OPENED_CHANGED_HASH = "uqvzCy8jAQc="
-
     def __init__(self, text: str = "", duration: int = 0,
                  position: "Notification.Position | None" = None,
                  assertive: bool = False):
@@ -108,10 +105,10 @@ class Notification(Component):
 
         # Register event listeners with explicit hashes
         self.element.add_event_listener(
-            "closed", self._handle_closed, self._CLOSED_HASH
+            "closed", self._handle_closed, _CLOSED_HASH
         )
         self.element.add_event_listener(
-            "opened-changed", self._handle_opened_changed, self._OPENED_CHANGED_HASH
+            "opened-changed", self._handle_opened_changed, _OPENED_CHANGED_HASH
         )
 
         # Set theme attribute if variants were added before attach

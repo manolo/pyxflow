@@ -810,6 +810,8 @@ class Grid(Component):
                 self._selection_column._update_select_all_state(self.element._tree)
             self._fire_selection_event()
         else:
+            if self._selected_item is None:
+                return  # Already deselected, avoid re-entrant loops
             self._selected_item = None
             for listener in self._selection_listeners:
                 listener({"item": None})

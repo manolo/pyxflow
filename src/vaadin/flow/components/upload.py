@@ -5,37 +5,13 @@ from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
+from vaadin.flow.server.uidl_handler import (
+    _FILE_REJECT_HASH, _UPLOAD_SUCCESS_HASH,
+    _UPLOAD_ERROR_HASH, _FILE_REMOVE_HASH,
+)
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
-
-
-# Event hashes for upload events (captured from Java Flow)
-# file-reject: captures event.detail.file.name and event.detail.error
-_FILE_REJECT_HASH = "0dtnkjBiKGk="
-_FILE_REJECT_CONFIG = {
-    "event.detail.file.name": False,
-    "event.detail.error": False,
-}
-
-# upload-success: captures element.files for all-finished detection
-_UPLOAD_SUCCESS_HASH = "RwCOyvcoKgk="
-_UPLOAD_SUCCESS_CONFIG = {
-    "element.files": False,
-}
-
-# upload-error: captures element.files
-_UPLOAD_ERROR_HASH = "RwCOyvcoKgk="
-_UPLOAD_ERROR_CONFIG = {
-    "element.files": False,
-}
-
-
-# file-remove: captures event.detail.file.name
-_FILE_REMOVE_HASH = "F6Wh0NdCR9A="
-_FILE_REMOVE_CONFIG = {
-    "event.detail.file.name": False,
-}
 
 
 class Upload(Component):

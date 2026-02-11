@@ -3,12 +3,10 @@
 from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.server.uidl_handler import _SUBMIT_HASH
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
-
-# Hash for submit event — includes event.detail.value in event data
-_SUBMIT_HASH = "6cdZ3Qcd5ng="
 
 
 class MessageInput(Component):
