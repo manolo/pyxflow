@@ -230,3 +230,82 @@ class TestComponentClassName:
 
         # Original should not be modified
         assert not button.has_class_name("other-class")
+
+
+class TestComponentExecuteJs:
+    """Test Component.execute_js with buffering."""
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_execute_js_when_attached(self, tree):
+        """execute_js delegates to element when attached."""
+        button = Button("Click me")
+        button._attach(tree)
+        tree.collect_changes()  # Clear initial changes
+
+        button.execute_js("this.focus()")
+        changes = tree.collect_changes()
+
+        exec_change = next(
+            (c for c in changes if c.get("key") == "execute"), None
+        )
+        assert exec_change is not None
+        assert exec_change["value"]["script"] == "this.focus()"
+        assert exec_change["value"]["args"] == []
+
+    def test_execute_js_with_args_when_attached(self, tree):
+        """execute_js passes arguments to element."""
+        button = Button("Click me")
+        button._attach(tree)
+        tree.collect_changes()
+
+        button.execute_js("this.style.color = $0", "red")
+        changes = tree.collect_changes()
+
+        exec_change = next(
+            (c for c in changes if c.get("key") == "execute"), None
+        )
+        assert exec_change is not None
+        assert exec_change["value"]["script"] == "this.style.color = $0"
+        assert exec_change["value"]["args"] == ["red"]
+
+    def test_execute_js_buffered_before_attach(self, tree):
+        """execute_js buffers calls when not yet attached."""
+        button = Button("Click me")
+        # Not attached yet — should not raise
+        button.execute_js("this.focus()")
+
+        # Now attach — buffered JS should be flushed
+        button._attach(tree)
+        changes = tree.collect_changes()
+
+        exec_change = next(
+            (c for c in changes if c.get("key") == "execute"), None
+        )
+        assert exec_change is not None
+        assert exec_change["value"]["script"] == "this.focus()"
+
+    def test_execute_js_buffered_multiple(self, tree):
+        """Multiple buffered execute_js calls are all flushed in order."""
+        button = Button("Click me")
+        button.execute_js("console.log($0)", "first")
+        button.execute_js("console.log($0)", "second")
+
+        button._attach(tree)
+        changes = tree.collect_changes()
+
+        exec_changes = [c for c in changes if c.get("key") == "execute"]
+        scripts = [c["value"]["script"] for c in exec_changes]
+        args = [c["value"]["args"] for c in exec_changes]
+        assert scripts == ["console.log($0)", "console.log($0)"]
+        assert args == [["first"], ["second"]]
+
+    def test_execute_js_buffer_cleared_after_attach(self, tree):
+        """Buffered JS list is cleaned up after attach."""
+        button = Button("Click me")
+        button.execute_js("this.focus()")
+
+        button._attach(tree)
+        assert not hasattr(button, "_pending_execute_js")

@@ -50,7 +50,7 @@ vaadin-pyflow/
 ├── demo/               # Demo app + __main__.py entry point
 │   ├── views/          # View files (hello_world, about, components, grid, etc.)
 │   └── services/       # PeopleService (data access layer)
-├── tests/              # 1061 unit tests
+├── tests/              # 1309 unit tests
 └── STATUS.md           # Implementation progress
 ../bundle-generator/    # Java project → frontend bundle (shared, at root level)
 ```
@@ -66,7 +66,7 @@ vaadin-pyflow/
 | `core/state_tree.py` | Node management, change tracking, execute queue |
 | `core/state_node.py` | Features, attach/put/splice, change collection |
 | `core/element.py` | Element wrapper: properties, attributes, styles, events |
-| `core/component.py` | Base Component class with element attachment |
+| `core/component.py` | Base Component class with element attachment, deferred execute_js |
 | `components/grid.py` | Grid: connectors, renderers, sorting, lazy loading (~600 lines) |
 | `components/dialog.py` | Dialog: FlowComponentHost, publishedEventHandler close |
 

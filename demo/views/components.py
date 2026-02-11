@@ -128,7 +128,7 @@ class ComponentsDemoView(VerticalLayout):
         )
         section.add(login_form)
         section.add(self.login_label)
-        login_form.element.execute_js(
+        login_form.execute_js(
             "setTimeout(() => document.activeElement?.blur(), 0)")
 
         # --- Theme Selector (ListBox) ---
@@ -1095,10 +1095,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
     def _crud_clear_form(self):
         self.crud_selected = None
         self.crud_is_new = False
-        self.crud_name.set_value("")
-        self.crud_email.set_value("")
-        self.crud_age.set_value("")
-        self.crud_role.set_value("")
-        self.crud_city.set_value("")
-        self.crud_dept.set_value("")
+        self.binder.read_bean(None)
+        self.crud_grid.select(None)
         self.crud_layout.set_detail(None)

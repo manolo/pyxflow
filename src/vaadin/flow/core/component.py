@@ -100,10 +100,29 @@ class Component:
         if pending_shortcut is not None:
             self._register_click_shortcut(pending_shortcut)
             del self._pending_click_shortcut
+        # Apply deferred JS executions
+        pending_js = getattr(self, "_pending_execute_js", None)
+        if pending_js:
+            for script, args in pending_js:
+                self._element.execute_js(script, *args)
+            del self._pending_execute_js
 
     def get_element(self) -> Element:
         """Get the element (public API)."""
         return self.element
+
+    def execute_js(self, script: str, *args):
+        """Execute JavaScript on this component's element.
+
+        If the component is not yet attached, the call is buffered
+        and executed when the component is attached to a UI.
+        """
+        if self._element is not None:
+            self._element.execute_js(script, *args)
+        else:
+            if not hasattr(self, "_pending_execute_js"):
+                self._pending_execute_js = []
+            self._pending_execute_js.append((script, args))
 
     def _sync_property(self, name: str, value):
         """Called when a property is synced from client.

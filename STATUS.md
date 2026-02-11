@@ -5,8 +5,8 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~12,000 (core src/), ~28,500 (total with demo + tests)
-**Tests:** 1304 passing
-**Last updated:** 2026-02-10
+**Tests:** 1309 passing
+**Last updated:** 2026-02-11
 
 ---
 
@@ -16,7 +16,7 @@
 - [x] StateTree - Node management, change tracking
 - [x] StateNode - Features, attach/put/splice
 - [x] Element - Properties, attributes, styles, events
-- [x] Component - Base class with element attachment
+- [x] Component - Base class with element attachment, deferred execute_js
 
 ### UIDL Protocol Compatibility (Java Flow)
 - [x] **Event hashes** - Hardcoded Java Flow hashes for exact compatibility
