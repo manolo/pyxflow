@@ -4,7 +4,7 @@ import time
 import pytest
 import aiohttp
 from aiohttp import web
-from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
+from aiohttp.test_utils import AioHTTPTestCase
 
 
 class TestHttpServerRoutes(AioHTTPTestCase):
@@ -15,7 +15,6 @@ class TestHttpServerRoutes(AioHTTPTestCase):
         from vaadin.flow.server.http_server import create_app
         return create_app()
 
-    @unittest_run_loop
     async def test_root_returns_html(self):
         """GET / should return index.html."""
         resp = await self.client.request("GET", "/")
@@ -23,14 +22,12 @@ class TestHttpServerRoutes(AioHTTPTestCase):
         text = await resp.text()
         assert "<!DOCTYPE html>" in text or "<html" in text
 
-    @unittest_run_loop
     async def test_init_endpoint_exists(self):
         """GET /?v-r=init should return JSON."""
         resp = await self.client.request("GET", "/?v-r=init&location=&query=")
         assert resp.status == 200
         assert resp.content_type == "application/json"
 
-    @unittest_run_loop
     async def test_uidl_endpoint_exists(self):
         """POST /?v-r=uidl should accept requests."""
         # First get init to establish session
@@ -55,7 +52,6 @@ class TestStaticFiles(AioHTTPTestCase):
         from vaadin.flow.server.http_server import create_app
         return create_app()
 
-    @unittest_run_loop
     async def test_vaadin_build_files_served(self):
         """GET /VAADIN/build/* should serve static files or 404 if no bundle."""
         # This will return 404 until we configure the bundle path
@@ -71,7 +67,6 @@ class TestSessionManagement(AioHTTPTestCase):
         from vaadin.flow.server.http_server import create_app
         return create_app()
 
-    @unittest_run_loop
     async def test_init_sets_session_cookie(self):
         """Init request should set a session cookie."""
         resp = await self.client.request("GET", "/?v-r=init&location=&query=")
@@ -79,7 +74,6 @@ class TestSessionManagement(AioHTTPTestCase):
         # Check for Set-Cookie header
         assert "Set-Cookie" in resp.headers or resp.cookies
 
-    @unittest_run_loop
     async def test_init_returns_csrf_token(self):
         """Init response should include CSRF token."""
         resp = await self.client.request("GET", "/?v-r=init&location=&query=")
@@ -90,7 +84,6 @@ class TestSessionManagement(AioHTTPTestCase):
         csrf = data["appConfig"]["uidl"]["Vaadin-Security-Key"]
         assert len(csrf) > 10  # Should be a real token
 
-    @unittest_run_loop
     async def test_uidl_rejects_invalid_csrf(self):
         """UIDL request with invalid CSRF should be rejected."""
         payload = {"csrfToken": "invalid-token", "rpc": [], "syncId": 0, "clientId": 0}
@@ -110,7 +103,6 @@ class TestSessionExpired(AioHTTPTestCase):
         from vaadin.flow.server.http_server import create_app
         return create_app()
 
-    @unittest_run_loop
     async def test_uidl_without_session_returns_session_expired_json(self):
         """UIDL without session should return meta.sessionExpired JSON (not 403)."""
         payload = {"csrfToken": "x", "rpc": [], "syncId": 0, "clientId": 0}
@@ -120,7 +112,6 @@ class TestSessionExpired(AioHTTPTestCase):
         assert '"sessionExpired":true' in text
         assert text.startswith("for(;;);")
 
-    @unittest_run_loop
     async def test_uidl_without_session_on_subroute(self):
         """UIDL on sub-route without session should also return session expired."""
         payload = {"csrfToken": "x", "rpc": [], "syncId": 0, "clientId": 0}
@@ -137,13 +128,11 @@ class TestHeartbeat(AioHTTPTestCase):
         from vaadin.flow.server.http_server import create_app
         return create_app()
 
-    @unittest_run_loop
     async def test_heartbeat_without_session_returns_403(self):
         """Heartbeat without valid session should return 403."""
         resp = await self.client.request("POST", "/?v-r=heartbeat")
         assert resp.status == 403
 
-    @unittest_run_loop
     async def test_heartbeat_with_session_returns_200(self):
         """Heartbeat with valid session should return 200."""
         # Establish session via init
@@ -154,7 +143,6 @@ class TestHeartbeat(AioHTTPTestCase):
         resp = await self.client.request("POST", "/?v-r=heartbeat")
         assert resp.status == 200
 
-    @unittest_run_loop
     async def test_heartbeat_on_subroute_returns_200(self):
         """Heartbeat on sub-route (e.g. /about?v-r=heartbeat) should work."""
         # Establish session via init on sub-route

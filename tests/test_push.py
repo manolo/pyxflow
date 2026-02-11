@@ -6,7 +6,7 @@ import re
 
 import aiohttp
 from aiohttp import web
-from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
+from aiohttp.test_utils import AioHTTPTestCase
 
 from vaadin.flow.server.http_server import _sessions
 from vaadin.flow.router import AppShell, Push, clear_app_shell
@@ -47,13 +47,11 @@ class PushTestBase(AioHTTPTestCase):
 class TestPushAuth(PushTestBase):
     """Test push authentication and rejection."""
 
-    @unittest_run_loop
     async def test_push_without_session_returns_403(self):
         """WebSocket push without session cookie returns 403."""
         resp = await self.client.request("GET", "/VAADIN/push")
         assert resp.status == 403
 
-    @unittest_run_loop
     async def test_push_wrong_push_id_returns_403(self):
         """WebSocket push with wrong v-pushId returns 403."""
         await self._init_session()
@@ -64,7 +62,6 @@ class TestPushAuth(PushTestBase):
 class TestPushHandshake(PushTestBase):
     """Test Atmosphere handshake and heartbeat."""
 
-    @unittest_run_loop
     async def test_push_handshake_format(self):
         """First WS message is Atmosphere handshake: <len>|<UUID>|30000|X."""
         push_id, _ = await self._init_session()
@@ -89,7 +86,6 @@ class TestPushHandshake(PushTestBase):
 
         await ws.close()
 
-    @unittest_run_loop
     async def test_push_heartbeat_accepted(self):
         """Sending 'X' heartbeat does not cause errors."""
         push_id, _ = await self._init_session()
@@ -104,7 +100,6 @@ class TestPushHandshake(PushTestBase):
 
         await ws.close()
 
-    @unittest_run_loop
     async def test_push_reconnect_new_handshake(self):
         """Reconnecting gives a new UUID in the handshake."""
         push_id, _ = await self._init_session()
@@ -130,7 +125,6 @@ class TestPushHandshake(PushTestBase):
 class TestPushMessages(PushTestBase):
     """Test push message delivery."""
 
-    @unittest_run_loop
     async def test_push_receives_changes(self):
         """Changes pushed via tree arrive on WS with meta.async."""
         push_id, _ = await self._init_session()
@@ -162,7 +156,6 @@ class TestPushMessages(PushTestBase):
 
         await ws.close()
 
-    @unittest_run_loop
     async def test_push_message_atmosphere_format(self):
         """Push message matches <len>|for(;;);[{...}] format."""
         push_id, _ = await self._init_session()
@@ -188,7 +181,6 @@ class TestPushMessages(PushTestBase):
 
         await ws.close()
 
-    @unittest_run_loop
     async def test_push_no_message_without_changes(self):
         """Signalling push without changes does not send a message."""
         push_id, _ = await self._init_session()
@@ -214,7 +206,6 @@ class TestPushMessages(PushTestBase):
 class TestPushReconnect(PushTestBase):
     """Test push reconnect delivers buffered messages."""
 
-    @unittest_run_loop
     async def test_push_reconnect_delivers_pending(self):
         """Buffered message from failed send is delivered on reconnect."""
         push_id, _ = await self._init_session()
@@ -263,7 +254,6 @@ class TestPushReconnect(PushTestBase):
 class TestPushInitConfig(PushTestBase):
     """Test push-related init configuration."""
 
-    @unittest_run_loop
     async def test_push_init_config(self):
         """Init response has pushScript at top level, pushMode and Vaadin-Push-ID in uidl."""
         resp = await self.client.request("GET", "/?v-r=init&location=&query=")
