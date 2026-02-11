@@ -119,6 +119,7 @@ class ComponentsDemoView(VerticalLayout):
         section = self.add_section("LoginForm", "tall")
 
         login_form = LoginForm()
+        login_form.set_no_autofocus(True)
         self.login_label = Span("Login status: (none)")
         login_form.add_login_listener(
             lambda e: self.login_label.set_text(f"Login: {e['username']}")
@@ -128,8 +129,6 @@ class ComponentsDemoView(VerticalLayout):
         )
         section.add(login_form)
         section.add(self.login_label)
-        login_form.execute_js(
-            "setTimeout(() => document.activeElement?.blur(), 0)")
 
         # --- Theme Selector (ListBox) ---
         section = self.add_section("ListBox")

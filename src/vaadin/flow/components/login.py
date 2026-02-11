@@ -27,6 +27,7 @@ class LoginForm(Component):
     def __init__(self):
         self._error = False
         self._no_forgot_password = False
+        self._no_autofocus = False
         self._action = ""
         self._login_listeners: list[Callable] = []
         self._forgot_password_listeners: list[Callable] = []
@@ -38,6 +39,8 @@ class LoginForm(Component):
             self.element.set_property("error", True)
         if self._no_forgot_password:
             self.element.set_property("noForgotPassword", True)
+        if self._no_autofocus:
+            self.element.set_property("noAutofocus", True)
         if self._action:
             self.element.set_property("action", self._action)
 
@@ -69,6 +72,12 @@ class LoginForm(Component):
         self._no_forgot_password = not visible
         if self._element:
             self.element.set_property("noForgotPassword", not visible)
+
+    def set_no_autofocus(self, no_autofocus: bool):
+        """Disable auto-focusing the username field on attach."""
+        self._no_autofocus = no_autofocus
+        if self._element:
+            self.element.set_property("noAutofocus", no_autofocus)
 
     def set_action(self, action: str):
         """Set the form action URL."""
