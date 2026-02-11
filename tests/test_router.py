@@ -291,15 +291,15 @@ class TestDiscoverViews:
         """After discover_views, get_menu_entries should return @Menu entries."""
         discover_views("demo.views")
         entries = get_menu_entries()
-        assert len(entries) == 6
+        assert len(entries) == 7
         titles = [e.title for e in entries]
-        assert titles == ["About", "Hello", "Components", "Grid", "Master-Detail", "Stopwatch"]
+        assert titles == ["About", "Hello", "Components", "Grid", "Master-Detail", "Stopwatch", "File Explorer"]
         # Verify order
         orders = [e.order for e in entries]
-        assert orders == [0, 1, 2, 3, 4, 10]
+        assert orders == [0, 1, 2, 3, 4, 10, 11]
         # Verify icons
         icons = [e.icon for e in entries]
-        assert icons == ["vaadin:info-circle", "vaadin:hand", "vaadin:grid-small", "vaadin:table", "vaadin:split-h", "vaadin:timer"]
+        assert icons == ["vaadin:info-circle", "vaadin:hand", "vaadin:grid-small", "vaadin:table", "vaadin:split-h", "vaadin:timer", "vaadin:folder-open"]
 
     def test_discover_views_registers_app_shell(self):
         """discover_views should register @AppShell from MainLayout."""

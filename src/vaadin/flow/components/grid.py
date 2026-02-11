@@ -859,3 +859,217 @@ class Grid(Component):
         """Called by client to request a data range."""
         if self._data_provider or self._data_provider_obj:
             self._fetch_and_push(start, length)
+
+
+class TreeGrid(Grid):
+    """A hierarchical data grid that displays tree-structured data.
+
+    Each row can be expanded/collapsed to show/hide child items.
+    Uses the same gridConnector as Grid, with tree-level overrides
+    injected as inline JS (the treeGridConnector is not in the bundle).
+    """
+
+    def __init__(self):
+        super().__init__()
+        self._hierarchy_column: Column | None = None
+        self._root_items: list = []
+        self._children_provider: Callable | None = None
+        self._expanded_item_ids: set[int] = set()  # id(original_item)
+        self._key_to_original: dict[str, object] = {}  # key -> original item
+
+    def add_hierarchy_column(self, value_provider: Callable, header: str = "Name") -> Column:
+        """Add the hierarchy column with expand/collapse toggles.
+
+        Uses vaadin-grid-tree-toggle with Lit property bindings (dot prefix).
+        The @click handler calls the server to toggle expansion — the grid
+        web component does NOT auto-detect tree toggles, so this is required
+        (matching the Java TreeGrid approach exactly).
+
+        Args:
+            value_provider: Function that takes an item and returns the display text.
+            header: Column header text.
+
+        Returns:
+            The created Column.
+        """
+        # Use .prop=${} (Lit property binding) — NOT attr="${}" (attribute binding).
+        # Attribute "leaf=false" is truthy in HTML; property .leaf=${false} is correct.
+        # model.expanded/level come from grid's row model (__getRowLevel, _isExpanded).
+        # @click=${onClick} triggers server-side toggle (same as Java TreeGrid).
+        template = (
+            '<vaadin-grid-tree-toggle '
+            '@click=${onClick} '
+            '.leaf=${!item.children} '
+            '.expanded=${live(model.expanded)} '
+            '.level=${model.level}>'
+            '${item.name}'
+            '</vaadin-grid-tree-toggle>'
+        )
+        renderer = LitRenderer(template)
+        renderer.with_property("name", value_provider)
+        renderer.with_property("children", lambda item: item.get("_has_children", False))
+        renderer.with_function("onClick", self._on_toggle_click)
+        col = self.add_column(renderer, header=header)
+        self._hierarchy_column = col
+        return col
+
+    def set_items(self, items, children_provider: Callable | None = None):
+        """Set tree data with a hierarchy defined by children_provider.
+
+        Args:
+            items: Root-level items (list of dicts).
+            children_provider: Function(item) -> list[item] for child items.
+                If None, items are displayed flat (like a regular Grid).
+        """
+        self._root_items = items
+        self._children_provider = children_provider
+        self._expanded_item_ids.clear()
+        self._key_to_original.clear()
+        self._items = self._flatten_tree()
+        self._key_to_item.clear()
+        if self._element:
+            self._push_data()
+
+    def expand(self, item):
+        """Expand a tree item programmatically."""
+        self._expanded_item_ids.add(id(item))
+        self._refresh_flat_data()
+
+    def collapse(self, item):
+        """Collapse a tree item programmatically."""
+        self._expanded_item_ids.discard(id(item))
+        self._refresh_flat_data()
+
+    def _on_toggle_click(self, item):
+        """Handle @click on vaadin-grid-tree-toggle from LitRenderer callback."""
+        if not item.get("_has_children", False):
+            return
+        # Find the key for this item in _key_to_item (same object by identity)
+        for key, val in self._key_to_item.items():
+            if val is item:
+                original = self._key_to_original.get(key)
+                if original is not None:
+                    item_id = id(original)
+                    if item_id in self._expanded_item_ids:
+                        self._expanded_item_ids.discard(item_id)
+                    else:
+                        self._expanded_item_ids.add(item_id)
+                    self._refresh_flat_data()
+                return
+
+    def update_expanded_state(self, key: str, expanded: bool):
+        """Called by client when user clicks a tree toggle.
+
+        Registered in Feature 19 and called via
+        grid.$server.updateExpandedState(key, expanded).
+        """
+        original = self._key_to_original.get(key)
+        if original is None:
+            return
+        if expanded:
+            self._expanded_item_ids.add(id(original))
+        else:
+            self._expanded_item_ids.discard(id(original))
+        self._refresh_flat_data()
+
+    def _refresh_flat_data(self):
+        """Re-flatten the tree and push to client."""
+        self._items = self._flatten_tree()
+        self._key_to_item.clear()
+        if self._element:
+            self._push_data()
+
+    def _flatten_tree(self) -> list[dict]:
+        """DFS traversal of visible items, adding _level, _has_children, _expanded."""
+        result: list[dict] = []
+        self._key_to_original.clear()
+
+        def visit(items, level):
+            for item in items:
+                children = self._children_provider(item) if self._children_provider else []
+                has_children = len(children) > 0
+                is_expanded = has_children and id(item) in self._expanded_item_ids
+
+                key = str(len(result))
+                self._key_to_original[key] = item
+
+                flat_item = dict(item)
+                flat_item["_level"] = level
+                flat_item["_has_children"] = has_children
+                flat_item["_expanded"] = is_expanded
+                result.append(flat_item)
+
+                if is_expanded:
+                    visit(children, level + 1)
+
+        visit(self._root_items, 0)
+        return result
+
+    def _push_data(self):
+        """Push flattened tree data to the client via execute commands."""
+        tree = self.element._tree
+        grid_ref = {"@v-node": self.element.node_id}
+
+        # Build items array for the connector
+        connector_items = []
+        self._key_to_item.clear()
+        for i, item in enumerate(self._items):
+            key = str(i)
+            self._key_to_item[key] = item
+            connector_item = {"key": key, "selected": False}
+            # Add tree properties for the gridConnector
+            connector_item["children"] = item.get("_has_children", False)
+            connector_item["expanded"] = item.get("_expanded", False)
+            connector_item["level"] = item.get("_level", 0)
+            for col in self._columns:
+                if col._renderer:
+                    self._add_renderer_data(tree, col, connector_item, item, key)
+                else:
+                    connector_item[col.internal_id] = item.get(col.property_name, "")
+            connector_items.append(connector_item)
+
+        # updateSize
+        tree.queue_execute([
+            grid_ref, len(connector_items),
+            "return $0.$connector.updateSize($1)",
+        ])
+
+        # set items (push all at index 0)
+        tree.queue_execute([
+            grid_ref, 0, connector_items,
+            "return $0.$connector.set($1, $2)",
+        ])
+
+        # confirm update
+        self._update_id += 1
+        tree.queue_execute([
+            grid_ref, self._update_id,
+            "return $0.$connector.confirm($1)",
+        ])
+
+    def _attach(self, tree: "StateTree"):
+        super()._attach(tree)
+
+        # Register updateExpandedState in Feature 19 (called by expandItem/collapseItem)
+        tree.add_change({
+            "node": self.element.node_id,
+            "type": "splice",
+            "feat": Feature.CLIENT_DELEGATE_HANDLERS,
+            "index": 0,
+            "add": ["updateExpandedState"],
+        })
+
+        # Inject tree grid overrides (treeGridConnector is not in the bundle).
+        # expandItem/collapseItem call $server.updateExpandedState(key, expanded)
+        # matching the Java treeGridConnector behavior exactly.
+        grid_ref = {"@v-node": self.element.node_id}
+        tree.queue_execute([
+            grid_ref,
+            "return (async function() {"
+            "  var g = $0;"
+            "  g.__getRowLevel = function(row) { return row._item && row._item.level != null ? row._item.level : 0 };"
+            "  g._isExpanded = function(item) { return !!(item && item.expanded) };"
+            "  g.expandItem = function(item) { if (item !== undefined) g.$server.updateExpandedState(g.getItemId(item), true) };"
+            "  g.collapseItem = function(item) { if (item !== undefined) g.$server.updateExpandedState(g.getItemId(item), false) };"
+            "}).apply(null, [$0])",
+        ])

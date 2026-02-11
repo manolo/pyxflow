@@ -13,7 +13,7 @@ from vaadin.flow.components.flex_layout import (
     Alignment as FlexAlignment,
 )
 from vaadin.flow.components.form_layout import FormLayout, FormItem, FormRow, ResponsiveStep
-from vaadin.flow.components.grid import Grid, Column, SortDirection, GridSortOrder, SelectionMode
+from vaadin.flow.components.grid import Grid, TreeGrid, Column, SortDirection, GridSortOrder, SelectionMode
 from vaadin.flow.components.renderer import LitRenderer, TextRenderer, ComponentRenderer
 from vaadin.flow.components.html import Div, H1, H2, H3, H4, Header, Footer, HtmlContainer, Image, Paragraph
 from vaadin.flow.components.notification import Notification, NotificationVariant
@@ -55,8 +55,10 @@ from vaadin.flow.components.custom_field import CustomField
 from vaadin.flow.components.login import LoginForm, LoginOverlay
 from vaadin.flow.components.multi_select_combo_box import MultiSelectComboBox
 from vaadin.flow.components.virtual_list import VirtualList
+from vaadin.flow.core.component import ClientCallable
 
 __all__ = [
+    "ClientCallable",
     "Button",
     "Checkbox",
     "CheckboxGroup",
@@ -80,6 +82,7 @@ __all__ = [
     "ComponentRenderer",
     "Grid",
     "GridSortOrder",
+    "TreeGrid",
     "LitRenderer",
     "TextRenderer",
     "SelectionMode",

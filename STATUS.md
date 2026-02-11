@@ -4,8 +4,8 @@
 
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
-**Lines of code:** ~12,000 (core src/), ~28,500 (total with demo + tests)
-**Tests:** 1309 passing
+**Lines of code:** ~13,200 (core src/), ~32,200 (total with demo + tests)
+**Tests:** 1370 passing
 **Last updated:** 2026-02-11
 
 ---
@@ -19,18 +19,7 @@
 - [x] Component - Base class with element attachment, deferred execute_js
 
 ### UIDL Protocol Compatibility (Java Flow)
-- [x] **Event hashes** - Hardcoded Java Flow hashes for exact compatibility
-  - Click: `F8oCtNArLiI=`
-  - Change: `Fg73o1qebBo=`
-  - Keydown: `OSoHnU3SjNg=`
-  - Opened-changed: `t7mULTj4JVU=`
-  - Checked-changed: `azhwx/bqd+0=`
-  - Notification closed: `vIpODLLAUDo=`
-  - Notification opened-changed: `uqvzCy8jAQc=`
-- [x] **UI navigation hashes** - For client-side routing
-  - ui-navigate: `msDV4SvCysE=`
-  - ui-leave-navigation: `i2nDWhpwLZE=`
-  - ui-refresh: `18ACma10cDE=`
+- [x] **Event hashes** - Dynamically computed via `compute_event_hash(config)` using `base64(sha256(BOM + json.encode('utf-16-be'))[:8])` for exact Java Flow compatibility
 - [x] **contextRootUrl** - Uses `"./"` matching Java Flow
 - [x] **Execute commands** - document.title, invalid property, serverConnected, component-queued (`queue_execute`)
 - [x] **FlowComponentHost** - Virtual children renderer for Dialog/Overlay components
@@ -38,6 +27,7 @@
 - [x] **Server-client state sync** - `_pending_server_change` flag absorbs echoes from server-initiated property changes
 - [x] **Client-side validation** - Field components use native web component validation (pattern, allowedCharPattern, required); `manualValidation` removed
 - [x] **Grid connector protocol** - `gridConnector.initLazy`, `$connector.set/updateSize/confirm`, `setHeaderRenderer`
+- [x] **TreeGrid** - Hierarchical Grid with expand/collapse, inline treeGridConnector overrides (no bundle rebuild)
 - [x] **Select connector protocol** - `selectConnector.initLazy`, `requestContentUpdate`
 - [x] **ComboBox connector protocol** - `comboBoxConnector.initLazy`, `$connector.set/updateSize/confirm`, filtering
 - [x] **MultiSelectComboBox connector** - Reuses `comboBoxConnector.initLazy`, multi-select with `selectedItems` array
@@ -133,6 +123,21 @@
 - [x] `@StyleSheet` decorator - Load custom CSS via UIDL EAGER dependencies, served from app's `styles/` directory
 - [x] Dev mode (`--dev`) - Auto-reload on Python file changes via watchfiles, socket-in-parent architecture (no EADDRINUSE on reload), file change logging
 - [x] WebSocket Push - Atmosphere protocol, `GET /VAADIN/push` endpoint, push sender coroutine, `UI.access()` / `UI.push()` API, reconnect resilience (pending message buffer)
+- [x] Heartbeat handler (`v-r=heartbeat`) — keeps session alive, prevents 403 after idle
+- [x] Session timeout / cleanup (30min idle, background sweep every 60s)
+- [x] Error handling — Per-RPC try/except, error Notification to user, navigation error feedback, push sender broad catch
+
+### Protocol / Security
+- [x] CSRF token validation (actual check) — validated in `http_server.py`
+- [x] ClientId validation (duplicate detection, replays last response)
+- [x] SyncId validation (out-of-sync detection)
+- [x] Resynchronize flag support
+- [x] Return channels — used by Grid and VirtualList ComponentRenderer
+
+### Theme
+- [x] Lumo/Aura theme support — `@StyleSheet("lumo/lumo.css")` or `@StyleSheet("aura/aura.css")` on layout
+- [x] Runtime theme switching — `UI.set_theme(theme, variant)` swaps theme CSS and dark/light mode at runtime
+- [x] Theme-agnostic CSS — Demo styles use `--vaadin-*` base properties with `--lumo-*` fallbacks
 
 ### Protocol
 - [x] Init response - appConfig, pushScript, CSRF, constants (Java-compatible hashes)
@@ -186,28 +191,9 @@ ListBox, MultiSelectListBox, MultiSelectComboBox, VirtualList, MessageInput, Mes
 ### ~~Phase 12 — WebSocket Push~~ ✓ DONE
 Atmosphere WebSocket protocol, `UI.access()` / `UI.push()` API, push sender coroutine, push demo view. See `../specs/PROTOCOL.md` § WebSocket Push.
 
-### Protocol / Security
-- [x] CSRF token validation (actual check) — validated in `http_server.py`
-- [x] ClientId validation (duplicate detection)
-- [x] SyncId validation (out-of-sync detection)
-- [x] Resynchronize flag support
-- [ ] `@ClientCallable` methods
-- [x] Return channels
-
-### Theme
-- [x] Lumo/Aura theme support — user declares `@StyleSheet("lumo/lumo.css")` or `@StyleSheet("aura/aura.css")` on layout; both extracted in bundle
-- [x] **Runtime theme switching** — `UI.set_theme(theme, variant)` swaps theme CSS and dark/light mode at runtime
-  - Lumo dark: `<html theme="dark">` attribute (CSS selector `[theme~="dark"]`)
-  - Aura dark: `<html style="color-scheme: dark">` (native CSS property)
-  - Removes all stale theme links before adding new one (no CSS conflicts)
-- [x] **Theme-agnostic CSS** — Demo styles use `--vaadin-*` base properties (shared by Lumo/Aura) with `--lumo-*` fallbacks
+### Pending
+- [x] `@ClientCallable` methods — Decorator, Feature 19 auto-registration, promise resolution/rejection
 - [ ] **Optimization:** inject layout `@StyleSheet` as `<link>` in `<head>` to avoid FOUC (currently loaded via UIDL after init)
-
-### Server Infrastructure
-- [x] Heartbeat handler (`v-r=heartbeat`) — keeps session alive, prevents 403 after idle
-- [x] Session timeout / cleanup (30min idle, background sweep every 60s)
-- [x] Error handling — Per-RPC try/except, error Notification to user, navigation error feedback, push sender broad catch
-- [x] Push / WebSocket — Atmosphere protocol, `UI.access()` / `UI.push()` API, push demo view, reconnect resilience
 
 ---
 
