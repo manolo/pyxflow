@@ -119,6 +119,28 @@ def Push(cls):
     return cls
 
 
+def ColorScheme(value: str):
+    """Set the initial color scheme on the AppShell.
+
+    Modifies <html> attributes at bootstrap time so the page loads
+    with the correct theme immediately (no flash).
+
+    Values: "dark", "light", "light dark", "dark light", "system", "normal".
+    "system" is an alias for "light dark".
+
+    Usage:
+        @AppShell
+        @ColorScheme("dark")
+        class MyAppShell:
+            pass
+    """
+    resolved = "light dark" if value == "system" else value
+    def decorator(cls):
+        cls._color_scheme = resolved
+        return cls
+    return decorator
+
+
 def get_app_shell() -> type | None:
     """Get the registered AppShell class, or None."""
     return _app_shell

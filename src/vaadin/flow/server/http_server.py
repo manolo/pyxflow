@@ -438,6 +438,13 @@ def get_index_html() -> str:
                 "</head>",
                 '  <script>window.Vaadin=window.Vaadin||{};window.Vaadin.featureFlags=window.Vaadin.featureFlags||{};window.Vaadin.featureFlags.masterDetailLayoutComponent=true;</script>\n</head>'
             )
+            # Apply @ColorScheme from AppShell to <html> tag
+            from vaadin.flow.router import get_app_shell
+            app_shell = get_app_shell()
+            color_scheme = getattr(app_shell, '_color_scheme', None) if app_shell else None
+            if color_scheme and color_scheme != "normal":
+                theme_attr = color_scheme.replace(' ', '-')
+                html = html.replace('<html', f'<html theme="{theme_attr}" style="color-scheme: {color_scheme};"', 1)
             return html
 
     # Fallback if no bundle found

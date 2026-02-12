@@ -1,4 +1,4 @@
-from vaadin.flow import AppShell, Push, StyleSheet
+from vaadin.flow import AppShell, ColorScheme, Push, StyleSheet
 from vaadin.flow.components import (
     AppLayout,
     DrawerToggle,
@@ -12,6 +12,7 @@ from vaadin.flow.menu import get_menu_entries
 
 @AppShell
 @Push
+@ColorScheme("dark")
 @StyleSheet("lumo/lumo.css", "styles/styles.css")
 class MainLayout(AppLayout):
     def __init__(self):

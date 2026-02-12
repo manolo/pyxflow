@@ -595,6 +595,37 @@ class UI:
         )
         self._tree.queue_execute([other_href, new_href, is_dark, is_lumo, js])
 
+    def set_color_scheme(self, value: str) -> None:
+        """Set the color scheme at runtime.
+
+        Modifies ``<html>`` theme attribute and CSS color-scheme property.
+
+        Args:
+            value: "dark", "light", "light dark", "dark light", "system",
+                   or "normal" (removes both attributes).
+        """
+        if value == "system":
+            value = "light dark"
+        if not value or value == "normal":
+            js = (
+                "return (function(){"
+                "var h=document.documentElement;"
+                "h.removeAttribute('theme');"
+                "h.style.colorScheme='';"
+                "})()"
+            )
+            self._tree.queue_execute([js])
+        else:
+            theme_attr = value.replace(' ', '-')
+            js = (
+                "return (function(){"
+                "var h=document.documentElement;"
+                "h.setAttribute('theme',$0);"
+                "h.style.colorScheme=$1;"
+                "})()"
+            )
+            self._tree.queue_execute([theme_attr, value, js])
+
     def set_theme_variant(self, variant: str) -> None:
         """Switch only the color variant (light/dark) without changing the theme.
 

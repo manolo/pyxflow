@@ -5,7 +5,7 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~13,400 (core src/), ~33,000 (total with demo + tests)
-**Tests:** 1754 passing
+**Tests:** 1771 passing
 **Last updated:** 2026-02-12
 
 ---
@@ -150,6 +150,8 @@
 - [x] Lumo/Aura theme support — `@StyleSheet("lumo/lumo.css")` or `@StyleSheet("aura/aura.css")` on layout
 - [x] Runtime theme switching — `UI.set_theme(theme, variant)` swaps theme CSS and dark/light mode at runtime
 - [x] Theme-agnostic CSS — Demo styles use `--vaadin-*` base properties with `--lumo-*` fallbacks
+- [x] `@ColorScheme` decorator — Set initial color scheme on `@AppShell` (dark/light/system), modifies `<html>` attributes at bootstrap (no flash)
+- [x] `UI.set_color_scheme(value)` — Runtime color scheme switching (dark/light/system/normal)
 
 ### Protocol
 - [x] Init response - appConfig, pushScript, CSRF, constants (Java-compatible hashes)
@@ -178,6 +180,7 @@
 - [x] `get_menu_entries()` - Collects @Menu routes, filters required params, sorts by order/path
 - [x] `@AppShell` - Global app configuration class (single place for @Push, @StyleSheet)
 - [x] `@Push` - Opt-in WebSocket push (conditional pushScript, push nodes in init)
+- [x] `@ColorScheme` - Initial color scheme (dark/light/system) applied to `<html>` at bootstrap
 - [x] AppShell `@StyleSheet` - Stylesheets loaded in init response (before any navigation)
 - [x] Route not found - Shows "Could not navigate to '...'" view for unregistered routes
 - [x] Dev mode route list - In `--dev` mode, not-found view shows clickable RouterLinks to all registered routes
