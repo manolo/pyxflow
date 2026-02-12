@@ -69,7 +69,7 @@ vaadin-pyflow/
 | `core/state_tree.py` | Node management, change tracking, execute queue |
 | `core/state_node.py` | Features, attach/put/splice, change collection |
 | `core/element.py` | Element wrapper: properties, attributes, styles, events |
-| `core/component.py` | Base Component class with element attachment, deferred execute_js |
+| `core/component.py` | Base Component class with element attachment, _BufferedStyle, deferred execute_js |
 | `components/grid.py` | Grid: connectors, renderers, sorting, lazy loading (~600 lines) |
 | `components/dialog.py` | Dialog: FlowComponentHost, publishedEventHandler close |
 
