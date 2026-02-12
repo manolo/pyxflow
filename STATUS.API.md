@@ -1,7 +1,7 @@
 # PyFlow API Inventory — Python vs Java Vaadin 25
 
 **Generated: 2026-02-12**
-**Python components: 49 | Tests: 1718 | LOC: ~13,800 (core)**
+**Python components: 49 | Tests: 1754 | LOC: ~13,800 (core)**
 
 Legend: `[x]` = implemented, `[ ]` = missing
 
@@ -44,6 +44,7 @@ All components inherit from `Component` which provides:
 |-------|---------|-----------|
 | **HasValidation** | `set_invalid` / `is_invalid` / `set_error_message` / `get_error_message` | [x] All field components except Checkbox (15) |
 | **HasRequired** | `set_required_indicator_visible` / `is_required_indicator_visible` | [x] All field components including Checkbox (16) |
+| **set_value fires listeners** | `set_value()` fires `{"value": ..., "from_client": False}` on server-side changes | [x] All 18 field components (matches Java `AbstractFieldSupport.setValue()`) |
 
 **Missing field mixins:**
 | Feature | Status |

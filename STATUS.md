@@ -5,7 +5,7 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~13,400 (core src/), ~33,000 (total with demo + tests)
-**Tests:** 1676 passing
+**Tests:** 1754 passing
 **Last updated:** 2026-02-12
 
 ---
@@ -113,6 +113,7 @@
 - [x] `HasValidation` mixin - `set_invalid()`, `is_invalid()`, `set_error_message()`, `get_error_message()` on all 14 field components + CustomField
 - [x] `HasRequired` mixin - `set_required_indicator_visible()`, `is_required_indicator_visible()` on all 14 field components + CustomField + Checkbox
 - [x] Deferred buffering - Values set before attach are buffered in `_pending_properties` and flushed on attach
+- [x] `set_value()` fires change listeners — All 18 field components fire `{"value": ..., "from_client": False}` on server-side value changes, matching Java Flow's `AbstractFieldSupport.setValue()` behavior
 
 ### Data Binding
 - [x] Binder - Fluent API (`for_field().with_validator().with_converter().bind()`), `read_bean`, `write_bean`, `set_bean` (auto two-way sync), `is_dirty()` dirty tracking with mSync-safe Select handling
