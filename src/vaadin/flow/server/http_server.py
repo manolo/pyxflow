@@ -332,14 +332,6 @@ async def handle_static(request: web.Request) -> web.Response:
             content_type = guess_content_type(file_path)
             return web.FileResponse(file_path, headers={"Content-Type": content_type, "Cache-Control": _BUNDLE_CACHE})  # type: ignore[return-value]
 
-    # Fallback: serve push scripts from flow-push module
-    if path.startswith("static/push/"):
-        push_base = Path(__file__).parents[5] / "flow" / "flow-push" / "target" / "classes" / "META-INF" / "resources" / "VAADIN"
-        push_file = push_base / path
-        if push_file.is_file():
-            content_type = guess_content_type(push_file)
-            return web.FileResponse(push_file, headers={"Content-Type": content_type, "Cache-Control": _BUNDLE_CACHE})  # type: ignore[return-value]
-
     return web.Response(text="Not found", status=404)
 
 
