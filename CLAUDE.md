@@ -30,6 +30,9 @@ pytest tests/ -v
 # Run specific test file
 pytest tests/test_rpc_events.py -v
 
+# Regenerate the frontend bundle (auto-discovers _v_fqcn components)
+vaadin --bundle
+
 # Run Java reference (bundle-generator with AllComponentsView)
 cd ../bundle-generator && ./mvnw package jetty:run-war
 # http://localhost:8080
@@ -80,11 +83,8 @@ vaadin-pyflow/
 4. Create `components/new_component.py`
 5. Export in `components/__init__.py`
 6. Add tests in `tests/`
-7. **Keep demos in sync** — Update BOTH:
-   - Python: `demo/views/components.py` (`ComponentsDemoView`)
-   - Java: `../bundle-generator/src/main/java/com/vaadin/pyflow/AllComponentsView.java`
-   These MUST mirror each other. The Java view drives bundle generation — if a web component isn't used there, it won't be in the bundle.
-8. Regenerate bundle: `cd ../bundle-generator && ./generate-bundle.sh`
+7. Add `_v_fqcn` class attribute with the Java FQCN (e.g. `_v_fqcn = "com.vaadin.flow.component.button.Button"`)
+8. Regenerate bundle: `vaadin --bundle` (auto-discovers all `_v_fqcn` components)
 
 ---
 
@@ -115,9 +115,42 @@ browser_take_screenshot → visual check
 
 ---
 
-## Bundle Location
+## Bundle
 
-The bundle lives inside the package at `src/vaadin/flow/bundle/` so it ships with the wheel.
-At runtime, `get_bundle_directory()` finds it via `Path(__file__).parents[1] / "bundle"`.
+The Vaadin frontend bundle (FlowClient, web components, Lumo/Aura themes) is pre-built and shipped inside the wheel at `src/vaadin/flow/bundle/`. At runtime, the server discovers it automatically.
 
-To regenerate: `cd ../bundle-generator && ./generate-bundle.sh`, then copy output to `src/vaadin/flow/bundle/`.
+### Regenerating the bundle (PyFlow developers)
+
+From the `vaadin-pyflow/` checkout:
+
+```bash
+vaadin --bundle                          # build → src/vaadin/flow/bundle/
+vaadin --bundle --keep                   # keep bundle-project/ for debugging
+vaadin --bundle --vaadin-version 25.1.0  # pin a different Vaadin version
+```
+
+The command auto-discovers all `Component` subclasses with `_v_fqcn`, generates a Maven project with `@Uses` for each, builds in production mode, and extracts the bundle from the WAR.
+
+If `bundle-project/` already exists (from a previous `--keep`), it reuses the Maven project and skips `mvn clean` for faster rebuilds.
+
+### Custom bundle for user projects
+
+Users can generate their own bundle to include only the components they use, or to add custom web components:
+
+```bash
+# From the project root (where my_app/ lives)
+vaadin my_app --bundle                   # build → my_app/bundle/
+vaadin my_app --bundle --keep            # keep my_app/bundle-project/
+```
+
+The generated `my_app/bundle/` takes priority over the package-internal bundle at runtime. This allows projects to:
+- Use a different Vaadin version than the one shipped with pyflow
+- Include additional web components (by adding `_v_fqcn` to custom components)
+- Reduce bundle size by only including used components (future)
+
+### Bundle discovery priority
+
+`get_bundle_directory()` checks these locations in order:
+1. `<app_directory>/bundle/` — user-project bundle (highest priority)
+2. `<package>/bundle/` — package-internal (shipped in wheel)
+3. `./bundle/` — development fallback

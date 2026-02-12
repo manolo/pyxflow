@@ -198,10 +198,14 @@ ListBox, MultiSelectListBox, MultiSelectComboBox, VirtualList, MessageInput, Mes
 ### ~~Phase 12 — WebSocket Push~~ ✓ DONE
 Atmosphere WebSocket protocol, `UI.access()` / `UI.push()` API, push sender coroutine, push demo view. See `../specs/PROTOCOL.md` § WebSocket Push.
 
-### Packaging
+### Packaging & Bundle
 - [x] PyPI-ready wheel — `pip install vaadin-pyflow` or `pip install git+https://github.com/manolo/vaadin-pyflow.git`
 - [x] Bundle inside package — `src/vaadin/flow/bundle/` ships in wheel (1.5 MB compressed)
 - [x] CLI entry point — `vaadin <app_module> [--dev] [--debug] [--port N]`
+- [x] `vaadin --bundle` — Auto-generate bundle from `_v_fqcn` component registry (Maven project, production build, WAR extraction)
+- [x] `vaadin <app> --bundle` — User projects can generate their own bundle (outputs to `<app>/bundle/`)
+- [x] `--keep` flag — Preserve `bundle-project/` for debugging or faster rebuilds (reuses Maven project, skips `clean`)
+- [x] Bundle discovery priority — app-dir bundle > package-internal > cwd fallback
 - [x] Apache 2.0 LICENSE file
 
 ### Pending

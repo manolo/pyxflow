@@ -5,6 +5,7 @@ __pycache__/
 *.so
 .Python
 /build/
+/bundle-project/
 # Keep src/vaadin/flow/bundle/ (Vaadin frontend assets shipped in wheel)
 !src/vaadin/flow/bundle/
 develop-eggs/
