@@ -46,6 +46,15 @@ class Tab(Component):
         """Check if this tab is selected."""
         return self._selected
 
+    def set_selected(self, selected: bool):
+        """Set the selected state (typically managed by Tabs, not called directly)."""
+        self._selected = selected
+
+    def set_flex_grow(self, flex_grow: float):
+        """Set flex-grow for this tab."""
+        if self._element:
+            self.element.get_style().set("flex-grow", str(flex_grow))
+
 
 class Tabs(Component):
     """A tabs component for organizing content.
@@ -179,6 +188,21 @@ class Tabs(Component):
     def is_autoselect(self) -> bool:
         """Check if the first tab is auto-selected."""
         return self._autoselect
+
+    def add_tab_at_index(self, index: int, tab: Tab):
+        """Add a tab at a specific index."""
+        self._tabs.insert(index, tab)
+        if self._element:
+            tab._attach(self._element._tree)
+            self.element.node.add_child(tab.element.node, index)
+        if index <= self._selected_index:
+            self._selected_index += 1
+            if self._element:
+                self.element.set_property("selected", self._selected_index)
+
+    def add_tab_as_first(self, tab: Tab):
+        """Add a tab as the first tab."""
+        self.add_tab_at_index(0, tab)
 
     def add_selected_change_listener(self, listener: Callable):
         """Add a listener for tab selection changes."""

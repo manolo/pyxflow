@@ -37,6 +37,8 @@ class ConfirmDialog(Component):
         self._confirm_listeners: list[Callable] = []
         self._cancel_listeners: list[Callable] = []
         self._reject_listeners: list[Callable] = []
+        self._close_on_esc = True
+        self._opened_change_listeners: list[Callable] = []
 
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
@@ -63,6 +65,9 @@ class ConfirmDialog(Component):
         if self._reject_theme:
             self.element.set_property("rejectTheme", self._reject_theme)
 
+        if not self._close_on_esc:
+            self.element.set_property("closeOnEsc", False)
+
         # Register event listeners with explicit hash (empty config)
         self.element.add_event_listener("confirm", self._on_confirm, _CLOSED_HASH)
         self.element.add_event_listener("cancel", self._on_cancel, _CLOSED_HASH)
@@ -73,12 +78,16 @@ class ConfirmDialog(Component):
         self._opened = True
         if self._element:
             self.element.set_property("opened", True)
+        for listener in self._opened_change_listeners:
+            listener({"opened": True})
 
     def close(self):
         """Close the confirm dialog."""
         self._opened = False
         if self._element:
             self.element.set_property("opened", False)
+        for listener in self._opened_change_listeners:
+            listener({"opened": False})
 
     def is_opened(self) -> bool:
         """Check if the dialog is open."""
@@ -183,6 +192,19 @@ class ConfirmDialog(Component):
     def add_reject_listener(self, listener: Callable):
         """Add a listener called when the reject button is clicked."""
         self._reject_listeners.append(listener)
+
+    def set_close_on_esc(self, close_on_esc: bool):
+        """Set whether the dialog closes on Escape key."""
+        self._close_on_esc = close_on_esc
+        if self._element:
+            self.element.set_property("closeOnEsc", close_on_esc)
+
+    def is_close_on_esc(self) -> bool:
+        return self._close_on_esc
+
+    def add_opened_change_listener(self, listener: Callable):
+        """Add a listener for opened state changes."""
+        self._opened_change_listeners.append(listener)
 
     def _on_confirm(self, event_data: dict):
         """Handle confirm event from client."""

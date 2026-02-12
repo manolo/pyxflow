@@ -229,6 +229,24 @@ class MenuBar(Component):
         """Check if submenus open on hover."""
         return self._open_on_hover
 
+    def close(self):
+        """Close any open submenus."""
+        if self._element:
+            self.element._tree.queue_execute([
+                {"@v-node": self.element.node_id},
+                "return $0.close()",
+            ])
+
+    def remove(self, *items: MenuItem):
+        """Remove root-level menu items."""
+        for item in items:
+            if item in self._items:
+                self._items.remove(item)
+
+    def remove_all(self):
+        """Remove all root-level menu items."""
+        self._items.clear()
+
 
 class _ItemElement:
     """Lightweight element wrapper for MenuItem nodes.

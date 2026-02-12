@@ -121,6 +121,13 @@ class Component:
         if pending_id is not None:
             self._element.set_attribute("id", pending_id)
             del self._pending_id
+        # Apply deferred attributes (aria-label, aria-labelledby, etc.)
+        pending_attrs = getattr(self, "_pending_attributes", None)
+        if pending_attrs:
+            for attr_name, attr_value in pending_attrs.items():
+                if attr_value is not None:
+                    self._element.set_attribute(attr_name, attr_value)
+            pending_attrs.clear()
         # Apply deferred properties (helperText, etc.)
         pending_props = getattr(self, "_pending_properties", None)
         if pending_props:
@@ -134,6 +141,13 @@ class Component:
         if getattr(self, "_base_click_listeners", None) and not getattr(self, "_click_event_registered", False):
             self._click_event_registered = True
             self._element.add_event_listener("click", self._dispatch_click)
+        # Apply deferred focus/blur listeners
+        if getattr(self, "_focus_listeners", None) and not getattr(self, "_focus_event_registered", False):
+            self._focus_event_registered = True
+            self._element.add_event_listener("focus", self._dispatch_focus)
+        if getattr(self, "_blur_listeners", None) and not getattr(self, "_blur_event_registered", False):
+            self._blur_event_registered = True
+            self._element.add_event_listener("blur", self._dispatch_blur)
         # Apply deferred class names
         if self._class_names:
             self._update_class_attribute()
@@ -435,6 +449,72 @@ class Component:
                 {"@v-node": self._element.node_id},
                 "return (async function() { setTimeout(function(){$0.blur()},0) }).apply($0)"
             ])
+
+    # --- ARIA Label (HasAriaLabel) ---
+
+    def set_aria_label(self, label: str | None):
+        """Set the aria-label attribute."""
+        if self._element:
+            if label is not None:
+                self._element.set_attribute("aria-label", label)
+            else:
+                self._element.remove_attribute("aria-label")
+        else:
+            if not hasattr(self, "_pending_attributes"):
+                self._pending_attributes = {}
+            self._pending_attributes["aria-label"] = label
+
+    def get_aria_label(self) -> str | None:
+        """Get the aria-label attribute."""
+        if self._element:
+            return self._element.get_attribute("aria-label")
+        return getattr(self, "_pending_attributes", {}).get("aria-label")
+
+    def set_aria_labelled_by(self, labelled_by: str | None):
+        """Set the aria-labelledby attribute."""
+        if self._element:
+            if labelled_by is not None:
+                self._element.set_attribute("aria-labelledby", labelled_by)
+            else:
+                self._element.remove_attribute("aria-labelledby")
+        else:
+            if not hasattr(self, "_pending_attributes"):
+                self._pending_attributes = {}
+            self._pending_attributes["aria-labelledby"] = labelled_by
+
+    def get_aria_labelled_by(self) -> str | None:
+        """Get the aria-labelledby attribute."""
+        if self._element:
+            return self._element.get_attribute("aria-labelledby")
+        return getattr(self, "_pending_attributes", {}).get("aria-labelledby")
+
+    # --- Focus / Blur listeners (FocusNotifier / BlurNotifier) ---
+
+    def add_focus_listener(self, listener):
+        """Add a focus event listener."""
+        if not hasattr(self, "_focus_listeners"):
+            self._focus_listeners = []
+        self._focus_listeners.append(listener)
+        if self._element is not None and not getattr(self, "_focus_event_registered", False):
+            self._focus_event_registered = True
+            self._element.add_event_listener("focus", self._dispatch_focus)
+
+    def _dispatch_focus(self, event_data: dict):
+        for listener in getattr(self, "_focus_listeners", []):
+            listener(event_data)
+
+    def add_blur_listener(self, listener):
+        """Add a blur event listener."""
+        if not hasattr(self, "_blur_listeners"):
+            self._blur_listeners = []
+        self._blur_listeners.append(listener)
+        if self._element is not None and not getattr(self, "_blur_event_registered", False):
+            self._blur_event_registered = True
+            self._element.add_event_listener("blur", self._dispatch_blur)
+
+    def _dispatch_blur(self, event_data: dict):
+        for listener in getattr(self, "_blur_listeners", []):
+            listener(event_data)
 
     # --- Tooltip ---
 

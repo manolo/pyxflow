@@ -237,6 +237,40 @@ class Popover(Component):
         """Add a listener for when the popover closes."""
         self._close_listeners.append(listener)
 
+    def remove(self, *components: Component):
+        """Remove specific components from the popover."""
+        for component in components:
+            if component in self._children:
+                self._children.remove(component)
+                component._parent = None
+                if self._element and component._element:
+                    self.element.remove_child(component.element)
+
+    def set_autofocus(self, autofocus: bool):
+        """Set whether to auto-focus the first focusable element."""
+        if self._element:
+            self.element.set_property("autofocus", autofocus)
+
+    def set_backdrop_visible(self, visible: bool):
+        """Set whether the backdrop is visible when modal."""
+        if self._element:
+            self.element.set_property("withBackdrop", visible)
+
+    def set_hover_delay(self, delay: int):
+        """Set hover delay in milliseconds."""
+        if self._element:
+            self.element.set_property("hoverDelay", delay)
+
+    def set_focus_delay(self, delay: int):
+        """Set focus delay in milliseconds."""
+        if self._element:
+            self.element.set_property("focusDelay", delay)
+
+    def set_hide_delay(self, delay: int):
+        """Set hide delay in milliseconds."""
+        if self._element:
+            self.element.set_property("hideDelay", delay)
+
     def _handle_opened_changed(self, event_data: dict):
         """Handle opened-changed event from client.
 

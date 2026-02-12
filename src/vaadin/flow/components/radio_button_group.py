@@ -109,6 +109,10 @@ class RadioButtonGroup(HasReadOnly, HasValidation, HasRequired, Component, Gener
         """Add a value change listener."""
         self._change_listeners.append(listener)
 
+    def set_item_enabled_provider(self, provider: Callable[[T], bool]):
+        """Set a provider to control which items are enabled."""
+        self._item_enabled_provider = provider
+
     def _handle_value_changed(self, event_data: dict):
         """Handle value-changed event from client.
 

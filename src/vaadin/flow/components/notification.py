@@ -240,6 +240,17 @@ class Notification(Component):
                 self.element.remove_property("text")
                 self._text = ""
 
+    def remove(self, *components: Component):
+        """Remove specific components from the notification content."""
+        for component in components:
+            if component in self._children:
+                self._children.remove(component)
+                component._parent = None
+                if self._element and component._element:
+                    self.element.node.remove_child(component.element.node)
+        if self._element:
+            self._update_virtual_child_node_ids()
+
     def remove_all(self):
         """Remove all components from the notification content."""
         if self._element:

@@ -96,6 +96,31 @@ class SideNavItem(Component):
             component.element.set_attribute("slot", "prefix")
             self.element.add_child(component.element)
 
+    def set_suffix_component(self, component: Component):
+        """Set the suffix slot component."""
+        self._suffix = component
+        if self._element:
+            component._attach(self._element._tree)
+            component.element.set_attribute("slot", "suffix")
+            self.element.add_child(component.element)
+
+    def get_items(self) -> list["SideNavItem"]:
+        """Get nested navigation items."""
+        return self._items.copy()
+
+    def remove(self, *items: "SideNavItem"):
+        """Remove specific nested items."""
+        for item in items:
+            if item in self._items:
+                self._items.remove(item)
+                if self._element and item._element:
+                    self.element.remove_child(item.element)
+
+    def remove_all(self):
+        """Remove all nested items."""
+        for item in list(self._items):
+            self.remove(item)
+
 
 class SideNav(Component):
     """Side navigation component.
@@ -164,3 +189,29 @@ class SideNav(Component):
     def is_collapsible(self) -> bool:
         """Check if the nav is collapsible."""
         return self._collapsible
+
+    def set_expanded(self, expanded: bool):
+        """Set whether the nav is expanded (when collapsible)."""
+        self._expanded = expanded
+        if self._element:
+            self.element.set_property("collapsed", not expanded)
+
+    def is_expanded(self) -> bool:
+        return getattr(self, "_expanded", True)
+
+    def get_items(self) -> list[SideNavItem]:
+        """Get all navigation items."""
+        return self._items.copy()
+
+    def remove(self, *items: SideNavItem):
+        """Remove specific navigation items."""
+        for item in items:
+            if item in self._items:
+                self._items.remove(item)
+                if self._element and item._element:
+                    self.element.remove_child(item.element)
+
+    def remove_all(self):
+        """Remove all navigation items."""
+        for item in list(self._items):
+            self.remove(item)

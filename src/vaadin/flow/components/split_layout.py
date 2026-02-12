@@ -157,6 +157,17 @@ class SplitLayout(Component):
                 self._pending_drag_listeners = []
             self._pending_drag_listeners.append(listener)
 
+    def remove(self, component: Component):
+        """Remove a specific component (primary or secondary)."""
+        if component is self._primary:
+            if self._element and self._primary._element:
+                self.element.remove_child(self._primary.element)
+            self._primary = None
+        elif component is self._secondary:
+            if self._element and self._secondary._element:
+                self.element.remove_child(self._secondary.element)
+            self._secondary = None
+
     def remove_all(self):
         """Remove all children."""
         if self._primary and self._element:

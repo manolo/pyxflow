@@ -310,6 +310,27 @@ class Dialog(Component):
         for listener in self._close_listeners:
             listener({})
 
+    def remove(self, *components: Component):
+        """Remove specific components from the dialog content."""
+        for component in components:
+            if component in self._children:
+                self._children.remove(component)
+                component._parent = None
+                if self._element and component._element:
+                    self.element.node.remove_child(component.element.node)
+        if self._element:
+            self._update_virtual_child_node_ids()
+
+    def set_top(self, top: str):
+        """Set the dialog top position (e.g., '100px')."""
+        if self._element:
+            self.element.get_style().set("--vaadin-dialog-overlay-offset-top", top)
+
+    def set_left(self, left: str):
+        """Set the dialog left position (e.g., '100px')."""
+        if self._element:
+            self.element.get_style().set("--vaadin-dialog-overlay-offset-left", left)
+
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""
         if name == "opened":

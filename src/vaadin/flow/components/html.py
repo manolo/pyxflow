@@ -55,8 +55,87 @@ class H4(_TextComponent):
     _tag = "h4"
 
 
+class H5(_TextComponent):
+    _tag = "h5"
+
+
+class H6(_TextComponent):
+    _tag = "h6"
+
+
 class Paragraph(_TextComponent):
     _tag = "p"
+
+
+class Pre(_TextComponent):
+    _tag = "pre"
+
+
+class NativeLabel(_TextComponent):
+    _tag = "label"
+
+
+class Hr(Component):
+    """HTML <hr> element (horizontal rule)."""
+
+    _tag = "hr"
+
+
+class Anchor(_TextComponent):
+    """HTML <a> element with href."""
+
+    _tag = "a"
+
+    def __init__(self, href: str = "", text: str = ""):
+        super().__init__(text)
+        self._href = href
+        self._target: str | None = None
+
+    def _attach(self, tree: "StateTree"):
+        super()._attach(tree)
+        if self._href:
+            self.element.set_attribute("href", self._href)
+        if self._target:
+            self.element.set_attribute("target", self._target)
+
+    def set_href(self, href: str):
+        self._href = href
+        if self._element:
+            self.element.set_attribute("href", href)
+
+    def get_href(self) -> str:
+        return self._href
+
+    def set_target(self, target: str):
+        self._target = target
+        if self._element:
+            self.element.set_attribute("target", target)
+
+    def get_target(self) -> str | None:
+        return self._target
+
+
+class IFrame(Component):
+    """HTML <iframe> element."""
+
+    _tag = "iframe"
+
+    def __init__(self, src: str = ""):
+        super().__init__()
+        self._src = src
+
+    def _attach(self, tree: "StateTree"):
+        super()._attach(tree)
+        if self._src:
+            self.element.set_attribute("src", self._src)
+
+    def set_src(self, src: str):
+        self._src = src
+        if self._element:
+            self.element.set_attribute("src", src)
+
+    def get_src(self) -> str:
+        return self._src
 
 
 class HtmlContainer(_TextComponent):
@@ -145,3 +224,33 @@ class Footer(HtmlContainer):
     """HTML <footer> element."""
 
     _tag = "footer"
+
+
+class Section(HtmlContainer):
+    """HTML <section> element."""
+
+    _tag = "section"
+
+
+class Nav(HtmlContainer):
+    """HTML <nav> element."""
+
+    _tag = "nav"
+
+
+class Main(HtmlContainer):
+    """HTML <main> element."""
+
+    _tag = "main"
+
+
+class Article(HtmlContainer):
+    """HTML <article> element."""
+
+    _tag = "article"
+
+
+class Aside(HtmlContainer):
+    """HTML <aside> element."""
+
+    _tag = "aside"

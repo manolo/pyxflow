@@ -131,6 +131,51 @@ class TextField(HasReadOnly, HasValidation, HasRequired, Component):
             comp.element.set_attribute("slot", "prefix")
             self.element.add_child(comp.element)
 
+    def set_suffix_component(self, component: Component):
+        """Set a suffix component (e.g. Icon) in the 'suffix' slot."""
+        self._suffix_component = component
+        if self._element:
+            self._attach_suffix(self._element._tree)
+
+    def _attach_suffix(self, tree: "StateTree"):
+        comp = self._suffix_component
+        if comp and not comp._element:
+            comp._ui = self._ui
+            comp._parent = self
+            comp._attach(tree)
+            comp.element.set_attribute("slot", "suffix")
+            self.element.add_child(comp.element)
+
+    def set_max_length(self, max_length: int):
+        """Set the maximum number of characters."""
+        self._max_length = max_length
+        if self._element:
+            self.element.set_property("maxlength", max_length)
+
+    def get_max_length(self) -> int:
+        return getattr(self, "_max_length", 0)
+
+    def set_min_length(self, min_length: int):
+        """Set the minimum number of characters."""
+        self._min_length = min_length
+        if self._element:
+            self.element.set_property("minlength", min_length)
+
+    def get_min_length(self) -> int:
+        return getattr(self, "_min_length", 0)
+
+    def set_autoselect(self, autoselect: bool):
+        """Set whether the text is automatically selected when the field gets focus."""
+        self._autoselect = autoselect
+        if self._element:
+            self.element.set_property("autoselect", autoselect)
+
+    def is_autoselect(self) -> bool:
+        return getattr(self, "_autoselect", False)
+
+    def is_clear_button_visible(self) -> bool:
+        return self._clear_button_visible
+
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""
         if name == "value":

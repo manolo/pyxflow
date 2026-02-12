@@ -99,6 +99,40 @@ class EmailField(HasReadOnly, HasValidation, HasRequired, Component):
         for listener in self._change_listeners:
             listener(event_data)
 
+    def set_pattern(self, pattern: str):
+        if self._element:
+            self.element.set_property("pattern", pattern)
+
+    def set_max_length(self, max_length: int):
+        if self._element:
+            self.element.set_property("maxlength", max_length)
+
+    def set_min_length(self, min_length: int):
+        if self._element:
+            self.element.set_property("minlength", min_length)
+
+    def set_prefix_component(self, component):
+        """Set a prefix component in the 'prefix' slot."""
+        self._prefix_component = component
+        if self._element:
+            if component and not component._element:
+                component._ui = self._ui
+                component._parent = self
+                component._attach(self._element._tree)
+                component.element.set_attribute("slot", "prefix")
+                self.element.add_child(component.element)
+
+    def set_suffix_component(self, component):
+        """Set a suffix component in the 'suffix' slot."""
+        self._suffix_component = component
+        if self._element:
+            if component and not component._element:
+                component._ui = self._ui
+                component._parent = self
+                component._attach(self._element._tree)
+                component.element.set_attribute("slot", "suffix")
+                self.element.add_child(component.element)
+
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""
         if name == "value":

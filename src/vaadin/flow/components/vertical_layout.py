@@ -1,6 +1,6 @@
 """VerticalLayout component."""
 
-from vaadin.flow.components.horizontal_layout import Alignment
+from vaadin.flow.components.horizontal_layout import Alignment, JustifyContentMode
 from vaadin.flow.core.component import Component
 
 
@@ -106,6 +106,57 @@ class VerticalLayout(Component):
         for component in self._expanded_components:
             if component._element:
                 component.element.get_style().set("flex-grow", "1")
+
+    def set_justify_content_mode(self, mode: JustifyContentMode):
+        """Set justify-content-mode on the layout."""
+        self._justify_content_mode = mode
+        if self._element:
+            self.element.get_style().set("justify-content", mode.value)
+
+    def get_justify_content_mode(self) -> JustifyContentMode | None:
+        return getattr(self, "_justify_content_mode", None)
+
+    def set_align_items(self, alignment: Alignment):
+        """Set the default alignment perpendicular to the layout direction."""
+        self._default_alignment = alignment
+        if self._element:
+            self.element.get_style().set("align-items", alignment.value)
+
+    def get_align_items(self) -> Alignment | None:
+        return self._default_alignment
+
+    def set_flex_grow(self, flex_grow: float, *components: Component):
+        for component in components:
+            if component._element:
+                component.element.get_style().set("flex-grow", str(flex_grow))
+
+    def set_flex_shrink(self, flex_shrink: float, *components: Component):
+        for component in components:
+            if component._element:
+                component.element.get_style().set("flex-shrink", str(flex_shrink))
+
+    def replace(self, old_component: Component, new_component: Component):
+        idx = self._children.index(old_component)
+        self.remove(old_component)
+        self.add_component_at_index(idx, new_component)
+
+    def add_component_at_index(self, index: int, component: Component):
+        self._children.insert(index, component)
+        component._parent = self
+        component._ui = self._ui
+        if self._element:
+            component._attach(self._element._tree)
+            self.element.add_child(component.element, index)
+
+    def set_wrap(self, wrap: bool):
+        """Enable or disable wrapping."""
+        self._style.set("flex-wrap", "wrap" if wrap else "nowrap")
+
+    def is_wrap(self) -> bool:
+        return self._style.get("flex-wrap") == "wrap"
+
+    def set_box_sizing(self, box_sizing: str):
+        self._style.set("box-sizing", box_sizing)
 
     def _update_theme(self):
         """Update the theme attribute."""

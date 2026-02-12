@@ -243,6 +243,18 @@ class MultiSelectListBox(HasReadOnly, Component, Generic[T]):
     def add_value_change_listener(self, listener: Callable):
         self._change_listeners.append(listener)
 
+    def select(self, *items: T):
+        """Add items to the selection."""
+        self.set_value(self._value | set(items))
+
+    def deselect(self, *items: T):
+        """Remove items from the selection."""
+        self.set_value(self._value - set(items))
+
+    def deselect_all(self):
+        """Deselect all items."""
+        self.set_value(set())
+
     def _handle_selected_changed(self, event_data: dict):
         """Handle selected-values-changed event from client.
 

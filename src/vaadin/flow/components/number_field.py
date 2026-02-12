@@ -21,6 +21,7 @@ class NumberField(HasReadOnly, HasValidation, HasRequired, Component):
         self._max: Optional[float] = None
         self._step: Optional[float] = None
         self._step_buttons_visible: bool = False
+        self._clear_button_visible: bool = False
         self._change_listeners: list[Callable] = []
 
     def _attach(self, tree):
@@ -39,6 +40,8 @@ class NumberField(HasReadOnly, HasValidation, HasRequired, Component):
             self.element.set_property("step", self._step)
         if self._step_buttons_visible:
             self.element.set_property("stepButtonsVisible", True)
+        if self._clear_button_visible:
+            self.element.set_property("clearButtonVisible", True)
         self.element.add_event_listener("change", self._handle_change)
 
     @property
@@ -141,6 +144,36 @@ class NumberField(HasReadOnly, HasValidation, HasRequired, Component):
 
         for listener in self._change_listeners:
             listener(event_data)
+
+    def set_clear_button_visible(self, visible: bool):
+        self._clear_button_visible = visible
+        if self._element:
+            self.element.set_property("clearButtonVisible", visible)
+
+    def is_clear_button_visible(self) -> bool:
+        return self._clear_button_visible
+
+    def set_prefix_component(self, component):
+        """Set a prefix component in the 'prefix' slot."""
+        self._prefix_component = component
+        if self._element:
+            if component and not component._element:
+                component._ui = self._ui
+                component._parent = self
+                component._attach(self._element._tree)
+                component.element.set_attribute("slot", "prefix")
+                self.element.add_child(component.element)
+
+    def set_suffix_component(self, component):
+        """Set a suffix component in the 'suffix' slot."""
+        self._suffix_component = component
+        if self._element:
+            if component and not component._element:
+                component._ui = self._ui
+                component._parent = self
+                component._attach(self._element._tree)
+                component.element.set_attribute("slot", "suffix")
+                self.element.add_child(component.element)
 
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""

@@ -61,6 +61,10 @@ class Column:
         self._node = None
         self._renderer: Renderer | None = None
         self._footer_text: str | None = None
+        self._frozen = False
+        self._frozen_to_end = False
+        self._visible = True
+        self._key: str | None = None
 
     @property
     def internal_id(self) -> str:
@@ -134,6 +138,38 @@ class Column:
         self._footer_text = text
         return self
 
+    def set_frozen(self, frozen: bool) -> "Column":
+        """Set whether the column is frozen (sticky to start)."""
+        self._frozen = frozen
+        if self._node:
+            self._node.put(Feature.ELEMENT_PROPERTY_MAP, "frozen", frozen)
+        return self
+
+    def set_frozen_to_end(self, frozen: bool) -> "Column":
+        """Set whether the column is frozen to the end (sticky to end)."""
+        self._frozen_to_end = frozen
+        if self._node:
+            self._node.put(Feature.ELEMENT_PROPERTY_MAP, "frozenToEnd", frozen)
+        return self
+
+    def set_visible(self, visible: bool) -> "Column":
+        """Set column visibility."""
+        self._visible = visible
+        if self._node:
+            self._node.put(Feature.ELEMENT_PROPERTY_MAP, "hidden", not visible)
+        return self
+
+    def is_visible(self) -> bool:
+        return self._visible
+
+    def set_key(self, key: str) -> "Column":
+        """Set a key for identifying this column."""
+        self._key = key
+        return self
+
+    def get_key(self) -> str | None:
+        return self._key
+
     def _create_element(self, tree: "StateTree"):
         """Create the vaadin-grid-column state node."""
         self._node = tree.create_node()
@@ -154,6 +190,12 @@ class Column:
             self._node.put(Feature.ELEMENT_PROPERTY_MAP, "resizable", True)
         if self._text_align:
             self._node.put(Feature.ELEMENT_PROPERTY_MAP, "textAlign", self._text_align)
+        if self._frozen:
+            self._node.put(Feature.ELEMENT_PROPERTY_MAP, "frozen", True)
+        if self._frozen_to_end:
+            self._node.put(Feature.ELEMENT_PROPERTY_MAP, "frozenToEnd", True)
+        if not self._visible:
+            self._node.put(Feature.ELEMENT_PROPERTY_MAP, "hidden", True)
         return self._node
 
 
@@ -389,6 +431,91 @@ class Grid(Component):
         if self._element:
             self.element.set_property("columnReorderingAllowed", allowed)
 
+    # --- Column Operations ---
+
+    def get_column_by_key(self, key: str) -> Column | None:
+        """Get a column by its key."""
+        for col in self._columns:
+            if col._key == key:
+                return col
+        return None
+
+    def remove_column(self, column: Column):
+        """Remove a column from the grid."""
+        if column in self._columns:
+            self._columns.remove(column)
+
+    def remove_all_columns(self):
+        """Remove all columns from the grid."""
+        self._columns.clear()
+
+    def add_component_column(self, component_provider: Callable) -> Column:
+        """Add a column that renders a component for each row.
+
+        Args:
+            component_provider: A function that takes an item dict and returns a Component.
+
+        Returns:
+            The created Column.
+        """
+        renderer = ComponentRenderer(component_provider)
+        return self.add_column(renderer)
+
+    # --- All Rows Visible ---
+
+    def set_all_rows_visible(self, all_rows_visible: bool):
+        """Set whether all rows should be visible (no virtual scrolling)."""
+        self._all_rows_visible = all_rows_visible
+        if self._element:
+            self.element.set_property("allRowsVisible", all_rows_visible)
+
+    def is_all_rows_visible(self) -> bool:
+        return getattr(self, "_all_rows_visible", False)
+
+    # --- Scroll ---
+
+    def scroll_to_index(self, index: int):
+        """Scroll to a specific row index."""
+        if self._element:
+            self.element._tree.queue_execute([
+                {"@v-node": self.element.node_id}, index,
+                "return $0.scrollToIndex($1)",
+            ])
+
+    def recalculate_column_widths(self):
+        """Recalculate column widths."""
+        if self._element:
+            self.element._tree.queue_execute([
+                {"@v-node": self.element.node_id},
+                "return $0.recalculateColumnWidths()",
+            ])
+
+    # --- Header/Footer Rows ---
+
+    def append_header_row(self) -> HeaderRow:
+        """Append an extra header row below existing header rows."""
+        return HeaderRow(self)
+
+    def append_footer_row(self) -> HeaderRow:
+        """Append a footer row."""
+        return HeaderRow(self)
+
+    def get_header_rows(self) -> list[HeaderRow]:
+        """Get header rows (returns one per prepend_header_row call)."""
+        return []  # Placeholder - header rows are managed via column groups
+
+    # --- Empty State ---
+
+    def set_empty_state_text(self, text: str):
+        """Set the text to show when the grid has no items."""
+        if self._element:
+            self.element.set_property("emptyStateText", text)
+
+    def set_empty_state_component(self, component: Component):
+        """Set a component to show when the grid has no items."""
+        # Store for attach
+        self._empty_state_component = component
+
     # --- Sorting ---
 
     def set_multi_sort(self, enabled: bool):
@@ -531,6 +658,8 @@ class Grid(Component):
             self.element.set_property("columnReorderingAllowed", True)
         if self._multi_sort:
             self.element.set_property("multiSort", True)
+        if getattr(self, "_all_rows_visible", False):
+            self.element.set_property("allRowsVisible", True)
 
         # Create selection column if multi-select
         if self._selection_mode == SelectionMode.MULTI:

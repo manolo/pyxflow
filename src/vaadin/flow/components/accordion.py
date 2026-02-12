@@ -45,7 +45,7 @@ class Accordion(Component):
 
         self.element.add_event_listener("opened-changed", self._handle_opened_changed)
 
-    def add(self, summary, content: Component) -> AccordionPanel:
+    def add(self, summary, content: Component | None = None) -> AccordionPanel:
         """Add a panel with a summary and content.
 
         Args:
@@ -55,6 +55,15 @@ class Accordion(Component):
         Returns:
             The created AccordionPanel.
         """
+        if isinstance(summary, AccordionPanel):
+            panel = summary
+            self._panels.append(panel)
+            if self._element:
+                panel._ui = self._ui
+                panel._parent = self
+                panel._attach(self._element._tree)
+                self.element.add_child(panel.element)
+            return panel
         panel = AccordionPanel(summary, content)
         self._panels.append(panel)
         if self._element:
@@ -64,8 +73,29 @@ class Accordion(Component):
             self.element.add_child(panel.element)
         return panel
 
-    def open(self, index: int):
-        """Open the panel at the given index."""
+    def remove(self, panel: AccordionPanel):
+        """Remove a panel from the accordion."""
+        if panel in self._panels:
+            idx = self._panels.index(panel)
+            self._panels.remove(panel)
+            panel._parent = None
+            if self._element and panel._element:
+                self.element.remove_child(panel.element)
+            if self._opened_index is not None:
+                if idx < self._opened_index:
+                    self._opened_index -= 1
+                elif idx == self._opened_index:
+                    self._opened_index = None
+
+    def open(self, index_or_panel=None):
+        """Open a panel by index or panel reference."""
+        if isinstance(index_or_panel, AccordionPanel):
+            if index_or_panel in self._panels:
+                index = self._panels.index(index_or_panel)
+            else:
+                return
+        else:
+            index = index_or_panel
         self._opened_index = index
         if self._element:
             self.element.set_property("opened", index)

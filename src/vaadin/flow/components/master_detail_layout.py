@@ -1,6 +1,6 @@
 """MasterDetailLayout component."""
 
-from typing import TYPE_CHECKING
+from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
@@ -46,6 +46,12 @@ class MasterDetailLayout(Component):
             self._add_virtual_child(self._detail, tree)
         self._update_details()
         self._has_initialized = True
+
+        # Flush pending event listeners
+        for listener in getattr(self, "_pending_backdrop_listeners", []):
+            self.element.add_event_listener("backdrop-click", listener)
+        for listener in getattr(self, "_pending_escape_listeners", []):
+            self.element.add_event_listener("detail-escape-press", listener)
 
     def _attach_master(self, component: Component, tree: "StateTree"):
         """Attach master as regular child (Feature 2, default slot)."""
@@ -206,3 +212,66 @@ class MasterDetailLayout(Component):
             if not hasattr(self, "_pending_properties"):
                 self._pending_properties = {}
             self._pending_properties["masterMinSize"] = size
+
+    def get_detail_size(self) -> str | None:
+        """Get the detail area size."""
+        if self._element:
+            return self.element.node.get(Feature.ELEMENT_PROPERTY_MAP, "detailSize", None)
+        return getattr(self, "_pending_properties", {}).get("detailSize")
+
+    def get_master_min_size(self) -> str | None:
+        """Get the minimum master area size."""
+        if self._element:
+            return self.element.node.get(Feature.ELEMENT_PROPERTY_MAP, "masterMinSize", None)
+        return getattr(self, "_pending_properties", {}).get("masterMinSize")
+
+    def set_detail_min_size(self, size: str):
+        """Set the minimum detail area size (e.g., '200px')."""
+        if self._element:
+            self.element.set_property("detailMinSize", size)
+        else:
+            if not hasattr(self, "_pending_properties"):
+                self._pending_properties = {}
+            self._pending_properties["detailMinSize"] = size
+
+    def set_orientation(self, orientation: str):
+        """Set orientation ('horizontal' or 'vertical')."""
+        if self._element:
+            self.element.set_property("orientation", orientation)
+        else:
+            if not hasattr(self, "_pending_properties"):
+                self._pending_properties = {}
+            self._pending_properties["orientation"] = orientation
+
+    def get_orientation(self) -> str:
+        """Get orientation (default: 'horizontal')."""
+        if self._element:
+            return self.element.node.get(Feature.ELEMENT_PROPERTY_MAP, "orientation", "horizontal")
+        return getattr(self, "_pending_properties", {}).get("orientation", "horizontal")
+
+    def set_containment(self, containment: str):
+        """Set containment mode ('layout' or 'viewport')."""
+        if self._element:
+            self.element.set_property("containment", containment)
+        else:
+            if not hasattr(self, "_pending_properties"):
+                self._pending_properties = {}
+            self._pending_properties["containment"] = containment
+
+    def add_backdrop_click_listener(self, listener: Callable):
+        """Add a listener for backdrop click events (when overlay detail is dismissed)."""
+        if self._element:
+            self.element.add_event_listener("backdrop-click", listener)
+        else:
+            if not hasattr(self, "_pending_backdrop_listeners"):
+                self._pending_backdrop_listeners: list[Callable] = []
+            self._pending_backdrop_listeners.append(listener)
+
+    def add_detail_escape_press_listener(self, listener: Callable):
+        """Add a listener for Escape key press in the detail area."""
+        if self._element:
+            self.element.add_event_listener("detail-escape-press", listener)
+        else:
+            if not hasattr(self, "_pending_escape_listeners"):
+                self._pending_escape_listeners: list[Callable] = []
+            self._pending_escape_listeners.append(listener)

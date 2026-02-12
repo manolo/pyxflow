@@ -15,7 +15,11 @@ from vaadin.flow.components.flex_layout import (
 from vaadin.flow.components.form_layout import FormLayout, FormItem, FormRow, ResponsiveStep
 from vaadin.flow.components.grid import Grid, TreeGrid, Column, ColumnGroup, HeaderRow, HeaderCell, SortDirection, GridSortOrder, SelectionMode
 from vaadin.flow.components.renderer import LitRenderer, TextRenderer, ComponentRenderer
-from vaadin.flow.components.html import Div, H1, H2, H3, H4, Header, Footer, HtmlContainer, Image, Paragraph
+from vaadin.flow.components.html import (
+    Div, H1, H2, H3, H4, H5, H6, Header, Footer, HtmlContainer, Image,
+    Paragraph, Pre, NativeLabel, Hr, Anchor, IFrame, Section, Nav, Main,
+    Article, Aside,
+)
 from vaadin.flow.components.notification import Notification, NotificationVariant
 from vaadin.flow.components.number_field import NumberField, IntegerField
 from vaadin.flow.components.password_field import PasswordField
@@ -95,6 +99,8 @@ __all__ = [
     "H2",
     "H3",
     "H4",
+    "H5",
+    "H6",
     "Header",
     "Footer",
     "HtmlContainer",
@@ -104,6 +110,16 @@ __all__ = [
     "IntegerField",
     "NumberField",
     "Paragraph",
+    "Pre",
+    "NativeLabel",
+    "Hr",
+    "Anchor",
+    "IFrame",
+    "Section",
+    "Nav",
+    "Main",
+    "Article",
+    "Aside",
     "PasswordField",
     "ProgressBar",
     "RadioButtonGroup",

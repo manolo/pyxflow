@@ -126,6 +126,17 @@ class TabSheet(Component):
         except ValueError:
             return -1
 
+    def get_tab(self, content: Component) -> Tab | None:
+        """Get the tab associated with a content component."""
+        for tab, c in self._tab_to_content.items():
+            if c is content:
+                return tab
+        return None
+
+    def get_component(self, tab: Tab) -> Component | None:
+        """Get the content component associated with a tab."""
+        return self._tab_to_content.get(tab)
+
     def _on_tab_selected(self, event_data: dict):
         """Forward selection events to listeners."""
         for listener in self._change_listeners:

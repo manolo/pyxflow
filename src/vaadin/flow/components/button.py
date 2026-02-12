@@ -115,6 +115,22 @@ class Button(Component):
         """Check if the button disables itself when clicked."""
         return self._disable_on_click
 
+    def set_autofocus(self, autofocus: bool):
+        """Set whether the button should auto-focus on page load."""
+        self._autofocus = autofocus
+        if self._element:
+            if autofocus:
+                self.element.set_attribute("autofocus", "")
+            else:
+                self.element.remove_attribute("autofocus")
+
+    def is_autofocus(self) -> bool:
+        return getattr(self, "_autofocus", False)
+
+    def click(self):
+        """Trigger a click event programmatically (server-side)."""
+        self._handle_click({})
+
     def _handle_click(self, event_data: dict):
         """Handle click event."""
         for listener in self._click_listeners:

@@ -17,6 +17,7 @@ class TextArea(HasReadOnly, HasValidation, HasRequired, Component):
         self._label = label
         self._value = ""
         self._placeholder = ""
+        self._clear_button_visible = False
         self._change_listeners: list[Callable] = []
 
     def _attach(self, tree):
@@ -26,6 +27,8 @@ class TextArea(HasReadOnly, HasValidation, HasRequired, Component):
         if self._placeholder:
             self.element.set_property("placeholder", self._placeholder)
         self.element.set_property("value", self._value)
+        if self._clear_button_visible:
+            self.element.set_property("clearButtonVisible", True)
         self.element.add_event_listener("change", self._handle_change)
 
     @property
@@ -111,6 +114,40 @@ class TextArea(HasReadOnly, HasValidation, HasRequired, Component):
         self._value = event_data.get("value", self._value)
         for listener in self._change_listeners:
             listener(event_data)
+
+    def set_clear_button_visible(self, visible: bool):
+        """Show or hide the clear button."""
+        self._clear_button_visible = visible
+        if self._element:
+            self.element.set_property("clearButtonVisible", visible)
+
+    def is_clear_button_visible(self) -> bool:
+        return self._clear_button_visible
+
+    def set_pattern(self, pattern: str):
+        """Set the regular expression pattern for validation."""
+        if self._element:
+            self.element.set_property("pattern", pattern)
+
+    def set_prefix_component(self, component):
+        """Set a prefix component in the 'prefix' slot."""
+        self._prefix_component = component
+        if self._element:
+            self._attach_slot_component(component, "prefix")
+
+    def set_suffix_component(self, component):
+        """Set a suffix component in the 'suffix' slot."""
+        self._suffix_component = component
+        if self._element:
+            self._attach_slot_component(component, "suffix")
+
+    def _attach_slot_component(self, component, slot: str):
+        if component and not component._element:
+            component._ui = self._ui
+            component._parent = self
+            component._attach(self._element._tree)
+            component.element.set_attribute("slot", slot)
+            self.element.add_child(component.element)
 
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""

@@ -165,6 +165,35 @@ class Select(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
         """
         pass
 
+    def set_empty_selection_allowed(self, allowed: bool):
+        """Set whether empty (no) selection is allowed."""
+        self._empty_selection_allowed = allowed
+        if self._element:
+            self.element.set_property("placeholder", self._empty_selection_caption if allowed else "")
+
+    def is_empty_selection_allowed(self) -> bool:
+        return getattr(self, "_empty_selection_allowed", False)
+
+    def set_empty_selection_caption(self, caption: str):
+        """Set the caption shown when no value is selected."""
+        self._empty_selection_caption = caption
+
+    def set_overlay_width(self, width: str):
+        """Set the overlay width (e.g. '300px')."""
+        if self._element:
+            self.element.set_property("overlayWidth", width)
+
+    def set_prefix_component(self, component: Component):
+        """Set a prefix component (e.g. an Icon)."""
+        self._prefix_component = component
+        if self._element:
+            tree = self._element._tree
+            component._ui = self._ui
+            component._parent = self
+            component._attach(tree)
+            component.element.set_attribute("slot", "prefix")
+            self.element.add_child(component.element)
+
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""
         if name == "value":

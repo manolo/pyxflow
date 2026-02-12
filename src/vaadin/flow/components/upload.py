@@ -38,6 +38,9 @@ class Upload(Component):
         self._file_rejected_listeners: list[Callable] = []
         self._file_removed_listeners: list[Callable] = []
         self._resource_id: str | None = None
+        self._upload_button: Component | None = None
+        self._drop_label: Component | None = None
+        self._drop_label_icon: Component | None = None
 
     def set_receiver(self, callback: Callable):
         """Set the receiver callback.
@@ -129,6 +132,26 @@ class Upload(Component):
         if self._accepted_file_types:
             self.element.set_property("accept", ",".join(self._accepted_file_types))
 
+        # Slotted components
+        if self._upload_button:
+            self._upload_button._ui = self._ui
+            self._upload_button._parent = self
+            self._upload_button._attach(tree)
+            self._upload_button.element.set_attribute("slot", "add-button")
+            self.element.add_child(self._upload_button.element)
+        if self._drop_label:
+            self._drop_label._ui = self._ui
+            self._drop_label._parent = self
+            self._drop_label._attach(tree)
+            self._drop_label.element.set_attribute("slot", "drop-label")
+            self.element.add_child(self._drop_label.element)
+        if self._drop_label_icon:
+            self._drop_label_icon._ui = self._ui
+            self._drop_label_icon._parent = self
+            self._drop_label_icon._attach(tree)
+            self._drop_label_icon.element.set_attribute("slot", "drop-label-icon")
+            self.element.add_child(self._drop_label_icon.element)
+
         # Register upload handler in HTTP server and set target attribute
         from vaadin.flow.server.http_server import register_upload_handler, _sessions
         # Find session_id for this tree
@@ -188,3 +211,50 @@ class Upload(Component):
         """Handle file-remove event from client."""
         for listener in self._file_removed_listeners:
             listener(event_data)
+
+    def set_upload_button(self, button: Component | None):
+        """Set a custom upload button component."""
+        self._upload_button = button
+        if self._element and button:
+            button._ui = self._ui
+            button._parent = self
+            button._attach(self._element._tree)
+            button.element.set_attribute("slot", "add-button")
+            self.element.add_child(button.element)
+
+    def get_upload_button(self) -> Component | None:
+        return self._upload_button
+
+    def set_drop_label(self, label: Component | None):
+        """Set a custom drop label component."""
+        self._drop_label = label
+        if self._element and label:
+            label._ui = self._ui
+            label._parent = self
+            label._attach(self._element._tree)
+            label.element.set_attribute("slot", "drop-label")
+            self.element.add_child(label.element)
+
+    def get_drop_label(self) -> Component | None:
+        return self._drop_label
+
+    def set_drop_label_icon(self, icon: Component | None):
+        """Set a custom drop label icon component."""
+        self._drop_label_icon = icon
+        if self._element and icon:
+            icon._ui = self._ui
+            icon._parent = self
+            icon._attach(self._element._tree)
+            icon.element.set_attribute("slot", "drop-label-icon")
+            self.element.add_child(icon.element)
+
+    def get_drop_label_icon(self) -> Component | None:
+        return self._drop_label_icon
+
+    def clear_file_list(self):
+        """Clear the file list on the client side."""
+        if self._element:
+            self.element._tree.queue_execute([
+                {"@v-node": self.element.node.id},
+                "return $0.files = []",
+            ])

@@ -34,6 +34,7 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
         self._item_label_generator: Optional[Callable[[T], str]] = None
         self._change_listeners: list[Callable] = []
         self._custom_value_listeners: list[Callable] = []
+        self._clear_button_visible = False
         self._update_id = 0
         self._provider: DataProvider | None = None
         self._provider_listener_unsub: Callable | None = None
@@ -51,6 +52,8 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
         self.element.set_property("itemLabelPath", "label")
         if self._allow_custom_value:
             self.element.set_property("allowCustomValue", True)
+        if self._clear_button_visible:
+            self.element.set_property("clearButtonVisible", True)
         # Register client-callable methods via Feature 19
         tree.add_change({
             "node": self.element.node_id,
@@ -270,6 +273,23 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
     def confirm_update(self, update_id: int):
         """Called by client to confirm a data update was applied."""
         pass
+
+    def set_clear_button_visible(self, visible: bool):
+        self._clear_button_visible = visible
+        if self._element:
+            self.element.set_property("clearButtonVisible", visible)
+
+    def is_clear_button_visible(self) -> bool:
+        return self._clear_button_visible
+
+    def set_auto_open(self, auto_open: bool):
+        if self._element:
+            self.element.set_property("autoOpenDisabled", not auto_open)
+
+    def set_overlay_width(self, width: str):
+        """Set the overlay width (e.g. '300px')."""
+        if self._element:
+            self.element.set_property("overlayWidth", width)
 
     def _sync_property(self, name: str, value):
         if name == "value":

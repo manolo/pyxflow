@@ -233,6 +233,26 @@ class ContextMenu(Component):
         """Check if the menu opens on left-click."""
         return self._open_on_click
 
+    def is_opened(self) -> bool:
+        """Check if the context menu is currently open."""
+        return getattr(self, "_opened", False)
+
+    def add_opened_change_listener(self, listener: Callable):
+        """Add a listener for opened state changes."""
+        if not hasattr(self, "_opened_change_listeners"):
+            self._opened_change_listeners: list[Callable] = []
+        self._opened_change_listeners.append(listener)
+
+    def remove(self, *items: ContextMenuItem):
+        """Remove root-level menu items."""
+        for item in items:
+            if item in self._items:
+                self._items.remove(item)
+
+    def remove_all(self):
+        """Remove all root-level menu items."""
+        self._items.clear()
+
 
 class _ContextItemElement:
     """Lightweight element wrapper for ContextMenuItem event dispatch."""

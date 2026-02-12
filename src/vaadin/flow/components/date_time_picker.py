@@ -143,6 +143,10 @@ class DateTimePicker(HasReadOnly, HasValidation, HasRequired, Component):
         for listener in self._change_listeners:
             listener(event_data)
 
+    def set_auto_open(self, auto_open: bool):
+        if self._element:
+            self.element.set_property("autoOpenDisabled", not auto_open)
+
     def _sync_property(self, name: str, value):
         if name == "value":
             self._value = self._parse_datetime(value) if value else None

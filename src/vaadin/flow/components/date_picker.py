@@ -111,6 +111,19 @@ class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):
         for listener in self._change_listeners:
             listener(event_data)
 
+    def set_clear_button_visible(self, visible: bool):
+        self._clear_button_visible = visible
+        if self._element:
+            self.element.set_property("clearButtonVisible", visible)
+
+    def is_clear_button_visible(self) -> bool:
+        return getattr(self, "_clear_button_visible", False)
+
+    def set_auto_open(self, auto_open: bool):
+        """Set whether the dropdown opens automatically on focus."""
+        if self._element:
+            self.element.set_property("autoOpenDisabled", not auto_open)
+
     def _sync_property(self, name: str, value):
         if name == "value":
             if value:

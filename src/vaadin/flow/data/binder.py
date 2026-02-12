@@ -354,6 +354,27 @@ class Binder(Generic[T]):
                     lambda bean, value, n=name: setattr(bean, n, value),
                 )
 
+    def remove_binding(self, binding_or_field) -> None:
+        """Remove a binding by Binding instance or by field.
+
+        Args:
+            binding_or_field: A Binding instance, or a field whose binding to remove.
+        """
+        if isinstance(binding_or_field, Binding):
+            binding = binding_or_field
+        else:
+            binding = None
+            for b in self._bindings:
+                if b.field is binding_or_field:
+                    binding = b
+                    break
+        if binding and binding in self._bindings:
+            self._bindings.remove(binding)
+
+    def remove_bean(self) -> None:
+        """Remove the currently set bean (equivalent to set_bean(None))."""
+        self.set_bean(None)
+
     def add_status_change_listener(self, listener: Callable):
         """Add a listener notified when any field value changes."""
         self._status_listeners.append(listener)

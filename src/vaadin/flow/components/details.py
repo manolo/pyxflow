@@ -100,6 +100,37 @@ class Details(Component):
                 comp._attach(self._element._tree)
                 self.element.add_child(comp.element)
 
+    def get_summary(self):
+        """Get the summary (string or Component)."""
+        return self._summary
+
+    def get_content(self) -> list[Component]:
+        """Get the content components."""
+        return list(self._content)
+
+    def remove(self, *components: Component):
+        """Remove specific content components."""
+        for comp in components:
+            if comp in self._content:
+                self._content.remove(comp)
+                comp._parent = None
+                if self._element and comp._element:
+                    self.element.remove_child(comp.element)
+
+    def remove_all(self):
+        """Remove all content components."""
+        for comp in list(self._content):
+            self.remove(comp)
+
+    def add_component_at_index(self, index: int, component: Component):
+        """Add a content component at a specific index."""
+        self._content.insert(index, component)
+        if self._element:
+            component._ui = self._ui
+            component._parent = self
+            component._attach(self._element._tree)
+            self.element.add_child(component.element, index)
+
     def add_opened_change_listener(self, listener: Callable):
         """Add a listener for opened state changes."""
         self._toggle_listeners.append(listener)

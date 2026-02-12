@@ -14,6 +14,16 @@ class Alignment(Enum):
     BASELINE = "baseline"
 
 
+class JustifyContentMode(Enum):
+    """Justify content mode options."""
+    START = "flex-start"
+    END = "flex-end"
+    CENTER = "center"
+    BETWEEN = "space-between"
+    AROUND = "space-around"
+    EVENLY = "space-evenly"
+
+
 class HorizontalLayout(Component):
     """A layout that arranges children horizontally."""
 
@@ -109,6 +119,60 @@ class HorizontalLayout(Component):
             if component._element:
                 component.element.get_style().set("flex-grow", "1")
 
+    def set_padding(self, padding: bool):
+        """Enable or disable padding."""
+        self._padding = padding
+        self._update_theme()
+
+    def set_justify_content_mode(self, mode: JustifyContentMode):
+        """Set justify-content-mode on the layout."""
+        self._justify_content_mode = mode
+        if self._element:
+            self.element.get_style().set("justify-content", mode.value)
+
+    def get_justify_content_mode(self) -> JustifyContentMode | None:
+        return getattr(self, "_justify_content_mode", None)
+
+    def set_align_items(self, alignment: Alignment):
+        """Set the default alignment perpendicular to the layout direction."""
+        self._default_alignment = alignment
+        if self._element:
+            self.element.get_style().set("align-items", alignment.value)
+
+    def get_align_items(self) -> Alignment | None:
+        return self._default_alignment
+
+    def set_flex_grow(self, flex_grow: float, *components: Component):
+        """Set flex-grow for specific components."""
+        for component in components:
+            if component._element:
+                component.element.get_style().set("flex-grow", str(flex_grow))
+
+    def set_flex_shrink(self, flex_shrink: float, *components: Component):
+        """Set flex-shrink for specific components."""
+        for component in components:
+            if component._element:
+                component.element.get_style().set("flex-shrink", str(flex_shrink))
+
+    def replace(self, old_component: Component, new_component: Component):
+        """Replace an existing component with a new one."""
+        idx = self._children.index(old_component)
+        self.remove(old_component)
+        self.add_component_at_index(idx, new_component)
+
+    def add_component_at_index(self, index: int, component: Component):
+        """Add a component at a specific index."""
+        self._children.insert(index, component)
+        component._parent = self
+        component._ui = self._ui
+        if self._element:
+            component._attach(self._element._tree)
+            self.element.add_child(component.element, index)
+
+    def set_box_sizing(self, box_sizing: str):
+        """Set box-sizing ('border-box' or 'content-box')."""
+        self._style.set("box-sizing", box_sizing)
+
     def _update_theme(self):
         """Update the theme attribute."""
         if not self._element:
@@ -116,6 +180,8 @@ class HorizontalLayout(Component):
         themes = []
         if self._margin:
             themes.append("margin")
+        if getattr(self, "_padding", False):
+            themes.append("padding")
         if self._spacing:
             themes.append("spacing")
         self.element.set_attribute("theme", " ".join(themes))

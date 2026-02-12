@@ -94,6 +94,15 @@ class Card(Component):
             if self._element:
                 self._attach_child(comp, self._element._tree)
 
+    def remove(self, *components: Component):
+        """Remove specific components from the default content slot."""
+        for comp in components:
+            if comp in self._children:
+                self._children.remove(comp)
+                comp._parent = None
+                if self._element and comp._element:
+                    self.element.remove_child(comp.element)
+
     def remove_all(self):
         """Remove all components from the default content slot."""
         if self._element:

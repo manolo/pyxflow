@@ -262,3 +262,18 @@ class FlexLayout(Component):
         if val:
             return int(val)
         return 0
+
+    def replace(self, old_component: Component, new_component: Component):
+        """Replace an existing component with a new one."""
+        idx = self._children.index(old_component)
+        self.remove(old_component)
+        self.add_component_at_index(idx, new_component)
+
+    def add_component_at_index(self, index: int, component: Component):
+        """Add a component at a specific index."""
+        self._children.insert(index, component)
+        component._parent = self
+        component._ui = self._ui
+        if self._element:
+            component._attach(self._element._tree)
+            self.element.add_child(component.element, index)
