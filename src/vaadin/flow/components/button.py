@@ -15,19 +15,36 @@ class Button(Component):
 
     _tag = "vaadin-button"
 
-    def __init__(self, text: str = "", icon: "Icon | None" = None):
+    def __init__(self, text: "str | Icon | Callable | None" = "", on_click: "Callable | Icon | None" = None, icon: "Icon | None" = None):
         super().__init__()
+        # Smart parameter detection: Button(Icon(...)), Button(lambda e: ...), etc.
+        if text is not None and isinstance(text, Component):
+            icon = icon or (on_click if isinstance(on_click, Component) else None)
+            if not icon:
+                icon = text  # type: ignore[assignment]
+            on_click = on_click if callable(on_click) else None
+            text = ""
+        elif callable(text):
+            on_click = text  # type: ignore[assignment]
+            text = ""
+        if on_click is not None and isinstance(on_click, Component):
+            icon = on_click  # type: ignore[assignment]
+            on_click = None
         self._text = text
         self._icon_component: "Icon | None" = icon
         self._click_listeners: list[Callable] = []
         self._text_node = None
+        self._icon_after_text = False
+        if on_click:
+            self._click_listeners.append(on_click)
 
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
-        if self._icon_component:
-            self._attach_icon(tree, self._icon_component)
+        # Text node first (clear_children inside), then icon — otherwise clear erases the icon
         if self._text:
             self._create_text_node(tree, self._text)
+        if self._icon_component:
+            self._attach_icon(tree, self._icon_component)
         # Register click listener
         self.element.add_event_listener("click", self._handle_click)
 
@@ -45,7 +62,8 @@ class Button(Component):
         icon._ui = self._ui
         icon._parent = self
         icon._attach(tree)
-        icon.element.set_attribute("slot", "prefix")
+        slot = "suffix" if self._icon_after_text else "prefix"
+        icon.element.set_attribute("slot", slot)
         self.element.add_child(icon.element)
 
     def set_icon(self, icon: "Icon"):
@@ -53,6 +71,16 @@ class Button(Component):
         self._icon_component = icon
         if self._element:
             self._attach_icon(self._element._tree, icon)
+
+    def set_icon_after_text(self, after: bool):
+        """Place the icon after the text (suffix slot) instead of before (prefix)."""
+        self._icon_after_text = after
+        if self._icon_component and self._icon_component._element:
+            slot = "suffix" if after else "prefix"
+            self._icon_component.element.set_attribute("slot", slot)
+
+    def is_icon_after_text(self) -> bool:
+        return self._icon_after_text
 
     def set_text(self, text: str):
         """Set the button text."""
