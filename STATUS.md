@@ -4,7 +4,7 @@
 
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
-**Lines of code:** ~13,400 (core src/), ~33,000 (total with demo + tests)
+**Lines of code:** ~14,500 (core src/), ~35,000 (total with demo + tests)
 **Tests:** 2051 passing
 **Last updated:** 2026-02-12
 
@@ -108,6 +108,9 @@
 - [x] `setTooltipText()` / `getTooltipText()` - Tooltips via `<vaadin-tooltip>` child
 - [x] `addClickShortcut(Key)` - Keyboard shortcuts (keydown→click dispatch)
 - [x] `get_style()` - Returns `_BufferedStyle` that works before and after attach (set/get/remove buffered pre-attach, delegates to real `Style` post-attach)
+- [x] `set_aria_label()` / `get_aria_label()` - ARIA label (HasAriaLabel)
+- [x] `set_aria_labelled_by()` / `get_aria_labelled_by()` - ARIA labelled-by reference
+- [x] `add_focus_listener()` / `add_blur_listener()` - Focus/blur events (FocusNotifier/BlurNotifier)
 
 ### Field Mixins
 - [x] `HasReadOnly` mixin - `set_read_only()`, `is_read_only()` on all 16 field components + Checkbox + ListBox + MultiSelectListBox (18 total)

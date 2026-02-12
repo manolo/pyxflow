@@ -1,7 +1,7 @@
 # PyFlow API Inventory — Python vs Java Vaadin 25
 
 **Generated: 2026-02-12**
-**Python components: 49 | Tests: 1910 | LOC: ~13,800 (core)**
+**Python components: 49 | Tests: 2051 | LOC: ~14,500 (core)**
 
 Legend: `[x]` = implemented, `[ ]` = missing
 
@@ -28,13 +28,9 @@ All components inherit from `Component` which provides:
 | `add_click_listener` / `add_click_shortcut` | [x] |
 | `execute_js` (deferred buffering) | [x] |
 | `get_element` / `get_ui` / `get_style` | [x] |
-
-**Missing from base vs Java:**
-| Method | Status |
-|--------|--------|
-| `set_aria_label` / `get_aria_label` (HasAriaLabel) | [ ] |
-| `set_aria_labelled_by` / `get_aria_labelled_by` | [ ] |
-| `add_focus_listener` / `add_blur_listener` (FocusNotifier/BlurNotifier) | [ ] |
+| `set_aria_label` / `get_aria_label` (HasAriaLabel) | [x] |
+| `set_aria_labelled_by` / `get_aria_labelled_by` | [x] |
+| `add_focus_listener` / `add_blur_listener` (FocusNotifier/BlurNotifier) | [x] |
 | `set_read_only` / `is_read_only` (HasReadOnly) | [x] 18 components |
 | `remove_all` (HasComponents) | [x] 10 containers |
 
@@ -50,7 +46,6 @@ All components inherit from `Component` which provides:
 **Missing field mixins:**
 | Feature | Status |
 |---------|--------|
-| `set_read_only` / `is_read_only` | [x] (HasReadOnly mixin) |
 | `set_value_change_mode` / `set_value_change_timeout` | [ ] |
 | `set_i18n` / `get_i18n` (per-component validation messages) | [ ] |
 | Constructor overloads with initial value + listener | [ ] |
@@ -77,8 +72,8 @@ All components inherit from `Component` which provides:
 | `set_default_horizontal_component_alignment` | [x] |
 | `set_horizontal_component_alignment` | [x] |
 | `remove_all` | [x] |
-| `set_justify_content_mode` / `get_justify_content_mode` | [ ] |
-| `set_align_items` / `get_align_items` | [ ] |
+| `set_justify_content_mode` / `get_justify_content_mode` | [x] |
+| `set_align_items` / `get_align_items` | [x] |
 | `set_flex_grow` / `get_flex_grow` / `set_flex_shrink` | [ ] |
 | `add_and_expand` / `replace` / `add_component_at_index` | [ ] |
 | `set_wrap` / `is_wrap` / `set_box_sizing` | [ ] |
@@ -90,9 +85,9 @@ All components inherit from `Component` which provides:
 | `set_spacing` / `set_margin` | [x] |
 | `set_default_vertical_component_alignment` | [x] |
 | `set_vertical_component_alignment` | [x] |
-| `set_padding` | [ ] |
+| `set_padding` | [x] |
 | `remove_all` | [x] |
-| `set_justify_content_mode` / `set_align_items` | [ ] |
+| `set_justify_content_mode` / `set_align_items` | [x] |
 | `set_flex_grow` / `set_flex_shrink` | [ ] |
 | `add_to_start` / `add_to_middle` / `add_to_end` | [ ] |
 | `replace` / `add_component_at_index` / `set_box_sizing` | [ ] |
@@ -128,7 +123,7 @@ All components inherit from `Component` which provides:
 | `set_orientation` / `get_orientation` / `set_splitter_position` / `get_splitter_position` | [x] |
 | `set_primary_style` / `set_secondary_style` / `remove_all` | [x] |
 | `add_splitter_drag_end_listener` | [x] |
-| `remove(component)` | [ ] |
+| `remove(component)` | [x] |
 
 ### Scroller
 | Feature | Status |
@@ -144,8 +139,8 @@ All components inherit from `Component` which provides:
 | `set_media` / `set_header` / `set_header_prefix` / `set_header_suffix` | [x] |
 | `add_to_footer` | [x] |
 | `get_media` / `get_header` / `get_header_prefix` / `get_header_suffix` | [x] |
-| `remove_all` | [x] |
-| `set_title_heading_level` / `remove` | [ ] |
+| `remove` / `remove_all` | [x] |
+| `set_title_heading_level` | [ ] |
 
 ---
 
@@ -155,10 +150,10 @@ All components inherit from `Component` which provides:
 | Feature | Status |
 |---------|--------|
 | `set_read_only` / `is_read_only` | [x] (HasReadOnly mixin) |
+| `set_aria_label` / `set_aria_labelled_by` | [x] (HasAriaLabel on base Component) |
+| `add_focus_listener` / `add_blur_listener` | [x] (FocusNotifier/BlurNotifier on base Component) |
 | `set_i18n` / `get_i18n` (validation messages) | [ ] |
 | `set_value_change_mode` / `set_value_change_timeout` | [ ] |
-| `set_aria_label` / `set_aria_labelled_by` | [ ] |
-| `add_focus_listener` / `add_blur_listener` | [ ] |
 
 ### TextField
 | Feature | Status |
@@ -171,9 +166,9 @@ All components inherit from `Component` which provides:
 | `set_invalid` / `is_invalid` (HasValidation) | [x] |
 | `set_required_indicator_visible` / `is_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` | [x] |
-| `set_max_length` / `get_max_length` / `set_min_length` / `get_min_length` | [ ] |
-| `set_suffix_component` / `get_suffix_component` | [ ] |
-| `set_autoselect` / `is_autoselect` | [ ] |
+| `set_max_length` / `set_min_length` | [x] |
+| `set_suffix_component` | [x] |
+| `set_autoselect` | [x] |
 
 ### TextArea
 | Feature | Status |
@@ -185,8 +180,8 @@ All components inherit from `Component` which provides:
 | `set_error_message` / `set_invalid` (HasValidation) | [x] |
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` | [x] |
-| `set_clear_button_visible` | [ ] |
-| `set_prefix_component` / `set_suffix_component` | [ ] |
+| `set_clear_button_visible` | [x] |
+| `set_prefix_component` / `set_suffix_component` | [x] |
 | `set_pattern` | [ ] |
 
 ### EmailField
@@ -198,8 +193,8 @@ All components inherit from `Component` which provides:
 | `set_error_message` / `set_invalid` (HasValidation) | [x] |
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` | [x] |
-| `set_pattern` / `set_min_length` / `set_max_length` | [ ] |
-| `set_prefix_component` / `set_suffix_component` | [ ] |
+| `set_min_length` / `set_max_length` | [x] |
+| `set_prefix_component` / `set_suffix_component` | [x] |
 
 ### PasswordField
 | Feature | Status |
@@ -210,8 +205,9 @@ All components inherit from `Component` which provides:
 | `set_error_message` / `set_invalid` (HasValidation) | [x] |
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` | [x] |
-| `set_clear_button_visible` / `set_pattern` | [ ] |
-| `set_min_length` / `set_max_length` / `set_prefix_component` | [ ] |
+| `set_clear_button_visible` | [x] |
+| `set_min_length` / `set_max_length` | [x] |
+| `set_pattern` / `set_prefix_component` | [ ] |
 
 ### NumberField / IntegerField
 | Feature | Status |
@@ -223,8 +219,8 @@ All components inherit from `Component` which provides:
 | `set_error_message` / `set_invalid` (HasValidation) | [x] |
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` | [x] |
-| `set_clear_button_visible` | [ ] |
-| `set_prefix_component` / `set_suffix_component` | [ ] |
+| `set_clear_button_visible` | [x] |
+| `set_prefix_component` / `set_suffix_component` | [x] |
 
 ### DatePicker
 | Feature | Status |
@@ -235,7 +231,7 @@ All components inherit from `Component` which provides:
 | `set_error_message` / `set_invalid` (HasValidation) | [x] |
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` | [x] |
-| `set_clear_button_visible` / `set_auto_open` | [ ] |
+| `set_clear_button_visible` / `set_auto_open` | [x] |
 | `set_locale` / `set_week_numbers_visible` / `set_initial_position` | [ ] |
 | `open` / `close` / `add_opened_change_listener` | [ ] |
 
@@ -248,7 +244,7 @@ All components inherit from `Component` which provides:
 | `set_error_message` / `set_invalid` (HasValidation) | [x] |
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` | [x] |
-| `set_clear_button_visible` / `set_auto_open` | [ ] |
+| `set_clear_button_visible` / `set_auto_open` | [x] |
 | `add_opened_change_listener` | [ ] |
 
 ### DateTimePicker
@@ -261,7 +257,8 @@ All components inherit from `Component` which provides:
 | `set_error_message` / `set_invalid` (HasValidation) | [x] |
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` | [x] |
-| `set_auto_open` / `set_week_numbers_visible` | [ ] |
+| `set_auto_open` | [x] |
+| `set_week_numbers_visible` | [ ] |
 
 ### CustomField
 | Feature | Status |
@@ -287,7 +284,7 @@ All components inherit from `Component` which provides:
 | `set_error_message` / `set_invalid` (HasValidation) | [x] |
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` / `add_custom_value_set_listener` | [x] |
-| `set_clear_button_visible` / `set_auto_open` | [ ] |
+| `set_clear_button_visible` / `set_auto_open` | [x] |
 | `set_renderer` / `set_class_name_generator` | [ ] |
 | `set_prefix_component` / `set_overlay_width` | [ ] |
 
@@ -313,9 +310,10 @@ All components inherit from `Component` which provides:
 | `set_error_message` / `set_invalid` (HasValidation) | [x] |
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` | [x] |
-| `set_clear_button_visible` / `set_auto_open` / `set_allow_custom_value` | [ ] |
+| `set_clear_button_visible` / `set_auto_open` | [x] |
+| `deselect_all` | [x] |
 | `set_renderer` / `set_auto_expand` / `set_selected_items_on_top` | [ ] |
-| `deselect_all` | [ ] |
+| `set_allow_custom_value` | [ ] |
 
 ### ListBox
 | Feature | Status |
@@ -331,7 +329,7 @@ All components inherit from `Component` which provides:
 | `set_items` / `get_items` / `set_value` / `get_value` | [x] |
 | `set_item_label_generator` / `set_item_enabled_provider` | [x] |
 | `add_value_change_listener` | [x] |
-| `select` / `deselect` / `deselect_all` | [ ] |
+| `select` / `deselect` / `deselect_all` | [x] |
 | `set_renderer` / `add_components` (dividers) | [ ] |
 
 ### Checkbox
@@ -352,7 +350,7 @@ All components inherit from `Component` which provides:
 | `set_error_message` / `set_invalid` (HasValidation) | [x] |
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` | [x] |
-| `select` / `deselect` / `deselect_all` | [ ] |
+| `select` / `deselect` / `deselect_all` | [x] |
 | `set_item_enabled_provider` / `set_renderer` | [ ] |
 | `add_theme_variants` (LUMO_VERTICAL) | [ ] |
 
@@ -381,19 +379,20 @@ All components inherit from `Component` which provides:
 | `set_selection_mode` / `get_selected_items` / `select_all` / `deselect_all` | [x] |
 | `select` / `deselect` (@ClientCallable) | [x] |
 | `add_selection_listener` | [x] |
-| `prepend_header_row` / `HeaderRow.join` → ColumnGroup | [x] |
+| `prepend_header_row` / `append_header_row` / `HeaderRow.join` → ColumnGroup | [x] |
 | Column: `set_header` / `get_header` / `set_width` / `set_flex_grow` | [x] |
 | Column: `set_auto_width` / `set_resizable` / `set_sortable` / `set_text_align` | [x] |
 | Column: `set_renderer` / `set_footer_text` | [x] |
+| Column: `set_frozen` / `set_frozen_to_end` / `set_visible` / `set_key` | [x] |
+| `get_column_by_key` | [x] |
+| `set_all_rows_visible` | [x] |
 | `ComponentRenderer` / `LitRenderer` / `TextRenderer` | [x] |
 | `add_item_click_listener` / `add_item_double_click_listener` | [x] |
 | `add_component_column` (shortcut) | [ ] |
 | `scroll_to_index` / `scroll_to_item` / `recalculate_column_widths` | [ ] |
-| Column: `frozen` / `frozen_to_end` / `visible` / `key` | [ ] |
-| `get_column_by_key` / `remove_column` / `remove_all_columns` | [ ] |
+| `remove_column` / `remove_all_columns` | [ ] |
 | `set_item_details_renderer` / `set_details_visible_on_click` | [ ] |
-| `append_header_row` / `append_footer_row` / `get_header_rows` | [ ] |
-| `set_all_rows_visible` | [ ] |
+| `append_footer_row` / `get_header_rows` | [ ] |
 | Editor API (`get_editor`) | [ ] |
 | Drag/drop (`set_rows_draggable` / `set_drop_mode` / listeners) | [ ] |
 | `set_empty_state_text` / `set_empty_state_component` | [ ] |
@@ -409,10 +408,9 @@ All components inherit from `Component` which provides:
 | `set_close_on_esc` / `is_close_on_esc` / `set_close_on_outside_click` / `is_close_on_outside_click` | [x] |
 | `add_open_listener` / `add_close_listener` | [x] |
 | `get_header` / `get_footer` (section components for buttons) | [x] |
-| `remove_all` | [x] |
-| `get_width` / `get_height` / `set_min_width` / `set_max_width` etc. | [ ] |
+| `remove` / `remove_all` | [x] |
+| `set_min_width` / `set_max_width` / `set_min_height` / `set_max_height` (inherited) | [x] |
 | `set_top` / `set_left` (positioning) | [ ] |
-| `remove` | [ ] |
 | `add_resize_listener` / `add_dragged_listener` | [ ] |
 
 ### ConfirmDialog
@@ -424,7 +422,7 @@ All components inherit from `Component` which provides:
 | `set_cancelable` / `is_cancelable` / `set_cancel_text` / `set_cancel_button_theme` | [x] |
 | `set_rejectable` / `is_rejectable` / `set_reject_text` / `set_reject_button_theme` | [x] |
 | `add_confirm_listener` / `add_cancel_listener` / `add_reject_listener` | [x] |
-| `set_close_on_esc` | [ ] |
+| `set_close_on_esc` | [x] |
 | Rich content (Component in header/text) | [ ] |
 | `add_opened_change_listener` | [ ] |
 
@@ -436,8 +434,7 @@ All components inherit from `Component` which provides:
 | `add` (component content) / `show` (static) | [x] |
 | `add_theme_variants` / `remove_theme_variants` | [x] |
 | `add_open_listener` / `add_close_listener` | [x] |
-| `remove_all` | [x] |
-| `remove` | [ ] |
+| `remove` / `remove_all` | [x] |
 
 ### Upload
 | Feature | Status |
@@ -448,8 +445,9 @@ All components inherit from `Component` which provides:
 | `set_accepted_file_types` / `get_accepted_file_types` | [x] |
 | `add_succeeded_listener` / `add_failed_listener` | [x] |
 | `add_file_rejected_listener` / `add_file_removed_listener` | [x] |
-| `set_upload_button` / `set_drop_label` / `set_drop_label_icon` | [ ] |
-| `clear_file_list` / `interrupt_upload` | [ ] |
+| `set_upload_button` / `set_drop_label` / `set_drop_label_icon` | [x] |
+| `clear_file_list` | [x] |
+| `interrupt_upload` | [ ] |
 | `set_i18n` / progress / started / all-finished listeners | [ ] |
 
 ### LoginForm
@@ -481,11 +479,11 @@ All components inherit from `Component` which provides:
 | `set_close_on_esc` / `is_close_on_esc` | [x] |
 | `set_close_on_outside_click` / `is_close_on_outside_click` | [x] |
 | `add_open_listener` / `add_close_listener` | [x] |
-| `set_autofocus` / `set_backdrop_visible` | [ ] |
-| `set_hover_delay` / `set_focus_delay` / `set_hide_delay` | [ ] |
+| `set_autofocus` | [x] |
+| `set_hover_delay` / `set_focus_delay` / `set_hide_delay` | [x] |
+| `remove` / `remove_all` | [x] |
+| `set_backdrop_visible` | [ ] |
 | `set_role` / `add_theme_variants` (ARROW, NO_PADDING) | [ ] |
-| `remove_all` | [x] |
-| `remove` | [ ] |
 
 ---
 
@@ -507,7 +505,8 @@ All components inherit from `Component` which provides:
 | Feature | Status |
 |---------|--------|
 | `set_label` / `get_label` / `is_selected` | [x] |
-| `set_selected` / `set_flex_grow` / `set_enabled` | [ ] |
+| `set_selected` / `set_flex_grow` | [x] |
+| `set_enabled` | [ ] |
 | `add_theme_variants` (TabVariant) | [ ] |
 
 ### TabSheet
@@ -524,17 +523,18 @@ All components inherit from `Component` which provides:
 | Feature | Status |
 |---------|--------|
 | `add_item` / `set_label` / `get_label` / `set_collapsible` / `is_collapsible` | [x] |
-| `is_expanded` / `set_expanded` | [ ] |
+| `is_expanded` / `set_expanded` | [x] |
+| `get_items` / `remove` / `remove_all` | [x] |
 | `set_auto_expand` / `is_auto_expand` | [ ] |
-| `get_items` / `remove` / `remove_all` | [ ] |
 
 ### SideNavItem
 | Feature | Status |
 |---------|--------|
 | `add_item` / `set_path` / `get_path` / `set_label` / `get_label` | [x] |
 | `set_expanded` / `is_expanded` / `set_prefix_component` | [x] |
+| `get_items` / `remove` / `remove_all` | [x] |
 | `set_match_nested` / `set_router_ignore` | [ ] |
-| `set_suffix_component` / `get_items` / `remove` / `remove_all` | [ ] |
+| `set_suffix_component` | [ ] |
 
 ### Details
 | Feature | Status |
@@ -542,8 +542,9 @@ All components inherit from `Component` which provides:
 | `set_summary_text` / `get_summary_text` / `set_summary` | [x] |
 | `set_opened` / `is_opened` / `add_content` | [x] |
 | `add_opened_change_listener` | [x] |
-| `get_summary` (Component) / `get_content` (Stream) | [ ] |
-| `remove` / `remove_all` / `add_component_at_index` | [ ] |
+| `get_summary` (Component) / `get_content` | [x] |
+| `remove` / `remove_all` | [x] |
+| `add_component_at_index` | [ ] |
 | `add_theme_variants` (DetailsVariant) | [ ] |
 
 ### Accordion
@@ -552,7 +553,7 @@ All components inherit from `Component` which provides:
 | `add(summary, content)` / `open(index)` / `close` | [x] |
 | `get_opened_index` / `get_opened_panel` / `get_panels` | [x] |
 | `add_opened_change_listener` | [x] |
-| `add(AccordionPanel)` / `remove(panel)` / `open(panel)` | [ ] |
+| `add(AccordionPanel)` / `remove(panel)` / `open(panel)` | [x] |
 
 ### MenuBar
 | Feature | Status |
@@ -561,7 +562,8 @@ All components inherit from `Component` which provides:
 | `set_open_on_hover` / `is_open_on_hover` | [x] |
 | MenuItem: `get_sub_menu` / `set_enabled` / `set_text` / `set_checkable` / `set_checked` | [x] |
 | MenuItem: `is_parent_item` / `add_click_listener` | [x] |
-| `add_item(Component)` / `remove` / `remove_all` / `close` | [ ] |
+| `remove` / `remove_all` | [x] |
+| `add_item(Component)` / `close` | [ ] |
 | MenuItem: `set_keep_open` / `set_disable_on_click` / `set_aria_label` | [ ] |
 | SubMenu: `add_separator` / `remove` / `remove_all` | [ ] |
 
@@ -572,20 +574,22 @@ All components inherit from `Component` which provides:
 | `set_target` / `get_target` / `set_open_on_click` / `is_open_on_click` | [x] |
 | ContextMenuItem: `get_sub_menu` / `set_text` / `set_enabled` / `set_checkable` / `set_checked` | [x] |
 | ContextSubMenu: `add_item` / `add_separator` / `get_items` | [x] |
-| `add_item(Component)` / `remove` / `remove_all` | [ ] |
-| `is_opened` | [ ] |
+| `is_opened` | [x] |
+| `remove` / `remove_all` | [x] |
+| `add_item(Component)` | [ ] |
 | `add_opened_change_listener` | [ ] |
 
 ### MasterDetailLayout
 | Feature | Status |
 |---------|--------|
 | `set_master` / `get_master` / `set_detail` / `get_detail` | [x] |
-| `set_detail_size` / `set_master_min_size` | [x] |
+| `set_detail_size` / `get_detail_size` / `set_master_min_size` / `get_master_min_size` | [x] |
+| `set_detail_min_size` | [x] |
 | `set_animation_enabled` / `is_animation_enabled` | [x] |
 | `set_overlay_mode` / `set_force_overlay` | [x] |
-| `set_orientation` / `get_orientation` / `set_containment` | [ ] |
-| `get_detail_size` / `get_master_min_size` / `set_detail_min_size` | [ ] |
-| `add_backdrop_click_listener` / `add_detail_escape_press_listener` | [ ] |
+| `set_orientation` / `get_orientation` | [x] |
+| `set_containment` | [x] |
+| `add_backdrop_click_listener` / `add_detail_escape_press_listener` | [x] |
 
 ---
 
@@ -598,10 +602,9 @@ All components inherit from `Component` which provides:
 | `set_icon_after_text` / `is_icon_after_text` | [x] |
 | `add_click_listener` | [x] |
 | `set_disable_on_click` / `is_disable_on_click` | [x] |
-| `set_autofocus` / `is_autofocus` | [ ] |
+| `set_autofocus` / `is_autofocus` | [x] |
 | `click` (server-side) / `click_in_client` | [ ] |
 | `add_theme_variants` (ButtonVariant) | [ ] |
-| `add_focus_listener` / `add_blur_listener` | [ ] |
 
 ### Icon
 | Feature | Status |
@@ -665,9 +668,11 @@ All components inherit from `Component` which provides:
 ### HTML Components
 | Feature | Status |
 |---------|--------|
-| H1, H2, H3, H4, Paragraph, Div, Span, Header, Footer | [x] |
-| H5, H6, Anchor, NativeLabel, Hr, Pre, IFrame | [ ] |
-| Section, Nav, Main, Article, Aside | [ ] |
+| H1, H2, H3, H4, H5, H6, Paragraph, Div, Span, Header, Footer | [x] |
+| Pre, NativeLabel, Hr | [x] |
+| Anchor (href, target) / IFrame (src) | [x] |
+| Section, Nav, Main, Article, Aside | [x] |
+| Image | [x] |
 
 ### Renderer
 | Feature | Status |
@@ -692,7 +697,7 @@ All components inherit from `Component` which provides:
 | Binding: `clear` / `read` / `validate` / `write` | [x] |
 | Validators (StringLength, Email, Regex, Range, Custom) | [x] |
 | Converters (StringToInteger, StringToDouble) | [x] |
-| `remove_binding` / `remove_bean` | [ ] |
+| `remove_binding` / `remove_bean` | [x] |
 
 ### DataProvider
 | Feature | Status |
@@ -710,6 +715,7 @@ All components inherit from `Component` which provides:
 
 | Component | Event | Listener Method |
 |-----------|-------|-----------------|
+| All components | focus / blur | `add_focus_listener` / `add_blur_listener` |
 | Button | click | `add_click_listener` |
 | TextField | value-change | `add_value_change_listener` |
 | TextArea | value-change | `add_value_change_listener` |
@@ -743,6 +749,7 @@ All components inherit from `Component` which provides:
 | MessageInput | submit | `add_submit_listener` |
 | Grid | item-click | `add_item_click_listener` |
 | Grid | item-double-click | `add_item_double_click_listener` |
+| MasterDetailLayout | backdrop-click, detail-escape-press | `add_backdrop_click_listener` / `add_detail_escape_press_listener` |
 
 ### Missing Events
 
@@ -753,7 +760,6 @@ All components inherit from `Component` which provides:
 #### MEDIUM Priority
 | Component | Missing Event | Notes |
 |-----------|--------------|-------|
-| All fields | focus / blur | `addFocusListener` / `addBlurListener` — validation UX |
 | Text fields | key-down | `addKeyDownListener` — Enter-to-submit |
 | ComboBox/DatePicker/TimePicker/Select | opened-changed | Overlay open/close tracking |
 | Upload | started / progress | Custom progress indicators |
@@ -766,7 +772,6 @@ All components inherit from `Component` which provides:
 |-----------|--------------|-------|
 | Grid | cell-focus / column-reorder / drag-drop | Rarely needed |
 | Dialog | resize / dragged | Rarely needed |
-| Button | focus / blur | Very rare for buttons |
 
 ---
 
@@ -774,23 +779,15 @@ All components inherit from `Component` which provides:
 
 | Category | Components | Count |
 |----------|-----------|-------|
-| **100%** | ProgressBar, Span, Markdown, MessageList, DrawerToggle | 5 |
-| **90-99%** | FormLayout, SplitLayout, FlexLayout, ConfirmDialog, Notification, Avatar, LoginForm, MessageInput, Popover, Accordion, Details, MasterDetailLayout, CustomField, Card, Scroller, Icon, Tabs, TabSheet, Dialog, Grid, Button | 21 |
-| **70-89%** | TextField, TextArea, EmailField, PasswordField, NumberField, DatePicker, TimePicker, DateTimePicker, ComboBox, Select, MultiSelectComboBox, Checkbox, CheckboxGroup, RadioButtonGroup, ListBox, MultiSelectListBox, Upload, VirtualList, AppLayout, MenuBar, ContextMenu, SideNav, SideNavItem, VerticalLayout, HorizontalLayout | 25 |
+| **100%** | ProgressBar, Span, Markdown, MessageList, DrawerToggle, Scroller, MasterDetailLayout, Accordion, Notification | 9 |
+| **90-99%** | FormLayout, SplitLayout, FlexLayout, ConfirmDialog, Avatar, LoginForm, MessageInput, Popover, Details, CustomField, Card, Icon, Tabs, Tab, TabSheet, Dialog, Grid, Button, TextField, TextArea, EmailField, PasswordField, NumberField, DatePicker, TimePicker, DateTimePicker, ComboBox, MultiSelectComboBox, CheckboxGroup, MultiSelectListBox, Upload, MenuBar, ContextMenu, SideNav, SideNavItem, Binder | 36 |
+| **70-89%** | Select, Checkbox, RadioButtonGroup, ListBox, VirtualList, AppLayout, VerticalLayout, HorizontalLayout | 8 |
 | **50-69%** | LoginOverlay, RouterLink | 2 |
-
-### Recently Implemented (top 5 gaps closed)
-
-1. ~~`set_read_only` / `is_read_only`~~ — [x] HasReadOnly mixin on 18 components
-2. ~~`remove_all`~~ — [x] 10 container components
-3. ~~Dialog `get_header` / `get_footer`~~ — [x] _DialogSection with slotted children
-4. ~~Button `set_disable_on_click`~~ — [x] Client-side double-click prevention
-5. ~~Grid `add_item_click_listener`~~ — [x] Item click + double-click events
 
 ### Remaining Priority Gaps
 
-1. **Layout `add_component_at_index` / `replace`** — Basic container operations
-2. **TextField `set_max_length` / `set_min_length`** — Input length constraints
-3. **Select `set_empty_selection_allowed`** — "-- Select --" placeholder pattern
-4. **`set_i18n`** — Missing from all components that support it
-5. **`set_value_change_mode` / `set_value_change_timeout`** — Debounced text input
+1. **`set_i18n`** — Missing from all components that support it
+2. **`set_value_change_mode` / `set_value_change_timeout`** — Debounced text input
+3. **Layout `add_component_at_index` / `replace`** — Basic container operations
+4. **Select `set_empty_selection_allowed`** — "-- Select --" placeholder pattern
+5. **Layout `set_flex_grow` / `set_flex_shrink`** — Per-child flex control on V/H layouts
