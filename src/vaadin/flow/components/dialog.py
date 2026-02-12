@@ -19,6 +19,7 @@ class Dialog(Component):
     the flow-component-renderer.js to be in the bundle.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.dialog.Dialog"
     _tag = "vaadin-dialog"
 
     def __init__(self):

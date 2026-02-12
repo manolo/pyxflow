@@ -17,6 +17,7 @@ class TabSheet(Component):
     with a content component.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.tabs.TabSheet"
     _tag = "vaadin-tabsheet"
 
     def __init__(self):

@@ -62,6 +62,7 @@ class MessageList(Component):
         )
     """
 
+    _v_fqcn = "com.vaadin.flow.component.messages.MessageList"
     _tag = "vaadin-message-list"
 
     def __init__(self):

@@ -83,6 +83,7 @@ class ContextMenu(Component):
     Uses contextMenuConnector.generateItemsTree() — same connector as MenuBar.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.contextmenu.ContextMenu"
     _tag = "vaadin-context-menu"
 
     def __init__(self, target: Component | None = None):

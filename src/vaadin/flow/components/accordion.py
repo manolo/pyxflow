@@ -20,6 +20,7 @@ class Accordion(Component):
     Only one panel can be expanded at a time.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.accordion.Accordion"
     _tag = "vaadin-accordion"
 
     def __init__(self):

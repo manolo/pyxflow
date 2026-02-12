@@ -24,6 +24,7 @@ class ListBox(Component, Generic[T]):
         lb.add_value_change_listener(lambda e: print(e))
     """
 
+    _v_fqcn = "com.vaadin.flow.component.listbox.ListBox"
     _tag = "vaadin-list-box"
 
     def __init__(self):
@@ -148,6 +149,7 @@ class MultiSelectListBox(Component, Generic[T]):
         lb.add_value_change_listener(lambda e: print(e))
     """
 
+    _v_fqcn = "com.vaadin.flow.component.listbox.MultiSelectListBox"
     _tag = "vaadin-list-box"
 
     def __init__(self):

@@ -18,6 +18,7 @@ class ConfirmDialog(Component):
     controlled via properties.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.confirmdialog.ConfirmDialog"
     _tag = "vaadin-confirm-dialog"
 
     def __init__(self, header: str = "", text: str = "", confirm_text: str = "Confirm"):

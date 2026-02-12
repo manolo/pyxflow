@@ -15,6 +15,7 @@ class RadioButtonGroup(HasValidation, HasRequired, Component, Generic[T]):
     Allows users to select one value among multiple choices.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.radiobutton.RadioButtonGroup"
     _tag = "vaadin-radio-group"
 
     def __init__(self, label: str = ""):

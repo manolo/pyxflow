@@ -25,6 +25,7 @@ class CustomField(HasValidation, HasRequired, Component):
         cf.add(prefix, number)
     """
 
+    _v_fqcn = "com.vaadin.flow.component.customfield.CustomField"
     _tag = "vaadin-custom-field"
 
     def __init__(self, label: str = ""):

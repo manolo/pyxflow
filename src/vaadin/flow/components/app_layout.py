@@ -21,6 +21,7 @@ class AppLayout(Component):
     to swap the content area on navigation.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.applayout.AppLayout"
     _tag = "vaadin-app-layout"
     _is_router_layout = True
 

@@ -10,6 +10,7 @@ class Markdown(Component):
     to prevent XSS.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.markdown.Markdown"
     _tag = "vaadin-markdown"
 
     def __init__(self, content: str = ""):

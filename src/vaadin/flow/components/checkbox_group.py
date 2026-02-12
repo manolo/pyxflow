@@ -15,6 +15,7 @@ class CheckboxGroup(HasValidation, HasRequired, Component, Generic[T]):
     Allows users to select multiple values from a list of options.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.checkbox.CheckboxGroup"
     _tag = "vaadin-checkbox-group"
 
     def __init__(self, label: str = ""):

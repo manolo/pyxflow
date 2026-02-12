@@ -145,40 +145,62 @@ class FlowApp:
             srv_sock.close()
 
 
+def _usage() -> None:
+    print("Usage: vaadin <app_module> [--dev] [--debug] [--port PORT] [--host HOST]")
+    print("       vaadin --bundle [--vaadin-version VERSION]")
+    print()
+    print("  app_module  Python module with views (e.g. demo.views)")
+    print("  --dev       Auto-reload on source changes")
+    print("  --debug     Verbose UIDL protocol logging")
+    print("  --port N    Server port (default: 8080)")
+    print("  --host H    Server host (default: localhost)")
+    print("  --bundle    Generate frontend bundle from component registry")
+    sys.exit(0)
+
+
 def main():
     """CLI entry point: ``vaadin <app_module> [--dev] [--debug]``."""
     if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
-        print("Usage: vaadin <app_module> [--dev] [--debug] [--port PORT] [--host HOST]")
-        print()
-        print("  app_module  Python module with views (e.g. demo.views)")
-        print("  --dev       Auto-reload on source changes")
-        print("  --debug     Verbose UIDL protocol logging")
-        print("  --port N    Server port (default: 8080)")
-        print("  --host H    Server host (default: localhost)")
+        _usage()
+
+    if sys.argv[1] == "--bundle":
+        from vaadin.flow.bundle_generator import generate_and_build
+        generate_and_build()
         sys.exit(0)
+
+    # Find the app module: first non-flag argument
+    args = sys.argv[1:]
+    views = None
+    rest: list[str] = []
+    for arg in args:
+        if views is None and not arg.startswith("-"):
+            views = arg
+        else:
+            rest.append(arg)
+
+    if views is None:
+        _usage()
+
+    if "." not in views:
+        views = f"{views}.views"
 
     cwd = os.getcwd()
     if cwd not in sys.path:
         sys.path.insert(0, cwd)
 
-    views = sys.argv[1]
-    if "." not in views:
-        views = f"{views}.views"
-    args = sys.argv[2:]
-
     port = 8080
     host = "localhost"
-    if "--port" in args:
-        idx = args.index("--port")
-        port = int(args[idx + 1])
-        args = args[:idx] + args[idx + 2:]
-    if "--host" in args:
-        idx = args.index("--host")
-        host = args[idx + 1]
-        args = args[:idx] + args[idx + 2:]
+    if "--port" in rest:
+        idx = rest.index("--port")
+        port = int(rest[idx + 1])
+        rest = rest[:idx] + rest[idx + 2:]
+    if "--host" in rest:
+        idx = rest.index("--host")
+        host = rest[idx + 1]
+        rest = rest[:idx] + rest[idx + 2:]
 
-    debug = "--debug" in args
-    dev = "--dev" in args
+    debug = "--debug" in rest
+    dev = "--dev" in rest
 
     if dev:
         # Reuse FlowApp dev mode

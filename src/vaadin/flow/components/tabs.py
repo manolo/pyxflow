@@ -15,6 +15,7 @@ class Tab(Component):
     Represents a single tab with a text label or child components.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.tabs.Tab"
     _tag = "vaadin-tab"
 
     def __init__(self, label: str = ""):
@@ -53,6 +54,7 @@ class Tabs(Component):
     selected property (0-indexed).
     """
 
+    _v_fqcn = "com.vaadin.flow.component.tabs.Tabs"
     _tag = "vaadin-tabs"
 
     def __init__(self, *tabs: Tab):

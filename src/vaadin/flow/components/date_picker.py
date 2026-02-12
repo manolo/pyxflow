@@ -14,6 +14,7 @@ class DatePicker(HasValidation, HasRequired, Component):
     The value is a Python datetime.date object.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.datepicker.DatePicker"
     _tag = "vaadin-date-picker"
 
     def __init__(self, label: str = ""):

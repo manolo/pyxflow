@@ -56,6 +56,7 @@ class FlexLayout(Component):
     Uses a plain <div> with display:flex. No predetermined width or height.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.orderedlayout.FlexLayout"
     _tag = "div"
 
     def __init__(self, *children: Component):

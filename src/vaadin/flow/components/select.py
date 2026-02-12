@@ -16,6 +16,7 @@ class Select(HasValidation, HasRequired, Component, Generic[T]):
     presented in an overlay.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.select.Select"
     _tag = "vaadin-select"
 
     def __init__(self, label: str = ""):

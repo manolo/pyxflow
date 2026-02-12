@@ -21,6 +21,7 @@ class MessageInput(Component):
         mi.add_submit_listener(lambda e: print(e["value"]))
     """
 
+    _v_fqcn = "com.vaadin.flow.component.messages.MessageInput"
     _tag = "vaadin-message-input"
 
     def __init__(self):

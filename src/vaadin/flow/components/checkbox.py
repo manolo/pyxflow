@@ -9,6 +9,7 @@ from vaadin.flow.components.mixins import HasRequired
 class Checkbox(HasRequired, Component):
     """A checkbox input component representing a binary choice."""
 
+    _v_fqcn = "com.vaadin.flow.component.checkbox.Checkbox"
     _tag = "vaadin-checkbox"
 
     def __init__(self, label: str = ""):

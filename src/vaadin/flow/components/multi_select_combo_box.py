@@ -27,6 +27,7 @@ class MultiSelectComboBox(HasValidation, HasRequired, Component, Generic[T]):
         cb.add_value_change_listener(lambda e: print(e))
     """
 
+    _v_fqcn = "com.vaadin.flow.component.combobox.MultiSelectComboBox"
     _tag = "vaadin-multi-select-combo-box"
 
     def __init__(self, label: str = ""):

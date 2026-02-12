@@ -11,6 +11,7 @@ class Icon(Component):
         Icon("home")          # auto-prefixes vaadin:
     """
 
+    _v_fqcn = "com.vaadin.flow.component.icon.Icon"
     _tag = "vaadin-icon"
 
     def __init__(self, icon: str = ""):

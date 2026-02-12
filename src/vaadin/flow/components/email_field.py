@@ -13,6 +13,7 @@ class EmailField(HasValidation, HasRequired, Component):
     addresses as input. The validity is checked according to RFC 5322.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.textfield.EmailField"
     _tag = "vaadin-email-field"
 
     def __init__(self, label: str = ""):

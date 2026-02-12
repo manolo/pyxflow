@@ -40,6 +40,7 @@ class Popover(Component):
         popover.set_position(PopoverPosition.BOTTOM)
     """
 
+    _v_fqcn = "com.vaadin.flow.component.popover.Popover"
     _tag = "vaadin-popover"
 
     def __init__(self):

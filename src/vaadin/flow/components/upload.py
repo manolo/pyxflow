@@ -22,6 +22,7 @@ class Upload(Component):
     to a dynamic resource URL.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.upload.Upload"
     _tag = "vaadin-upload"
 
     def __init__(self):

@@ -94,6 +94,7 @@ class MenuBar(Component):
     to build the hierarchical menu structure.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.menubar.MenuBar"
     _tag = "vaadin-menu-bar"
 
     def __init__(self):

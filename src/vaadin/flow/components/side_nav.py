@@ -18,6 +18,7 @@ class SideNavItem(Component):
         item = SideNavItem("Home", "/", Icon("vaadin:home"))
     """
 
+    _v_fqcn = "com.vaadin.flow.component.sidenav.SideNavItem"
     _tag = "vaadin-side-nav-item"
 
     def __init__(self, label: str = "", path: str | None = None, icon: Component | None = None):
@@ -97,6 +98,7 @@ class SideNav(Component):
         nav.add_item(SideNavItem("Home", "/"))
     """
 
+    _v_fqcn = "com.vaadin.flow.component.sidenav.SideNav"
     _tag = "vaadin-side-nav"
 
     def __init__(self):

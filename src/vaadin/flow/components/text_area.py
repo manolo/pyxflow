@@ -9,6 +9,7 @@ from vaadin.flow.components.mixins import HasValidation, HasRequired
 class TextArea(HasValidation, HasRequired, Component):
     """A multi-line text input component."""
 
+    _v_fqcn = "com.vaadin.flow.component.textfield.TextArea"
     _tag = "vaadin-text-area"
 
     def __init__(self, label: str = ""):

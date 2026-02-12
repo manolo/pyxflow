@@ -15,6 +15,7 @@ class DateTimePicker(HasValidation, HasRequired, Component):
     Internally uses datepickerConnector and timepickerConnector for the sub-fields.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.datetimepicker.DateTimePicker"
     _tag = "vaadin-date-time-picker"
 
     def __init__(self, label: str = ""):

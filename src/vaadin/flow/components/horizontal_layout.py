@@ -17,6 +17,7 @@ class Alignment(Enum):
 class HorizontalLayout(Component):
     """A layout that arranges children horizontally."""
 
+    _v_fqcn = "com.vaadin.flow.component.orderedlayout.HorizontalLayout"
     _tag = "vaadin-horizontal-layout"
 
     def __init__(self, *children: Component):

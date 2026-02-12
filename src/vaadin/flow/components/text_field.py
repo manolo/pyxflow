@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 class TextField(HasValidation, HasRequired, Component):
     """A text field component."""
 
+    _v_fqcn = "com.vaadin.flow.component.textfield.TextField"
     _tag = "vaadin-text-field"
 
     def __init__(self, label: str = ""):

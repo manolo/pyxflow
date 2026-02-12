@@ -188,6 +188,7 @@ class FormLayout(Component):
     breakpoints to adjust the number of columns based on viewport width.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.formlayout.FormLayout"
     _tag = "vaadin-form-layout"
 
     def __init__(self, *components: Component):

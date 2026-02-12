@@ -22,6 +22,7 @@ class Card(Component):
         card.add_to_footer(Button("Action"))
     """
 
+    _v_fqcn = "com.vaadin.flow.component.card.Card"
     _tag = "vaadin-card"
 
     def __init__(self, *children: Component):

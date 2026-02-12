@@ -14,6 +14,7 @@ class TimePicker(HasValidation, HasRequired, Component):
     The value is a Python datetime.time object.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.timepicker.TimePicker"
     _tag = "vaadin-time-picker"
 
     def __init__(self, label: str = ""):

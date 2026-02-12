@@ -20,6 +20,7 @@ class ComboBox(HasValidation, HasRequired, Component, Generic[T]):
     Items are pushed to the client via the comboBoxConnector, similar to Grid.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.combobox.ComboBox"
     _tag = "vaadin-combo-box"
 
     def __init__(self, label: str = ""):

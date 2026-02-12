@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 class Button(Component):
     """A button component."""
 
+    _v_fqcn = "com.vaadin.flow.component.button.Button"
     _tag = "vaadin-button"
 
     def __init__(self, text: "str | Icon | Callable | None" = "", on_click: "Callable | Icon | None" = None, icon: "Icon | None" = None):

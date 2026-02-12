@@ -17,6 +17,7 @@ class Avatar(Component):
         avatar = Avatar(name="Hugo", abbr="HS", img="https://...")
     """
 
+    _v_fqcn = "com.vaadin.flow.component.avatar.Avatar"
     _tag = "vaadin-avatar"
 
     def __init__(self, name: str = "", abbr: str = "", img: str = ""):
@@ -106,6 +107,7 @@ class AvatarGroup(Component):
         group.set_max_items_visible(3)
     """
 
+    _v_fqcn = "com.vaadin.flow.component.avatar.AvatarGroup"
     _tag = "vaadin-avatar-group"
 
     def __init__(self):

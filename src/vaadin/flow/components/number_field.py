@@ -9,6 +9,7 @@ from vaadin.flow.components.mixins import HasValidation, HasRequired
 class NumberField(HasValidation, HasRequired, Component):
     """A number input field component."""
 
+    _v_fqcn = "com.vaadin.flow.component.textfield.NumberField"
     _tag = "vaadin-number-field"
 
     def __init__(self, label: str = ""):
@@ -152,6 +153,7 @@ class NumberField(HasValidation, HasRequired, Component):
 class IntegerField(NumberField):
     """An integer-only number input field component."""
 
+    _v_fqcn = "com.vaadin.flow.component.textfield.IntegerField"
     _tag = "vaadin-integer-field"
 
     def __init__(self, label: str = ""):

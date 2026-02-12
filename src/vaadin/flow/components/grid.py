@@ -267,6 +267,7 @@ class Grid(Component):
     via the gridConnector's $connector methods.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.grid.Grid"
     _tag = "vaadin-grid"
 
     def __init__(self):
@@ -981,6 +982,8 @@ class TreeGrid(Grid):
     Uses the same gridConnector as Grid, with tree-level overrides
     injected as inline JS (the treeGridConnector is not in the bundle).
     """
+
+    _v_fqcn = "com.vaadin.flow.component.treegrid.TreeGrid"
 
     def __init__(self):
         super().__init__()

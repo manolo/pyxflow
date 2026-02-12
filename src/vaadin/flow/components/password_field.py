@@ -13,6 +13,7 @@ class PasswordField(HasValidation, HasRequired, Component):
     an optional reveal button.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.textfield.PasswordField"
     _tag = "vaadin-password-field"
 
     def __init__(self, label: str = ""):

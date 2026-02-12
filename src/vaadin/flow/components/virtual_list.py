@@ -25,6 +25,7 @@ class VirtualList(Component, Generic[T]):
         vl.set_renderer(LitRenderer.of("<div>${item.name}</div>").with_property("name", lambda x: x))
     """
 
+    _v_fqcn = "com.vaadin.flow.component.virtuallist.VirtualList"
     _tag = "vaadin-virtual-list"
 
     def __init__(self):

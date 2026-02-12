@@ -47,6 +47,7 @@ class Notification(Component):
     not to the current view.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.notification.Notification"
     _tag = "vaadin-notification"
 
     class Position(Enum):

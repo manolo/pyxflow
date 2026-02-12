@@ -22,6 +22,7 @@ class LoginForm(Component):
         form.add_forgot_password_listener(lambda e: print("forgot"))
     """
 
+    _v_fqcn = "com.vaadin.flow.component.login.LoginForm"
     _tag = "vaadin-login-form"
 
     def __init__(self):
@@ -120,6 +121,7 @@ class LoginOverlay(Component):
         overlay.open()
     """
 
+    _v_fqcn = "com.vaadin.flow.component.login.LoginOverlay"
     _tag = "vaadin-login-overlay"
 
     def __init__(self):

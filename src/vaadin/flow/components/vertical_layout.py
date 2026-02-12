@@ -7,6 +7,7 @@ from vaadin.flow.core.component import Component
 class VerticalLayout(Component):
     """A layout that arranges children vertically."""
 
+    _v_fqcn = "com.vaadin.flow.component.orderedlayout.VerticalLayout"
     _tag = "vaadin-vertical-layout"
 
     def __init__(self, *children: Component):

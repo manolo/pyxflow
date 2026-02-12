@@ -25,6 +25,7 @@ class SplitLayout(Component):
         split.set_splitter_position(70)
     """
 
+    _v_fqcn = "com.vaadin.flow.component.splitlayout.SplitLayout"
     _tag = "vaadin-split-layout"
 
     def __init__(self, *args):

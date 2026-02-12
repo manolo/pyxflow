@@ -10,6 +10,7 @@ class ProgressBar(Component):
     The progress can be determinate or indeterminate.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.progressbar.ProgressBar"
     _tag = "vaadin-progress-bar"
 
     def __init__(self):

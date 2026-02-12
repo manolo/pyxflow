@@ -25,6 +25,7 @@ class Scroller(Component):
         scroller.set_height("200px")
     """
 
+    _v_fqcn = "com.vaadin.flow.component.orderedlayout.Scroller"
     _tag = "vaadin-scroller"
 
     def __init__(self, *children: Component,

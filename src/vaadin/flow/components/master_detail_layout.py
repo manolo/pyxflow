@@ -26,6 +26,7 @@ class MasterDetailLayout(Component):
         layout.set_detail(form)
     """
 
+    _v_fqcn = "com.vaadin.flow.component.masterdetaillayout.MasterDetailLayout"
     _tag = "vaadin-master-detail-layout"
 
     def __init__(self):

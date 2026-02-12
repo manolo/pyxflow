@@ -15,6 +15,7 @@ class Details(Component):
     The summary is always visible and toggles the content visibility on click.
     """
 
+    _v_fqcn = "com.vaadin.flow.component.details.Details"
     _tag = "vaadin-details"
 
     def __init__(self, summary: "str | Component | None" = None, *content: Component):
