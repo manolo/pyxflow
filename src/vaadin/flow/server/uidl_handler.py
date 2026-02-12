@@ -480,6 +480,20 @@ class UidlHandler:
             if element:
                 element.fire_event(event_type, event_data)
 
+    @staticmethod
+    def _make_not_found_view(route: str) -> type:
+        """Create a one-off view class that shows a 'Route not found' message."""
+        from vaadin.flow.components.html import H3, Paragraph, Div
+
+        class _NotFoundView(Div):
+            def __init__(self):
+                super().__init__()
+                self.add(
+                    H3(f"Could not navigate to '{route}'"),
+                    Paragraph("Check that the route exists and is correctly registered."),
+                )
+        return _NotFoundView
+
     def _handle_navigation(self, event_data: dict):
         """Handle navigation event - create or switch views.
 
@@ -521,7 +535,8 @@ class UidlHandler:
             if _view_class is not None:
                 view_class = _view_class
             else:
-                return
+                view_class = self._make_not_found_view(route)
+                page_title = "Not Found"
 
         # --- Before leave guard on current view ---
         if self._view is not None and hasattr(self._view, 'before_leave'):

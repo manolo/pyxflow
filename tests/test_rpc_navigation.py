@@ -496,3 +496,63 @@ class TestNavigationContainerStructure:
         )
         assert container_splice is not None
         assert len(container_splice.get("addNodes", [])) > 0
+
+
+class TestRouteNotFound:
+    """Test that navigating to an unknown route shows a not-found view."""
+
+    @pytest.fixture
+    def session(self):
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init_response = handler.handle_init({})
+        csrf = init_response["appConfig"]["uidl"]["Vaadin-Security-Key"]
+        return {"handler": handler, "tree": tree, "csrf": csrf}
+
+    def _navigate(self, session, route):
+        payload = {
+            "csrfToken": session["csrf"],
+            "rpc": [{
+                "type": "event",
+                "node": 1,
+                "event": "ui-navigate",
+                "data": {"route": route, "query": "", "appShellTitle": "",
+                         "historyState": {"idx": 0}, "trigger": ""}
+            }],
+            "syncId": 0,
+            "clientId": 0,
+        }
+        return session["handler"].handle_uidl(payload)
+
+    def test_unknown_route_returns_changes(self, session):
+        """Navigation to unknown route should produce changes, not a no-op."""
+        response = self._navigate(session, "this-route-does-not-exist")
+        changes = response.get("changes", [])
+        assert len(changes) > 0
+
+    def test_unknown_route_shows_not_found_message(self, session):
+        """Not-found view should contain the route name in an h3 tag."""
+        response = self._navigate(session, "nonexistent-page")
+        changes = response.get("changes", [])
+        tags = [c.get("value") for c in changes if c.get("key") == "tag"]
+        assert "h3" in tags
+
+    def test_unknown_route_sets_title(self, session):
+        """Not-found view should set the page title to 'Not Found'."""
+        response = self._navigate(session, "bad-route")
+        execute = response.get("execute", [])
+        # Find the title-setting execute command
+        title_cmd = [e for e in execute if isinstance(e, list) and any(
+            "document.title" in str(item) for item in e
+        )]
+        assert len(title_cmd) > 0
+
+    def test_unknown_route_contains_route_text(self, session):
+        """The not-found view text should include the attempted route."""
+        response = self._navigate(session, "foo/bar/baz")
+        changes = response.get("changes", [])
+        # Find text node with the route path
+        text_values = [c.get("value") for c in changes
+                       if c.get("key") == "text" and c.get("feat") == Feature.TEXT_NODE]
+        all_text = " ".join(str(v) for v in text_values if v)
+        assert "foo/bar/baz" in all_text
