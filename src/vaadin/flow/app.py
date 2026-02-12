@@ -52,7 +52,7 @@ class FlowApp:
         if dev:
             self._run_dev(debug)
         else:
-            _serve(self._views, self._host, self._port, debug)
+            _serve(self._views, self._host, self._port, debug, dev=False)
 
     def _run_dev(self, debug: bool):
         """Dev mode: parent owns the socket, children are restarted on changes.
@@ -238,7 +238,7 @@ def main():
         app._host = host
         app._run_dev(debug)
     else:
-        _serve(views, host, port, debug)
+        _serve(views, host, port, debug, dev=dev)
 
 
 def _dev_serve():
@@ -249,17 +249,19 @@ def _dev_serve():
     try:
         cfg = json.loads(os.environ["_PYFLOW_APP"])
         _serve(cfg["views"], cfg["host"], cfg["port"], cfg["debug"],
-               socket_fd=cfg.get("socket_fd"))
+               dev=True, socket_fd=cfg.get("socket_fd"))
     except KeyboardInterrupt:
         pass
 
 
-def _serve(views: str, host: str, port: int, debug: bool, socket_fd: int | None = None):
+def _serve(views: str, host: str, port: int, debug: bool, *, dev: bool = False, socket_fd: int | None = None):
     import importlib
     from pathlib import Path
     from vaadin.flow.router import discover_views
     from vaadin.flow.server.http_server import run_server, set_app_directory
+    import vaadin.flow.server.http_server as _http
 
+    _http._dev_mode = dev
     discover_views(views)
 
     # Resolve app package directory (e.g. "demo.views" → demo/)

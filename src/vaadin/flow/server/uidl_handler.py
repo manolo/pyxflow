@@ -482,16 +482,39 @@ class UidlHandler:
 
     @staticmethod
     def _make_not_found_view(route: str) -> type:
-        """Create a one-off view class that shows a 'Route not found' message."""
-        from vaadin.flow.components.html import H3, Paragraph, Div
+        """Create a one-off view class that shows a 'Route not found' message.
 
-        class _NotFoundView(Div):
-            def __init__(self):
-                super().__init__()
-                self.add(
-                    H3(f"Could not navigate to '{route}'"),
-                    Paragraph("Check that the route exists and is correctly registered."),
-                )
+        In dev mode, also lists all registered routes as clickable links.
+        """
+        from vaadin.flow.components.html import H3, Paragraph, Div
+        from vaadin.flow.server.http_server import _dev_mode
+
+        if _dev_mode:
+            class _NotFoundView(Div):
+                def __init__(self):
+                    super().__init__()
+                    from vaadin.flow.router import _routes
+                    from vaadin.flow.components.router_link import RouterLink
+                    from vaadin.flow.components.vertical_layout import VerticalLayout
+
+                    self.add(H3(f"Could not navigate to '{route}'"))
+                    links = VerticalLayout()
+                    links.set_padding(False)
+                    links.set_spacing(False)
+                    for path, (view_cls, title, *_rest) in sorted(_routes.items()):
+                        label = f"/{path}" if path else "/"
+                        if title:
+                            label += f" — {title}"
+                        links.add(RouterLink(label, f"/{path}"))
+                    self.add(Paragraph("Available routes:"), links)
+        else:
+            class _NotFoundView(Div):
+                def __init__(self):
+                    super().__init__()
+                    self.add(
+                        H3(f"Could not navigate to '{route}'"),
+                        Paragraph("Check that the route exists and is correctly registered."),
+                    )
         return _NotFoundView
 
     def _handle_navigation(self, event_data: dict):

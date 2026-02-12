@@ -28,6 +28,9 @@ _upload_handlers: dict[str, tuple[str, Callable]] = {}
 # App package directory (e.g. demo/) — set by FlowApp
 _app_directory: Path | None = None
 
+# Dev mode flag — enables detailed not-found view with route list
+_dev_mode: bool = False
+
 def set_app_directory(directory: Path):
     """Set the app package directory for serving styles etc."""
     global _app_directory

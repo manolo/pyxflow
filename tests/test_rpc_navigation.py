@@ -556,3 +556,93 @@ class TestRouteNotFound:
                        if c.get("key") == "text" and c.get("feat") == Feature.TEXT_NODE]
         all_text = " ".join(str(v) for v in text_values if v)
         assert "foo/bar/baz" in all_text
+
+
+class TestRouteNotFoundDevMode:
+    """Test that dev mode not-found view shows available routes."""
+
+    @pytest.fixture
+    def session(self):
+        import vaadin.flow.server.http_server as http
+        old = http._dev_mode
+        http._dev_mode = True
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init_response = handler.handle_init({})
+        csrf = init_response["appConfig"]["uidl"]["Vaadin-Security-Key"]
+        yield {"handler": handler, "tree": tree, "csrf": csrf}
+        http._dev_mode = old
+
+    def _navigate(self, session, route):
+        payload = {
+            "csrfToken": session["csrf"],
+            "rpc": [{
+                "type": "event",
+                "node": 1,
+                "event": "ui-navigate",
+                "data": {"route": route, "query": "", "appShellTitle": "",
+                         "historyState": {"idx": 0}, "trigger": ""}
+            }],
+            "syncId": 0,
+            "clientId": 0,
+        }
+        return session["handler"].handle_uidl(payload)
+
+    def test_dev_mode_shows_route_links(self, session):
+        """Dev mode not-found view should contain router-link elements."""
+        response = self._navigate(session, "nonexistent")
+        changes = response.get("changes", [])
+        # RouterLink renders as <a> tags with router-link attribute
+        tags = [c.get("value") for c in changes if c.get("key") == "tag"]
+        assert "a" in tags
+
+    def test_dev_mode_shows_available_routes_text(self, session):
+        """Dev mode should show 'Available routes:' text."""
+        response = self._navigate(session, "nonexistent")
+        changes = response.get("changes", [])
+        text_values = [c.get("value") for c in changes
+                       if c.get("key") == "text" and c.get("feat") == Feature.TEXT_NODE]
+        all_text = " ".join(str(v) for v in text_values if v)
+        assert "Available routes:" in all_text
+
+    def test_dev_mode_includes_registered_routes(self, session):
+        """Dev mode should list actual registered route paths."""
+        from vaadin.flow.router import _routes
+        response = self._navigate(session, "nonexistent")
+        changes = response.get("changes", [])
+        # Check that href attributes include registered paths
+        hrefs = [c.get("value") for c in changes
+                 if c.get("key") == "href" and c.get("feat") == Feature.ELEMENT_ATTRIBUTE_MAP]
+        # At least one registered route should appear
+        for path in list(_routes.keys())[:3]:
+            assert f"/{path}" in hrefs
+
+    def test_production_mode_no_route_links(self):
+        """Production mode should NOT show route links."""
+        import vaadin.flow.server.http_server as http
+        old = http._dev_mode
+        http._dev_mode = False
+        try:
+            tree = StateTree()
+            handler = UidlHandler(tree)
+            init_response = handler.handle_init({})
+            csrf = init_response["appConfig"]["uidl"]["Vaadin-Security-Key"]
+            payload = {
+                "csrfToken": csrf,
+                "rpc": [{
+                    "type": "event",
+                    "node": 1,
+                    "event": "ui-navigate",
+                    "data": {"route": "nonexistent", "query": "", "appShellTitle": "",
+                             "historyState": {"idx": 0}, "trigger": ""}
+                }],
+                "syncId": 0,
+                "clientId": 0,
+            }
+            response = handler.handle_uidl(payload)
+            changes = response.get("changes", [])
+            tags = [c.get("value") for c in changes if c.get("key") == "tag"]
+            # No anchor tags in production mode
+            assert "a" not in tags
+        finally:
+            http._dev_mode = old
