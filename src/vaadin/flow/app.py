@@ -164,12 +164,21 @@ def main():
     if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
         _usage()
 
-    # Parse all arguments: find module name (first non-flag) and flags
+    # Parse all arguments: find module name (first non-flag) and flags.
+    # Flags that consume the next token as their value:
+    _VALUE_FLAGS = {"--vaadin-version", "--port", "--host"}
     args = sys.argv[1:]
     views = None
     rest: list[str] = []
+    skip_next = False
     for arg in args:
-        if views is None and not arg.startswith("-"):
+        if skip_next:
+            rest.append(arg)
+            skip_next = False
+        elif arg in _VALUE_FLAGS:
+            rest.append(arg)
+            skip_next = True
+        elif views is None and not arg.startswith("-"):
             views = arg
         else:
             rest.append(arg)
