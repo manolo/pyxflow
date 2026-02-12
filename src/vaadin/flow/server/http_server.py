@@ -350,14 +350,17 @@ def get_bundle_directory() -> Path | None:
     It is generated from a reference Java Vaadin application.
 
     Search order:
-    1. Package-internal bundle (inside installed package)
-    2. ./bundle/ in the project root (development override)
+    1. App-directory bundle (user project: ``my_app/bundle/``)
+    2. Package-internal bundle (inside installed package / pyflow source)
+    3. ./bundle/ in the project root (development fallback)
     """
-    # Check common locations (in priority order)
-    candidates = [
+    candidates: list[Path] = []
+    if _app_directory:
+        candidates.append(_app_directory / "bundle")
+    candidates += [
         # Package-internal bundle (ships inside the wheel)
         Path(__file__).parents[1] / "bundle",
-        # Project-local bundle (development override)
+        # Project-local bundle (development fallback)
         Path.cwd() / "bundle",
     ]
 
