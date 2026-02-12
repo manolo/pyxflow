@@ -41,7 +41,7 @@ class Icon(Component):
 
     def set_color(self, color: str):
         """Set the icon color via CSS fill."""
-        self._set_style("fill", color)
+        self.get_style().set("fill", color)
 
     def set_size(self, size: str):
         """Set the icon size (width and height)."""

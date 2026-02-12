@@ -21,9 +21,9 @@ class VerticalLayout(Component):
         self._default_alignment: Alignment | None = None
 
     def _attach(self, tree):
-        # Set default width before _attach applies pending styles
-        if "width" not in self._pending_styles:
-            self._pending_styles["width"] = "100%"
+        # Set default width before _attach flushes buffered styles
+        if self._style.get("width") is None:
+            self._style.set("width", "100%")
         super()._attach(tree)
         self._update_theme()
         if self._default_alignment:

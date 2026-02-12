@@ -5,12 +5,48 @@ from __future__ import annotations
 import functools
 from typing import TYPE_CHECKING
 
-from vaadin.flow.core.element import Element
+from vaadin.flow.core.element import Element, Style
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.element import Style
     from vaadin.flow.core.keys import Key
     from vaadin.flow.core.state_tree import StateTree
+
+
+class _BufferedStyle:
+    """Style manager that buffers before the component is attached.
+
+    Before attach, set/get/remove operate on a local dict.
+    After ``_flush(real_style)`` is called, all buffered values are applied
+    and subsequent calls delegate directly to the real ``Style`` object.
+    """
+
+    def __init__(self):
+        self._buffer: dict[str, str] = {}
+        self._delegate: Style | None = None
+
+    def set(self, name: str, value: str):
+        if self._delegate is not None:
+            self._delegate.set(name, value)
+        else:
+            self._buffer[name] = value
+
+    def get(self, name: str) -> str | None:
+        if self._delegate is not None:
+            return self._delegate.get(name)
+        return self._buffer.get(name)
+
+    def remove(self, name: str):
+        if self._delegate is not None:
+            self._delegate.remove(name)
+        else:
+            self._buffer.pop(name, None)
+
+    def _flush(self, real_style: Style):
+        """Flush buffered values to the real Style and switch to delegation."""
+        for name, value in self._buffer.items():
+            real_style.set(name, value)
+        self._buffer.clear()
+        self._delegate = real_style
 
 
 def ClientCallable(func):
@@ -53,7 +89,7 @@ class Component:
         self._visible: bool = True
         self._enabled: bool = True
         self._class_names: set[str] = set()
-        self._pending_styles: dict[str, str] = {}
+        self._style = _BufferedStyle()
         self._pending_theme: str | None = None
         self._tooltip_element: Element | None = None
         self._click_shortcut_registered: bool = False
@@ -74,11 +110,8 @@ class Component:
         self._element = self._create_element(tree)
         # Register component for property sync
         tree.register_component(self)
-        # Apply deferred styles
-        if self._pending_styles:
-            for name, value in self._pending_styles.items():
-                self._element.get_style().set(name, value)
-            self._pending_styles.clear()
+        # Flush buffered styles to the real element Style
+        self._style._flush(self._element.get_style())
         # Apply deferred theme
         if self._pending_theme is not None:
             self._element.set_attribute("theme", self._pending_theme)
@@ -173,13 +206,10 @@ class Component:
         When a component is set to invisible, it is not rendered on the page.
         """
         self._visible = visible
-        if self._element:
-            self.element.get_style().set("display", "" if visible else "none")
+        if not visible:
+            self._style.set("display", "none")
         else:
-            if not visible:
-                self._pending_styles["display"] = "none"
-            else:
-                self._pending_styles.pop("display", None)
+            self._style.remove("display")
 
     # Enabled methods
 
@@ -244,57 +274,43 @@ class Component:
 
     # --- HasSize methods ---
 
-    def _set_style(self, name: str, value: str | None):
-        """Set a style property, buffering if not yet attached."""
-        val = value or ""
-        if self._element:
-            self._element.get_style().set(name, val)
-        else:
-            self._pending_styles[name] = val
-
-    def _get_style(self, name: str) -> str | None:
-        """Get a style property."""
-        if self._element:
-            return self._element.get_style().get(name)
-        return self._pending_styles.get(name)
-
     def set_width(self, width: str | None):
         """Set width (e.g., '100px', '50%', '10em'). None removes width."""
-        self._set_style("width", width)
+        self._style.set("width", width or "")
 
     def get_width(self) -> str | None:
-        return self._get_style("width")
+        return self._style.get("width")
 
     def set_height(self, height: str | None):
         """Set height (e.g., '100px', '50%', '10em'). None removes height."""
-        self._set_style("height", height)
+        self._style.set("height", height or "")
 
     def get_height(self) -> str | None:
-        return self._get_style("height")
+        return self._style.get("height")
 
     def set_min_width(self, min_width: str | None):
-        self._set_style("min-width", min_width)
+        self._style.set("min-width", min_width or "")
 
     def get_min_width(self) -> str | None:
-        return self._get_style("min-width")
+        return self._style.get("min-width")
 
     def set_max_width(self, max_width: str | None):
-        self._set_style("max-width", max_width)
+        self._style.set("max-width", max_width or "")
 
     def get_max_width(self) -> str | None:
-        return self._get_style("max-width")
+        return self._style.get("max-width")
 
     def set_min_height(self, min_height: str | None):
-        self._set_style("min-height", min_height)
+        self._style.set("min-height", min_height or "")
 
     def get_min_height(self) -> str | None:
-        return self._get_style("min-height")
+        return self._style.get("min-height")
 
     def set_max_height(self, max_height: str | None):
-        self._set_style("max-height", max_height)
+        self._style.set("max-height", max_height or "")
 
     def get_max_height(self) -> str | None:
-        return self._get_style("max-height")
+        return self._style.get("max-height")
 
     def set_size_full(self):
         """Set both width and height to 100%."""
@@ -376,8 +392,7 @@ class Component:
         if self._element:
             self._element.set_attribute("id", id)
         else:
-            # Buffer for later (reuse _pending_styles pattern isn't ideal,
-            # so we store in a simple attribute)
+            # Buffer for later
             self._pending_id = id
 
     def get_id(self) -> str | None:
@@ -498,9 +513,13 @@ class Component:
 
     # --- HasStyle shortcut ---
 
-    def get_style(self) -> "Style":
-        """Get the inline style manager."""
-        return self.element.get_style()
+    def get_style(self) -> _BufferedStyle:
+        """Get the inline style manager.
+
+        Works both before and after the component is attached.
+        Before attach, operations are buffered and flushed on attach.
+        """
+        return self._style
 
 
 class UI:

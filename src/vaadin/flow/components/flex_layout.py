@@ -97,13 +97,13 @@ class FlexLayout(Component):
     def set_flex_direction(self, direction: FlexDirection | None):
         """Set the flex-direction CSS property."""
         if direction is None:
-            self._set_style("flex-direction", "")
+            self.get_style().set("flex-direction", "")
         else:
-            self._set_style("flex-direction", direction.value)
+            self.get_style().set("flex-direction", direction.value)
 
     def get_flex_direction(self) -> FlexDirection:
         """Get the flex-direction. Default is ROW."""
-        val = self._get_style("flex-direction")
+        val = self.get_style().get("flex-direction")
         if val:
             for d in FlexDirection:
                 if d.value == val:
@@ -114,11 +114,11 @@ class FlexLayout(Component):
 
     def set_flex_wrap(self, wrap: FlexWrap):
         """Set the flex-wrap CSS property."""
-        self._set_style("flex-wrap", wrap.value)
+        self.get_style().set("flex-wrap", wrap.value)
 
     def get_flex_wrap(self) -> FlexWrap:
         """Get the flex-wrap. Default is NOWRAP."""
-        val = self._get_style("flex-wrap")
+        val = self.get_style().get("flex-wrap")
         if val:
             for w in FlexWrap:
                 if w.value == val:
@@ -129,11 +129,11 @@ class FlexLayout(Component):
 
     def set_justify_content_mode(self, mode: JustifyContentMode):
         """Set the justify-content CSS property."""
-        self._set_style("justify-content", mode.value)
+        self.get_style().set("justify-content", mode.value)
 
     def get_justify_content_mode(self) -> JustifyContentMode:
         """Get the justify-content mode. Default is START."""
-        val = self._get_style("justify-content")
+        val = self.get_style().get("justify-content")
         if val:
             for m in JustifyContentMode:
                 if m.value == val:
@@ -145,13 +145,13 @@ class FlexLayout(Component):
     def set_align_items(self, alignment: Alignment | None):
         """Set the align-items CSS property (cross-axis alignment for all children)."""
         if alignment is None:
-            self._set_style("align-items", "")
+            self.get_style().set("align-items", "")
         else:
-            self._set_style("align-items", alignment.value)
+            self.get_style().set("align-items", alignment.value)
 
     def get_align_items(self) -> Alignment:
         """Get the align-items value. Default is STRETCH."""
-        val = self._get_style("align-items")
+        val = self.get_style().get("align-items")
         if val:
             for a in Alignment:
                 if a.value == val:
@@ -164,22 +164,13 @@ class FlexLayout(Component):
         """Set align-self on individual components."""
         for component in components:
             if alignment is None:
-                if component._element:
-                    component.element.get_style().set("align-self", "")
-                else:
-                    component._pending_styles.pop("align-self", None)
+                component.get_style().remove("align-self")
             else:
-                if component._element:
-                    component.element.get_style().set("align-self", alignment.value)
-                else:
-                    component._pending_styles["align-self"] = alignment.value
+                component.get_style().set("align-self", alignment.value)
 
     def get_align_self(self, component: Component) -> Alignment:
         """Get align-self for a component. Default is AUTO."""
-        if component._element:
-            val = component.element.get_style().get("align-self")
-        else:
-            val = component._pending_styles.get("align-self")
+        val = component.get_style().get("align-self")
         if val:
             for a in Alignment:
                 if a.value == val:
@@ -191,13 +182,13 @@ class FlexLayout(Component):
     def set_align_content(self, alignment: ContentAlignment | None):
         """Set the align-content CSS property (multi-line cross-axis alignment)."""
         if alignment is None:
-            self._set_style("align-content", "")
+            self.get_style().set("align-content", "")
         else:
-            self._set_style("align-content", alignment.value)
+            self.get_style().set("align-content", alignment.value)
 
     def get_align_content(self) -> ContentAlignment:
         """Get the align-content value. Default is STRETCH."""
-        val = self._get_style("align-content")
+        val = self.get_style().get("align-content")
         if val:
             for a in ContentAlignment:
                 if a.value == val:
@@ -209,17 +200,11 @@ class FlexLayout(Component):
     def set_flex_grow(self, flex_grow: float, *components: Component):
         """Set flex-grow on components."""
         for component in components:
-            if component._element:
-                component.element.get_style().set("flex-grow", str(flex_grow))
-            else:
-                component._pending_styles["flex-grow"] = str(flex_grow)
+            component.get_style().set("flex-grow", str(flex_grow))
 
     def get_flex_grow(self, component: Component) -> float:
         """Get flex-grow for a component. Default is 0."""
-        if component._element:
-            val = component.element.get_style().get("flex-grow")
-        else:
-            val = component._pending_styles.get("flex-grow")
+        val = component.get_style().get("flex-grow")
         if val:
             return float(val)
         return 0.0
@@ -233,17 +218,11 @@ class FlexLayout(Component):
     def set_flex_shrink(self, flex_shrink: float, *components: Component):
         """Set flex-shrink on components."""
         for component in components:
-            if component._element:
-                component.element.get_style().set("flex-shrink", str(flex_shrink))
-            else:
-                component._pending_styles["flex-shrink"] = str(flex_shrink)
+            component.get_style().set("flex-shrink", str(flex_shrink))
 
     def get_flex_shrink(self, component: Component) -> float:
         """Get flex-shrink for a component. Default is 1."""
-        if component._element:
-            val = component.element.get_style().get("flex-shrink")
-        else:
-            val = component._pending_styles.get("flex-shrink")
+        val = component.get_style().get("flex-shrink")
         if val:
             return float(val)
         return 1.0
@@ -254,45 +233,27 @@ class FlexLayout(Component):
         """Set flex-basis on components."""
         for component in components:
             if width is None:
-                if component._element:
-                    component.element.get_style().set("flex-basis", "")
-                else:
-                    component._pending_styles.pop("flex-basis", None)
+                component.get_style().remove("flex-basis")
             else:
-                if component._element:
-                    component.element.get_style().set("flex-basis", width)
-                else:
-                    component._pending_styles["flex-basis"] = width
+                component.get_style().set("flex-basis", width)
 
     def get_flex_basis(self, component: Component) -> str | None:
         """Get flex-basis for a component."""
-        if component._element:
-            val = component.element.get_style().get("flex-basis")
-        else:
-            val = component._pending_styles.get("flex-basis")
+        val = component.get_style().get("flex-basis")
         return val or None
 
     # --- Order ---
 
     def set_order(self, order: int, component: Component):
         """Set the order CSS property on a component."""
-        if component._element:
-            if order == 0:
-                component.element.get_style().set("order", "")
-            else:
-                component.element.get_style().set("order", str(order))
+        if order == 0:
+            component.get_style().remove("order")
         else:
-            if order == 0:
-                component._pending_styles.pop("order", None)
-            else:
-                component._pending_styles["order"] = str(order)
+            component.get_style().set("order", str(order))
 
     def get_order(self, component: Component) -> int:
         """Get the order for a component. Default is 0."""
-        if component._element:
-            val = component.element.get_style().get("order")
-        else:
-            val = component._pending_styles.get("order")
+        val = component.get_style().get("order")
         if val:
             return int(val)
         return 0
