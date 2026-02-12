@@ -28,6 +28,7 @@ class SideNavItem(Component):
         self._icon = icon
         self._items: list["SideNavItem"] = []
         self._text_node = None
+        self._expanded = False
 
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
@@ -42,6 +43,8 @@ class SideNavItem(Component):
             self._icon._attach(tree)
             self._icon.element.set_attribute("slot", "prefix")
             self.element.add_child(self._icon.element)
+        if self._expanded:
+            self.element.set_property("expanded", True)
         for item in self._items:
             self._attach_sub_item(item, tree)
 
@@ -77,8 +80,13 @@ class SideNavItem(Component):
 
     def set_expanded(self, expanded: bool):
         """Expand or collapse nested items."""
+        self._expanded = expanded
         if self._element:
             self.element.set_property("expanded", expanded)
+
+    def is_expanded(self) -> bool:
+        """Check if nested items are expanded."""
+        return self._expanded
 
     def set_prefix_component(self, component: Component):
         """Set the prefix slot component (typically an Icon)."""
@@ -152,3 +160,7 @@ class SideNav(Component):
         self._collapsible = collapsible
         if self._element:
             self.element.set_property("collapsible", collapsible)
+
+    def is_collapsible(self) -> bool:
+        """Check if the nav is collapsible."""
+        return self._collapsible

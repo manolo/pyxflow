@@ -225,6 +225,14 @@ class ContextMenu(Component):
         if self._element:
             self.element.set_property("openOnClick", open_on_click)
 
+    def get_target(self) -> Component | None:
+        """Get the target component."""
+        return self._target
+
+    def is_open_on_click(self) -> bool:
+        """Check if the menu opens on left-click."""
+        return self._open_on_click
+
 
 class _ContextItemElement:
     """Lightweight element wrapper for ContextMenuItem event dispatch."""

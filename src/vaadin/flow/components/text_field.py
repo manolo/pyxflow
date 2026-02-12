@@ -69,6 +69,10 @@ class TextField(HasValidation, HasRequired, Component):
         if self._element:
             self.element.set_property("label", label)
 
+    def get_label(self) -> str:
+        """Get the label."""
+        return self._label
+
     def set_pattern(self, pattern: str):
         """Set the regular expression pattern for validation."""
         self._pattern = pattern
@@ -102,6 +106,10 @@ class TextField(HasValidation, HasRequired, Component):
         self._placeholder = text
         if self._element:
             self.element.set_property("placeholder", text)
+
+    def get_placeholder(self) -> str:
+        """Get the placeholder text."""
+        return self._placeholder
 
     def set_prefix_component(self, component: Component):
         """Set a prefix component (e.g. Icon) in the 'prefix' slot."""

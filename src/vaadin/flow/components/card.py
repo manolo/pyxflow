@@ -136,6 +136,22 @@ class Card(Component):
         if self._element:
             self._attach_slotted(component, "header-suffix", self._element._tree)
 
+    def get_media(self) -> Component | None:
+        """Get the media component."""
+        return self._media
+
+    def get_header(self) -> Component | None:
+        """Get the header component."""
+        return self._header
+
+    def get_header_prefix(self) -> Component | None:
+        """Get the header prefix component."""
+        return self._header_prefix
+
+    def get_header_suffix(self) -> Component | None:
+        """Get the header suffix component."""
+        return self._header_suffix
+
     def add_to_footer(self, *components: Component):
         """Add components to the footer slot."""
         for comp in components:

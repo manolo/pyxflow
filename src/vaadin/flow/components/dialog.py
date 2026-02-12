@@ -32,6 +32,8 @@ class Dialog(Component):
         self._header_title = ""
         self._width = None
         self._height = None
+        self._close_on_esc = True
+        self._close_on_outside_click = True
         self._children: list[Component] = []
         self._open_listeners: list[Callable] = []
         self._close_listeners: list[Callable] = []
@@ -45,6 +47,10 @@ class Dialog(Component):
         self.element.set_property("resizable", self._resizable)
         if self._header_title:
             self.element.set_property("headerTitle", self._header_title)
+        if not self._close_on_esc:
+            self.element.set_property("closeOnEsc", False)
+        if not self._close_on_outside_click:
+            self.element.set_property("closeOnOutsideClick", False)
         if self._width:
             self.element.get_style().set("--vaadin-dialog-overlay-width", self._width)
         if self._height:
@@ -166,6 +172,26 @@ class Dialog(Component):
         self._height = height
         if self._element and height:
             self.element.get_style().set("--vaadin-dialog-overlay-height", height)
+
+    def set_close_on_esc(self, close_on_esc: bool):
+        """Set whether the dialog closes on Escape key."""
+        self._close_on_esc = close_on_esc
+        if self._element:
+            self.element.set_property("closeOnEsc", close_on_esc)
+
+    def is_close_on_esc(self) -> bool:
+        """Check if the dialog closes on Escape key."""
+        return self._close_on_esc
+
+    def set_close_on_outside_click(self, close_on_outside_click: bool):
+        """Set whether the dialog closes on outside click."""
+        self._close_on_outside_click = close_on_outside_click
+        if self._element:
+            self.element.set_property("closeOnOutsideClick", close_on_outside_click)
+
+    def is_close_on_outside_click(self) -> bool:
+        """Check if the dialog closes on outside click."""
+        return self._close_on_outside_click
 
     def add_open_listener(self, listener: Callable):
         """Add a listener for when the dialog opens."""

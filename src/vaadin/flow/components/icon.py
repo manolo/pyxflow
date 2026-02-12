@@ -17,6 +17,7 @@ class Icon(Component):
     def __init__(self, icon: str = ""):
         super().__init__()
         self._icon = self._normalize(icon)
+        self._color: str | None = None
 
     @staticmethod
     def _normalize(icon: str) -> str:
@@ -41,7 +42,12 @@ class Icon(Component):
 
     def set_color(self, color: str):
         """Set the icon color via CSS fill."""
+        self._color = color
         self.get_style().set("fill", color)
+
+    def get_color(self) -> str | None:
+        """Get the icon color."""
+        return self._color
 
     def set_size(self, size: str):
         """Set the icon size (width and height)."""

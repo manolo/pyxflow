@@ -72,5 +72,9 @@ class Scroller(Component):
         if self._element:
             self.element.set_property("scrollDirection", direction.value)
 
+    def get_content(self) -> Component | None:
+        """Get the first content component, or None."""
+        return self._children[0] if self._children else None
+
     def get_scroll_direction(self) -> ScrollDirection:
         return self._scroll_direction

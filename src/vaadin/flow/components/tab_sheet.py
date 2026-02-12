@@ -111,6 +111,21 @@ class TabSheet(Component):
         """Add a listener for tab selection changes."""
         self._change_listeners.append(listener)
 
+    def get_tab_count(self) -> int:
+        """Get the number of tabs."""
+        return self._tabs_component.get_tab_count()
+
+    def get_tab_at(self, index: int) -> Tab:
+        """Get the tab at the given index."""
+        return self._tabs_component._tabs[index]
+
+    def get_index_of(self, tab: Tab) -> int:
+        """Get the index of the given tab, or -1 if not found."""
+        try:
+            return self._tabs_component._tabs.index(tab)
+        except ValueError:
+            return -1
+
     def _on_tab_selected(self, event_data: dict):
         """Forward selection events to listeners."""
         for listener in self._change_listeners:

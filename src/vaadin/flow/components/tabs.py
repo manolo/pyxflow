@@ -63,6 +63,7 @@ class Tabs(Component):
         self._selected_index = 0 if tabs else -1
         self._change_listeners: list[Callable] = []
         self._autoselect = True
+        self._orientation = "horizontal"
 
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
@@ -74,6 +75,8 @@ class Tabs(Component):
 
         # Set selected property
         self.element.set_property("selected", self._selected_index)
+        if self._orientation != "horizontal":
+            self.element.set_attribute("orientation", self._orientation)
 
         # Update selected state on tabs
         self._update_tab_selection()
@@ -156,12 +159,21 @@ class Tabs(Component):
 
     def set_orientation(self, orientation: str):
         """Set the tabs orientation ('horizontal' or 'vertical')."""
+        self._orientation = orientation
         if self._element:
             self.element.set_attribute("orientation", orientation)
+
+    def get_orientation(self) -> str:
+        """Get the tabs orientation."""
+        return self._orientation
 
     def set_autoselect(self, autoselect: bool):
         """Set whether the first tab should be auto-selected."""
         self._autoselect = autoselect
+
+    def is_autoselect(self) -> bool:
+        """Check if the first tab is auto-selected."""
+        return self._autoselect
 
     def add_selected_change_listener(self, listener: Callable):
         """Add a listener for tab selection changes."""

@@ -30,6 +30,8 @@ class AppLayout(Component):
         self._navbar_components: list[Component] = []
         self._drawer_components: list[Component] = []
         self._content: Component | None = None
+        self._primary_section = "navbar"
+        self._drawer_opened = True
 
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
@@ -83,16 +85,23 @@ class AppLayout(Component):
 
     def set_drawer_opened(self, opened: bool):
         """Open or close the drawer."""
+        self._drawer_opened = opened
         if self._element:
             self.element.set_property("drawerOpened", opened)
 
     def is_drawer_opened(self) -> bool:
-        return True  # default
+        """Check if the drawer is open."""
+        return self._drawer_opened
 
     def set_primary_section(self, section: str):
         """Set which section is primary ('navbar' or 'drawer')."""
+        self._primary_section = section
         if self._element:
             self.element.set_property("primarySection", section)
+
+    def get_primary_section(self) -> str:
+        """Get which section is primary ('navbar' or 'drawer')."""
+        return self._primary_section
 
     # --- RouterLayout interface ---
 
