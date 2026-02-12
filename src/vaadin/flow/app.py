@@ -145,11 +145,20 @@ class FlowApp:
             srv_sock.close()
 
 
+def _auto_detect_app() -> str | None:
+    """Try to find an app module in cwd by looking for <pkg>/views/."""
+    from pathlib import Path
+    for entry in sorted(Path.cwd().iterdir()):
+        if entry.is_dir() and (entry / "views").is_dir():
+            return entry.name
+    return None
+
+
 def _usage() -> None:
-    print("Usage: vaadin <app_module> [--dev] [--debug] [--port PORT] [--host HOST]")
+    print("Usage: vaadin [app_module] [--dev] [--debug] [--port PORT] [--host HOST]")
     print("       vaadin [app_module] --bundle [--keep] [--vaadin-version VERSION]")
     print()
-    print("  app_module  Python module with views (e.g. demo)")
+    print("  app_module  Python module with views (auto-detected if omitted)")
     print("  --dev       Auto-reload on source changes")
     print("  --debug     Verbose UIDL protocol logging")
     print("  --port N    Server port (default: 8080)")
@@ -160,8 +169,8 @@ def _usage() -> None:
 
 
 def main():
-    """CLI entry point: ``vaadin <app_module> [--dev] [--debug]``."""
-    if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
+    """CLI entry point: ``vaadin [app_module] [--dev] [--debug]``."""
+    if len(sys.argv) >= 2 and sys.argv[1] in ("-h", "--help"):
         _usage()
 
     # Parse all arguments: find module name (first non-flag) and flags.
@@ -207,7 +216,9 @@ def main():
         sys.exit(0)
 
     if views is None:
-        _usage()
+        views = _auto_detect_app()
+        if views is None:
+            _usage()
 
     if "." not in views:
         views = f"{views}.views"
