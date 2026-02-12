@@ -157,7 +157,13 @@ def main():
         print("  --host H    Server host (default: localhost)")
         sys.exit(0)
 
+    cwd = os.getcwd()
+    if cwd not in sys.path:
+        sys.path.insert(0, cwd)
+
     views = sys.argv[1]
+    if "." not in views:
+        views = f"{views}.views"
     args = sys.argv[2:]
 
     port = 8080
@@ -187,6 +193,9 @@ def main():
 
 def _dev_serve():
     """Entry point for dev-mode child process (reads config from env)."""
+    cwd = os.getcwd()
+    if cwd not in sys.path:
+        sys.path.insert(0, cwd)
     try:
         cfg = json.loads(os.environ["_PYFLOW_APP"])
         _serve(cfg["views"], cfg["host"], cfg["port"], cfg["debug"],
