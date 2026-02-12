@@ -1,12 +1,5 @@
-from vaadin.flow import Route
-from vaadin.flow.components import (
-    Button,
-    Dialog,
-    Span,
-    TextField,
-    VerticalLayout,
-)
-
+from vaadin.flow import Route, Menu
+from vaadin.flow.components import *
 
 @Route("dialog-demo", page_title="Dialog Demo")
 class DialogDemoView(VerticalLayout):
