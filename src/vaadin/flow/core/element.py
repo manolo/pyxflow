@@ -22,6 +22,10 @@ class Style:
         """Get a style property."""
         return self._node.get(Feature.INLINE_STYLE_PROPERTY_MAP, name)
 
+    def remove(self, name: str):
+        """Remove a style property."""
+        self._node.remove(Feature.INLINE_STYLE_PROPERTY_MAP, name)
+
 
 class Element:
     """Represents a DOM element."""
