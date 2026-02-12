@@ -3,10 +3,10 @@
 from typing import Callable
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasRequired
+from vaadin.flow.components.mixins import HasReadOnly, HasRequired
 
 
-class Checkbox(HasRequired, Component):
+class Checkbox(HasReadOnly, HasRequired, Component):
     """A checkbox input component representing a binary choice."""
 
     _v_fqcn = "com.vaadin.flow.component.checkbox.Checkbox"

@@ -4,10 +4,10 @@ import datetime
 from typing import Callable, Optional
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasValidation, HasRequired
+from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 
 
-class DatePicker(HasValidation, HasRequired, Component):
+class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):
     """A date picker component.
 
     Allows users to select a date from a calendar overlay.

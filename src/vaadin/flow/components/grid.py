@@ -9,6 +9,7 @@ from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
 from vaadin.flow.components.renderer import Renderer, LitRenderer, ComponentRenderer
 from vaadin.flow.data.provider import DataProvider, ListDataProvider, Query
+from vaadin.flow.server.uidl_handler import _ITEM_CLICK_HASH
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -280,6 +281,9 @@ class Grid(Component):
         self._key_to_item: dict[str, dict] = {}
         self._update_id = 0
         self._column_reordering_allowed = False
+        # Item click listeners
+        self._item_click_listeners: list[Callable] = []
+        self._item_double_click_listeners: list[Callable] = []
         # Sorting
         self._sort_orders: list[GridSortOrder] = []
         self._sort_listeners: list[Callable] = []
@@ -399,6 +403,49 @@ class Grid(Component):
         The listener receives a list of GridSortOrder objects.
         """
         self._sort_listeners.append(listener)
+
+    # --- Item Click ---
+
+    def add_item_click_listener(self, listener: Callable):
+        """Add a listener for item click events.
+
+        The listener receives a dict with 'item' key.
+        """
+        first = not self._item_click_listeners
+        self._item_click_listeners.append(listener)
+        if first and self._element:
+            self.element.add_event_listener("item-click", self._handle_item_click, _ITEM_CLICK_HASH)
+
+    def add_item_double_click_listener(self, listener: Callable):
+        """Add a listener for item double-click events.
+
+        The listener receives a dict with 'item' key.
+        """
+        first = not self._item_double_click_listeners
+        self._item_double_click_listeners.append(listener)
+        if first and self._element:
+            self.element.add_event_listener("item-double-click", self._handle_item_double_click, _ITEM_CLICK_HASH)
+
+    def _handle_item_click(self, event_data: dict):
+        """Handle item-click event from grid connector."""
+        item = self._resolve_item_from_event(event_data)
+        if item is not None:
+            for listener in self._item_click_listeners:
+                listener({"item": item})
+
+    def _handle_item_double_click(self, event_data: dict):
+        """Handle item-double-click event from grid connector."""
+        item = self._resolve_item_from_event(event_data)
+        if item is not None:
+            for listener in self._item_double_click_listeners:
+                listener({"item": item})
+
+    def _resolve_item_from_event(self, event_data: dict) -> dict | None:
+        """Resolve item from event data containing itemKey."""
+        key = event_data.get("event.detail.itemKey")
+        if key is not None:
+            return self._key_to_item.get(str(key))
+        return None
 
     def set_sort_order(self, sort_orders: list[GridSortOrder]):
         """Set the sort order programmatically."""
@@ -586,7 +633,13 @@ class Grid(Component):
             if col._renderer:
                 self._setup_renderer(tree, col)
 
-        # 4. Push initial data if available
+        # 4. Register item click event listeners
+        if self._item_click_listeners:
+            self.element.add_event_listener("item-click", self._handle_item_click, _ITEM_CLICK_HASH)
+        if self._item_double_click_listeners:
+            self.element.add_event_listener("item-double-click", self._handle_item_double_click, _ITEM_CLICK_HASH)
+
+        # 5. Push initial data if available
         if self._data_provider_obj:
             dp = self._data_provider_obj
             if dp.is_in_memory:

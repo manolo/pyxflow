@@ -4,10 +4,10 @@ import datetime
 from typing import Callable, Optional
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasValidation, HasRequired
+from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 
 
-class TimePicker(HasValidation, HasRequired, Component):
+class TimePicker(HasReadOnly, HasValidation, HasRequired, Component):
     """A time picker component.
 
     Allows users to select a time from a dropdown overlay.

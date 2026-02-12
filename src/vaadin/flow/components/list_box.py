@@ -3,6 +3,7 @@
 from typing import Callable, Generic, TypeVar, Optional, Set, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.mixins import HasReadOnly
 from vaadin.flow.core.state_node import Feature
 
 if TYPE_CHECKING:
@@ -11,7 +12,7 @@ if TYPE_CHECKING:
 T = TypeVar('T')
 
 
-class ListBox(Component, Generic[T]):
+class ListBox(HasReadOnly, Component, Generic[T]):
     """A single-select list box component.
 
     Items are rendered as ``vaadin-item`` child elements.
@@ -140,7 +141,7 @@ class ListBox(Component, Generic[T]):
                     listener({"value": self._value})
 
 
-class MultiSelectListBox(Component, Generic[T]):
+class MultiSelectListBox(HasReadOnly, Component, Generic[T]):
     """A multi-select list box component.
 
     Items are rendered as ``vaadin-item`` child elements.

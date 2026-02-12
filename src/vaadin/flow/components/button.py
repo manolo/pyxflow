@@ -36,6 +36,7 @@ class Button(Component):
         self._click_listeners: list[Callable] = []
         self._text_node = None
         self._icon_after_text = False
+        self._disable_on_click = False
         if on_click:
             self._click_listeners.append(on_click)
 
@@ -46,6 +47,8 @@ class Button(Component):
             self._create_text_node(tree, self._text)
         if self._icon_component:
             self._attach_icon(tree, self._icon_component)
+        if self._disable_on_click:
+            self.element.set_property("disableOnClick", True)
         # Register click listener
         self.element.add_event_listener("click", self._handle_click)
 
@@ -96,6 +99,21 @@ class Button(Component):
     def add_click_listener(self, listener: Callable):
         """Add a click listener."""
         self._click_listeners.append(listener)
+
+    def set_disable_on_click(self, disable: bool):
+        """Set whether the button disables itself when clicked.
+
+        When enabled, the button is immediately disabled on the client
+        before the click event is sent to the server, preventing
+        double-click issues.
+        """
+        self._disable_on_click = disable
+        if self._element:
+            self.element.set_property("disableOnClick", disable)
+
+    def is_disable_on_click(self) -> bool:
+        """Check if the button disables itself when clicked."""
+        return self._disable_on_click
 
     def _handle_click(self, event_data: dict):
         """Handle click event."""

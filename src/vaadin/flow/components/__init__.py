@@ -52,7 +52,7 @@ from vaadin.flow.components.message_input import MessageInput
 from vaadin.flow.components.message_list import MessageList, MessageListItem
 from vaadin.flow.components.list_box import ListBox, MultiSelectListBox
 from vaadin.flow.components.custom_field import CustomField
-from vaadin.flow.components.mixins import HasValidation, HasRequired
+from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 from vaadin.flow.components.login import LoginForm, LoginOverlay
 from vaadin.flow.components.multi_select_combo_box import MultiSelectComboBox
 from vaadin.flow.components.virtual_list import VirtualList
@@ -150,6 +150,7 @@ __all__ = [
     "ListBox",
     "MultiSelectListBox",
     "CustomField",
+    "HasReadOnly",
     "HasValidation",
     "HasRequired",
     "LoginForm",

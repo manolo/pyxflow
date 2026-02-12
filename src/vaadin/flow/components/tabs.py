@@ -127,6 +127,11 @@ class Tabs(Component):
                         if self._element:
                             self.element.set_property("selected", -1)
 
+    def remove_all(self):
+        """Remove all tabs."""
+        for tab in list(self._tabs):
+            self.remove(tab)
+
     def get_selected_tab(self) -> Tab | None:
         """Get the currently selected tab."""
         if 0 <= self._selected_index < len(self._tabs):

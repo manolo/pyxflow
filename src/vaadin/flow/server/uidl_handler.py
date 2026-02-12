@@ -187,6 +187,12 @@ _LOGIN_CONFIG = {
 }
 _LOGIN_HASH = compute_event_hash(_LOGIN_CONFIG)
 
+# Grid item-click event configuration (gridConnector dispatches CustomEvent with detail.itemKey)
+_ITEM_CLICK_CONFIG = {
+    "event.detail.itemKey": False,
+}
+_ITEM_CLICK_HASH = compute_event_hash(_ITEM_CLICK_CONFIG)
+
 
 # Reverse lookup: hash → config for all known event hashes.
 # Used when a component registers a listener with an explicit hash_key
@@ -209,6 +215,7 @@ _HASH_TO_CONFIG = {
     _VALUE_CHANGED_HASH: _VALUE_CHANGED_CONFIG,
     _SELECTED_ITEMS_CHANGED_HASH: _SELECTED_ITEMS_CHANGED_CONFIG,
     _SPLITTER_DRAGEND_HASH: _SPLITTER_DRAGEND_CONFIG,
+    _ITEM_CLICK_HASH: _ITEM_CLICK_CONFIG,
 }
 
 

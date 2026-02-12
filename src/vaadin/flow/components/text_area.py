@@ -3,10 +3,10 @@
 from typing import Callable
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasValidation, HasRequired
+from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 
 
-class TextArea(HasValidation, HasRequired, Component):
+class TextArea(HasReadOnly, HasValidation, HasRequired, Component):
     """A multi-line text input component."""
 
     _v_fqcn = "com.vaadin.flow.component.textfield.TextArea"

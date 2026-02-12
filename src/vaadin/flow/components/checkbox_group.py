@@ -3,13 +3,13 @@
 from typing import Callable, Generic, TypeVar, Set, Optional
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasValidation, HasRequired
+from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 from vaadin.flow.core.state_node import Feature
 
 T = TypeVar('T')
 
 
-class CheckboxGroup(HasValidation, HasRequired, Component, Generic[T]):
+class CheckboxGroup(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
     """A checkbox group component.
 
     Allows users to select multiple values from a list of options.

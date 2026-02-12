@@ -3,13 +3,13 @@
 from typing import Callable, Optional, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasValidation, HasRequired
+from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
 
 
-class CustomField(HasValidation, HasRequired, Component):
+class CustomField(HasReadOnly, HasValidation, HasRequired, Component):
     """A field wrapper that composes a value from its children.
 
     CustomField allows you to group multiple input fields into a single
@@ -57,6 +57,16 @@ class CustomField(HasValidation, HasRequired, Component):
             if self._element:
                 component._attach(self._element._tree)
                 self.element.node.add_child(component.element.node)
+
+    def remove_all(self):
+        """Remove all child components."""
+        if self._element:
+            for child in self._children:
+                if child._element:
+                    self.element.node.remove_child(child.element.node)
+        for child in self._children:
+            child._parent = None
+        self._children.clear()
 
     def set_label(self, label: str):
         self._label = label

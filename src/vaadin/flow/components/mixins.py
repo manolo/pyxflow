@@ -1,4 +1,28 @@
-"""Field component mixins: HasValidation, HasRequired."""
+"""Field component mixins: HasValidation, HasRequired, HasReadOnly."""
+
+
+class HasReadOnly:
+    """Mixin providing read-only API.
+
+    Sets the 'readonly' property on the web component, making the field
+    non-editable but still focusable and visible (unlike disabled).
+    """
+
+    _read_only: bool = False
+
+    def set_read_only(self, read_only: bool) -> None:
+        """Set whether the field is read-only."""
+        self._read_only = read_only
+        if self._element is not None:
+            self.element.set_property("readonly", read_only)
+        else:
+            if not hasattr(self, "_pending_properties"):
+                self._pending_properties = {}
+            self._pending_properties["readonly"] = read_only
+
+    def is_read_only(self) -> bool:
+        """Get whether the field is read-only."""
+        return self._read_only
 
 
 class HasValidation:

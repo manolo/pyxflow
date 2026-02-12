@@ -302,7 +302,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         section.add(markdown)
 
         # --- Buttons & Actions ---
-        section = self.add_section("Buttons & Actions", "col-span-3")
+        section = self.add_section("Buttons & Actions", "col-span-2")
 
         self.click_button = Button("Clicked: 0")
         self.click_button.add_theme_name("primary")
@@ -329,6 +329,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
 
         button_row = HorizontalLayout()
         button_row.add(self.click_button, dialog_btn, notification_btn, success_btn, error_btn, test_error_btn)
+        button_row.get_style().set("flex-wrap", "wrap")
         section.add(button_row)
 
         # Dialog (hidden initially — overlay, not a visible card)

@@ -3,13 +3,13 @@
 from typing import TYPE_CHECKING, Callable
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasValidation, HasRequired
+from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
 
 
-class TextField(HasValidation, HasRequired, Component):
+class TextField(HasReadOnly, HasValidation, HasRequired, Component):
     """A text field component."""
 
     _v_fqcn = "com.vaadin.flow.component.textfield.TextField"

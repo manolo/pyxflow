@@ -3,10 +3,10 @@
 from typing import Callable
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasValidation, HasRequired
+from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 
 
-class PasswordField(HasValidation, HasRequired, Component):
+class PasswordField(HasReadOnly, HasValidation, HasRequired, Component):
     """A password input field component.
 
     The input is masked by default. The masking can be toggled using

@@ -5,7 +5,7 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~13,400 (core src/), ~33,000 (total with demo + tests)
-**Tests:** 1771 passing
+**Tests:** 1910 passing
 **Last updated:** 2026-02-12
 
 ---
@@ -40,7 +40,7 @@
 - [x] **ContextMenu connector protocol** - `contextMenuConnector.initLazy`, `$connector.generateItems`
 
 ### Components
-- [x] Button - Text, click listener, icon (prefix slot)
+- [x] Button - Text, click listener, icon (prefix slot), `set_disable_on_click`
 - [x] Checkbox - Label, checked, indeterminate, value change
 - [x] IntegerField - Integer input with min/max/step
 - [x] NumberField - Numeric input with min/max/step
@@ -50,11 +50,11 @@
 - [x] Div - Simple `<div>` with text content (extends HtmlContainer)
 - [x] Header - HTML `<header>` container (extends HtmlContainer)
 - [x] Footer - HTML `<footer>` container (extends HtmlContainer)
-- [x] VerticalLayout - Theme, add children, padding/spacing/margin, expand, horizontal component alignment
-- [x] HorizontalLayout - Theme, add children, margin/spacing, expand, vertical component alignment
-- [x] FlexLayout - Pure CSS Flexbox `<div>`: flex-direction, flex-wrap, justify-content, align-items/self/content, flex-grow/shrink/basis, order, expand
+- [x] VerticalLayout - Theme, add/remove/remove_all children, padding/spacing/margin, expand, horizontal component alignment
+- [x] HorizontalLayout - Theme, add/remove/remove_all children, margin/spacing, expand, vertical component alignment
+- [x] FlexLayout - Pure CSS Flexbox `<div>`: flex-direction, flex-wrap, justify-content, align-items/self/content, flex-grow/shrink/basis, order, expand, remove_all
 - [x] SplitLayout - Horizontal/vertical split with primary/secondary slots, splitter position, orientation
-- [x] Dialog - Header title, modal, draggable, resizable, FlowComponentHost renderer, publishedEventHandler close
+- [x] Dialog - Header title, modal, draggable, resizable, FlowComponentHost renderer, publishedEventHandler close, `get_header()`/`get_footer()` sections
 - [x] Notification - Position, duration, theme variants, open/close, static show(), body attachment
 - [x] PasswordField - Password input with reveal button
 - [x] EmailField - Email input with validation
@@ -63,7 +63,7 @@
 - [x] RadioButtonGroup - Radio button selection
 - [x] CheckboxGroup - Multiple checkbox selection
 - [x] FormLayout - Responsive steps, colspan, FormItem (label slot), FormRow, auto-responsive, CSS custom properties
-- [x] Grid - Columns (path, header, width, flexGrow, autoWidth, resizable, sortable, textAlign), in-memory data push, single/multi selection, sorting, lazy loading/DataProvider, column reordering, LitRenderer, ComponentRenderer, header rows (column groups), column footers
+- [x] Grid - Columns (path, header, width, flexGrow, autoWidth, resizable, sortable, textAlign), in-memory data push, single/multi selection, sorting, lazy loading/DataProvider, column reordering, LitRenderer, ComponentRenderer, header rows (column groups), column footers, `add_item_click_listener`, `add_item_double_click_listener`
 - [x] ConfirmDialog - Confirm/cancel/reject actions, header/message/button text, theme, cancelable/rejectable
 - [x] ComboBox - Filtered dropdown, data push protocol, item label generator, custom value support
 - [x] DatePicker - Date selection with calendar overlay, min/max, connector init
@@ -110,6 +110,7 @@
 - [x] `get_style()` - Returns `_BufferedStyle` that works before and after attach (set/get/remove buffered pre-attach, delegates to real `Style` post-attach)
 
 ### Field Mixins
+- [x] `HasReadOnly` mixin - `set_read_only()`, `is_read_only()` on all 16 field components + Checkbox + ListBox + MultiSelectListBox (18 total)
 - [x] `HasValidation` mixin - `set_invalid()`, `is_invalid()`, `set_error_message()`, `get_error_message()` on all 14 field components + CustomField
 - [x] `HasRequired` mixin - `set_required_indicator_visible()`, `is_required_indicator_visible()` on all 14 field components + CustomField + Checkbox
 - [x] Deferred buffering - Values set before attach are buffered in `_pending_properties` and flushed on attach

@@ -64,6 +64,11 @@ class HorizontalLayout(Component):
                 if self._element:
                     self.element.remove_child(component.element)
 
+    def remove_all(self):
+        """Remove all child components."""
+        for child in list(self._children):
+            self.remove(child)
+
     def set_spacing(self, spacing: bool):
         """Enable or disable spacing."""
         self._spacing = spacing

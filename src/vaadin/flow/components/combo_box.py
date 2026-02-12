@@ -3,7 +3,7 @@
 from typing import Callable, Generic, TypeVar, Optional, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasValidation, HasRequired
+from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 from vaadin.flow.core.state_node import Feature
 from vaadin.flow.data.provider import DataProvider, Query
 
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 T = TypeVar('T')
 
 
-class ComboBox(HasValidation, HasRequired, Component, Generic[T]):
+class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
     """A combo box component with filtering support.
 
     Allows users to select a value from a filtered dropdown list.

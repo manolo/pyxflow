@@ -3,10 +3,10 @@
 from typing import Callable, Optional
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasValidation, HasRequired
+from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 
 
-class NumberField(HasValidation, HasRequired, Component):
+class NumberField(HasReadOnly, HasValidation, HasRequired, Component):
     """A number input field component."""
 
     _v_fqcn = "com.vaadin.flow.component.textfield.NumberField"

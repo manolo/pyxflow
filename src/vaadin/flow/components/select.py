@@ -3,13 +3,13 @@
 from typing import Callable, Generic, TypeVar, Optional
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasValidation, HasRequired
+from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 from vaadin.flow.core.state_node import Feature
 
 T = TypeVar('T')
 
 
-class Select(HasValidation, HasRequired, Component, Generic[T]):
+class Select(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
     """A select dropdown component.
 
     Allows users to choose a single value from a list of options

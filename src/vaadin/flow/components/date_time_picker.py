@@ -4,10 +4,10 @@ import datetime
 from typing import Callable, Optional
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasValidation, HasRequired
+from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 
 
-class DateTimePicker(HasValidation, HasRequired, Component):
+class DateTimePicker(HasReadOnly, HasValidation, HasRequired, Component):
     """A date-time picker component.
 
     Combines DatePicker and TimePicker into a single field.

@@ -133,6 +133,16 @@ class Popover(Component):
                 component._attach(self._element._tree)
                 self.element.add_child(component.element)
 
+    def remove_all(self):
+        """Remove all components from the popover."""
+        if self._element:
+            for child in self._children:
+                if child._element:
+                    self.element.remove_child(child.element)
+        for child in self._children:
+            child._parent = None
+        self._children.clear()
+
     def open(self):
         """Open the popover."""
         self._opened = True

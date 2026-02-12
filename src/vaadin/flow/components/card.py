@@ -94,6 +94,16 @@ class Card(Component):
             if self._element:
                 self._attach_child(comp, self._element._tree)
 
+    def remove_all(self):
+        """Remove all components from the default content slot."""
+        if self._element:
+            for child in self._children:
+                if child._element:
+                    self.element.remove_child(child.element)
+        for child in self._children:
+            child._parent = None
+        self._children.clear()
+
     def set_title(self, title: "Component | str"):
         """Set the title (slot='title'). Can be a string or a Component."""
         self._title = title

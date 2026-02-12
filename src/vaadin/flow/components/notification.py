@@ -240,6 +240,18 @@ class Notification(Component):
                 self.element.remove_property("text")
                 self._text = ""
 
+    def remove_all(self):
+        """Remove all components from the notification content."""
+        if self._element:
+            for child in self._children:
+                if child._element:
+                    self.element.node.remove_child(child.element.node)
+        for child in self._children:
+            child._parent = None
+        self._children.clear()
+        if self._element:
+            self._update_virtual_child_node_ids()
+
     # --- Theme Variants ---
 
     def add_theme_variants(self, *variants: NotificationVariant):

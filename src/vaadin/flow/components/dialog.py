@@ -9,6 +9,44 @@ if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
 
 
+class _DialogSection:
+    """Internal container for dialog header or footer slot."""
+
+    def __init__(self, dialog: "Dialog", slot_name: str):
+        self._dialog = dialog
+        self._slot_name = slot_name
+        self._children: list[Component] = []
+
+    def add(self, *components: Component):
+        """Add components to this section."""
+        for component in components:
+            self._children.append(component)
+            if self._dialog._element:
+                self._attach_child(component)
+
+    def _attach_child(self, component: Component):
+        """Attach a single child to the dialog with the correct slot."""
+        tree = self._dialog._element._tree
+        component._ui = self._dialog._ui
+        component._parent = self._dialog
+        component._attach(tree)
+        component.element.set_attribute("slot", self._slot_name)
+        self._dialog.element.node.add_child(component.element.node)
+        self._dialog._update_virtual_child_node_ids()
+
+    def remove_all(self):
+        """Remove all components from this section."""
+        if self._dialog._element:
+            for child in self._children:
+                if child._element:
+                    self._dialog.element.node.remove_child(child.element.node)
+        for child in self._children:
+            child._parent = None
+        self._children.clear()
+        if self._dialog._element:
+            self._dialog._update_virtual_child_node_ids()
+
+
 class Dialog(Component):
     """A dialog overlay component.
 
@@ -35,6 +73,8 @@ class Dialog(Component):
         self._close_on_esc = True
         self._close_on_outside_click = True
         self._children: list[Component] = []
+        self._header_section = _DialogSection(self, "header")
+        self._footer_section = _DialogSection(self, "footer")
         self._open_listeners: list[Callable] = []
         self._close_listeners: list[Callable] = []
 
@@ -62,6 +102,12 @@ class Dialog(Component):
             child._attach(tree)
             self.element.node.add_child(child.element.node)
 
+        # Attach header/footer section children
+        for child in self._header_section._children:
+            self._header_section._attach_child(child)
+        for child in self._footer_section._children:
+            self._footer_section._attach_child(child)
+
         # Update virtualChildNodeIds property
         self._update_virtual_child_node_ids()
 
@@ -83,6 +129,12 @@ class Dialog(Component):
         if not self._element:
             return
         child_ids = [child.element.node_id for child in self._children if child._element]
+        for child in self._header_section._children:
+            if child._element:
+                child_ids.append(child.element.node_id)
+        for child in self._footer_section._children:
+            if child._element:
+                child_ids.append(child.element.node_id)
         self.element.set_property("virtualChildNodeIds", child_ids)
 
     def add(self, *components: Component):
@@ -93,6 +145,18 @@ class Dialog(Component):
                 component._attach(self._element._tree)
                 self.element.node.add_child(component.element.node)
                 self._update_virtual_child_node_ids()
+
+    def remove_all(self):
+        """Remove all components from the dialog content."""
+        if self._element:
+            for child in self._children:
+                if child._element:
+                    self.element.node.remove_child(child.element.node)
+        for child in self._children:
+            child._parent = None
+        self._children.clear()
+        if self._element:
+            self._update_virtual_child_node_ids()
 
     def open(self):
         """Open the dialog."""
@@ -150,6 +214,14 @@ class Dialog(Component):
     def is_resizable(self) -> bool:
         """Check if the dialog is resizable."""
         return self._resizable
+
+    def get_header(self) -> _DialogSection:
+        """Get the header section for adding components to the dialog header."""
+        return self._header_section
+
+    def get_footer(self) -> _DialogSection:
+        """Get the footer section for adding components to the dialog footer."""
+        return self._footer_section
 
     def set_header_title(self, title: str):
         """Set the dialog header title."""

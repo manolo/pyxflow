@@ -3,10 +3,10 @@
 from typing import Callable
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasValidation, HasRequired
+from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 
 
-class EmailField(HasValidation, HasRequired, Component):
+class EmailField(HasReadOnly, HasValidation, HasRequired, Component):
     """An email input field component.
 
     Email Field is an extension of Text Field that accepts only email
