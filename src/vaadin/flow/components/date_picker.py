@@ -33,7 +33,8 @@ class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):
         if self._placeholder:
             self.element.set_property("placeholder", self._placeholder)
         if self._value is not None:
-            self.element.set_property("value", self._value.isoformat())
+            val_str = self._value.isoformat() if isinstance(self._value, datetime.date) else str(self._value)
+            self.element.set_property("value", val_str)
         else:
             self.element.set_property("value", "")
         if self._min is not None:
@@ -55,10 +56,22 @@ class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):
         return self._value
 
     @value.setter
-    def value(self, val: Optional[datetime.date]):
-        self._value = val
+    def value(self, val):
+        if isinstance(val, str):
+            if val:
+                try:
+                    self._value = datetime.date.fromisoformat(val)
+                except ValueError:
+                    self._value = None
+            else:
+                self._value = None
+        else:
+            self._value = val
         if self._element:
-            self.element.set_property("value", val.isoformat() if val else "")
+            self.element.set_property(
+                "value",
+                self._value.isoformat() if self._value else "",
+            )
 
     def get_value(self) -> Optional[datetime.date]:
         return self._value
