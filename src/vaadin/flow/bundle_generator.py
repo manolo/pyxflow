@@ -2,8 +2,14 @@
 
 Usage (via CLI)::
 
-    vaadin --bundle                    # build + extract into src/vaadin/flow/bundle/
+    # PyFlow developer (from vaadin-pyflow/ checkout)
+    vaadin --bundle                          # → src/vaadin/flow/bundle/
+    vaadin --bundle --keep                   # keep bundle-project/ for debugging
     vaadin --bundle --vaadin-version 25.0.4  # pin Vaadin version
+
+    # User project
+    vaadin my_app --bundle                   # → my_app/bundle/
+    vaadin my_app --bundle --keep            # keep my_app/bundle-project/
 """
 
 import os
@@ -218,13 +224,14 @@ def _find_mvn(project_dir: Path) -> list[str]:
     sys.exit(1)
 
 
-def build_and_extract(project_dir: Path, bundle_dir: Path) -> None:
+def build_and_extract(project_dir: Path, bundle_dir: Path, *, clean: bool = True) -> None:
     """Run Maven build and extract bundle from WAR into bundle_dir."""
     # Build
     mvn_cmd = _find_mvn(project_dir)
+    goals = ["clean", "package"] if clean else ["package"]
     print(f"  Building Maven project (production mode) with {mvn_cmd[0]}...")
     result = subprocess.run(
-        [*mvn_cmd, "clean", "package", "-DskipTests", "-Pproduction"],
+        [*mvn_cmd, *goals, "-DskipTests", "-Pproduction"],
         cwd=project_dir,
         capture_output=True,
         text=True,
@@ -303,23 +310,31 @@ def _extract_theme_jar(lib_dir: Path, prefix: str, theme_name: str, bundle_dir: 
     print(f"  {theme_name.capitalize()} CSS extracted to: {theme_dir}")
 
 
-def generate_and_build() -> None:
-    """CLI entry point: generate project, build, extract bundle."""
-    # Parse optional --vaadin-version
-    vaadin_version = _DEFAULT_VAADIN_VERSION
-    args = sys.argv[2:]  # skip "vaadin" and "--bundle"
-    if "--vaadin-version" in args:
-        idx = args.index("--vaadin-version")
-        vaadin_version = args[idx + 1]
+def generate_and_build(
+    app_dir: Path | None = None,
+    keep: bool = False,
+    vaadin_version: str = _DEFAULT_VAADIN_VERSION,
+) -> None:
+    """CLI entry point: generate project, build, extract bundle.
 
-    # All paths relative to cwd — must run from vaadin-pyflow/ checkout
-    project_dir = Path.cwd() / "build" / "bundle"
-    bundle_dir = Path.cwd() / "src" / "vaadin" / "flow" / "bundle"
+    Args:
+        app_dir: App package directory (e.g. ``my_app/``).  When *None*,
+                 auto-detects pyflow dev tree.
+        keep: If *True*, keep ``bundle-project/`` after extraction.
+        vaadin_version: Vaadin platform version for the pom.xml.
+    """
+    is_pyflow_dev = (Path.cwd() / "src" / "vaadin" / "flow").is_dir()
 
-    if not (Path.cwd() / "src" / "vaadin" / "flow").is_dir():
-        print("ERROR: Must run from the vaadin-pyflow/ project directory.")
-        print(f"  Current directory: {Path.cwd()}")
-        print("  Expected: a checkout containing src/vaadin/flow/")
+    if is_pyflow_dev:
+        project_dir = Path.cwd() / "bundle-project"
+        bundle_dir = Path.cwd() / "src" / "vaadin" / "flow" / "bundle"
+    elif app_dir:
+        project_dir = app_dir / "bundle-project"
+        bundle_dir = app_dir / "bundle"
+    else:
+        print("ERROR: Cannot determine bundle output directory.")
+        print("  Run from a pyflow source tree (src/vaadin/flow/ exists)")
+        print("  or specify an app module: vaadin <app_module> --bundle")
         sys.exit(1)
 
     print("===================================================")
@@ -330,9 +345,22 @@ def generate_and_build() -> None:
     print(f"  Bundle output:  {bundle_dir}")
     print()
 
-    generate_project(project_dir, vaadin_version)
-    print()
-    build_and_extract(project_dir, bundle_dir)
+    if project_dir.exists():
+        # Reuse existing Maven project — only update FakeView.java
+        print("  Reusing existing Maven project in bundle-project/")
+        registry = discover_java_components()
+        java_dir = project_dir / "src" / "main" / "java" / "com" / "vaadin" / "pyflow"
+        (java_dir / "FakeView.java").write_text(generate_fake_view(registry))
+        print()
+        build_and_extract(project_dir, bundle_dir, clean=False)
+    else:
+        generate_project(project_dir, vaadin_version)
+        print()
+        build_and_extract(project_dir, bundle_dir, clean=True)
+
+    if not keep:
+        shutil.rmtree(project_dir)
+        print(f"  Cleaned up {project_dir}")
 
     print()
     print("===================================================")
