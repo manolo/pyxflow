@@ -105,7 +105,7 @@ class MasterDetailView(Div):
         self.last_name = TextField("Last Name")
         self.email = TextField("Email")
         self.phone = TextField("Phone")
-        self.date_of_birth = TextField("Date Of Birth")
+        self.date_of_birth = DatePicker("Date Of Birth")
         self.occupation = TextField("Occupation")
         self.role = TextField("Role")
         self.important = Checkbox("Important")
