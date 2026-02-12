@@ -215,11 +215,11 @@ _HASH_TO_CONFIG = {
 class UidlHandler:
     """Handles UIDL protocol messages."""
 
-    def __init__(self, tree: "StateTree"):
+    def __init__(self, tree: "StateTree", csrf_token: str | None = None):
         self._tree = tree
         self._sync_id = 0
         self._client_id = 0
-        self._csrf_token = secrets.token_hex(16)
+        self._csrf_token = csrf_token or secrets.token_hex(16)
         self._app_id = f"ROOT-{random.randint(1000000, 9999999)}"
         self._client_key = self._app_id.split("-")[0]  # "ROOT" — client registry key
         self._initialized = False
@@ -239,7 +239,7 @@ class UidlHandler:
         self._last_processed_client_id = -1  # Last successfully processed clientId
         self._last_response: dict | None = None  # Cached for duplicate detection
 
-    def handle_init(self, browser_details: dict, initial_route: str = "") -> dict:
+    def handle_init(self, browser_details: dict, initial_route: str = "", ui_id: int = 0) -> dict:
         """Handle init request.
 
         Returns appConfig with initial UIDL.
@@ -248,6 +248,7 @@ class UidlHandler:
         Args:
             browser_details: Browser details from client
             initial_route: The route from the request path (e.g., "about" for /about)
+            ui_id: The UI ID for this browser tab (0, 1, 2, ...)
         """
         # Reset state for fresh UI (handles page reload)
         self._tree.reset()
@@ -308,7 +309,7 @@ class UidlHandler:
         response = {
             "appConfig": {
                 "productionMode": True,
-                "v-uiId": 0,
+                "v-uiId": ui_id,
                 "appId": self._app_id,
                 "contextRootUrl": "./",
                 "heartbeatInterval": 300,

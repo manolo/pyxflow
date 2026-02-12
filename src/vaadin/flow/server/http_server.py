@@ -45,28 +45,25 @@ def register_upload_handler(session_id: str, handler: Callable) -> str:
 
 
 def get_or_create_session(request: web.Request) -> tuple[str, dict[str, Any]]:
-    """Get existing session or create new one."""
+    """Get existing session or create new one.
+
+    The session shell contains shared state (csrf_token, last_activity)
+    and a ``uis`` dict keyed by ui_id.  Each browser tab gets its own
+    UI entry created in ``handle_init()``.
+    """
     session_id = request.cookies.get("JSESSIONID")
 
     if session_id and session_id in _sessions:
         _sessions[session_id]["last_activity"] = time.monotonic()
         return session_id, _sessions[session_id]
 
-    # Create new session
+    # Create new session shell (no tree/handler yet — created per UI in handle_init)
     session_id = str(uuid.uuid4())
-    tree = StateTree()
-    handler = UidlHandler(tree)
-
-    # Use the handler's CSRF token for the session
     session = {
-        "csrf_token": handler._csrf_token,
-        "tree": tree,
-        "handler": handler,
-        "initialized": False,
+        "csrf_token": secrets.token_hex(16),
         "last_activity": time.monotonic(),
-        "push_ws": None,
-        "push_sender_task": None,
-        "pending_push": None,
+        "next_ui_id": 0,
+        "uis": {},
     }
     _sessions[session_id] = session
     return session_id, session
@@ -84,7 +81,11 @@ async def handle_root(request: web.Request) -> web.Response:
 
 
 async def handle_init(request: web.Request) -> web.Response:
-    """Handle GET /?v-r=init - return appConfig."""
+    """Handle GET /?v-r=init - return appConfig.
+
+    Each init call allocates a new UI (tree + handler) within the session,
+    allowing multiple browser tabs to coexist independently.
+    """
     session_id, session = get_or_create_session(request)
 
     # Parse browser details (optional)
@@ -95,13 +96,24 @@ async def handle_init(request: web.Request) -> web.Response:
         except json.JSONDecodeError:
             pass
 
-    # Get init response from handler
-    # Pass the request path so the handler knows the initial route
-    handler: UidlHandler = session["handler"]
-    initial_route = request.path.strip("/")  # "/about" -> "about", "/" -> ""
-    response_data = handler.handle_init(browser_details, initial_route=initial_route)
+    # Allocate a new UI for this tab
+    ui_id = session["next_ui_id"]
+    session["next_ui_id"] = ui_id + 1
 
-    session["initialized"] = True
+    tree = StateTree()
+    handler = UidlHandler(tree, csrf_token=session["csrf_token"])
+
+    session["uis"][ui_id] = {
+        "tree": tree,
+        "handler": handler,
+        "push_ws": None,
+        "push_sender_task": None,
+        "pending_push": None,
+    }
+
+    # Pass the request path so the handler knows the initial route
+    initial_route = request.path.strip("/")  # "/about" -> "about", "/" -> ""
+    response_data = handler.handle_init(browser_details, initial_route=initial_route, ui_id=ui_id)
 
     # Set session cookie
     response = web.json_response(response_data)
@@ -109,21 +121,28 @@ async def handle_init(request: web.Request) -> web.Response:
     return response
 
 
+def _session_expired_response() -> web.Response:
+    """Return session-expired JSON (HTTP 200) so FlowClient reloads the page."""
+    return web.Response(
+        text='for(;;);[{"meta":{"sessionExpired":true}}]',
+        content_type="application/json"
+    )
+
+
 async def handle_uidl(request: web.Request) -> web.Response:
     """Handle POST /?v-r=uidl - process UIDL request."""
     session_id = request.cookies.get("JSESSIONID")
 
     if not session_id or session_id not in _sessions:
-        # Return session-expired JSON (HTTP 200) so FlowClient reloads the page.
-        # Java Flow does the same — the client checks meta.sessionExpired, calls
-        # handleSessionExpiredError(null), and since sessExpMsg has all-null fields
-        # it triggers window.location.reload().
-        return web.Response(
-            text='for(;;);[{"meta":{"sessionExpired":true}}]',
-            content_type="application/json"
-        )
+        return _session_expired_response()
 
     session = _sessions[session_id]
+
+    # Route to the correct UI by v-uiId
+    ui_id = int(request.query.get("v-uiId", "0"))
+    ui_state = session["uis"].get(ui_id)
+    if ui_state is None:
+        return _session_expired_response()
 
     try:
         payload = await request.json()
@@ -142,7 +161,7 @@ async def handle_uidl(request: web.Request) -> web.Response:
 
     # Process UIDL
     log.debug("RPC: %s", payload.get("rpc", []))
-    handler: UidlHandler = session["handler"]
+    handler: UidlHandler = ui_state["handler"]
     response_data = handler.handle_uidl(payload)
 
     # Wrap response with XSS protection prefix
@@ -207,21 +226,31 @@ async def handle_upload(request: web.Request) -> web.Response:
 
 
 async def handle_push(request: web.Request) -> web.Response:
-    """Handle WebSocket push connection (Atmosphere protocol)."""
+    """Handle WebSocket push connection (Atmosphere protocol).
+
+    Each browser tab has its own push WebSocket, keyed by v-uiId.
+    """
     session_id = request.cookies.get("JSESSIONID")
     if not session_id or session_id not in _sessions:
         return web.Response(status=403)
 
     session = _sessions[session_id]
-    handler: UidlHandler = session["handler"]
+
+    # Route to the correct UI by v-uiId
+    ui_id = int(request.query.get("v-uiId", "0"))
+    ui_state = session["uis"].get(ui_id)
+    if ui_state is None:
+        return web.Response(status=403)
+
+    handler: UidlHandler = ui_state["handler"]
 
     # Validate push ID
     push_id = request.query.get("v-pushId", "")
     if push_id != getattr(handler, "_push_id", None):
         return web.Response(status=403)
 
-    # Cancel existing push sender if reconnecting
-    old_task = session.get("push_sender_task")
+    # Cancel existing push sender for this UI if reconnecting
+    old_task = ui_state.get("push_sender_task")
     if old_task and not old_task.done():
         old_task.cancel()
         try:
@@ -238,14 +267,12 @@ async def handle_push(request: web.Request) -> web.Response:
     handshake_data = f"{atmo_uuid}|30000|X"
     await ws.send_str(f"{len(handshake_data)}|{handshake_data}")
 
-    session["push_ws"] = ws
+    ui_state["push_ws"] = ws
     session["last_activity"] = time.monotonic()
 
-    tree: StateTree = session["tree"]
-
     # Start push sender task
-    sender_task = asyncio.create_task(_push_sender(ws, session))
-    session["push_sender_task"] = sender_task
+    sender_task = asyncio.create_task(_push_sender(ws, ui_state))
+    ui_state["push_sender_task"] = sender_task
 
     try:
         async for msg in ws:
@@ -262,24 +289,24 @@ async def handle_push(request: web.Request) -> web.Response:
             await sender_task
         except asyncio.CancelledError:
             pass
-        session["push_ws"] = None
-        session["push_sender_task"] = None
+        ui_state["push_ws"] = None
+        ui_state["push_sender_task"] = None
 
     return ws
 
 
-async def _push_sender(ws: web.WebSocketResponse, session: dict):
+async def _push_sender(ws: web.WebSocketResponse, ui_state: dict):
     """Coroutine that waits for push signals and sends UIDL over WebSocket."""
-    tree: StateTree = session["tree"]
-    handler: UidlHandler = session["handler"]
+    tree: StateTree = ui_state["tree"]
+    handler: UidlHandler = ui_state["handler"]
 
     # Replay any buffered message from a previous failed connection
-    pending = session.pop("pending_push", None)
+    pending = ui_state.pop("pending_push", None)
     if pending:
         try:
             await ws.send_str(pending)
         except (ConnectionResetError, ConnectionError):
-            session["pending_push"] = pending
+            ui_state["pending_push"] = pending
             return
 
     while not ws.closed:
@@ -313,7 +340,7 @@ async def _push_sender(ws: web.WebSocketResponse, session: dict):
         try:
             await ws.send_str(prefixed)
         except (ConnectionResetError, ConnectionError):
-            session["pending_push"] = prefixed
+            ui_state["pending_push"] = prefixed
             break
         except Exception:
             log.exception("Error in push sender")

@@ -1,11 +1,11 @@
 # PyFlow Implementation Status
 
-## Current State: All 49 Components + WebSocket Push + Full UIDL Compatibility
+## Current State: All 49 Components + WebSocket Push + Multi-UI Sessions + Full UIDL Compatibility
 
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~13,400 (core src/), ~33,000 (total with demo + tests)
-**Tests:** 1667 passing
+**Tests:** 1676 passing
 **Last updated:** 2026-02-12
 
 ---
@@ -126,6 +126,7 @@
 - [x] HTTP Server (aiohttp) - Sessions, static files
 - [x] UIDL Handler - Init, navigation, events, mSync
 - [x] Page reload support - State reset on init
+- [x] Multiple UIs per session - Each browser tab gets independent StateTree/UidlHandler keyed by `v-uiId`, shared CSRF token per session
 - [x] Serves index.html from bundle (Vaadin-generated)
 - [x] Lumo/Aura theme CSS - Extracted from JARs, served at `/lumo/*` and `/aura/*`, loaded via `@StyleSheet` on layout
 - [x] `@StyleSheet` decorator - Load custom CSS via UIDL EAGER dependencies, served from app's `styles/` directory
@@ -142,6 +143,7 @@
 - [x] SyncId validation (out-of-sync detection)
 - [x] Resynchronize flag support
 - [x] Return channels — used by Grid and VirtualList ComponentRenderer
+- [x] Multi-UI session routing — `v-uiId` query param routes UIDL/push to correct UI; invalid UI returns session-expired
 
 ### Theme
 - [x] Lumo/Aura theme support — `@StyleSheet("lumo/lumo.css")` or `@StyleSheet("aura/aura.css")` on layout

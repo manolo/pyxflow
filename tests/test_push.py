@@ -41,7 +41,13 @@ class PushTestBase(AioHTTPTestCase):
         uidl = data["appConfig"]["uidl"]
         push_id = uidl["Vaadin-Push-ID"]
         csrf = uidl["Vaadin-Security-Key"]
-        return push_id, csrf
+        ui_id = data["appConfig"]["v-uiId"]
+        return push_id, csrf, ui_id
+
+    def _get_ui_state(self, ui_id=0):
+        """Get the UI state dict for the given ui_id from the first session."""
+        session = list(_sessions.values())[0]
+        return session["uis"][ui_id]
 
 
 class TestPushAuth(PushTestBase):
@@ -64,7 +70,7 @@ class TestPushHandshake(PushTestBase):
 
     async def test_push_handshake_format(self):
         """First WS message is Atmosphere handshake: <len>|<UUID>|30000|X."""
-        push_id, _ = await self._init_session()
+        push_id, _, _ = await self._init_session()
         ws = await self.client.ws_connect(f"/VAADIN/push?v-pushId={push_id}")
 
         msg = await ws.receive(timeout=2)
@@ -88,7 +94,7 @@ class TestPushHandshake(PushTestBase):
 
     async def test_push_heartbeat_accepted(self):
         """Sending 'X' heartbeat does not cause errors."""
-        push_id, _ = await self._init_session()
+        push_id, _, _ = await self._init_session()
         ws = await self.client.ws_connect(f"/VAADIN/push?v-pushId={push_id}")
         await ws.receive(timeout=2)  # consume handshake
 
@@ -102,7 +108,7 @@ class TestPushHandshake(PushTestBase):
 
     async def test_push_reconnect_new_handshake(self):
         """Reconnecting gives a new UUID in the handshake."""
-        push_id, _ = await self._init_session()
+        push_id, _, _ = await self._init_session()
 
         # First connection
         ws1 = await self.client.ws_connect(f"/VAADIN/push?v-pushId={push_id}")
@@ -127,13 +133,13 @@ class TestPushMessages(PushTestBase):
 
     async def test_push_receives_changes(self):
         """Changes pushed via tree arrive on WS with meta.async."""
-        push_id, _ = await self._init_session()
+        push_id, _, _ = await self._init_session()
         ws = await self.client.ws_connect(f"/VAADIN/push?v-pushId={push_id}")
         await ws.receive(timeout=2)  # consume handshake
 
         # Inject a change and signal push
-        session = list(_sessions.values())[0]
-        tree = session["tree"]
+        ui_state = self._get_ui_state()
+        tree = ui_state["tree"]
         tree.add_change({"node": 10, "type": "put", "key": "text", "feat": 7, "value": "hello"})
         tree.notify_push()
 
@@ -158,12 +164,12 @@ class TestPushMessages(PushTestBase):
 
     async def test_push_message_atmosphere_format(self):
         """Push message matches <len>|for(;;);[{...}] format."""
-        push_id, _ = await self._init_session()
+        push_id, _, _ = await self._init_session()
         ws = await self.client.ws_connect(f"/VAADIN/push?v-pushId={push_id}")
         await ws.receive(timeout=2)  # consume handshake
 
-        session = list(_sessions.values())[0]
-        tree = session["tree"]
+        ui_state = self._get_ui_state()
+        tree = ui_state["tree"]
         tree.add_change({"node": 5, "type": "put", "key": "label", "feat": 1, "value": "test"})
         tree.notify_push()
 
@@ -183,12 +189,12 @@ class TestPushMessages(PushTestBase):
 
     async def test_push_no_message_without_changes(self):
         """Signalling push without changes does not send a message."""
-        push_id, _ = await self._init_session()
+        push_id, _, _ = await self._init_session()
         ws = await self.client.ws_connect(f"/VAADIN/push?v-pushId={push_id}")
         await ws.receive(timeout=2)  # consume handshake
 
-        session = list(_sessions.values())[0]
-        tree = session["tree"]
+        ui_state = self._get_ui_state()
+        tree = ui_state["tree"]
         # Signal push without adding changes
         tree.notify_push()
 
@@ -208,9 +214,9 @@ class TestPushReconnect(PushTestBase):
 
     async def test_push_reconnect_delivers_pending(self):
         """Buffered message from failed send is delivered on reconnect."""
-        push_id, _ = await self._init_session()
-        session = list(_sessions.values())[0]
-        tree = session["tree"]
+        push_id, _, _ = await self._init_session()
+        ui_state = self._get_ui_state()
+        tree = ui_state["tree"]
 
         # Connect first WS
         ws1 = await self.client.ws_connect(f"/VAADIN/push?v-pushId={push_id}")
@@ -227,12 +233,12 @@ class TestPushReconnect(PushTestBase):
 
         # Now add a change and set it as pending_push (simulating failed send)
         tree.add_change({"node": 99, "type": "put", "key": "text", "feat": 7, "value": "reconnected"})
-        handler = session["handler"]
+        handler = ui_state["handler"]
         response_data = handler._build_response()
         response_data["meta"] = {"async": True}
         message = f"for(;;);[{json.dumps(response_data)}]"
         prefixed = f"{len(message)}|{message}"
-        session["pending_push"] = prefixed
+        ui_state["pending_push"] = prefixed
 
         # Reconnect
         ws2 = await self.client.ws_connect(f"/VAADIN/push?v-pushId={push_id}")
