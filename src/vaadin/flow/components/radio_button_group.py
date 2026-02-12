@@ -83,9 +83,13 @@ class RadioButtonGroup(HasValidation, HasRequired, Component, Generic[T]):
 
     def set_value(self, value: Optional[T]):
         """Set the selected value."""
+        old_value = self._value
         self._value = value
         if self._element and value is not None:
             self.element.set_property("value", self._get_item_label(value))
+        if value != old_value:
+            for listener in self._change_listeners:
+                listener({"value": value, "from_client": False})
 
     def set_label(self, label: str):
         """Set the label."""

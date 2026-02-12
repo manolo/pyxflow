@@ -64,7 +64,11 @@ class DatePicker(HasValidation, HasRequired, Component):
         return self._value
 
     def set_value(self, value: Optional[datetime.date]):
+        old_value = self._value
         self.value = value
+        if value != old_value:
+            for listener in self._change_listeners:
+                listener({"value": value, "from_client": False})
 
     def set_label(self, label: str):
         self._label = label

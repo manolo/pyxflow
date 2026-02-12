@@ -134,14 +134,10 @@ class ComponentsDemoView(VerticalLayout):
         section = self.add_section("ListBox")
         list_box = ListBox()
         list_box.set_items("Lumo Light", "Lumo Dark", "Aura Light", "Aura Dark")
-        list_box.set_value("Lumo Light")
-        def _on_theme_selected(e):
-            value = e['value']
-            if not value:
-                return
-            parts = value.lower().split()
-            self._ui.set_theme(parts[0], parts[1])
-        list_box.add_value_change_listener(_on_theme_selected)
+        list_box.set_value("Lumo Dark")
+        list_box.add_value_change_listener(
+            lambda e: (ui := self.get_ui()) and e.get('value') and ui.set_theme(*e['value'].lower().split())
+        )
         section.add(Span("Select Theme"))
         section.add(list_box)
 

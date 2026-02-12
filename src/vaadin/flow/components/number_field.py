@@ -62,7 +62,11 @@ class NumberField(HasValidation, HasRequired, Component):
 
     def set_value(self, value: Optional[float]):
         """Set the value."""
+        old_value = self._value
         self.value = value
+        if value != old_value:
+            for listener in self._change_listeners:
+                listener({"value": value, "from_client": False})
 
     def get_label(self) -> str:
         """Get the label."""
@@ -188,7 +192,11 @@ class IntegerField(NumberField):
 
     def set_value(self, value: Optional[int]):  # type: ignore[override]
         """Set the value."""
+        old_value = self._int_value
         self.value = value
+        if value != old_value:
+            for listener in self._change_listeners:
+                listener({"value": value, "from_client": False})
 
     def _handle_change(self, event_data: dict):
         """Handle change event."""

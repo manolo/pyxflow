@@ -185,9 +185,13 @@ class MultiSelectComboBox(HasValidation, HasRequired, Component, Generic[T]):
         return self._value.copy()
 
     def set_value(self, value: Set[T]):
+        old_value = self._value.copy()
         self._value = set(value)
         if self._element:
             self._push_selected_items()
+        if self._value != old_value:
+            for listener in self._change_listeners:
+                listener({"value": self._value, "from_client": False})
 
     def select(self, *items: T):
         """Add items to the selection."""

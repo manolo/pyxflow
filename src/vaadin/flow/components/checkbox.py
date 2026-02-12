@@ -44,11 +44,15 @@ class Checkbox(HasRequired, Component):
 
     def set_checked(self, checked: bool):
         """Set the checked state."""
+        old_checked = self._checked
         self._checked = checked
         self._indeterminate = False  # Setting checked clears indeterminate
         if self._element:
             self.element.set_property("checked", checked)
             self.element.set_property("indeterminate", False)
+        if checked != old_checked:
+            for listener in self._change_listeners:
+                listener({"value": checked, "from_client": False})
 
     def get_value(self) -> bool:
         """Get the checked state."""

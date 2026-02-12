@@ -78,9 +78,13 @@ class CustomField(HasValidation, HasRequired, Component):
         return self._value
 
     def set_value(self, value: str):
+        old_value = self._value
         self._value = value
         if self._element:
             self.element.set_property("value", value)
+        if value != old_value:
+            for listener in self._change_listeners:
+                listener({"value": value, "from_client": False})
 
     def add_value_change_listener(self, listener: Callable):
         self._change_listeners.append(listener)

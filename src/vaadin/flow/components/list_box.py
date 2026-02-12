@@ -94,6 +94,7 @@ class ListBox(Component, Generic[T]):
         return self._value
 
     def set_value(self, value: Optional[T]):
+        old_value = self._value
         self._value = value
         if self._element:
             if value is not None:
@@ -102,6 +103,9 @@ class ListBox(Component, Generic[T]):
                     self.element.set_property("selected", idx)
             else:
                 self.element.set_property("selected", -1)
+        if value != old_value:
+            for listener in self._change_listeners:
+                listener({"value": value, "from_client": False})
 
     def set_item_label_generator(self, generator: Callable[[T], str]):
         self._item_label_generator = generator
@@ -215,6 +219,7 @@ class MultiSelectListBox(Component, Generic[T]):
         return self._value.copy()
 
     def set_value(self, value: Set[T]):
+        old_value = self._value.copy()
         self._value = set(value)
         if self._element:
             indices = []
@@ -224,6 +229,9 @@ class MultiSelectListBox(Component, Generic[T]):
                         indices.append(i)
                         break
             self.element.set_property("selectedValues", indices)
+        if self._value != old_value:
+            for listener in self._change_listeners:
+                listener({"value": self._value, "from_client": False})
 
     def set_item_label_generator(self, generator: Callable[[T], str]):
         self._item_label_generator = generator

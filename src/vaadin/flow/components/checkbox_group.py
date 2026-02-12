@@ -83,11 +83,15 @@ class CheckboxGroup(HasValidation, HasRequired, Component, Generic[T]):
 
     def set_value(self, value: Set[T]):
         """Set the selected values."""
+        old_value = self._value.copy()
         self._value = set(value)
         if self._element:
             # Set the value property as a list of labels
             labels = [self._get_item_label(item) for item in self._value]
             self.element.set_property("value", labels)
+        if self._value != old_value:
+            for listener in self._change_listeners:
+                listener({"value": self._value, "from_client": False})
 
     def set_label(self, label: str):
         """Set the label."""

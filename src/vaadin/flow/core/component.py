@@ -564,6 +564,8 @@ class UI:
         Lumo dark uses ``theme="dark"`` attribute on ``<html>``.
         Aura dark uses the native ``color-scheme: dark`` CSS property.
         """
+        if not theme:
+            return
         new_href = self._THEME_CSS[theme]
         other_href = self._THEME_CSS["aura" if theme == "lumo" else "lumo"]
         is_dark = "1" if variant == "dark" else ""

@@ -46,7 +46,11 @@ class TextArea(HasValidation, HasRequired, Component):
 
     def set_value(self, value: str):
         """Set the value."""
+        old_value = self._value
         self.value = value
+        if value != old_value:
+            for listener in self._change_listeners:
+                listener({"value": value, "from_client": False})
 
     def get_label(self) -> str:
         """Get the label."""

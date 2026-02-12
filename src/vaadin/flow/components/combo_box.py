@@ -191,6 +191,7 @@ class ComboBox(HasValidation, HasRequired, Component, Generic[T]):
         return self._value
 
     def set_value(self, value: Optional[T]):
+        old_value = self._value
         self._value = value
         if self._element:
             if value is not None:
@@ -201,6 +202,9 @@ class ComboBox(HasValidation, HasRequired, Component, Generic[T]):
             else:
                 self.element.set_property("selectedItem", None)
                 self.element.set_property("value", "")
+        if value != old_value:
+            for listener in self._change_listeners:
+                listener({"value": value, "from_client": False})
 
     def set_label(self, label: str):
         self._label = label
