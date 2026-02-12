@@ -106,6 +106,12 @@ class TestGenerateFakeView:
         java = generate_fake_view(registry)
         assert "import com.vaadin.flow.component.button.Button;" in java
 
+    def test_has_push_annotation(self):
+        registry = {}
+        java = generate_fake_view(registry)
+        assert "@Push" in java
+        assert "import com.vaadin.flow.component.page.Push;" in java
+
     def test_has_jsmodule_annotation(self):
         registry = {"Button": "com.vaadin.flow.component.button.Button"}
         java = generate_fake_view(registry)

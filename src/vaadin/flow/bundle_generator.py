@@ -119,6 +119,7 @@ def generate_fake_view(registry: dict[str, str]) -> str:
         "import com.vaadin.flow.component.html.Div;",
         "import com.vaadin.flow.component.dependency.JsModule;",
         "import com.vaadin.flow.component.dependency.Uses;",
+        "import com.vaadin.flow.component.page.Push;",
         "import com.vaadin.flow.router.Route;",
     ]
     uses: list[str] = []
@@ -136,6 +137,7 @@ package com.vaadin.pyflow;
 
 {imports_str}
 
+@Push
 @Route("")
 @JsModule("./pyflow-bundle.js")
 {uses_str}
@@ -274,7 +276,7 @@ def build_and_extract(project_dir: Path, bundle_dir: Path, *, clean: bool = True
     exploded_lib = project_dir / "target" / "bundle-generator-1.0-SNAPSHOT" / "WEB-INF" / "lib"
     _extract_theme_jar(exploded_lib, "vaadin-lumo-theme-", "lumo", bundle_dir)
     _extract_theme_jar(exploded_lib, "vaadin-aura-theme-", "aura", bundle_dir)
-    _extract_push_scripts(exploded_lib, bundle_dir)
+    _extract_jar_resources(exploded_lib, "flow-push-", bundle_dir, "Push scripts")
 
     # Report
     js_size = sum(f.stat().st_size for f in bundle_dir.rglob("*.js"))
@@ -311,30 +313,26 @@ def _extract_theme_jar(lib_dir: Path, prefix: str, theme_name: str, bundle_dir: 
     print(f"  {theme_name.capitalize()} CSS extracted to: {theme_dir}")
 
 
-def _extract_push_scripts(lib_dir: Path, bundle_dir: Path) -> None:
-    """Extract vaadinPush.js from flow-push JAR in WEB-INF/lib/."""
+def _extract_jar_resources(lib_dir: Path, jar_prefix: str, bundle_dir: Path, label: str) -> None:
+    """Extract META-INF/resources/* from a JAR in WEB-INF/lib/ into bundle_dir."""
     if not lib_dir.exists():
-        print("  WARNING: WEB-INF/lib not found, skipping push scripts")
         return
 
-    jar_files = [f for f in lib_dir.iterdir() if f.name.startswith("flow-push-") and f.suffix == ".jar"]
+    jar_files = [f for f in lib_dir.iterdir() if f.name.startswith(jar_prefix) and f.suffix == ".jar"]
     if not jar_files:
-        print("  WARNING: flow-push JAR not found in WEB-INF/lib")
         return
 
-    jar_file = jar_files[0]
-    jar_prefix = "META-INF/resources/"
-
-    with zipfile.ZipFile(jar_file) as zf:
+    entry_prefix = "META-INF/resources/"
+    with zipfile.ZipFile(jar_files[0]) as zf:
         for entry in zf.namelist():
-            if entry.startswith(jar_prefix) and not entry.endswith("/"):
-                rel = entry[len(jar_prefix):]
+            if entry.startswith(entry_prefix) and not entry.endswith("/"):
+                rel = entry[len(entry_prefix):]
                 dest = bundle_dir / rel
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 with zf.open(entry) as src, open(dest, "wb") as dst:
                     dst.write(src.read())
 
-    print(f"  Push scripts extracted to: {bundle_dir / 'VAADIN' / 'static' / 'push'}")
+    print(f"  {label} extracted from {jar_files[0].name}")
 
 
 def generate_and_build(
