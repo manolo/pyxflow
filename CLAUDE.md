@@ -20,9 +20,11 @@
 ## Quick Commands
 
 ```bash
-# Run the app
+# Run the app (auto-detects demo/ module)
 source .venv/bin/activate && python -m demo
 # http://localhost:8088
+# Or via CLI: vaadin demo --port 8088
+# Or auto-detect: vaadin --port 8088  (finds demo/views/ automatically)
 
 # Run tests
 pytest tests/ -v
@@ -53,7 +55,7 @@ vaadin-pyflow/
 ├── demo/               # Demo app + __main__.py entry point
 │   ├── views/          # View files (hello_world, about, components, grid, etc.)
 │   └── services/       # PeopleService (data access layer)
-├── tests/              # 1591 unit tests
+├── tests/              # 1667 unit tests
 └── STATUS.md           # Implementation progress
 ../bundle-generator/    # Java project → frontend bundle (shared, at root level)
 ```

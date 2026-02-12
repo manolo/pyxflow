@@ -4,8 +4,8 @@
 
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
-**Lines of code:** ~13,200 (core src/), ~32,200 (total with demo + tests)
-**Tests:** 1658 passing
+**Lines of code:** ~13,400 (core src/), ~33,000 (total with demo + tests)
+**Tests:** 1667 passing
 **Last updated:** 2026-02-12
 
 ---
@@ -15,8 +15,8 @@
 ### Core
 - [x] StateTree - Node management, change tracking
 - [x] StateNode - Features, attach/put/splice
-- [x] Element - Properties, attributes, styles, events
-- [x] Component - Base class with element attachment, deferred execute_js
+- [x] Element - Properties, attributes, styles (set/get/remove), events
+- [x] Component - Base class with element attachment, `_BufferedStyle`, deferred execute_js
 
 ### UIDL Protocol Compatibility (Java Flow)
 - [x] **Event hashes** - Dynamically computed via `compute_event_hash(config)` using `base64(sha256(BOM + json.encode('utf-16-be'))[:8])` for exact Java Flow compatibility
@@ -107,6 +107,7 @@
 - [x] `setHelperText()` / `getHelperText()` - Helper text below fields
 - [x] `setTooltipText()` / `getTooltipText()` - Tooltips via `<vaadin-tooltip>` child
 - [x] `addClickShortcut(Key)` - Keyboard shortcuts (keydown→click dispatch)
+- [x] `get_style()` - Returns `_BufferedStyle` that works before and after attach (set/get/remove buffered pre-attach, delegates to real `Style` post-attach)
 
 ### Field Mixins
 - [x] `HasValidation` mixin - `set_invalid()`, `is_invalid()`, `set_error_message()`, `get_error_message()` on all 14 field components + CustomField
@@ -133,6 +134,7 @@
 - [x] Heartbeat handler (`v-r=heartbeat`) — keeps session alive, prevents 403 after idle
 - [x] Session timeout / cleanup (30min idle, background sweep every 60s)
 - [x] Error handling — Per-RPC try/except, error Notification to user, navigation error feedback, push sender broad catch
+- [x] Missing bundle file logging — `[404] /VAADIN/{path}` printed to server console for easier debugging
 
 ### Protocol / Security
 - [x] CSRF token validation (actual check) — validated in `http_server.py`
@@ -174,6 +176,8 @@
 - [x] `@AppShell` - Global app configuration class (single place for @Push, @StyleSheet)
 - [x] `@Push` - Opt-in WebSocket push (conditional pushScript, push nodes in init)
 - [x] AppShell `@StyleSheet` - Stylesheets loaded in init response (before any navigation)
+- [x] Route not found - Shows "Could not navigate to '...'" view for unregistered routes
+- [x] Dev mode route list - In `--dev` mode, not-found view shows clickable RouterLinks to all registered routes
 
 ---
 
@@ -201,7 +205,7 @@ Atmosphere WebSocket protocol, `UI.access()` / `UI.push()` API, push sender coro
 ### Packaging & Bundle
 - [x] PyPI-ready wheel — `pip install vaadin-pyflow` or `pip install git+https://github.com/manolo/vaadin-pyflow.git`
 - [x] Bundle inside package — `src/vaadin/flow/bundle/` ships in wheel (1.5 MB compressed)
-- [x] CLI entry point — `vaadin <app_module> [--dev] [--debug] [--port N]`
+- [x] CLI entry point — `vaadin [app_module] [--dev] [--debug] [--port N]` (app module auto-detected if omitted)
 - [x] `vaadin --bundle` — Auto-generate bundle from `_v_fqcn` component registry (Maven project, production build, WAR extraction)
 - [x] `vaadin <app> --bundle` — User projects can generate their own bundle (outputs to `<app>/bundle/`)
 - [x] `--keep` flag — Preserve `bundle-project/` for debugging or faster rebuilds (reuses Maven project, skips `clean`)
