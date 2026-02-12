@@ -28,5 +28,11 @@ class Markdown(Component):
         if self._element:
             self.element.set_property("content", content)
 
+    def append_content(self, content: str):
+        """Append content to the existing markdown content."""
+        self._content += content
+        if self._element:
+            self.element.set_property("content", self._content)
+
     def get_content(self) -> str:
         return self._content
