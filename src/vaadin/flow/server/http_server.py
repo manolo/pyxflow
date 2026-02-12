@@ -332,6 +332,7 @@ async def handle_static(request: web.Request) -> web.Response:
             content_type = guess_content_type(file_path)
             return web.FileResponse(file_path, headers={"Content-Type": content_type, "Cache-Control": _BUNDLE_CACHE})  # type: ignore[return-value]
 
+    print(f"  [404] /VAADIN/{path}", flush=True)
     return web.Response(text="Not found", status=404)
 
 
