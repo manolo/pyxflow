@@ -27,6 +27,13 @@ class MessageListItem:
         self.user_img = user_img
         self.user_color_index = user_color_index
         self.theme = theme
+        self._message_list: "MessageList | None" = None
+
+    def append_text(self, text: str):
+        """Append text to this item and update the parent MessageList."""
+        self.text += text
+        if self._message_list:
+            self._message_list._push_items()
 
     def to_dict(self) -> dict:
         d: dict = {}
@@ -84,6 +91,8 @@ class MessageList(Component):
     def set_items(self, *items: MessageListItem):
         """Set the message items."""
         self._items = list(items)
+        for item in self._items:
+            item._message_list = self
         self._push_items()
 
     def get_items(self) -> list[MessageListItem]:
