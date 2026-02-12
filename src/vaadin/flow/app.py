@@ -147,14 +147,15 @@ class FlowApp:
 
 def _usage() -> None:
     print("Usage: vaadin <app_module> [--dev] [--debug] [--port PORT] [--host HOST]")
-    print("       vaadin --bundle [--vaadin-version VERSION]")
+    print("       vaadin [app_module] --bundle [--keep] [--vaadin-version VERSION]")
     print()
-    print("  app_module  Python module with views (e.g. demo.views)")
+    print("  app_module  Python module with views (e.g. demo)")
     print("  --dev       Auto-reload on source changes")
     print("  --debug     Verbose UIDL protocol logging")
     print("  --port N    Server port (default: 8080)")
     print("  --host H    Server host (default: localhost)")
     print("  --bundle    Generate frontend bundle from component registry")
+    print("  --keep      Keep build/bundle-project/ after extraction")
     sys.exit(0)
 
 
@@ -163,12 +164,7 @@ def main():
     if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
         _usage()
 
-    if sys.argv[1] == "--bundle":
-        from vaadin.flow.bundle_generator import generate_and_build
-        generate_and_build()
-        sys.exit(0)
-
-    # Find the app module: first non-flag argument
+    # Parse all arguments: find module name (first non-flag) and flags
     args = sys.argv[1:]
     views = None
     rest: list[str] = []
@@ -177,6 +173,29 @@ def main():
             views = arg
         else:
             rest.append(arg)
+
+    if "--bundle" in rest:
+        from pathlib import Path
+        from vaadin.flow.bundle_generator import generate_and_build
+
+        keep = "--keep" in rest
+        vaadin_version = "25.0.4"
+        if "--vaadin-version" in rest:
+            idx = rest.index("--vaadin-version")
+            vaadin_version = rest[idx + 1]
+
+        # Resolve app_dir from module name if given
+        app_dir = None
+        if views:
+            # "demo" → "demo/", "my_app" → "my_app/"
+            app_dir = Path.cwd() / views.replace(".", os.sep).replace("-", "_")
+
+        cwd = os.getcwd()
+        if cwd not in sys.path:
+            sys.path.insert(0, cwd)
+
+        generate_and_build(app_dir=app_dir, keep=keep, vaadin_version=vaadin_version)
+        sys.exit(0)
 
     if views is None:
         _usage()
