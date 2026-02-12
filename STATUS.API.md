@@ -1,7 +1,7 @@
 # PyFlow API Inventory — Python vs Java Vaadin 25
 
 **Generated: 2026-02-12**
-**Python components: 49 | Tests: 1754 | LOC: ~13,800 (core)**
+**Python components: 49 | Tests: 1910 | LOC: ~13,800 (core)**
 
 Legend: `[x]` = implemented, `[ ]` = missing
 
@@ -35,13 +35,14 @@ All components inherit from `Component` which provides:
 | `set_aria_label` / `get_aria_label` (HasAriaLabel) | [ ] |
 | `set_aria_labelled_by` / `get_aria_labelled_by` | [ ] |
 | `add_focus_listener` / `add_blur_listener` (FocusNotifier/BlurNotifier) | [ ] |
-| `set_read_only` / `is_read_only` (HasValueAndElement) | [ ] |
-| `remove_all` (HasComponents) | [ ] |
+| `set_read_only` / `is_read_only` (HasReadOnly) | [x] 18 components |
+| `remove_all` (HasComponents) | [x] 10 containers |
 
 ## Field Mixins (applied to 15-16 components)
 
 | Mixin | Methods | Applied to |
 |-------|---------|-----------|
+| **HasReadOnly** | `set_read_only` / `is_read_only` | [x] 16 field + Checkbox + ListBox + MultiSelectListBox (18 total) |
 | **HasValidation** | `set_invalid` / `is_invalid` / `set_error_message` / `get_error_message` | [x] All field components except Checkbox (15) |
 | **HasRequired** | `set_required_indicator_visible` / `is_required_indicator_visible` | [x] All field components including Checkbox (16) |
 | **set_value fires listeners** | `set_value()` fires `{"value": ..., "from_client": False}` on server-side changes | [x] All 18 field components (matches Java `AbstractFieldSupport.setValue()`) |
@@ -49,7 +50,7 @@ All components inherit from `Component` which provides:
 **Missing field mixins:**
 | Feature | Status |
 |---------|--------|
-| `set_read_only` / `is_read_only` | [ ] |
+| `set_read_only` / `is_read_only` | [x] (HasReadOnly mixin) |
 | `set_value_change_mode` / `set_value_change_timeout` | [ ] |
 | `set_i18n` / `get_i18n` (per-component validation messages) | [ ] |
 | Constructor overloads with initial value + listener | [ ] |
@@ -75,7 +76,7 @@ All components inherit from `Component` which provides:
 | `set_spacing` / `set_padding` / `set_margin` | [x] |
 | `set_default_horizontal_component_alignment` | [x] |
 | `set_horizontal_component_alignment` | [x] |
-| `remove_all` | [ ] |
+| `remove_all` | [x] |
 | `set_justify_content_mode` / `get_justify_content_mode` | [ ] |
 | `set_align_items` / `get_align_items` | [ ] |
 | `set_flex_grow` / `get_flex_grow` / `set_flex_shrink` | [ ] |
@@ -90,7 +91,7 @@ All components inherit from `Component` which provides:
 | `set_default_vertical_component_alignment` | [x] |
 | `set_vertical_component_alignment` | [x] |
 | `set_padding` | [ ] |
-| `remove_all` | [ ] |
+| `remove_all` | [x] |
 | `set_justify_content_mode` / `set_align_items` | [ ] |
 | `set_flex_grow` / `set_flex_shrink` | [ ] |
 | `add_to_start` / `add_to_middle` / `add_to_end` | [ ] |
@@ -104,7 +105,8 @@ All components inherit from `Component` which provides:
 | `set_justify_content_mode` / `set_align_items` / `set_align_content` | [x] |
 | `set_align_self` / `set_flex_grow` / `set_flex_shrink` / `set_flex_basis` | [x] |
 | `set_order` / `get_order` | [x] |
-| `remove_all` / `replace` / `add_component_at_index` | [ ] |
+| `remove_all` | [x] |
+| `replace` / `add_component_at_index` | [ ] |
 
 ### FormLayout
 | Feature | Status |
@@ -133,7 +135,7 @@ All components inherit from `Component` which provides:
 |---------|--------|
 | `add` / `set_content` / `get_content` | [x] |
 | `set_scroll_direction` / `get_scroll_direction` | [x] |
-| `remove_all` | [ ] |
+| `remove_all` | [x] |
 
 ### Card
 | Feature | Status |
@@ -142,7 +144,8 @@ All components inherit from `Component` which provides:
 | `set_media` / `set_header` / `set_header_prefix` / `set_header_suffix` | [x] |
 | `add_to_footer` | [x] |
 | `get_media` / `get_header` / `get_header_prefix` / `get_header_suffix` | [x] |
-| `set_title_heading_level` / `remove` / `remove_all` | [ ] |
+| `remove_all` | [x] |
+| `set_title_heading_level` / `remove` | [ ] |
 
 ---
 
@@ -151,7 +154,7 @@ All components inherit from `Component` which provides:
 ### Common Field Gaps (missing across most/all fields)
 | Feature | Status |
 |---------|--------|
-| `set_read_only` / `is_read_only` | [ ] |
+| `set_read_only` / `is_read_only` | [x] (HasReadOnly mixin) |
 | `set_i18n` / `get_i18n` (validation messages) | [ ] |
 | `set_value_change_mode` / `set_value_change_timeout` | [ ] |
 | `set_aria_label` / `set_aria_labelled_by` | [ ] |
@@ -268,6 +271,7 @@ All components inherit from `Component` which provides:
 | `set_value` / `get_value` / `add_value_change_listener` | [x] |
 | `set_error_message` / `set_invalid` (HasValidation) | [x] |
 | `set_required_indicator_visible` (HasRequired) | [x] |
+| `remove_all` | [x] |
 
 ---
 
@@ -382,7 +386,7 @@ All components inherit from `Component` which provides:
 | Column: `set_auto_width` / `set_resizable` / `set_sortable` / `set_text_align` | [x] |
 | Column: `set_renderer` / `set_footer_text` | [x] |
 | `ComponentRenderer` / `LitRenderer` / `TextRenderer` | [x] |
-| `add_item_click_listener` / `add_item_double_click_listener` | [ ] |
+| `add_item_click_listener` / `add_item_double_click_listener` | [x] |
 | `add_component_column` (shortcut) | [ ] |
 | `scroll_to_index` / `scroll_to_item` / `recalculate_column_widths` | [ ] |
 | Column: `frozen` / `frozen_to_end` / `visible` / `key` | [ ] |
@@ -404,10 +408,11 @@ All components inherit from `Component` which provides:
 | `set_width` / `set_height` | [x] |
 | `set_close_on_esc` / `is_close_on_esc` / `set_close_on_outside_click` / `is_close_on_outside_click` | [x] |
 | `add_open_listener` / `add_close_listener` | [x] |
-| `get_header` / `get_footer` (section components for buttons) | [ ] |
+| `get_header` / `get_footer` (section components for buttons) | [x] |
+| `remove_all` | [x] |
 | `get_width` / `get_height` / `set_min_width` / `set_max_width` etc. | [ ] |
 | `set_top` / `set_left` (positioning) | [ ] |
-| `remove` / `remove_all` | [ ] |
+| `remove` | [ ] |
 | `add_resize_listener` / `add_dragged_listener` | [ ] |
 
 ### ConfirmDialog
@@ -431,7 +436,8 @@ All components inherit from `Component` which provides:
 | `add` (component content) / `show` (static) | [x] |
 | `add_theme_variants` / `remove_theme_variants` | [x] |
 | `add_open_listener` / `add_close_listener` | [x] |
-| `remove` / `remove_all` | [ ] |
+| `remove_all` | [x] |
+| `remove` | [ ] |
 
 ### Upload
 | Feature | Status |
@@ -478,7 +484,8 @@ All components inherit from `Component` which provides:
 | `set_autofocus` / `set_backdrop_visible` | [ ] |
 | `set_hover_delay` / `set_focus_delay` / `set_hide_delay` | [ ] |
 | `set_role` / `add_theme_variants` (ARROW, NO_PADDING) | [ ] |
-| `remove` / `remove_all` | [ ] |
+| `remove_all` | [x] |
+| `remove` | [ ] |
 
 ---
 
@@ -491,7 +498,8 @@ All components inherit from `Component` which provides:
 | `get_selected_tab` / `set_selected_tab` / `get_selected_index` / `set_selected_index` | [x] |
 | `get_tab_count` / `set_orientation` / `get_orientation` | [x] |
 | `set_autoselect` / `is_autoselect` / `add_selected_change_listener` | [x] |
-| `remove_all` / `add_tab_at_index` / `add_tab_as_first` | [ ] |
+| `remove_all` | [x] |
+| `add_tab_at_index` / `add_tab_as_first` | [ ] |
 | `set_flex_grow_for_enclosed_tabs` | [ ] |
 | `add_theme_variants` (TabsVariant) | [ ] |
 
@@ -589,8 +597,8 @@ All components inherit from `Component` which provides:
 | `set_text` / `get_text` / `set_icon` | [x] |
 | `set_icon_after_text` / `is_icon_after_text` | [x] |
 | `add_click_listener` | [x] |
+| `set_disable_on_click` / `is_disable_on_click` | [x] |
 | `set_autofocus` / `is_autofocus` | [ ] |
-| `set_disable_on_click` / `is_disable_on_click` | [ ] |
 | `click` (server-side) / `click_in_client` | [ ] |
 | `add_theme_variants` (ButtonVariant) | [ ] |
 | `add_focus_listener` / `add_blur_listener` | [ ] |
@@ -733,14 +741,14 @@ All components inherit from `Component` which provides:
 | MenuBar | item-click | via MenuItem `add_click_listener` |
 | ContextMenu | item-click | via ContextMenuItem click handler |
 | MessageInput | submit | `add_submit_listener` |
+| Grid | item-click | `add_item_click_listener` |
+| Grid | item-double-click | `add_item_double_click_listener` |
 
 ### Missing Events
 
 #### HIGH Priority
-| Component | Missing Event | Notes |
-|-----------|--------------|-------|
-| Grid | `add_item_click_listener` | Row click — very common |
-| Grid | `add_item_double_click_listener` | Edit-on-double-click pattern |
+
+(None — all high-priority events implemented)
 
 #### MEDIUM Priority
 | Component | Missing Event | Notes |
@@ -767,18 +775,22 @@ All components inherit from `Component` which provides:
 | Category | Components | Count |
 |----------|-----------|-------|
 | **100%** | ProgressBar, Span, Markdown, MessageList, DrawerToggle | 5 |
-| **90-99%** | FormLayout, SplitLayout, FlexLayout, ConfirmDialog, Notification, Avatar, LoginForm, MessageInput, Popover, Accordion, Details, MasterDetailLayout, CustomField, Card, Scroller, Icon, Tabs, TabSheet, Dialog | 19 |
-| **70-89%** | TextField, TextArea, EmailField, PasswordField, NumberField, DatePicker, TimePicker, DateTimePicker, ComboBox, Select, MultiSelectComboBox, Checkbox, CheckboxGroup, RadioButtonGroup, ListBox, MultiSelectListBox, Grid, Upload, VirtualList, AppLayout, MenuBar, ContextMenu, SideNav, SideNavItem | 24 |
-| **50-69%** | VerticalLayout, HorizontalLayout, Button, LoginOverlay, RouterLink | 5 |
+| **90-99%** | FormLayout, SplitLayout, FlexLayout, ConfirmDialog, Notification, Avatar, LoginForm, MessageInput, Popover, Accordion, Details, MasterDetailLayout, CustomField, Card, Scroller, Icon, Tabs, TabSheet, Dialog, Grid, Button | 21 |
+| **70-89%** | TextField, TextArea, EmailField, PasswordField, NumberField, DatePicker, TimePicker, DateTimePicker, ComboBox, Select, MultiSelectComboBox, Checkbox, CheckboxGroup, RadioButtonGroup, ListBox, MultiSelectListBox, Upload, VirtualList, AppLayout, MenuBar, ContextMenu, SideNav, SideNavItem, VerticalLayout, HorizontalLayout | 25 |
+| **50-69%** | LoginOverlay, RouterLink | 2 |
 
-### Top Priority Gaps (cross-cutting)
+### Recently Implemented (top 5 gaps closed)
 
-1. **`set_read_only` / `is_read_only`** — Missing from all field/selection components
-2. **`remove_all`** — Missing from most container components (only SplitLayout and FormItem have it)
-3. **Dialog `get_header` / `get_footer`** — Needed for adding Save/Cancel buttons
-4. **Button `set_disable_on_click`** — Standard form double-click prevention
-5. **Layout `add_component_at_index` / `replace`** — Basic container operations
-6. **TextField `set_max_length` / `set_min_length`** — Input length constraints
-7. **Select `set_empty_selection_allowed`** — "-- Select --" placeholder pattern
-8. **Grid `add_item_click_listener`** — Very commonly needed
-9. **`set_i18n`** — Missing from all components that support it
+1. ~~`set_read_only` / `is_read_only`~~ — [x] HasReadOnly mixin on 18 components
+2. ~~`remove_all`~~ — [x] 10 container components
+3. ~~Dialog `get_header` / `get_footer`~~ — [x] _DialogSection with slotted children
+4. ~~Button `set_disable_on_click`~~ — [x] Client-side double-click prevention
+5. ~~Grid `add_item_click_listener`~~ — [x] Item click + double-click events
+
+### Remaining Priority Gaps
+
+1. **Layout `add_component_at_index` / `replace`** — Basic container operations
+2. **TextField `set_max_length` / `set_min_length`** — Input length constraints
+3. **Select `set_empty_selection_allowed`** — "-- Select --" placeholder pattern
+4. **`set_i18n`** — Missing from all components that support it
+5. **`set_value_change_mode` / `set_value_change_timeout`** — Debounced text input
