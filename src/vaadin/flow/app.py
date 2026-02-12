@@ -258,6 +258,9 @@ def _serve(views: str, host: str, port: int, debug: bool, socket_fd: int | None 
     pkg_mod = importlib.import_module(package)
     if pkg_mod.__file__:
         set_app_directory(Path(pkg_mod.__file__).parent)
+    elif hasattr(pkg_mod, "__path__"):
+        # Namespace package (no __init__.py) — use __path__
+        set_app_directory(Path(list(pkg_mod.__path__)[0]))
 
     if socket_fd is not None:
         import socket
