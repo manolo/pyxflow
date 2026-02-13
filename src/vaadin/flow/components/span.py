@@ -36,6 +36,8 @@ class Span(Component):
         self._text = text
         if self._text_node:
             self._text_node.put(Feature.TEXT_NODE, "text", text)
+        elif self._element:
+            self._create_text_node(self._element._tree, text)
 
     def get_text(self) -> str:
         """Get the span text."""

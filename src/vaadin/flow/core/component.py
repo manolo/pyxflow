@@ -162,6 +162,9 @@ class Component:
             for script, args in pending_js:
                 self._element.execute_js(script, *args)
             del self._pending_execute_js
+        # Apply deferred enabled state (disabled attribute)
+        if not self._enabled:
+            self._element.set_attribute("disabled", "")
         # Auto-register @ClientCallable methods in Feature 19
         self._register_client_callable_methods(tree)
 

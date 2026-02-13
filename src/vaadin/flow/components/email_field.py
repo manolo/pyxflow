@@ -97,10 +97,14 @@ class EmailField(HasReadOnly, HasValidation, HasRequired, Component):
         self._change_listeners.append(listener)
 
     def _handle_change(self, event_data: dict):
-        """Handle change event."""
+        """Handle change event.
+
+        Value arrives via mSync (_sync_property), not event_data.
+        Construct proper event dict for listeners.
+        """
         self._value = event_data.get("value", self._value)
         for listener in self._change_listeners:
-            listener(event_data)
+            listener({"value": self._value, "from_client": True})
 
     def set_pattern(self, pattern: str):
         if self._element:

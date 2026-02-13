@@ -42,8 +42,12 @@ class TextField(HasReadOnly, HasValidation, HasRequired, Component):
             self.element.set_property("pattern", self._pattern)
         if self._allowed_char_pattern:
             self.element.set_property("allowedCharPattern", self._allowed_char_pattern)
+        if getattr(self, "_max_length", 0):
+            self.element.set_property("maxlength", self._max_length)
         if self._prefix_component:
             self._attach_prefix(tree)
+        if getattr(self, "_suffix_component", None):
+            self._attach_suffix(tree)
         self.element.add_event_listener(self._get_event_name(), self._handle_change)
 
     @property
@@ -97,10 +101,14 @@ class TextField(HasReadOnly, HasValidation, HasRequired, Component):
         self._change_listeners.append(listener)
 
     def _handle_change(self, event_data: dict):
-        """Handle change event."""
+        """Handle change event.
+
+        Value arrives via mSync (_sync_property), not event_data.
+        Construct proper event dict for listeners.
+        """
         self._value = event_data.get("value", self._value)
         for listener in self._change_listeners:
-            listener(event_data)
+            listener({"value": self._value, "from_client": True})
 
     def set_clear_button_visible(self, visible: bool):
         """Show or hide the clear button."""

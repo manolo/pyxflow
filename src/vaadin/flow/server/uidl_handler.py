@@ -846,6 +846,12 @@ class UidlHandler:
         if component and getattr(component, "_click_shortcut_registered", False):
             # Dispatch as click on the same element
             self._handle_click(node_id, event_data)
+        elif node_id == self._body_node.id:
+            # Global shortcut: scan all components for click shortcuts
+            for comp in self._tree._components.values():
+                if getattr(comp, "_click_shortcut_registered", False):
+                    self._handle_click(comp.element.node_id, event_data)
+                    break
         else:
             # Generic keydown dispatch
             element = self._tree.get_element(node_id)

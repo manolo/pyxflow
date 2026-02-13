@@ -47,6 +47,8 @@ class Button(Component):
             self._create_text_node(tree, self._text)
         if self._icon_component:
             self._attach_icon(tree, self._icon_component)
+            if not self._text:
+                self.add_theme_name("icon")
         if self._disable_on_click:
             self.element.set_property("disableOnClick", True)
         # Register click listener
@@ -133,5 +135,7 @@ class Button(Component):
 
     def _handle_click(self, event_data: dict):
         """Handle click event."""
+        if self._disable_on_click:
+            self.set_enabled(False)
         for listener in self._click_listeners:
             listener(event_data)
