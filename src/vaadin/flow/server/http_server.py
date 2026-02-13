@@ -644,10 +644,12 @@ def run_server(host: str = "localhost", port: int = 8080, debug: bool = False, s
             print(f"  /{path} -> {cls.__name__}")
 
     app = create_app()
+    # shutdown_timeout=0 avoids waiting for open WebSocket push connections
+    # to close gracefully (the default 60s causes Ctrl+C to hang).
     if sock is not None:
-        web.run_app(app, sock=sock)
+        web.run_app(app, sock=sock, shutdown_timeout=0)
     else:
-        web.run_app(app, host=host, port=port, reuse_address=True)
+        web.run_app(app, host=host, port=port, reuse_address=True, shutdown_timeout=0)
 
 
 # Default view class (for backwards compatibility)
