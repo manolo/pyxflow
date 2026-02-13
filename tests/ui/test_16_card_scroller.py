@@ -51,13 +51,42 @@ class TestScroller:
 
 class TestMasterDetailLayout:
     @pytest.mark.spec("V16.10")
-    def test_renders(self, view_page: Page):
+    def test_master_visible(self, view_page: Page):
         mdl = view_page.locator("#mdl1")
-        expect(mdl).to_contain_text("Master panel")
+        expect(mdl.locator("#mdl-item-1")).to_be_visible()
+        expect(mdl.locator("#mdl-item-2")).to_be_visible()
+
+    @pytest.mark.spec("V16.11")
+    def test_open_detail(self, view_page: Page):
+        view_page.locator("#mdl-item-1").click()
+        detail = view_page.locator("#mdl-detail")
+        expect(detail).to_be_visible(timeout=5000)
+        expect(detail).to_contain_text("Detail for item 1")
+
+    @pytest.mark.spec("V16.12")
+    def test_close_detail(self, view_page: Page):
+        # Detail should still be open from previous test
+        expect(view_page.locator("#mdl-detail")).to_be_visible()
+        view_page.locator("#mdl-close").click()
+        expect(view_page.locator("#mdl-detail")).to_be_hidden(timeout=5000)
+
+    @pytest.mark.spec("V16.13")
+    def test_switch_detail(self, view_page: Page):
+        # Open item 2
+        view_page.locator("#mdl-item-2").click()
+        detail = view_page.locator("#mdl-detail")
+        expect(detail).to_be_visible(timeout=5000)
+        expect(detail).to_contain_text("Detail for item 2")
+        # Switch to item 3
+        view_page.locator("#mdl-item-3").click()
+        expect(detail).to_contain_text("Detail for item 3", timeout=5000)
+        # Close
+        view_page.locator("#mdl-close").click()
+        expect(detail).to_be_hidden(timeout=5000)
 
 
 class TestNavigation:
-    @pytest.mark.spec("V16.13")
+    @pytest.mark.spec("V16.14")
     def test_nav_via_sidenav(self, view_page: Page):
         """Navigate to next view via SideNav link."""
         view_page.locator("vaadin-side-nav-item[path='/test/notification-popover']").click()

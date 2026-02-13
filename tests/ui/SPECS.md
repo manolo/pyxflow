@@ -1527,22 +1527,26 @@ Feature: Card, Scroller, MasterDetailLayout
     Then "New" visible, "Old" gone
 
   # --- MasterDetailLayout ---
-  Scenario: V16.10 — MasterDetailLayout renders
-    Given MasterDetailLayout with set_master(Span("Master")), set_detail(Span("Detail"))
-    Then master and detail panels visible
+  Scenario: V16.10 — Master buttons visible
+    Given MasterDetailLayout with 3 item buttons as master
+    Then Item 1, Item 2, Item 3 buttons visible
 
-  Scenario: V16.11 — MasterDetailLayout drawer width
-    Given MasterDetailLayout with set_drawer_width("400px")
-    Then detail panel width is ~400px
+  Scenario: V16.11 — Open detail
+    When click "Item 1" button
+    Then detail panel appears with "Detail for item 1"
 
-  Scenario: V16.12 — MasterDetailLayout toggle visibility
-    Given set_drawer_toggle_visible(True)
-    Then toggle button visible for detail panel
+  Scenario: V16.12 — Close detail
+    When click "Close" button in detail panel
+    Then detail panel hidden
+
+  Scenario: V16.13 — Switch detail between items
+    When click "Item 2", then click "Item 3"
+    Then detail content updates, close hides it
 
   # --- Nav ---
-  Scenario: V16.13 — Nav to next view
-    When click link "Next: Upload"
-    Then URL contains "/test/upload"
+  Scenario: V16.14 — Nav to next view
+    When click link "Next: Notification & Popover"
+    Then URL contains "/test/notification-popover"
 ```
 
 ---

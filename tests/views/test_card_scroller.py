@@ -54,10 +54,25 @@ class TestCardScrollerView(VerticalLayout):
         # --- MasterDetailLayout ---
         mdl = MasterDetailLayout()
         mdl.set_id("mdl1")
-        mdl.set_master(Span("Master panel"))
-        mdl.set_detail(Span("Detail panel"))
-        mdl.set_width("100%")
-        mdl.set_height("200px")
+        mdl.set_height("250px")
+        mdl.get_style().set("border", "1px solid var(--lumo-contrast-20pct)")
+
+        master = VerticalLayout()
+        for i in range(1, 4):
+            btn = Button(f"Item {i}")
+            btn.set_id(f"mdl-item-{i}")
+            def on_click(e, idx=i, layout=mdl):
+                detail = VerticalLayout()
+                detail.set_id("mdl-detail")
+                detail.add(Span(f"Detail for item {idx}"))
+                close_btn = Button("Close")
+                close_btn.set_id("mdl-close")
+                close_btn.add_click_listener(lambda ev, l=layout: l.set_detail(None))
+                detail.add(close_btn)
+                layout.set_detail(detail)
+            btn.add_click_listener(on_click)
+            master.add(btn)
+        mdl.set_master(master)
 
         self.add(
             card1, card2,
