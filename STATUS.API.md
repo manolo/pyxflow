@@ -1,7 +1,7 @@
 # PyFlow API Inventory — Python vs Java Vaadin 25
 
 **Generated: 2026-02-12**
-**Python components: 49 | Tests: 2051 | LOC: ~14,500 (core)**
+**Python components: 49 | Tests: 2092 unit | LOC: ~14,800 (core)**
 
 Legend: `[x]` = implemented, `[ ]` = missing
 
@@ -46,8 +46,8 @@ All components inherit from `Component` which provides:
 **Missing field mixins:**
 | Feature | Status |
 |---------|--------|
-| `set_value_change_mode` / `set_value_change_timeout` | [ ] |
-| `set_i18n` / `get_i18n` (per-component validation messages) | [ ] |
+| `set_value_change_mode` / `set_value_change_timeout` | [x] 5 text field types (TextField, TextArea, EmailField, PasswordField, NumberField) |
+| `set_i18n` / `get_i18n` (per-component localization) | [x] 7 components (Upload, DatePicker, TimePicker, DateTimePicker, LoginForm, LoginOverlay, MessageInput) |
 | Constructor overloads with initial value + listener | [ ] |
 
 ---
@@ -74,9 +74,9 @@ All components inherit from `Component` which provides:
 | `remove_all` | [x] |
 | `set_justify_content_mode` / `get_justify_content_mode` | [x] |
 | `set_align_items` / `get_align_items` | [x] |
-| `set_flex_grow` / `get_flex_grow` / `set_flex_shrink` | [ ] |
-| `add_and_expand` / `replace` / `add_component_at_index` | [ ] |
-| `set_wrap` / `is_wrap` / `set_box_sizing` | [ ] |
+| `set_flex_grow` / `get_flex_grow` / `set_flex_shrink` | [x] |
+| `add_and_expand` / `replace` / `add_component_at_index` | [x] |
+| `set_wrap` / `is_wrap` / `set_box_sizing` | [x] |
 
 ### HorizontalLayout
 | Feature | Status |
@@ -88,9 +88,9 @@ All components inherit from `Component` which provides:
 | `set_padding` | [x] |
 | `remove_all` | [x] |
 | `set_justify_content_mode` / `set_align_items` | [x] |
-| `set_flex_grow` / `set_flex_shrink` | [ ] |
-| `add_to_start` / `add_to_middle` / `add_to_end` | [ ] |
-| `replace` / `add_component_at_index` / `set_box_sizing` | [ ] |
+| `set_flex_grow` / `get_flex_grow` / `set_flex_shrink` | [x] |
+| `add_and_expand` / `add_to_start` / `add_to_middle` / `add_to_end` | [ ] (add_and_expand [x], add_to_* [ ]) |
+| `replace` / `add_component_at_index` / `set_box_sizing` / `set_wrap` / `is_wrap` | [x] |
 
 ### FlexLayout
 | Feature | Status |
@@ -152,8 +152,8 @@ All components inherit from `Component` which provides:
 | `set_read_only` / `is_read_only` | [x] (HasReadOnly mixin) |
 | `set_aria_label` / `set_aria_labelled_by` | [x] (HasAriaLabel on base Component) |
 | `add_focus_listener` / `add_blur_listener` | [x] (FocusNotifier/BlurNotifier on base Component) |
-| `set_i18n` / `get_i18n` (validation messages) | [ ] |
-| `set_value_change_mode` / `set_value_change_timeout` | [ ] |
+| `set_i18n` / `get_i18n` (localization) | [x] 7 components |
+| `set_value_change_mode` / `set_value_change_timeout` | [x] 5 text field types |
 
 ### TextField
 | Feature | Status |
@@ -182,7 +182,7 @@ All components inherit from `Component` which provides:
 | `add_value_change_listener` | [x] |
 | `set_clear_button_visible` | [x] |
 | `set_prefix_component` / `set_suffix_component` | [x] |
-| `set_pattern` | [ ] |
+| `set_pattern` | [x] |
 
 ### EmailField
 | Feature | Status |
@@ -207,7 +207,7 @@ All components inherit from `Component` which provides:
 | `add_value_change_listener` | [x] |
 | `set_clear_button_visible` | [x] |
 | `set_min_length` / `set_max_length` | [x] |
-| `set_pattern` / `set_prefix_component` | [ ] |
+| `set_pattern` / `set_prefix_component` | [x] |
 
 ### NumberField / IntegerField
 | Feature | Status |
@@ -296,9 +296,9 @@ All components inherit from `Component` which provides:
 | `set_item_label_generator` / `add_value_change_listener` | [x] |
 | `set_error_message` / `set_invalid` (HasValidation) | [x] |
 | `set_required_indicator_visible` (HasRequired) | [x] |
-| `set_empty_selection_allowed` / `set_empty_selection_caption` | [ ] |
+| `set_empty_selection_allowed` / `set_empty_selection_caption` | [x] |
 | `set_renderer` / `set_item_enabled_provider` | [ ] |
-| `set_prefix_component` / `set_overlay_width` | [ ] |
+| `set_prefix_component` / `set_overlay_width` | [x] |
 
 ### MultiSelectComboBox
 | Feature | Status |
@@ -448,7 +448,8 @@ All components inherit from `Component` which provides:
 | `set_upload_button` / `set_drop_label` / `set_drop_label_icon` | [x] |
 | `clear_file_list` | [x] |
 | `interrupt_upload` | [ ] |
-| `set_i18n` / progress / started / all-finished listeners | [ ] |
+| `set_i18n` | [x] |
+| progress / started / all-finished listeners | [ ] |
 
 ### LoginForm
 | Feature | Status |
@@ -456,7 +457,8 @@ All components inherit from `Component` which provides:
 | `add_login_listener` / `add_forgot_password_listener` | [x] |
 | `set_error` / `is_error` | [x] |
 | `set_forgot_password_button_visible` / `set_no_autofocus` / `set_action` | [x] |
-| `set_i18n` / `set_enabled` | [ ] |
+| `set_i18n` | [x] |
+| `set_enabled` | [ ] |
 
 ### LoginOverlay
 | Feature | Status |
@@ -465,7 +467,8 @@ All components inherit from `Component` which provides:
 | `set_title` / `get_title` / `set_description` / `get_description` | [x] |
 | `set_error` / `is_error` / `set_forgot_password_button_visible` | [x] |
 | `add_login_listener` / `add_forgot_password_listener` | [x] |
-| `set_i18n` / `set_action` / `set_no_autofocus` | [ ] |
+| `set_i18n` | [x] |
+| `set_action` / `set_no_autofocus` | [ ] |
 | `get_custom_form_area` / `get_footer` | [ ] |
 
 ### Popover
@@ -635,7 +638,7 @@ All components inherit from `Component` which provides:
 | Feature | Status |
 |---------|--------|
 | `add_submit_listener` | [x] |
-| `set_i18n` | [ ] |
+| `set_i18n` | [x] |
 
 ### MessageList (100% complete)
 | Feature | Status |
@@ -779,15 +782,16 @@ All components inherit from `Component` which provides:
 
 | Category | Components | Count |
 |----------|-----------|-------|
-| **100%** | ProgressBar, Span, Markdown, MessageList, DrawerToggle, Scroller, MasterDetailLayout, Accordion, Notification | 9 |
-| **90-99%** | FormLayout, SplitLayout, FlexLayout, ConfirmDialog, Avatar, LoginForm, MessageInput, Popover, Details, CustomField, Card, Icon, Tabs, Tab, TabSheet, Dialog, Grid, Button, TextField, TextArea, EmailField, PasswordField, NumberField, DatePicker, TimePicker, DateTimePicker, ComboBox, MultiSelectComboBox, CheckboxGroup, MultiSelectListBox, Upload, MenuBar, ContextMenu, SideNav, SideNavItem, Binder | 36 |
-| **70-89%** | Select, Checkbox, RadioButtonGroup, ListBox, VirtualList, AppLayout, VerticalLayout, HorizontalLayout | 8 |
-| **50-69%** | LoginOverlay, RouterLink | 2 |
+| **100%** | ProgressBar, Span, Markdown, MessageList, DrawerToggle, Scroller, MasterDetailLayout, Accordion, Notification, MessageInput | 10 |
+| **90-99%** | FormLayout, SplitLayout, FlexLayout, ConfirmDialog, Avatar, LoginForm, Popover, Details, CustomField, Card, Icon, Tabs, Tab, TabSheet, Dialog, Grid, Button, TextField, TextArea, EmailField, PasswordField, NumberField, DatePicker, TimePicker, DateTimePicker, ComboBox, MultiSelectComboBox, CheckboxGroup, MultiSelectListBox, Upload, MenuBar, ContextMenu, SideNav, SideNavItem, Binder, VerticalLayout, HorizontalLayout, Select | 37 |
+| **70-89%** | Checkbox, RadioButtonGroup, ListBox, VirtualList, AppLayout, LoginOverlay | 6 |
+| **50-69%** | RouterLink | 1 |
 
 ### Remaining Priority Gaps
 
-1. **`set_i18n`** — Missing from all components that support it
-2. **`set_value_change_mode` / `set_value_change_timeout`** — Debounced text input
-3. **Layout `add_component_at_index` / `replace`** — Basic container operations
-4. **Select `set_empty_selection_allowed`** — "-- Select --" placeholder pattern
-5. **Layout `set_flex_grow` / `set_flex_shrink`** — Per-child flex control on V/H layouts
+All 5 previous priority gaps have been implemented:
+- ~~`set_i18n`~~ — [x] 7 components
+- ~~`set_value_change_mode`~~ — [x] 5 text field types
+- ~~Layout operations~~ — [x] get_flex_grow, add_and_expand, replace, add_component_at_index, set_wrap, set_box_sizing
+- ~~Select `set_empty_selection_allowed`~~ — [x] creates actual empty item node
+- ~~Layout flex control~~ — [x] set_flex_grow, get_flex_grow, set_flex_shrink

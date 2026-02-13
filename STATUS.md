@@ -4,9 +4,9 @@
 
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
-**Lines of code:** ~14,500 (core src/), ~35,000 (total with demo + tests)
-**Tests:** 2051 passing
-**Last updated:** 2026-02-12
+**Lines of code:** ~14,800 (core src/), ~36,000 (total with demo + tests)
+**Tests:** 2092 passing
+**Last updated:** 2026-02-13
 
 ---
 
@@ -43,36 +43,36 @@
 - [x] Button - Text, click listener, icon (prefix slot), `set_disable_on_click`
 - [x] Checkbox - Label, checked, indeterminate, value change
 - [x] IntegerField - Integer input with min/max/step
-- [x] NumberField - Numeric input with min/max/step
-- [x] TextArea - Multi-line text input with placeholder
-- [x] TextField - Label, value, change event, mSync, clearButtonVisible, placeholder, prefix component slot, errorMessage, pattern, allowedCharPattern
+- [x] NumberField - Numeric input with min/max/step, ValueChangeMode
+- [x] TextArea - Multi-line text input with placeholder, ValueChangeMode
+- [x] TextField - Label, value, change event, mSync, clearButtonVisible, placeholder, prefix component slot, errorMessage, pattern, allowedCharPattern, ValueChangeMode
 - [x] Span - Text content
 - [x] Div - Simple `<div>` with text content (extends HtmlContainer)
 - [x] Header - HTML `<header>` container (extends HtmlContainer)
 - [x] Footer - HTML `<footer>` container (extends HtmlContainer)
-- [x] VerticalLayout - Theme, add/remove/remove_all children, padding/spacing/margin, expand, horizontal component alignment
-- [x] HorizontalLayout - Theme, add/remove/remove_all children, margin/spacing, expand, vertical component alignment
+- [x] VerticalLayout - Theme, add/remove/remove_all children, padding/spacing/margin, expand, horizontal component alignment, get_flex_grow, add_and_expand
+- [x] HorizontalLayout - Theme, add/remove/remove_all children, margin/spacing, expand, vertical component alignment, get_flex_grow, add_and_expand, set_wrap
 - [x] FlexLayout - Pure CSS Flexbox `<div>`: flex-direction, flex-wrap, justify-content, align-items/self/content, flex-grow/shrink/basis, order, expand, remove_all
 - [x] SplitLayout - Horizontal/vertical split with primary/secondary slots, splitter position, orientation
 - [x] Dialog - Header title, modal, draggable, resizable, FlowComponentHost renderer, publishedEventHandler close, `get_header()`/`get_footer()` sections
 - [x] Notification - Position, duration, theme variants, open/close, static show(), body attachment
-- [x] PasswordField - Password input with reveal button
-- [x] EmailField - Email input with validation
+- [x] PasswordField - Password input with reveal button, ValueChangeMode
+- [x] EmailField - Email input with validation, ValueChangeMode
 - [x] ProgressBar - Determinate/indeterminate progress
-- [x] Select - Dropdown single selection, `selectConnector.initLazy` overlay renderer
+- [x] Select - Dropdown single selection, `selectConnector.initLazy` overlay renderer, empty selection allowed
 - [x] RadioButtonGroup - Radio button selection
 - [x] CheckboxGroup - Multiple checkbox selection
 - [x] FormLayout - Responsive steps, colspan, FormItem (label slot), FormRow, auto-responsive, CSS custom properties
 - [x] Grid - Columns (path, header, width, flexGrow, autoWidth, resizable, sortable, textAlign), in-memory data push, single/multi selection, sorting, lazy loading/DataProvider, column reordering, LitRenderer, ComponentRenderer, header rows (column groups), column footers, `add_item_click_listener`, `add_item_double_click_listener`
 - [x] ConfirmDialog - Confirm/cancel/reject actions, header/message/button text, theme, cancelable/rejectable
 - [x] ComboBox - Filtered dropdown, data push protocol, item label generator, custom value support
-- [x] DatePicker - Date selection with calendar overlay, min/max, connector init
-- [x] TimePicker - Time selection with dropdown, step, min/max, connector init
+- [x] DatePicker - Date selection with calendar overlay, min/max, connector init, i18n
+- [x] TimePicker - Time selection with dropdown, step, min/max, connector init, i18n
 - [x] Tabs - Tab container with selected index, orientation, selection change events
 - [x] Tab - Individual tab with label text
 - [x] TabSheet - Tabs + content panels with slot-based association
 - [x] MenuBar - Hierarchical menus with connector protocol, submenu support, click listeners
-- [x] Upload - File upload via multipart HTTP POST, receiver callback, file reject/success/error events, max files/size, accepted types, auto-upload, drop zone
+- [x] Upload - File upload via multipart HTTP POST, receiver callback, file reject/success/error events, max files/size, accepted types, auto-upload, drop zone, i18n
 - [x] Icon - `vaadin-icon`, auto-prefix `vaadin:`, color (CSS fill), size
 - [x] DrawerToggle - Hamburger button for AppLayout drawer, extends Button
 - [x] SideNav / SideNavItem - Navigation items with path, prefix icon slot, nested items via children slot, collapsible, label span
@@ -80,7 +80,7 @@
 - [x] Details - Expandable panel, summary (text or Component), opened-changed sync
 - [x] Accordion / AccordionPanel - Vertically stacked expandable panels, single-open, opened index sync
 - [x] ContextMenu - Right-click/long-press menu, contextMenuConnector, hierarchical items, separators
-- [x] DateTimePicker - Combined date+time, datepickerConnector + timepickerConnector, min/max/step
+- [x] DateTimePicker - Combined date+time, datepickerConnector + timepickerConnector, min/max/step, i18n
 - [x] Markdown - Renders markdown as HTML, `content` property, new in Vaadin 25
 - [x] Avatar - Name, abbreviation, image, color index
 - [x] AvatarGroup - Item list (JSON property), max items visible
@@ -88,13 +88,13 @@
 - [x] Card - Multi-slot container (title, subtitle, media, header-prefix/suffix, footer, content). New in v25
 - [x] Popover - Overlay anchored to target, FlowComponentHost renderer, position, trigger config, open/close/modal
 - [x] MasterDetailLayout - Master/detail slots, size property. New in v25
-- [x] MessageInput - Submit event with message text
+- [x] MessageInput - Submit event with message text, i18n
 - [x] MessageList - Items JSON property (text, time, userName, userAbbr, userImg, userColorIndex), markdown rendering
 - [x] ListBox - Items as `vaadin-item` children, selected index, value change
 - [x] MultiSelectListBox - Items as children, selectedValues array, multi-select
 - [x] CustomField - Composite field wrapper, children contribute to combined value
-- [x] LoginForm - Login event (username/password), forgot-password event, error property
-- [x] LoginOverlay - Login form in overlay, opened/title/description properties
+- [x] LoginForm - Login event (username/password), forgot-password event, error property, i18n
+- [x] LoginOverlay - Login form in overlay, opened/title/description properties, i18n
 - [x] MultiSelectComboBox - Multi-select with chips, comboBoxConnector, data provider, filtering
 - [x] VirtualList - Scrollable list, virtualListConnector, LitRenderer/ComponentRenderer support
 
@@ -111,6 +111,8 @@
 - [x] `set_aria_label()` / `get_aria_label()` - ARIA label (HasAriaLabel)
 - [x] `set_aria_labelled_by()` / `get_aria_labelled_by()` - ARIA labelled-by reference
 - [x] `add_focus_listener()` / `add_blur_listener()` - Focus/blur events (FocusNotifier/BlurNotifier)
+- [x] `ValueChangeMode` - Controls when text fields sync to server (EAGER/LAZY/TIMEOUT/ON_BLUR/ON_CHANGE). Applied to TextField, TextArea, EmailField, PasswordField, NumberField
+- [x] `set_i18n(dict)` / `get_i18n()` - Localization via dict-based approach on 7 components (Upload, DatePicker, TimePicker, DateTimePicker, LoginForm, LoginOverlay, MessageInput)
 
 ### Field Mixins
 - [x] `HasReadOnly` mixin - `set_read_only()`, `is_read_only()` on all 16 field components + Checkbox + ListBox + MultiSelectListBox (18 total)
@@ -161,7 +163,7 @@
 - [x] Init response - appConfig, pushScript, CSRF, constants (Java-compatible hashes)
 - [x] UIDL response - syncId, changes, execute
 - [x] Push response - `meta.async`, Atmosphere length-prefix format
-- [x] RPC: event - click, change, ui-navigate, keydown
+- [x] RPC: event - click, change, input, blur, ui-navigate, keydown
 - [x] RPC: mSync - Property sync from client
 - [x] RPC: publishedEventHandler - Generic dispatch to any component method (Dialog close, Grid select/deselect)
 - [x] **UIDL compatibility verified** - Matches Java Flow exactly:

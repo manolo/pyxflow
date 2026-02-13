@@ -85,6 +85,11 @@ class VerticalLayout(Component):
             if component._element:
                 component.element.get_style().set("flex-grow", "1")
 
+    def add_and_expand(self, *components: Component):
+        """Add components and set them to expand (flex-grow: 1)."""
+        self.add(*components)
+        self.expand(*components)
+
     def set_default_horizontal_component_alignment(self, alignment: Alignment):
         """Set default horizontal alignment for all children."""
         self._default_alignment = alignment
@@ -124,6 +129,10 @@ class VerticalLayout(Component):
 
     def get_align_items(self) -> Alignment | None:
         return self._default_alignment
+
+    def get_flex_grow(self, component: Component) -> float:
+        """Get the flex-grow value of a component."""
+        return float(component.get_style().get("flex-grow") or 0)
 
     def set_flex_grow(self, flex_grow: float, *components: Component):
         for component in components:

@@ -60,6 +60,7 @@ from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequire
 from vaadin.flow.components.login import LoginForm, LoginOverlay
 from vaadin.flow.components.multi_select_combo_box import MultiSelectComboBox
 from vaadin.flow.components.virtual_list import VirtualList
+from vaadin.flow.components.value_change_mode import ValueChangeMode
 from vaadin.flow.core.component import ClientCallable
 
 __all__ = [
@@ -172,5 +173,6 @@ __all__ = [
     "LoginForm",
     "LoginOverlay",
     "MultiSelectComboBox",
+    "ValueChangeMode",
     "VirtualList",
 ]

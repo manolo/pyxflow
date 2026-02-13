@@ -258,3 +258,14 @@ class Upload(Component):
                 {"@v-node": self.element.node.id},
                 "return $0.files = []",
             ])
+
+    def set_i18n(self, i18n: dict):
+        """Set the i18n localization object.
+
+        The dict keys should match the web component's i18n structure.
+        """
+        self._i18n = i18n
+        self.execute_js(f"return (function(){{$0.i18n = Object.assign({{}}, $0.i18n, {json.dumps(i18n)})}}).call(null)")
+
+    def get_i18n(self) -> dict | None:
+        return getattr(self, "_i18n", None)

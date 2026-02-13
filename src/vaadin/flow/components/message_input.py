@@ -1,5 +1,6 @@
 """MessageInput component."""
 
+import json
 from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
@@ -37,6 +38,14 @@ class MessageInput(Component):
         The listener receives a dict with key ``"value"`` containing the message text.
         """
         self._submit_listeners.append(listener)
+
+    def set_i18n(self, i18n: dict):
+        """Set the i18n localization object (button label, placeholder, etc.)."""
+        self._i18n = i18n
+        self.execute_js(f"return (function(){{$0.i18n = Object.assign({{}}, $0.i18n, {json.dumps(i18n)})}}).call(null)")
+
+    def get_i18n(self) -> dict | None:
+        return getattr(self, "_i18n", None)
 
     def _on_submit(self, event_data: dict):
         """Handle submit event from client."""

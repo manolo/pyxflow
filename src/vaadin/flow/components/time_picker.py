@@ -1,6 +1,7 @@
 """TimePicker component."""
 
 import datetime
+import json
 from typing import Callable, Optional
 
 from vaadin.flow.core.component import Component
@@ -143,6 +144,14 @@ class TimePicker(HasReadOnly, HasValidation, HasRequired, Component):
     def set_auto_open(self, auto_open: bool):
         if self._element:
             self.element.set_property("autoOpenDisabled", not auto_open)
+
+    def set_i18n(self, i18n: dict):
+        """Set the i18n localization object."""
+        self._i18n = i18n
+        self.execute_js(f"return (function(){{$0.i18n = Object.assign({{}}, $0.i18n, {json.dumps(i18n)})}}).call(null)")
+
+    def get_i18n(self) -> dict | None:
+        return getattr(self, "_i18n", None)
 
     def _sync_property(self, name: str, value):
         if name == "value":

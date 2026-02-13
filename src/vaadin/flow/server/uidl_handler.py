@@ -946,6 +946,8 @@ class UidlHandler:
         event_configs = {
             "click": (_CLICK_HASH, _CLICK_CONFIG),
             "change": (_CHANGE_HASH, _CHANGE_CONFIG),
+            "input": (_CHANGE_HASH, _CHANGE_CONFIG),
+            "blur": (_CHANGE_HASH, _CHANGE_CONFIG),
             "opened-changed": (_OPENED_CHANGED_HASH, _OPENED_CHANGED_CONFIG),
             "checked-changed": (_CHECKED_CHANGED_HASH, _CHECKED_CHANGED_CONFIG),
             "keydown": (_KEYDOWN_HASH, _KEYDOWN_CONFIG),

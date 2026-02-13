@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Callable
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
+from vaadin.flow.components.value_change_mode import ValueChangeMode
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -25,6 +26,8 @@ class TextField(HasReadOnly, HasValidation, HasRequired, Component):
         self._allowed_char_pattern: str = ""
         self._prefix_component: Component | None = None
         self._change_listeners: list[Callable] = []
+        self._value_change_mode: ValueChangeMode = ValueChangeMode.ON_CHANGE
+        self._value_change_timeout: int = 400
 
     def _attach(self, tree):
         super()._attach(tree)
@@ -41,7 +44,7 @@ class TextField(HasReadOnly, HasValidation, HasRequired, Component):
             self.element.set_property("allowedCharPattern", self._allowed_char_pattern)
         if self._prefix_component:
             self._attach_prefix(tree)
-        self.element.add_event_listener("change", self._handle_change)
+        self.element.add_event_listener(self._get_event_name(), self._handle_change)
 
     @property
     def value(self) -> str:
@@ -175,6 +178,33 @@ class TextField(HasReadOnly, HasValidation, HasRequired, Component):
 
     def is_clear_button_visible(self) -> bool:
         return self._clear_button_visible
+
+    def set_value_change_mode(self, mode: ValueChangeMode):
+        """Set how eagerly value changes are synced to the server.
+
+        EAGER/LAZY/TIMEOUT use the "input" event (every keystroke).
+        ON_BLUR uses the "blur" event (when focus leaves).
+        ON_CHANGE uses the "change" event (default, on Enter or blur).
+        """
+        self._value_change_mode = mode
+
+    def get_value_change_mode(self) -> ValueChangeMode:
+        return self._value_change_mode
+
+    def set_value_change_timeout(self, timeout: int):
+        """Set the timeout in ms for LAZY/TIMEOUT modes (no effect for now)."""
+        self._value_change_timeout = timeout
+
+    def get_value_change_timeout(self) -> int:
+        return self._value_change_timeout
+
+    def _get_event_name(self) -> str:
+        """Return the DOM event name for the current value change mode."""
+        if self._value_change_mode in (ValueChangeMode.EAGER, ValueChangeMode.LAZY, ValueChangeMode.TIMEOUT):
+            return "input"
+        elif self._value_change_mode == ValueChangeMode.ON_BLUR:
+            return "blur"
+        return "change"
 
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""

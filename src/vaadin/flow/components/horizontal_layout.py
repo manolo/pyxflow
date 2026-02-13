@@ -96,6 +96,11 @@ class HorizontalLayout(Component):
             if component._element:
                 component.element.get_style().set("flex-grow", "1")
 
+    def add_and_expand(self, *components: Component):
+        """Add components and set them to expand (flex-grow: 1)."""
+        self.add(*components)
+        self.expand(*components)
+
     def set_default_vertical_component_alignment(self, alignment: Alignment):
         """Set default vertical alignment for all children."""
         self._default_alignment = alignment
@@ -142,6 +147,10 @@ class HorizontalLayout(Component):
     def get_align_items(self) -> Alignment | None:
         return self._default_alignment
 
+    def get_flex_grow(self, component: Component) -> float:
+        """Get the flex-grow value of a component."""
+        return float(component.get_style().get("flex-grow") or 0)
+
     def set_flex_grow(self, flex_grow: float, *components: Component):
         """Set flex-grow for specific components."""
         for component in components:
@@ -168,6 +177,13 @@ class HorizontalLayout(Component):
         if self._element:
             component._attach(self._element._tree)
             self.element.add_child(component.element, index)
+
+    def set_wrap(self, wrap: bool):
+        """Enable or disable wrapping."""
+        self._style.set("flex-wrap", "wrap" if wrap else "nowrap")
+
+    def is_wrap(self) -> bool:
+        return self._style.get("flex-wrap") == "wrap"
 
     def set_box_sizing(self, box_sizing: str):
         """Set box-sizing ('border-box' or 'content-box')."""

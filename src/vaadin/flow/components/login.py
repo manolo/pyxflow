@@ -1,5 +1,6 @@
 """LoginForm and LoginOverlay components."""
 
+import json
 from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
@@ -98,6 +99,14 @@ class LoginForm(Component):
     def _on_forgot_password(self, event_data: dict):
         for listener in self._forgot_password_listeners:
             listener(event_data)
+
+    def set_i18n(self, i18n: dict):
+        """Set the i18n localization object (form labels, error messages, etc.)."""
+        self._i18n = i18n
+        self.execute_js(f"return (function(){{$0.i18n = Object.assign({{}}, $0.i18n, {json.dumps(i18n)})}}).call(null)")
+
+    def get_i18n(self) -> dict | None:
+        return getattr(self, "_i18n", None)
 
     def _sync_property(self, name: str, value):
         if name == "error":
@@ -212,6 +221,14 @@ class LoginOverlay(Component):
     def _on_forgot_password(self, event_data: dict):
         for listener in self._forgot_password_listeners:
             listener(event_data)
+
+    def set_i18n(self, i18n: dict):
+        """Set the i18n localization object (form labels, error messages, etc.)."""
+        self._i18n = i18n
+        self.execute_js(f"return (function(){{$0.i18n = Object.assign({{}}, $0.i18n, {json.dumps(i18n)})}}).call(null)")
+
+    def get_i18n(self) -> dict | None:
+        return getattr(self, "_i18n", None)
 
     def _sync_property(self, name: str, value):
         if name == "opened":

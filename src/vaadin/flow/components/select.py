@@ -28,6 +28,10 @@ class Select(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
         self._item_label_generator: Optional[Callable[[T], str]] = None
         self._change_listeners: list[Callable] = []
         self._list_box = None
+        self._empty_selection_allowed = False
+        self._empty_selection_caption = ""
+        self._empty_item_node = None
+        self._empty_text_node = None
 
     def _attach(self, tree):
         super()._attach(tree)
@@ -51,13 +55,17 @@ class Select(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
 
     def _create_list_box(self, tree):
         """Create the list-box element with items."""
-        if not self._items:
+        if not self._items and not self._empty_selection_allowed:
             return
 
         # Create vaadin-select-list-box element
         list_box_node = tree.create_node()
         list_box_node.attach()
         list_box_node.put(Feature.ELEMENT_DATA, "tag", "vaadin-select-list-box")
+
+        # Add empty selection item if allowed
+        if self._empty_selection_allowed:
+            self._add_empty_item(tree, list_box_node)
 
         # Add items to the list box
         for i, item in enumerate(self._items):
@@ -88,6 +96,24 @@ class Select(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
                 self.element.set_property("value", self._get_item_label(self._value))
             except ValueError:
                 pass
+
+    def _add_empty_item(self, tree, list_box_node):
+        """Add an empty selection item as first child of the list-box."""
+        item_node = tree.create_node()
+        item_node.attach()
+        item_node.put(Feature.ELEMENT_DATA, "tag", "vaadin-select-item")
+        # Set empty value attribute so selecting it deselects
+        item_node.put(Feature.ELEMENT_PROPERTY_MAP, "value", "")
+
+        # Add caption text if any
+        text_node = tree.create_node()
+        text_node.attach()
+        text_node.put(Feature.TEXT_NODE, "text", self._empty_selection_caption or "")
+        item_node.add_child(text_node)
+
+        list_box_node.add_child(item_node)
+        self._empty_item_node = item_node
+        self._empty_text_node = text_node
 
     def _get_item_label(self, item: T) -> str:
         """Get the label for an item."""
@@ -166,17 +192,29 @@ class Select(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
         pass
 
     def set_empty_selection_allowed(self, allowed: bool):
-        """Set whether empty (no) selection is allowed."""
+        """Set whether empty (no) selection is allowed.
+
+        When enabled, an empty item is added as the first option in the
+        dropdown, allowing the user to deselect the current value.
+        """
         self._empty_selection_allowed = allowed
-        if self._element:
-            self.element.set_property("placeholder", self._empty_selection_caption if allowed else "")
+        if self._element and self._element._tree:
+            tree = self._element._tree
+            if allowed and self._empty_item_node is None and self._list_box is not None:
+                self._add_empty_item(tree, self._list_box)
+            elif not allowed and self._empty_item_node is not None and self._list_box is not None:
+                self._list_box.remove_child(self._empty_item_node)
+                self._empty_item_node = None
+                self._empty_text_node = None
 
     def is_empty_selection_allowed(self) -> bool:
-        return getattr(self, "_empty_selection_allowed", False)
+        return self._empty_selection_allowed
 
     def set_empty_selection_caption(self, caption: str):
         """Set the caption shown when no value is selected."""
         self._empty_selection_caption = caption
+        if hasattr(self, "_empty_text_node") and self._empty_text_node is not None:
+            self._empty_text_node.put(Feature.TEXT_NODE, "text", caption)
 
     def set_overlay_width(self, width: str):
         """Set the overlay width (e.g. '300px')."""
