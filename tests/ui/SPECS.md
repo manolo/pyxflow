@@ -3,8 +3,8 @@
 ## Test Infrastructure
 
 - **Framework:** Playwright (Python)
-- **Server:** PyFlow demo app at `http://localhost:8088`
-- **Layout:** All test views share `TestMainLayout` (HorizontalLayout with SideNav + content area)
+- **Server:** PyFlow test app at `http://localhost:8088` (`python -m tests`)
+- **Layout:** All test views in `tests/views/` share `TestMainLayout` (HorizontalLayout with SideNav + content area)
 - **Navigation:** SPA navigation via SideNav clicks; `navigate_to()` helper with `page.goto()` fallback
 - **Shared page:** Single browser context reused across all 29 test modules (session-scoped `shared_page` fixture)
 - **Fail-fast:** If >4 consecutive tests fail, abort the entire suite

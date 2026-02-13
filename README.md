@@ -286,7 +286,7 @@ pytest tests/ui/
 pytest tests/ui/ --headed
 ```
 
-UI tests are in `tests/ui/` and excluded from the default `pytest` run. They use a shared browser session with SideNav-based SPA navigation across 29 test views, each backed by a `TestMainLayout` with a menu sidebar.
+UI tests are in `tests/ui/` and excluded from the default `pytest` run. They use a shared browser session with SideNav-based SPA navigation across 29 test views in `tests/views/`, each backed by a `TestMainLayout` with a menu sidebar. The test server auto-starts via `python -m tests`.
 
 ### Project structure
 
@@ -298,12 +298,14 @@ src/vaadin/flow/
 └── server/         # HTTP server (aiohttp), UIDL protocol handler
 
 demo/
-├── views/          # Demo views + 29 test views with TestMainLayout
+├── views/          # Demo views (7 routes)
 └── __main__.py     # python -m demo
 
 tests/
+├── views/          # 29 test views with TestMainLayout (independent app)
 ├── unit/           # Unit tests (default pytest target)
-└── ui/             # Playwright integration tests (run explicitly)
+├── ui/             # Playwright integration tests (run explicitly)
+└── __main__.py     # python -m tests (test server on :8088)
 ```
 
 ### Architecture

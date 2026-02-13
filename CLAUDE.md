@@ -57,9 +57,10 @@ vaadin-pyflow/
 │   ├── server/         # HTTP server (aiohttp), UIDL handler
 │   └── app.py          # FlowApp entry point
 ├── demo/               # Demo app + __main__.py entry point
-│   ├── views/          # Demo views + 29 test views with TestMainLayout (SideNav router layout)
+│   ├── views/          # Demo views (7 routes)
 │   └── services/       # PeopleService (data access layer)
 ├── tests/
+│   ├── views/          # 29 test views with TestMainLayout (independent app, python -m tests)
 │   ├── unit/           # 2274 unit tests (default pytest target)
 │   └── ui/             # 323 Playwright UI tests (run explicitly via pytest tests/ui/)
 └── STATUS.md           # Implementation progress
