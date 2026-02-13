@@ -71,13 +71,26 @@ def get_or_create_session(request: web.Request) -> tuple[str, dict[str, Any]]:
 
 async def handle_root(request: web.Request) -> web.Response:
     """Handle GET / - serve index.html."""
-    # Check if this is an init request
-    if request.query.get("v-r") == "init":
+    vr = request.query.get("v-r")
+    if vr == "init":
         return await handle_init(request)
+    if vr == "health":
+        return await handle_health(request)
 
     # Serve index.html from bundle
     html = get_index_html()
     return web.Response(text=html, content_type="text/html")
+
+
+async def handle_health(request: web.Request) -> web.Response:
+    """Handle GET /?v-r=health — return server info and registered routes."""
+    from vaadin.flow.router import get_all_routes
+    routes = sorted(get_all_routes().keys())
+    return web.json_response({
+        "pyflow": True,
+        "dev": _dev_mode,
+        "routes": routes,
+    })
 
 
 async def handle_init(request: web.Request) -> web.Response:
