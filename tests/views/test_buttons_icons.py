@@ -1,6 +1,6 @@
 """Test View 1: Buttons & Icons — /test/buttons-icons"""
 
-from vaadin.flow import Route
+from vaadin.flow import Route, RouteAlias
 from vaadin.flow.components import (
     Button, DrawerToggle, HorizontalLayout, Icon, Span,
     TextField, VerticalLayout,
@@ -11,6 +11,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/buttons-icons", page_title="Test: Buttons & Icons", layout=TestMainLayout)
+@RouteAlias("")
 @Menu(title="Buttons & Icons", order=1)
 class TestButtonsIconsView(VerticalLayout):
     def __init__(self):
