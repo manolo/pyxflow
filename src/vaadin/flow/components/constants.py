@@ -103,6 +103,22 @@ class SortDirection(str, Enum):
     DESCENDING = "desc"
 
 
+class GridDropMode(str, Enum):
+    """Grid drop mode for drag-and-drop."""
+    BETWEEN = "between"
+    ON_TOP = "on-top"
+    ON_TOP_OR_BETWEEN = "on-top-or-between"
+    ON_GRID = "on-grid"
+
+
+class AutoExpandMode(str, Enum):
+    """MultiSelectComboBox auto-expand mode."""
+    NONE = "none"
+    VERTICAL = "vertical"
+    HORIZONTAL = "horizontal"
+    BOTH = "both"
+
+
 class SelectionMode(str, Enum):
     """Grid selection mode."""
     SINGLE = "SINGLE"

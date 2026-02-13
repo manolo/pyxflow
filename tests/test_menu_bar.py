@@ -279,3 +279,238 @@ class TestMenuBar:
                           and c.get("type") == "splice"
                           and c.get("feat") == Feature.ELEMENT_CHILDREN_LIST]
         assert len(children_splices) >= 2
+
+
+class TestMenuItemKeepOpen:
+    """Tests for MenuItem.set_keep_open / is_keep_open."""
+
+    def test_default_is_false(self):
+        item = MenuItem("Test")
+        assert item.is_keep_open() is False
+
+    def test_set_keep_open_true(self):
+        item = MenuItem("Test")
+        item.set_keep_open(True)
+        assert item.is_keep_open() is True
+
+    def test_set_keep_open_false(self):
+        item = MenuItem("Test")
+        item.set_keep_open(True)
+        item.set_keep_open(False)
+        assert item.is_keep_open() is False
+
+    def test_keep_open_creates_node_property(self):
+        tree = StateTree()
+        tree._app_id = "ROOT-1234567"
+
+        mb = MenuBar()
+        item = mb.add_item("Stay Open")
+        item.set_keep_open(True)
+        mb._attach(tree)
+
+        changes = tree.collect_changes()
+        keep_open = [c for c in changes
+                     if c.get("key") == "keepOpen"
+                     and c.get("feat") == Feature.ELEMENT_PROPERTY_MAP]
+        assert len(keep_open) == 1
+        assert keep_open[0]["value"] is True
+
+    def test_keep_open_false_no_property(self):
+        """When keep_open is False (default), no keepOpen property should be emitted."""
+        tree = StateTree()
+        tree._app_id = "ROOT-1234567"
+
+        mb = MenuBar()
+        mb.add_item("Normal")
+        mb._attach(tree)
+
+        changes = tree.collect_changes()
+        keep_open = [c for c in changes
+                     if c.get("key") == "keepOpen"
+                     and c.get("feat") == Feature.ELEMENT_PROPERTY_MAP]
+        assert len(keep_open) == 0
+
+
+class TestMenuItemDisableOnClick:
+    """Tests for MenuItem.set_disable_on_click / is_disable_on_click."""
+
+    def test_default_is_false(self):
+        item = MenuItem("Test")
+        assert item.is_disable_on_click() is False
+
+    def test_set_disable_on_click_true(self):
+        item = MenuItem("Test")
+        item.set_disable_on_click(True)
+        assert item.is_disable_on_click() is True
+
+    def test_set_disable_on_click_false(self):
+        item = MenuItem("Test")
+        item.set_disable_on_click(True)
+        item.set_disable_on_click(False)
+        assert item.is_disable_on_click() is False
+
+    def test_disable_on_click_creates_node_property(self):
+        tree = StateTree()
+        tree._app_id = "ROOT-1234567"
+
+        mb = MenuBar()
+        item = mb.add_item("Once")
+        item.set_disable_on_click(True)
+        mb._attach(tree)
+
+        changes = tree.collect_changes()
+        disable = [c for c in changes
+                   if c.get("key") == "disableOnClick"
+                   and c.get("feat") == Feature.ELEMENT_PROPERTY_MAP]
+        assert len(disable) == 1
+        assert disable[0]["value"] is True
+
+    def test_disable_on_click_false_no_property(self):
+        """When disable_on_click is False (default), no property emitted."""
+        tree = StateTree()
+        tree._app_id = "ROOT-1234567"
+
+        mb = MenuBar()
+        mb.add_item("Normal")
+        mb._attach(tree)
+
+        changes = tree.collect_changes()
+        disable = [c for c in changes
+                   if c.get("key") == "disableOnClick"
+                   and c.get("feat") == Feature.ELEMENT_PROPERTY_MAP]
+        assert len(disable) == 0
+
+
+class TestMenuItemAriaLabel:
+    """Tests for MenuItem.set_aria_label / get_aria_label."""
+
+    def test_default_is_none(self):
+        item = MenuItem("Test")
+        assert item.get_aria_label() is None
+
+    def test_set_aria_label(self):
+        item = MenuItem("Test")
+        item.set_aria_label("Open file menu")
+        assert item.get_aria_label() == "Open file menu"
+
+    def test_aria_label_creates_node_property(self):
+        tree = StateTree()
+        tree._app_id = "ROOT-1234567"
+
+        mb = MenuBar()
+        item = mb.add_item("File")
+        item.set_aria_label("File menu")
+        mb._attach(tree)
+
+        changes = tree.collect_changes()
+        aria = [c for c in changes
+                if c.get("key") == "ariaLabel"
+                and c.get("feat") == Feature.ELEMENT_PROPERTY_MAP]
+        assert len(aria) == 1
+        assert aria[0]["value"] == "File menu"
+
+    def test_no_aria_label_no_property(self):
+        """When aria_label is not set, no ariaLabel property should be emitted."""
+        tree = StateTree()
+        tree._app_id = "ROOT-1234567"
+
+        mb = MenuBar()
+        mb.add_item("Normal")
+        mb._attach(tree)
+
+        changes = tree.collect_changes()
+        aria = [c for c in changes
+                if c.get("key") == "ariaLabel"
+                and c.get("feat") == Feature.ELEMENT_PROPERTY_MAP]
+        assert len(aria) == 0
+
+
+class TestSubMenuSeparator:
+    """Tests for SubMenu.add_separator."""
+
+    def test_add_separator(self):
+        parent = MenuItem("File")
+        sub = parent.get_sub_menu()
+        sep = sub.add_separator()
+        assert isinstance(sep, MenuItem)
+        assert sep._is_separator is True
+        assert sep.get_text() == ""
+
+    def test_separator_in_items_list(self):
+        parent = MenuItem("File")
+        sub = parent.get_sub_menu()
+        sub.add_item("New")
+        sub.add_separator()
+        sub.add_item("Open")
+        items = sub.get_items()
+        assert len(items) == 3
+        assert items[1]._is_separator is True
+
+    def test_separator_creates_node_property(self):
+        tree = StateTree()
+        tree._app_id = "ROOT-1234567"
+
+        mb = MenuBar()
+        file_item = mb.add_item("File")
+        file_item.get_sub_menu().add_item("New")
+        file_item.get_sub_menu().add_separator()
+        file_item.get_sub_menu().add_item("Open")
+        mb._attach(tree)
+
+        changes = tree.collect_changes()
+        sep_props = [c for c in changes
+                     if c.get("key") == "separator"
+                     and c.get("feat") == Feature.ELEMENT_PROPERTY_MAP]
+        assert len(sep_props) == 1
+        assert sep_props[0]["value"] is True
+
+
+class TestSubMenuRemove:
+    """Tests for SubMenu.remove and SubMenu.remove_all."""
+
+    def test_remove_single_item(self):
+        parent = MenuItem("File")
+        sub = parent.get_sub_menu()
+        item1 = sub.add_item("New")
+        item2 = sub.add_item("Open")
+        sub.remove(item1)
+        items = sub.get_items()
+        assert len(items) == 1
+        assert items[0] is item2
+
+    def test_remove_multiple_items(self):
+        parent = MenuItem("File")
+        sub = parent.get_sub_menu()
+        item1 = sub.add_item("New")
+        item2 = sub.add_item("Open")
+        item3 = sub.add_item("Save")
+        sub.remove(item1, item3)
+        items = sub.get_items()
+        assert len(items) == 1
+        assert items[0] is item2
+
+    def test_remove_nonexistent_item(self):
+        """Removing an item not in the submenu should not raise an error."""
+        parent = MenuItem("File")
+        sub = parent.get_sub_menu()
+        sub.add_item("New")
+        other_item = MenuItem("Other")
+        sub.remove(other_item)  # should not raise
+        assert len(sub.get_items()) == 1
+
+    def test_remove_all(self):
+        parent = MenuItem("File")
+        sub = parent.get_sub_menu()
+        sub.add_item("New")
+        sub.add_item("Open")
+        sub.add_item("Save")
+        assert len(sub.get_items()) == 3
+        sub.remove_all()
+        assert len(sub.get_items()) == 0
+
+    def test_remove_all_empty(self):
+        """remove_all on empty submenu should not raise."""
+        parent = MenuItem("File")
+        sub = parent.get_sub_menu()
+        sub.remove_all()
+        assert len(sub.get_items()) == 0

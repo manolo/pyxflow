@@ -57,6 +57,8 @@ class TimePicker(HasReadOnly, HasValidation, HasRequired, Component):
 
         # Register change listener
         self.element.add_event_listener("change", self._handle_change)
+        if getattr(self, "_opened_change_listeners", None):
+            self.element.add_event_listener("opened-changed", self._handle_opened_changed)
 
     @staticmethod
     def _format_time(t: datetime.time) -> str:
@@ -156,6 +158,29 @@ class TimePicker(HasReadOnly, HasValidation, HasRequired, Component):
 
     def get_i18n(self) -> dict | None:
         return getattr(self, "_i18n", None)
+
+    def open(self):
+        """Open the time picker overlay."""
+        if self._element:
+            self.element.set_property("opened", True)
+
+    def close(self):
+        """Close the time picker overlay."""
+        if self._element:
+            self.element.set_property("opened", False)
+
+    def add_opened_change_listener(self, listener: Callable):
+        """Add a listener for when the overlay opens or closes."""
+        if not hasattr(self, "_opened_change_listeners"):
+            self._opened_change_listeners = []
+        self._opened_change_listeners.append(listener)
+        if self._element and len(self._opened_change_listeners) == 1:
+            self.element.add_event_listener("opened-changed", self._handle_opened_changed)
+
+    def _handle_opened_changed(self, event_data: dict):
+        """Handle opened-changed event."""
+        for listener in getattr(self, "_opened_change_listeners", []):
+            listener(event_data)
 
     def add_theme_variants(self, *variants: TimePickerVariant):
         """Add theme variants to the time picker."""

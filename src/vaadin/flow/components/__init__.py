@@ -63,9 +63,9 @@ from vaadin.flow.components.constants import (
     Alignment as FlexAlignment,
     Orientation, ScrollDirection,
     # Grid
-    SortDirection, SelectionMode, ColumnTextAlign,
+    SortDirection, SelectionMode, ColumnTextAlign, GridDropMode,
     # Field
-    Autocomplete, ValueChangeMode,
+    Autocomplete, ValueChangeMode, AutoExpandMode,
     # Position
     PopoverPosition,
     # Theme variants
@@ -197,8 +197,10 @@ __all__ = [
     "ColumnTextAlign",
     "SelectionMode",
     "SortDirection",
+    "GridDropMode",
     # Enums — field
     "Autocomplete",
+    "AutoExpandMode",
     "ValueChangeMode",
     # Enums — position
     "PopoverPosition",

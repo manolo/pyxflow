@@ -46,6 +46,10 @@ class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):
             self.element.set_property("max", self._max.isoformat())
         if self._clear_button_visible:
             self.element.set_property("clearButtonVisible", True)
+        if getattr(self, "_week_numbers_visible", False):
+            self.element.set_property("showWeekNumbers", True)
+        if getattr(self, "_initial_position", None):
+            self.element.set_property("initialPosition", self._initial_position.isoformat())
         # Init connector
         el_ref = {"@v-node": self.element.node.id}
         tree.queue_execute([
@@ -55,6 +59,8 @@ class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):
 
         # Register change listener
         self.element.add_event_listener("change", self._handle_change)
+        if getattr(self, "_opened_change_listeners", None):
+            self.element.add_event_listener("opened-changed", self._handle_opened_changed)
 
     @property
     def value(self) -> Optional[datetime.date]:
@@ -149,6 +155,47 @@ class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):
 
     def get_i18n(self) -> dict | None:
         return getattr(self, "_i18n", None)
+
+    def set_week_numbers_visible(self, visible: bool):
+        """Set whether ISO week numbers are shown."""
+        self._week_numbers_visible = visible
+        if self._element:
+            self.element.set_property("showWeekNumbers", visible)
+
+    def is_week_numbers_visible(self) -> bool:
+        return getattr(self, "_week_numbers_visible", False)
+
+    def set_initial_position(self, date: "datetime.date | None"):
+        """Set the initial calendar position when no value is selected."""
+        self._initial_position = date
+        if self._element:
+            self.element.set_property("initialPosition", date.isoformat() if date else "")
+
+    def get_initial_position(self):
+        return getattr(self, "_initial_position", None)
+
+    def open(self):
+        """Open the date picker overlay."""
+        if self._element:
+            self.element.set_property("opened", True)
+
+    def close(self):
+        """Close the date picker overlay."""
+        if self._element:
+            self.element.set_property("opened", False)
+
+    def add_opened_change_listener(self, listener: Callable):
+        """Add a listener for when the overlay opens or closes."""
+        if not hasattr(self, "_opened_change_listeners"):
+            self._opened_change_listeners = []
+        self._opened_change_listeners.append(listener)
+        if self._element and len(self._opened_change_listeners) == 1:
+            self.element.add_event_listener("opened-changed", self._handle_opened_changed)
+
+    def _handle_opened_changed(self, event_data: dict):
+        """Handle opened-changed event."""
+        for listener in getattr(self, "_opened_change_listeners", []):
+            listener(event_data)
 
     def add_theme_variants(self, *variants: DatePickerVariant):
         """Add theme variants to the date picker."""

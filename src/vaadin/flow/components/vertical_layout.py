@@ -158,6 +158,10 @@ class VerticalLayout(Component):
             component._attach(self._element._tree)
             self.element.add_child(component.element, index)
 
+    def add_component_as_first(self, component: Component):
+        """Add a component as the first child."""
+        self.add_component_at_index(0, component)
+
     def set_wrap(self, wrap: bool):
         """Enable or disable wrapping."""
         self._style.set("flex-wrap", "wrap" if wrap else "nowrap")

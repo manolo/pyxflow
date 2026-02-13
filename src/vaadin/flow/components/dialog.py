@@ -332,6 +332,32 @@ class Dialog(Component):
         if self._element:
             self.element.get_style().set("--vaadin-dialog-overlay-offset-left", left)
 
+    def add_resize_listener(self, listener: Callable):
+        """Add a listener called when the dialog is resized."""
+        if not hasattr(self, "_resize_listeners"):
+            self._resize_listeners = []
+        self._resize_listeners.append(listener)
+        if self._element and len(self._resize_listeners) == 1:
+            self.element.add_event_listener("resize", self._handle_resize)
+
+    def add_dragged_listener(self, listener: Callable):
+        """Add a listener called when the dialog is dragged."""
+        if not hasattr(self, "_dragged_listeners"):
+            self._dragged_listeners = []
+        self._dragged_listeners.append(listener)
+        if self._element and len(self._dragged_listeners) == 1:
+            self.element.add_event_listener("dragged", self._handle_dragged)
+
+    def _handle_resize(self, event_data: dict):
+        """Handle resize event."""
+        for listener in getattr(self, "_resize_listeners", []):
+            listener(event_data)
+
+    def _handle_dragged(self, event_data: dict):
+        """Handle dragged event."""
+        for listener in getattr(self, "_dragged_listeners", []):
+            listener(event_data)
+
     def add_theme_variants(self, *variants: DialogVariant):
         """Add theme variants to the dialog."""
         self.add_theme_name(*variants)

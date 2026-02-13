@@ -363,3 +363,139 @@ class TestSpan:
         )
         assert text_node is not None
         assert text_node["value"] == "Hello World"
+
+
+class TestVerticalLayoutAddComponentAsFirst:
+    """Tests for VerticalLayout.add_component_as_first."""
+
+    @pytest.fixture
+    def attached_layout(self):
+        from vaadin.flow.components import VerticalLayout
+        from vaadin.flow.core.component import UI
+
+        tree = StateTree()
+        ui = UI(tree)
+        layout = VerticalLayout()
+        layout._ui = ui
+        layout._attach(tree)
+        return layout, tree
+
+    def test_add_component_as_first_empty_layout(self, attached_layout):
+        """Adding to an empty layout places component as first."""
+        from vaadin.flow.components import Span
+
+        layout, tree = attached_layout
+        tree.collect_changes()
+
+        c = Span("First")
+        layout.add_component_as_first(c)
+        assert layout._children[0] is c
+        assert len(layout._children) == 1
+
+    def test_add_component_as_first_with_existing_children(self, attached_layout):
+        """Component added as first should precede existing children."""
+        from vaadin.flow.components import Span
+
+        layout, tree = attached_layout
+        a = Span("A")
+        b = Span("B")
+        layout.add(a, b)
+        tree.collect_changes()
+
+        c = Span("C")
+        layout.add_component_as_first(c)
+
+        assert layout._children[0] is c
+        assert layout._children[1] is a
+        assert layout._children[2] is b
+        assert len(layout._children) == 3
+
+    def test_add_component_as_first_creates_splice_at_index_0(self, attached_layout):
+        """The splice change should be at index 0."""
+        from vaadin.flow.components import Span
+
+        layout, tree = attached_layout
+        layout.add(Span("A"))
+        tree.collect_changes()
+
+        c = Span("C")
+        layout.add_component_as_first(c)
+
+        changes = tree.collect_changes()
+        splice = next(
+            (ch for ch in changes
+             if ch.get("type") == "splice"
+             and ch.get("feat") == Feature.ELEMENT_CHILDREN_LIST
+             and ch.get("node") == layout.element.node_id),
+            None
+        )
+        assert splice is not None
+        assert splice["index"] == 0
+
+
+class TestHorizontalLayoutAddComponentAsFirst:
+    """Tests for HorizontalLayout.add_component_as_first."""
+
+    @pytest.fixture
+    def attached_layout(self):
+        from vaadin.flow.components import HorizontalLayout
+        from vaadin.flow.core.component import UI
+
+        tree = StateTree()
+        ui = UI(tree)
+        layout = HorizontalLayout()
+        layout._ui = ui
+        layout._attach(tree)
+        return layout, tree
+
+    def test_add_component_as_first_empty_layout(self, attached_layout):
+        """Adding to an empty layout places component as first."""
+        from vaadin.flow.components import Span
+
+        layout, tree = attached_layout
+        tree.collect_changes()
+
+        c = Span("First")
+        layout.add_component_as_first(c)
+        assert layout._children[0] is c
+        assert len(layout._children) == 1
+
+    def test_add_component_as_first_with_existing_children(self, attached_layout):
+        """Component added as first should precede existing children."""
+        from vaadin.flow.components import Span
+
+        layout, tree = attached_layout
+        a = Span("A")
+        b = Span("B")
+        layout.add(a, b)
+        tree.collect_changes()
+
+        c = Span("C")
+        layout.add_component_as_first(c)
+
+        assert layout._children[0] is c
+        assert layout._children[1] is a
+        assert layout._children[2] is b
+        assert len(layout._children) == 3
+
+    def test_add_component_as_first_creates_splice_at_index_0(self, attached_layout):
+        """The splice change should be at index 0."""
+        from vaadin.flow.components import Span
+
+        layout, tree = attached_layout
+        layout.add(Span("A"))
+        tree.collect_changes()
+
+        c = Span("C")
+        layout.add_component_as_first(c)
+
+        changes = tree.collect_changes()
+        splice = next(
+            (ch for ch in changes
+             if ch.get("type") == "splice"
+             and ch.get("feat") == Feature.ELEMENT_CHILDREN_LIST
+             and ch.get("node") == layout.element.node_id),
+            None
+        )
+        assert splice is not None
+        assert splice["index"] == 0

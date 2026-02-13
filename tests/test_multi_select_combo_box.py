@@ -306,3 +306,204 @@ class TestMultiSelectComboBox:
         cb._attach(tree)
         # Should not raise
         cb.reset_data_communicator()
+
+
+class TestMultiSelectComboBoxAutoExpand:
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_default_auto_expand(self):
+        """Default auto-expand mode is NONE."""
+        from vaadin.flow.components.constants import AutoExpandMode
+        cb = MultiSelectComboBox()
+        assert cb.get_auto_expand() == AutoExpandMode.NONE
+
+    def test_set_auto_expand_horizontal(self, tree):
+        """HORIZONTAL mode sets autoExpandHorizontally=true, autoExpandVertically=false."""
+        from vaadin.flow.components.constants import AutoExpandMode
+        cb = MultiSelectComboBox()
+        cb.set_auto_expand(AutoExpandMode.HORIZONTAL)
+        cb._attach(tree)
+
+        changes = tree.collect_changes()
+        h = [c for c in changes if c.get("key") == "autoExpandHorizontally"]
+        v = [c for c in changes if c.get("key") == "autoExpandVertically"]
+        assert any(c["value"] is True for c in h)
+        assert any(c["value"] is False for c in v)
+
+    def test_set_auto_expand_vertical(self, tree):
+        """VERTICAL mode sets autoExpandVertically=true, autoExpandHorizontally=false."""
+        from vaadin.flow.components.constants import AutoExpandMode
+        cb = MultiSelectComboBox()
+        cb.set_auto_expand(AutoExpandMode.VERTICAL)
+        cb._attach(tree)
+
+        changes = tree.collect_changes()
+        h = [c for c in changes if c.get("key") == "autoExpandHorizontally"]
+        v = [c for c in changes if c.get("key") == "autoExpandVertically"]
+        assert any(c["value"] is False for c in h)
+        assert any(c["value"] is True for c in v)
+
+    def test_set_auto_expand_both(self, tree):
+        """BOTH mode sets both properties to true."""
+        from vaadin.flow.components.constants import AutoExpandMode
+        cb = MultiSelectComboBox()
+        cb.set_auto_expand(AutoExpandMode.BOTH)
+        cb._attach(tree)
+
+        changes = tree.collect_changes()
+        h = [c for c in changes if c.get("key") == "autoExpandHorizontally"]
+        v = [c for c in changes if c.get("key") == "autoExpandVertically"]
+        assert any(c["value"] is True for c in h)
+        assert any(c["value"] is True for c in v)
+
+    def test_set_auto_expand_none_no_properties(self, tree):
+        """NONE mode does not set any autoExpand properties on attach."""
+        from vaadin.flow.components.constants import AutoExpandMode
+        cb = MultiSelectComboBox()
+        cb.set_auto_expand(AutoExpandMode.NONE)
+        cb._attach(tree)
+
+        changes = tree.collect_changes()
+        h = [c for c in changes if c.get("key") == "autoExpandHorizontally"]
+        v = [c for c in changes if c.get("key") == "autoExpandVertically"]
+        assert len(h) == 0
+        assert len(v) == 0
+
+    def test_get_auto_expand(self):
+        """get_auto_expand returns the mode that was set."""
+        from vaadin.flow.components.constants import AutoExpandMode
+        cb = MultiSelectComboBox()
+        cb.set_auto_expand(AutoExpandMode.BOTH)
+        assert cb.get_auto_expand() == AutoExpandMode.BOTH
+
+    def test_set_auto_expand_after_attach(self, tree):
+        """Setting auto-expand after attach updates properties immediately."""
+        from vaadin.flow.components.constants import AutoExpandMode
+        cb = MultiSelectComboBox()
+        cb._attach(tree)
+        tree.collect_changes()
+
+        cb.set_auto_expand(AutoExpandMode.HORIZONTAL)
+        changes = tree.collect_changes()
+        h = [c for c in changes if c.get("key") == "autoExpandHorizontally"]
+        v = [c for c in changes if c.get("key") == "autoExpandVertically"]
+        assert any(c["value"] is True for c in h)
+        assert any(c["value"] is False for c in v)
+
+
+class TestMultiSelectComboBoxSelectedItemsOnTop:
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_default_selected_items_on_top(self):
+        """Default is False."""
+        cb = MultiSelectComboBox()
+        assert cb.is_selected_items_on_top() is False
+
+    def test_set_selected_items_on_top_before_attach(self, tree):
+        """Setting before attach applies on attach."""
+        cb = MultiSelectComboBox()
+        cb.set_selected_items_on_top(True)
+        cb._attach(tree)
+
+        changes = tree.collect_changes()
+        sot = [c for c in changes if c.get("key") == "selectedItemsOnTop"]
+        assert any(c["value"] is True for c in sot)
+
+    def test_set_selected_items_on_top_after_attach(self, tree):
+        """Setting after attach updates property immediately."""
+        cb = MultiSelectComboBox()
+        cb._attach(tree)
+        tree.collect_changes()
+
+        cb.set_selected_items_on_top(True)
+        changes = tree.collect_changes()
+        sot = [c for c in changes if c.get("key") == "selectedItemsOnTop"]
+        assert any(c["value"] is True for c in sot)
+
+    def test_is_selected_items_on_top(self):
+        """Getter reflects what was set."""
+        cb = MultiSelectComboBox()
+        cb.set_selected_items_on_top(True)
+        assert cb.is_selected_items_on_top() is True
+
+
+class TestMultiSelectComboBoxKeepFilter:
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_default_keep_filter(self):
+        """Default is False."""
+        cb = MultiSelectComboBox()
+        assert cb.is_keep_filter() is False
+
+    def test_set_keep_filter_before_attach(self, tree):
+        """Setting before attach applies on attach."""
+        cb = MultiSelectComboBox()
+        cb.set_keep_filter(True)
+        cb._attach(tree)
+
+        changes = tree.collect_changes()
+        kf = [c for c in changes if c.get("key") == "keepFilter"]
+        assert any(c["value"] is True for c in kf)
+
+    def test_set_keep_filter_after_attach(self, tree):
+        """Setting after attach updates property immediately."""
+        cb = MultiSelectComboBox()
+        cb._attach(tree)
+        tree.collect_changes()
+
+        cb.set_keep_filter(True)
+        changes = tree.collect_changes()
+        kf = [c for c in changes if c.get("key") == "keepFilter"]
+        assert any(c["value"] is True for c in kf)
+
+    def test_is_keep_filter(self):
+        """Getter reflects what was set."""
+        cb = MultiSelectComboBox()
+        cb.set_keep_filter(True)
+        assert cb.is_keep_filter() is True
+
+
+class TestMultiSelectComboBoxAllowCustomValue:
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_set_allow_custom_value_before_attach(self, tree):
+        """Setting before attach applies on attach."""
+        cb = MultiSelectComboBox()
+        cb.set_allow_custom_value(True)
+        cb._attach(tree)
+
+        changes = tree.collect_changes()
+        acv = [c for c in changes if c.get("key") == "allowCustomValue"]
+        assert any(c["value"] is True for c in acv)
+
+    def test_set_allow_custom_value_after_attach(self, tree):
+        """Setting after attach updates property immediately."""
+        cb = MultiSelectComboBox()
+        cb._attach(tree)
+        tree.collect_changes()
+
+        cb.set_allow_custom_value(True)
+        changes = tree.collect_changes()
+        acv = [c for c in changes if c.get("key") == "allowCustomValue"]
+        assert any(c["value"] is True for c in acv)
+
+    def test_allow_custom_value_not_set_by_default(self, tree):
+        """No allowCustomValue property when not explicitly set."""
+        cb = MultiSelectComboBox()
+        cb._attach(tree)
+
+        changes = tree.collect_changes()
+        acv = [c for c in changes if c.get("key") == "allowCustomValue"]
+        assert len(acv) == 0

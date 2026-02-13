@@ -130,3 +130,40 @@ class TestDateTimePicker:
         dtp._attach(tree)
         dtp.value = dt
         assert dtp.value == dt
+
+
+class TestDateTimePickerWeekNumbers:
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_default_week_numbers_not_visible(self):
+        """Week numbers are not visible by default."""
+        dtp = DateTimePicker()
+        assert dtp.is_week_numbers_visible() is False
+
+    def test_set_week_numbers_visible(self):
+        """set_week_numbers_visible updates internal state."""
+        dtp = DateTimePicker()
+        dtp.set_week_numbers_visible(True)
+        assert dtp.is_week_numbers_visible() is True
+
+    def test_set_week_numbers_visible_false(self):
+        """Setting False after True returns to False."""
+        dtp = DateTimePicker()
+        dtp.set_week_numbers_visible(True)
+        dtp.set_week_numbers_visible(False)
+        assert dtp.is_week_numbers_visible() is False
+
+    def test_set_week_numbers_after_attach(self, tree):
+        """Setting after attach executes JS on the internal date picker."""
+        dtp = DateTimePicker()
+        dtp._attach(tree)
+        tree._pending_execute.clear()
+
+        dtp.set_week_numbers_visible(True)
+        # Should have queued a JS execution for the sub-field
+        execute = tree._pending_execute
+        js_strings = [cmd[-1] for cmd in execute]
+        assert any("showWeekNumbers" in js and "true" in js for js in js_strings)

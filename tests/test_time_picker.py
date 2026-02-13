@@ -191,3 +191,93 @@ class TestTimePicker:
     def test_get_label(self):
         tp = TimePicker("Test")
         assert tp.get_label() == "Test"
+
+
+class TestTimePickerOpenClose:
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_open_after_attach(self, tree):
+        """open() sets opened=True."""
+        tp = TimePicker()
+        tp._attach(tree)
+        tree.collect_changes()
+
+        tp.open()
+        changes = tree.collect_changes()
+        opened = [c for c in changes if c.get("key") == "opened"]
+        assert any(c["value"] is True for c in opened)
+
+    def test_close_after_attach(self, tree):
+        """close() sets opened=False."""
+        tp = TimePicker()
+        tp._attach(tree)
+        tree.collect_changes()
+
+        tp.open()
+        tree.collect_changes()
+
+        tp.close()
+        changes = tree.collect_changes()
+        opened = [c for c in changes if c.get("key") == "opened"]
+        assert any(c["value"] is False for c in opened)
+
+    def test_open_before_attach_is_noop(self):
+        """open() before attach does nothing (no crash)."""
+        tp = TimePicker()
+        tp.open()  # should not raise
+
+    def test_close_before_attach_is_noop(self):
+        """close() before attach does nothing (no crash)."""
+        tp = TimePicker()
+        tp.close()  # should not raise
+
+
+class TestTimePickerOpenedChangeListener:
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_add_opened_change_listener_before_attach(self, tree):
+        """Listener added before attach is registered during attach."""
+        tp = TimePicker()
+        events = []
+        tp.add_opened_change_listener(lambda e: events.append(e))
+        tp._attach(tree)
+
+        # Simulate opened-changed event
+        tp._handle_opened_changed({"value": True})
+        assert len(events) == 1
+        assert events[0]["value"] is True
+
+    def test_add_opened_change_listener_after_attach(self, tree):
+        """Listener added after attach is registered immediately."""
+        tp = TimePicker()
+        tp._attach(tree)
+
+        events = []
+        tp.add_opened_change_listener(lambda e: events.append(e))
+
+        # Event listener should be registered on the element
+        assert "opened-changed" in tp.element._listeners
+
+        tp._handle_opened_changed({"value": False})
+        assert len(events) == 1
+        assert events[0]["value"] is False
+
+    def test_multiple_opened_change_listeners(self, tree):
+        """Multiple listeners all receive events."""
+        tp = TimePicker()
+        tp._attach(tree)
+
+        events1 = []
+        events2 = []
+        tp.add_opened_change_listener(lambda e: events1.append(e))
+        tp.add_opened_change_listener(lambda e: events2.append(e))
+
+        tp._handle_opened_changed({"value": True})
+        assert len(events1) == 1
+        assert len(events2) == 1

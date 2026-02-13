@@ -26,6 +26,23 @@ class SubMenu:
         """Get the items in this submenu."""
         return self._parent._children.copy()
 
+    def add_separator(self) -> "MenuItem":
+        """Add a separator item."""
+        separator = MenuItem("")
+        separator._is_separator = True
+        self._parent._children.append(separator)
+        return separator
+
+    def remove(self, *items: "MenuItem"):
+        """Remove items from this submenu."""
+        for item in items:
+            if item in self._parent._children:
+                self._parent._children.remove(item)
+
+    def remove_all(self):
+        """Remove all items from this submenu."""
+        self._parent._children.clear()
+
 
 class MenuItem:
     """Represents a menu item in a MenuBar.
@@ -86,6 +103,27 @@ class MenuItem:
     def is_parent_item(self) -> bool:
         """Check if this item has children (is a parent/submenu trigger)."""
         return len(self._children) > 0
+
+    def set_keep_open(self, keep_open: bool):
+        """Set whether clicking this item keeps the menu open."""
+        self._keep_open = keep_open
+
+    def is_keep_open(self) -> bool:
+        return getattr(self, "_keep_open", False)
+
+    def set_disable_on_click(self, disable: bool):
+        """Set whether the item disables itself after click."""
+        self._disable_on_click = disable
+
+    def is_disable_on_click(self) -> bool:
+        return getattr(self, "_disable_on_click", False)
+
+    def set_aria_label(self, label: str):
+        """Set ARIA label for accessibility."""
+        self._aria_label = label
+
+    def get_aria_label(self) -> str | None:
+        return getattr(self, "_aria_label", None)
 
 
 class MenuBar(Component):
@@ -181,6 +219,22 @@ class MenuBar(Component):
         # Disabled state
         if not item._enabled:
             item_node.put(Feature.ELEMENT_ATTRIBUTE_MAP, "disabled", "")
+
+        # Separator
+        if getattr(item, "_is_separator", False):
+            item_node.put(Feature.ELEMENT_PROPERTY_MAP, "separator", True)
+
+        # Keep open
+        if getattr(item, "_keep_open", False):
+            item_node.put(Feature.ELEMENT_PROPERTY_MAP, "keepOpen", True)
+
+        # Disable on click
+        if getattr(item, "_disable_on_click", False):
+            item_node.put(Feature.ELEMENT_PROPERTY_MAP, "disableOnClick", True)
+
+        # ARIA label
+        if getattr(item, "_aria_label", None):
+            item_node.put(Feature.ELEMENT_PROPERTY_MAP, "ariaLabel", item._aria_label)
 
         # Store node reference for event handling
         item._node = item_node  # type: ignore[assignment]

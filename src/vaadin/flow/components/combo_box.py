@@ -58,6 +58,16 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
             self.element.set_property("clearButtonVisible", True)
         if self._auto_open_disabled:
             self.element.set_property("autoOpenDisabled", True)
+        if getattr(self, "_overlay_width", None):
+            self.element.set_property("overlayWidth", self._overlay_width)
+        if getattr(self, "_prefix_component", None):
+            comp = self._prefix_component
+            if not comp._element:
+                comp._ui = self._ui
+                comp._parent = self
+                comp._attach(tree)
+                comp.element.set_attribute("slot", "prefix")
+                self.element.add_child(comp.element)
         # Register client-callable methods via Feature 19
         tree.add_change({
             "node": self.element.node_id,
@@ -116,10 +126,15 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
             # Build connector items from provider results
             connector_items = []
             for i, item in enumerate(provider_items):
-                connector_items.append({
+                ci = {
                     "key": str(i),
                     "label": self._get_item_label(item),
-                })
+                }
+                if getattr(self, "_class_name_generator", None):
+                    cn = self._class_name_generator(item)
+                    if cn:
+                        ci["className"] = cn
+                connector_items.append(ci)
             # Store provider items so value selection works
             self._items = provider_items
         else:
@@ -135,10 +150,15 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
             # Build connector items
             connector_items = []
             for i, item in filtered:
-                connector_items.append({
+                ci = {
                     "key": str(i),
                     "label": self._get_item_label(item),
-                })
+                }
+                if getattr(self, "_class_name_generator", None):
+                    cn = self._class_name_generator(item)
+                    if cn:
+                        ci["className"] = cn
+                connector_items.append(ci)
 
         size = len(connector_items)
 
@@ -242,6 +262,10 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
     def set_item_label_generator(self, generator: Callable[[T], str]):
         self._item_label_generator = generator
 
+    def set_class_name_generator(self, generator: Callable[[T], str | None]):
+        """Set a function that generates CSS class names for dropdown items."""
+        self._class_name_generator = generator
+
     def add_value_change_listener(self, listener: Callable):
         self._change_listeners.append(listener)
 
@@ -295,8 +319,20 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
 
     def set_overlay_width(self, width: str):
         """Set the overlay width (e.g. '300px')."""
+        self._overlay_width = width
         if self._element:
             self.element.set_property("overlayWidth", width)
+
+    def set_prefix_component(self, component: Component):
+        """Set a prefix component (e.g. Icon) in the 'prefix' slot."""
+        self._prefix_component = component
+        if self._element:
+            if component and not component._element:
+                component._ui = self._ui
+                component._parent = self
+                component._attach(self._element._tree)
+                component.element.set_attribute("slot", "prefix")
+                self.element.add_child(component.element)
 
     def add_theme_variants(self, *variants: ComboBoxVariant):
         """Add theme variants to the combo box."""

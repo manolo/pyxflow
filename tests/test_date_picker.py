@@ -173,3 +173,201 @@ class TestDatePicker:
     def test_get_label(self):
         dp = DatePicker("Test")
         assert dp.get_label() == "Test"
+
+
+class TestDatePickerWeekNumbers:
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_default_week_numbers_not_visible(self):
+        """Week numbers are not visible by default."""
+        dp = DatePicker()
+        assert dp.is_week_numbers_visible() is False
+
+    def test_set_week_numbers_visible_before_attach(self, tree):
+        """Setting before attach applies showWeekNumbers on attach."""
+        dp = DatePicker()
+        dp.set_week_numbers_visible(True)
+        dp._attach(tree)
+
+        changes = tree.collect_changes()
+        wn = [c for c in changes if c.get("key") == "showWeekNumbers"]
+        assert any(c["value"] is True for c in wn)
+
+    def test_set_week_numbers_visible_after_attach(self, tree):
+        """Setting after attach updates property immediately."""
+        dp = DatePicker()
+        dp._attach(tree)
+        tree.collect_changes()
+
+        dp.set_week_numbers_visible(True)
+        changes = tree.collect_changes()
+        wn = [c for c in changes if c.get("key") == "showWeekNumbers"]
+        assert any(c["value"] is True for c in wn)
+
+    def test_is_week_numbers_visible(self):
+        """Getter returns what was set."""
+        dp = DatePicker()
+        dp.set_week_numbers_visible(True)
+        assert dp.is_week_numbers_visible() is True
+
+    def test_week_numbers_not_set_by_default_on_attach(self, tree):
+        """showWeekNumbers property not set when not explicitly enabled."""
+        dp = DatePicker()
+        dp._attach(tree)
+
+        changes = tree.collect_changes()
+        wn = [c for c in changes if c.get("key") == "showWeekNumbers"]
+        assert len(wn) == 0
+
+
+class TestDatePickerInitialPosition:
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_default_initial_position(self):
+        """Default initial position is None."""
+        dp = DatePicker()
+        assert dp.get_initial_position() is None
+
+    def test_set_initial_position_before_attach(self, tree):
+        """Setting before attach applies initialPosition on attach."""
+        dp = DatePicker()
+        dp.set_initial_position(datetime.date(2025, 6, 1))
+        dp._attach(tree)
+
+        changes = tree.collect_changes()
+        ip = [c for c in changes if c.get("key") == "initialPosition"]
+        assert any(c["value"] == "2025-06-01" for c in ip)
+
+    def test_set_initial_position_after_attach(self, tree):
+        """Setting after attach updates property immediately."""
+        dp = DatePicker()
+        dp._attach(tree)
+        tree.collect_changes()
+
+        dp.set_initial_position(datetime.date(2025, 3, 15))
+        changes = tree.collect_changes()
+        ip = [c for c in changes if c.get("key") == "initialPosition"]
+        assert any(c["value"] == "2025-03-15" for c in ip)
+
+    def test_set_initial_position_none(self, tree):
+        """Setting None after a value clears the position."""
+        dp = DatePicker()
+        dp.set_initial_position(datetime.date(2025, 1, 1))
+        dp._attach(tree)
+        tree.collect_changes()
+
+        dp.set_initial_position(None)
+        changes = tree.collect_changes()
+        ip = [c for c in changes if c.get("key") == "initialPosition"]
+        assert any(c["value"] == "" for c in ip)
+
+    def test_get_initial_position(self):
+        """Getter returns what was set."""
+        dp = DatePicker()
+        dp.set_initial_position(datetime.date(2025, 9, 1))
+        assert dp.get_initial_position() == datetime.date(2025, 9, 1)
+
+    def test_initial_position_not_set_by_default(self, tree):
+        """initialPosition property not set when not explicitly set."""
+        dp = DatePicker()
+        dp._attach(tree)
+
+        changes = tree.collect_changes()
+        ip = [c for c in changes if c.get("key") == "initialPosition"]
+        assert len(ip) == 0
+
+
+class TestDatePickerOpenClose:
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_open_after_attach(self, tree):
+        """open() sets opened=True."""
+        dp = DatePicker()
+        dp._attach(tree)
+        tree.collect_changes()
+
+        dp.open()
+        changes = tree.collect_changes()
+        opened = [c for c in changes if c.get("key") == "opened"]
+        assert any(c["value"] is True for c in opened)
+
+    def test_close_after_attach(self, tree):
+        """close() sets opened=False."""
+        dp = DatePicker()
+        dp._attach(tree)
+        tree.collect_changes()
+
+        dp.open()
+        tree.collect_changes()
+
+        dp.close()
+        changes = tree.collect_changes()
+        opened = [c for c in changes if c.get("key") == "opened"]
+        assert any(c["value"] is False for c in opened)
+
+    def test_open_before_attach_is_noop(self):
+        """open() before attach does nothing (no crash)."""
+        dp = DatePicker()
+        dp.open()  # should not raise
+
+    def test_close_before_attach_is_noop(self):
+        """close() before attach does nothing (no crash)."""
+        dp = DatePicker()
+        dp.close()  # should not raise
+
+
+class TestDatePickerOpenedChangeListener:
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_add_opened_change_listener_before_attach(self, tree):
+        """Listener added before attach is registered during attach."""
+        dp = DatePicker()
+        events = []
+        dp.add_opened_change_listener(lambda e: events.append(e))
+        dp._attach(tree)
+
+        # Simulate opened-changed event
+        dp._handle_opened_changed({"value": True})
+        assert len(events) == 1
+        assert events[0]["value"] is True
+
+    def test_add_opened_change_listener_after_attach(self, tree):
+        """Listener added after attach is registered immediately."""
+        dp = DatePicker()
+        dp._attach(tree)
+
+        events = []
+        dp.add_opened_change_listener(lambda e: events.append(e))
+
+        # Event listener should be registered on the element
+        assert "opened-changed" in dp.element._listeners
+
+        dp._handle_opened_changed({"value": False})
+        assert len(events) == 1
+        assert events[0]["value"] is False
+
+    def test_multiple_opened_change_listeners(self, tree):
+        """Multiple listeners all receive events."""
+        dp = DatePicker()
+        dp._attach(tree)
+
+        events1 = []
+        events2 = []
+        dp.add_opened_change_listener(lambda e: events1.append(e))
+        dp.add_opened_change_listener(lambda e: events2.append(e))
+
+        dp._handle_opened_changed({"value": True})
+        assert len(events1) == 1
+        assert len(events2) == 1

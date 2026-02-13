@@ -307,3 +307,170 @@ class TestComboBox:
         items = cb.get_items()
         items.append("C")
         assert len(cb.get_items()) == 2
+
+
+class TestComboBoxClassNameGenerator:
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_set_class_name_generator(self, tree):
+        """Setting a class name generator includes className in connector items."""
+        cb = ComboBox()
+        cb.set_class_name_generator(lambda item: "highlight" if item == "Chrome" else None)
+        cb.set_items("Firefox", "Chrome", "Safari")
+        cb._attach(tree)
+
+        execute = tree.collect_execute()
+        set_cmd = [cmd for cmd in execute if "$connector.set(" in cmd[-1]][0]
+        items = set_cmd[2]
+        # Chrome should have className
+        chrome_item = [it for it in items if it["label"] == "Chrome"][0]
+        assert chrome_item["className"] == "highlight"
+        # Firefox should NOT have className
+        firefox_item = [it for it in items if it["label"] == "Firefox"][0]
+        assert "className" not in firefox_item
+
+    def test_class_name_generator_returns_none(self, tree):
+        """When generator returns None for all items, no className keys appear."""
+        cb = ComboBox()
+        cb.set_class_name_generator(lambda item: None)
+        cb.set_items("A", "B")
+        cb._attach(tree)
+
+        execute = tree.collect_execute()
+        set_cmd = [cmd for cmd in execute if "$connector.set(" in cmd[-1]][0]
+        items = set_cmd[2]
+        for it in items:
+            assert "className" not in it
+
+    def test_class_name_generator_all_items(self, tree):
+        """When generator returns a value for all items, every item has className."""
+        cb = ComboBox()
+        cb.set_class_name_generator(lambda item: "bold")
+        cb.set_items("X", "Y")
+        cb._attach(tree)
+
+        execute = tree.collect_execute()
+        set_cmd = [cmd for cmd in execute if "$connector.set(" in cmd[-1]][0]
+        items = set_cmd[2]
+        for it in items:
+            assert it["className"] == "bold"
+
+    def test_class_name_generator_with_filter(self, tree):
+        """Class name generator is applied to filtered results too."""
+        cb = ComboBox()
+        cb.set_class_name_generator(lambda item: "special" if "fire" in item.lower() else None)
+        cb.set_items("Firefox", "Chrome", "Safari")
+        cb._attach(tree)
+        tree.collect_execute()
+
+        cb.set_viewport_range(0, 50, "fire")
+        execute = tree.collect_execute()
+        set_cmd = [cmd for cmd in execute if "$connector.set(" in cmd[-1]][0]
+        items = set_cmd[2]
+        assert len(items) == 1
+        assert items[0]["className"] == "special"
+
+
+class TestComboBoxPrefixComponent:
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_set_prefix_component_before_attach(self, tree):
+        """Prefix component set before attach is attached during ComboBox attach."""
+        from vaadin.flow.components.icon import Icon
+        cb = ComboBox()
+        icon = Icon("search")
+        cb.set_prefix_component(icon)
+        cb._attach(tree)
+
+        # Icon should be attached
+        assert icon._element is not None
+        # Icon should have slot="prefix"
+        changes = tree.collect_changes()
+        attr_changes = [
+            c for c in changes
+            if c.get("key") == "slot" and c.get("node") == icon.element.node_id
+        ]
+        assert any(c["value"] == "prefix" for c in attr_changes)
+
+    def test_set_prefix_component_after_attach(self, tree):
+        """Prefix component set after attach is attached immediately."""
+        from vaadin.flow.components.span import Span
+        cb = ComboBox()
+        cb._attach(tree)
+        tree.collect_changes()
+
+        span = Span("$")
+        cb.set_prefix_component(span)
+
+        assert span._element is not None
+        changes = tree.collect_changes()
+        attr_changes = [
+            c for c in changes
+            if c.get("key") == "slot" and c.get("node") == span.element.node_id
+        ]
+        assert any(c["value"] == "prefix" for c in attr_changes)
+
+    def test_prefix_component_becomes_child(self, tree):
+        """Prefix component is added as child of the combo box element."""
+        from vaadin.flow.components.icon import Icon
+        cb = ComboBox()
+        icon = Icon("search")
+        cb.set_prefix_component(icon)
+        cb._attach(tree)
+
+        # Verify a splice change added the icon node as child of the combo box node
+        changes = tree.collect_changes()
+        splice_changes = [
+            c for c in changes
+            if c.get("type") == "splice"
+            and c.get("feat") == Feature.ELEMENT_CHILDREN_LIST
+            and c.get("node") == cb.element.node_id
+        ]
+        # At least one splice should reference the icon node
+        added_node_ids = []
+        for sc in splice_changes:
+            added_node_ids.extend(sc.get("addNodes", []))
+        assert icon.element.node_id in added_node_ids
+
+
+class TestComboBoxOverlayWidth:
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_set_overlay_width_before_attach(self, tree):
+        """Overlay width set before attach is applied during attach."""
+        cb = ComboBox()
+        cb.set_overlay_width("300px")
+        cb._attach(tree)
+
+        changes = tree.collect_changes()
+        ow = [c for c in changes if c.get("key") == "overlayWidth"]
+        assert any(c["value"] == "300px" for c in ow)
+
+    def test_set_overlay_width_after_attach(self, tree):
+        """Overlay width set after attach is applied immediately."""
+        cb = ComboBox()
+        cb._attach(tree)
+        tree.collect_changes()
+
+        cb.set_overlay_width("400px")
+        changes = tree.collect_changes()
+        ow = [c for c in changes if c.get("key") == "overlayWidth"]
+        assert any(c["value"] == "400px" for c in ow)
+
+    def test_overlay_width_not_set_by_default(self, tree):
+        """No overlayWidth property when not explicitly set."""
+        cb = ComboBox()
+        cb._attach(tree)
+
+        changes = tree.collect_changes()
+        ow = [c for c in changes if c.get("key") == "overlayWidth"]
+        assert len(ow) == 0

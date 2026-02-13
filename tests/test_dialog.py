@@ -209,3 +209,130 @@ class TestDialog:
             None
         )
         assert title_change is not None
+
+
+class TestDialogResizeListener:
+    """Tests for Dialog.add_resize_listener."""
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_add_resize_listener_registers_event(self, tree):
+        """add_resize_listener should register a 'resize' event on the element."""
+        dialog = Dialog()
+        dialog._attach(tree)
+        tree.collect_changes()  # clear initial changes
+
+        dialog.add_resize_listener(lambda e: None)
+
+        changes = tree.collect_changes()
+        resize_listener = [c for c in changes
+                           if c.get("key") == "resize"
+                           and c.get("feat") == Feature.ELEMENT_LISTENER_MAP]
+        assert len(resize_listener) == 1
+
+    def test_resize_listener_called_on_event(self, tree):
+        """Simulating a resize event should call the registered listener."""
+        dialog = Dialog()
+        dialog._attach(tree)
+
+        events = []
+        dialog.add_resize_listener(lambda e: events.append(e))
+
+        dialog._handle_resize({"width": "500px", "height": "300px"})
+        assert len(events) == 1
+        assert events[0]["width"] == "500px"
+
+    def test_multiple_resize_listeners(self, tree):
+        """Multiple resize listeners should all be called."""
+        dialog = Dialog()
+        dialog._attach(tree)
+
+        events1 = []
+        events2 = []
+        dialog.add_resize_listener(lambda e: events1.append(e))
+        dialog.add_resize_listener(lambda e: events2.append(e))
+
+        dialog._handle_resize({"width": "400px"})
+        assert len(events1) == 1
+        assert len(events2) == 1
+
+    def test_resize_event_registered_only_once(self, tree):
+        """Adding multiple resize listeners should only register one event listener."""
+        dialog = Dialog()
+        dialog._attach(tree)
+        tree.collect_changes()  # clear initial
+
+        dialog.add_resize_listener(lambda e: None)
+        dialog.add_resize_listener(lambda e: None)
+
+        changes = tree.collect_changes()
+        resize_listeners = [c for c in changes
+                            if c.get("key") == "resize"
+                            and c.get("feat") == Feature.ELEMENT_LISTENER_MAP]
+        # Only one registration (lazy: first listener triggers it)
+        assert len(resize_listeners) == 1
+
+
+class TestDialogDraggedListener:
+    """Tests for Dialog.add_dragged_listener."""
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_add_dragged_listener_registers_event(self, tree):
+        """add_dragged_listener should register a 'dragged' event on the element."""
+        dialog = Dialog()
+        dialog._attach(tree)
+        tree.collect_changes()  # clear initial changes
+
+        dialog.add_dragged_listener(lambda e: None)
+
+        changes = tree.collect_changes()
+        dragged_listener = [c for c in changes
+                            if c.get("key") == "dragged"
+                            and c.get("feat") == Feature.ELEMENT_LISTENER_MAP]
+        assert len(dragged_listener) == 1
+
+    def test_dragged_listener_called_on_event(self, tree):
+        """Simulating a dragged event should call the registered listener."""
+        dialog = Dialog()
+        dialog._attach(tree)
+
+        events = []
+        dialog.add_dragged_listener(lambda e: events.append(e))
+
+        dialog._handle_dragged({"top": "100px", "left": "200px"})
+        assert len(events) == 1
+        assert events[0]["top"] == "100px"
+
+    def test_multiple_dragged_listeners(self, tree):
+        """Multiple dragged listeners should all be called."""
+        dialog = Dialog()
+        dialog._attach(tree)
+
+        events1 = []
+        events2 = []
+        dialog.add_dragged_listener(lambda e: events1.append(e))
+        dialog.add_dragged_listener(lambda e: events2.append(e))
+
+        dialog._handle_dragged({"top": "50px"})
+        assert len(events1) == 1
+        assert len(events2) == 1
+
+    def test_dragged_event_registered_only_once(self, tree):
+        """Adding multiple dragged listeners should only register one event listener."""
+        dialog = Dialog()
+        dialog._attach(tree)
+        tree.collect_changes()  # clear initial
+
+        dialog.add_dragged_listener(lambda e: None)
+        dialog.add_dragged_listener(lambda e: None)
+
+        changes = tree.collect_changes()
+        dragged_listeners = [c for c in changes
+                             if c.get("key") == "dragged"
+                             and c.get("feat") == Feature.ELEMENT_LISTENER_MAP]
+        assert len(dragged_listeners) == 1

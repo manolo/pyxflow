@@ -5,7 +5,7 @@ from typing import Callable, Generic, TypeVar, Optional, Set, TYPE_CHECKING
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 from vaadin.flow.core.state_node import Feature
-from vaadin.flow.components.constants import MultiSelectComboBoxVariant
+from vaadin.flow.components.constants import MultiSelectComboBoxVariant, AutoExpandMode
 from vaadin.flow.data.provider import DataProvider, Query
 
 if TYPE_CHECKING:
@@ -58,6 +58,16 @@ class MultiSelectComboBox(HasReadOnly, HasValidation, HasRequired, Component, Ge
         self.element.set_property("itemLabelPath", "label")
         if self._clear_button_visible:
             self.element.set_property("clearButtonVisible", True)
+        if getattr(self, "_allow_custom_value", False):
+            self.element.set_property("allowCustomValue", True)
+        if getattr(self, "_auto_expand", None) and self._auto_expand != AutoExpandMode.NONE:
+            mode = self._auto_expand
+            self.element.set_property("autoExpandHorizontally", mode in (AutoExpandMode.HORIZONTAL, AutoExpandMode.BOTH))
+            self.element.set_property("autoExpandVertically", mode in (AutoExpandMode.VERTICAL, AutoExpandMode.BOTH))
+        if getattr(self, "_selected_items_on_top", False):
+            self.element.set_property("selectedItemsOnTop", True)
+        if getattr(self, "_keep_filter", False):
+            self.element.set_property("keepFilter", True)
 
         # Register client-callable methods via Feature 19
         tree.add_change({
@@ -284,8 +294,38 @@ class MultiSelectComboBox(HasReadOnly, HasValidation, HasRequired, Component, Ge
             self.element.set_property("autoOpenDisabled", not auto_open)
 
     def set_allow_custom_value(self, allow: bool):
+        """Set whether custom values are allowed."""
+        self._allow_custom_value = allow
         if self._element:
             self.element.set_property("allowCustomValue", allow)
+
+    def set_auto_expand(self, mode: "AutoExpandMode"):
+        """Set how the field expands when chips don't fit."""
+        self._auto_expand = mode
+        if self._element:
+            self.element.set_property("autoExpandHorizontally", mode in (AutoExpandMode.HORIZONTAL, AutoExpandMode.BOTH))
+            self.element.set_property("autoExpandVertically", mode in (AutoExpandMode.VERTICAL, AutoExpandMode.BOTH))
+
+    def get_auto_expand(self):
+        return getattr(self, "_auto_expand", AutoExpandMode.NONE)
+
+    def set_selected_items_on_top(self, enabled: bool):
+        """Set whether selected items appear at the top of the dropdown."""
+        self._selected_items_on_top = enabled
+        if self._element:
+            self.element.set_property("selectedItemsOnTop", enabled)
+
+    def is_selected_items_on_top(self) -> bool:
+        return getattr(self, "_selected_items_on_top", False)
+
+    def set_keep_filter(self, enabled: bool):
+        """Set whether filter text persists after selecting an item."""
+        self._keep_filter = enabled
+        if self._element:
+            self.element.set_property("keepFilter", enabled)
+
+    def is_keep_filter(self) -> bool:
+        return getattr(self, "_keep_filter", False)
 
     def add_theme_variants(self, *variants: MultiSelectComboBoxVariant):
         """Add theme variants to the multi-select combo box."""

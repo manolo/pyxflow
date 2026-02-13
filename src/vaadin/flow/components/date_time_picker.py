@@ -157,6 +157,16 @@ class DateTimePicker(HasReadOnly, HasValidation, HasRequired, Component):
     def get_i18n(self) -> dict | None:
         return getattr(self, "_i18n", None)
 
+    def set_week_numbers_visible(self, visible: bool):
+        """Set whether ISO week numbers are shown in the date picker."""
+        self._week_numbers_visible = visible
+        if self._element:
+            # The internal date picker sub-field shows week numbers
+            self.execute_js(f"$0.querySelector('[slot=date-picker]').showWeekNumbers = {'true' if visible else 'false'}")
+
+    def is_week_numbers_visible(self) -> bool:
+        return getattr(self, "_week_numbers_visible", False)
+
     def add_theme_variants(self, *variants: DateTimePickerVariant):
         """Add theme variants to the date time picker."""
         self.add_theme_name(*variants)

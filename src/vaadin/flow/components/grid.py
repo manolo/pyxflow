@@ -8,7 +8,7 @@ from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
 from vaadin.flow.components.renderer import Renderer, LitRenderer, ComponentRenderer
 from vaadin.flow.components.constants import (
-    SortDirection, SelectionMode, ColumnTextAlign, GridVariant,
+    SortDirection, SelectionMode, ColumnTextAlign, GridVariant, GridDropMode,
 )
 from vaadin.flow.data.provider import DataProvider, ListDataProvider, Query
 from vaadin.flow.server.uidl_handler import _ITEM_CLICK_HASH
@@ -324,6 +324,7 @@ class Grid(Component):
         self._selection_column: _GridSelectionColumn | None = None
         self._selected_keys: set[str] = set()
         # Header rows / column groups
+        self._header_rows: list[HeaderRow] = []
         self._column_groups: list[ColumnGroup] = []
         # Lazy loading
         self._data_provider: Callable | None = None
@@ -376,7 +377,9 @@ class Grid(Component):
 
     def prepend_header_row(self) -> HeaderRow:
         """Add an extra header row above the default column headers."""
-        return HeaderRow(self)
+        row = HeaderRow(self)
+        self._header_rows.append(row)
+        return row
 
     def set_items(self, items):
         """Set the data items (in-memory mode).
@@ -433,10 +436,16 @@ class Grid(Component):
         """Remove a column from the grid."""
         if column in self._columns:
             self._columns.remove(column)
+            # Clear any sorts on this column
+            self._sort_orders = [o for o in self._sort_orders if o.column is not column]
+            # Remove from DOM if attached
+            if self._element and column._node:
+                self.element.node.remove_child(column._node)
 
     def remove_all_columns(self):
         """Remove all columns from the grid."""
-        self._columns.clear()
+        for col in list(self._columns):
+            self.remove_column(col)
 
     def add_component_column(self, component_provider: Callable) -> Column:
         """Add a column that renders a component for each row.
@@ -471,6 +480,18 @@ class Grid(Component):
                 "return $0.scrollToIndex($1)",
             ])
 
+    def scroll_to_item(self, item):
+        """Scroll to a specific item."""
+        for key, it in self._key_to_item.items():
+            if it is item or it == item:
+                index = int(key)
+                if self._element:
+                    self.element._tree.queue_execute([
+                        {"@v-node": self.element.node_id}, index,
+                        "return $0.scrollToIndex($1)",
+                    ])
+                return
+
     def recalculate_column_widths(self):
         """Recalculate column widths."""
         if self._element:
@@ -483,20 +504,25 @@ class Grid(Component):
 
     def append_header_row(self) -> HeaderRow:
         """Append an extra header row below existing header rows."""
-        return HeaderRow(self)
+        row = HeaderRow(self)
+        self._header_rows.append(row)
+        return row
 
     def append_footer_row(self) -> HeaderRow:
         """Append a footer row."""
-        return HeaderRow(self)
+        row = HeaderRow(self)
+        self._header_rows.append(row)
+        return row
 
     def get_header_rows(self) -> list[HeaderRow]:
-        """Get header rows (returns one per prepend_header_row call)."""
-        return []  # Placeholder - header rows are managed via column groups
+        """Get header rows."""
+        return self._header_rows
 
     # --- Empty State ---
 
     def set_empty_state_text(self, text: str):
         """Set the text to show when the grid has no items."""
+        self._empty_state_text = text
         if self._element:
             self.element.set_property("emptyStateText", text)
 
@@ -656,6 +682,15 @@ class Grid(Component):
             self.element.set_property("multiSort", True)
         if getattr(self, "_all_rows_visible", False):
             self.element.set_property("allRowsVisible", True)
+        if getattr(self, "_rows_draggable", False):
+            self.element.set_property("rowsDraggable", True)
+        if getattr(self, "_drop_mode", None):
+            mode = self._drop_mode
+            self.element.set_property("dropMode", mode.value if hasattr(mode, 'value') else mode)
+        if getattr(self, "_empty_state_text", None):
+            self.element.set_property("emptyStateText", self._empty_state_text)
+        if getattr(self, "_details_visible_on_click", True) is False:
+            self.element.set_property("__disallowDetailsOnClick", True)
 
         # Create selection column if multi-select
         if self._selection_mode == SelectionMode.MULTI:
@@ -1147,10 +1182,36 @@ class Grid(Component):
         """Called by client to toggle details. No-op for now."""
         pass
 
+    def set_details_visible_on_click(self, visible: bool):
+        """Set whether item details open when clicking a row."""
+        self._details_visible_on_click = visible
+        if self._element:
+            self.element.set_property("__disallowDetailsOnClick", not visible)
+
     def set_requested_range(self, start: int, length: int):
         """Called by client to request a data range."""
         if self._data_provider or self._data_provider_obj:
             self._fetch_and_push(start, length)
+
+    # --- Drag and Drop ---
+
+    def set_rows_draggable(self, draggable: bool):
+        """Set whether rows can be dragged."""
+        self._rows_draggable = draggable
+        if self._element:
+            self.element.set_property("rowsDraggable", draggable)
+
+    def is_rows_draggable(self) -> bool:
+        return getattr(self, "_rows_draggable", False)
+
+    def set_drop_mode(self, mode: "GridDropMode | str | None"):
+        """Set the drop mode for drag-and-drop."""
+        self._drop_mode = mode
+        if self._element:
+            self.element.set_property("dropMode", mode.value if hasattr(mode, 'value') else mode)
+
+    def get_drop_mode(self):
+        return getattr(self, "_drop_mode", None)
 
     def add_theme_variants(self, *variants: GridVariant):
         """Add theme variants to the grid."""

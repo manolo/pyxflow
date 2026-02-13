@@ -5,6 +5,7 @@ import pytest
 
 from vaadin.flow.components.grid import (
     Grid, Column, SortDirection, GridSortOrder, SelectionMode, _GridSelectionColumn,
+    HeaderRow,
 )
 from vaadin.flow.core.state_tree import StateTree
 from vaadin.flow.core.state_node import Feature
@@ -783,3 +784,487 @@ class TestLazyLoading:
         grid.set_viewport_range(0, 10)
         execute = tree.collect_execute()
         assert len(execute) == 0
+
+
+class TestGridNewAPIMethods:
+    """Tests for newly added Grid API methods:
+
+    scroll_to_item, set_details_visible_on_click, set_rows_draggable,
+    is_rows_draggable, set_drop_mode, get_drop_mode, remove_column (sort clearing),
+    remove_all_columns, set_empty_state_text (buffering), get_header_rows,
+    append_footer_row.
+    """
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    # --- scroll_to_item ---
+
+    def test_scroll_to_item_after_attach(self, tree):
+        """scroll_to_item looks up item identity in _key_to_item and queues scrollToIndex."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        items = [{"name": "Alice"}, {"name": "Bob"}, {"name": "Charlie"}]
+        grid.set_items(items)
+        grid._attach(tree)
+        tree.collect_execute()  # drain init commands
+
+        grid.scroll_to_item(items[2])
+        execute = tree.collect_execute()
+        js_strings = [cmd[-1] for cmd in execute]
+        assert any("scrollToIndex" in js for js in js_strings)
+        # The index for "Charlie" is 2
+        scroll_cmd = [cmd for cmd in execute if "scrollToIndex" in cmd[-1]][0]
+        assert scroll_cmd[1] == 2
+
+    def test_scroll_to_item_first_item(self, tree):
+        """scroll_to_item finds the first item at index 0."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        items = [{"name": "Alice"}, {"name": "Bob"}]
+        grid.set_items(items)
+        grid._attach(tree)
+        tree.collect_execute()
+
+        grid.scroll_to_item(items[0])
+        execute = tree.collect_execute()
+        scroll_cmd = [cmd for cmd in execute if "scrollToIndex" in cmd[-1]][0]
+        assert scroll_cmd[1] == 0
+
+    def test_scroll_to_item_not_found(self, tree):
+        """scroll_to_item does nothing when item is not in the grid."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid.set_items([{"name": "Alice"}])
+        grid._attach(tree)
+        tree.collect_execute()
+
+        grid.scroll_to_item({"name": "Unknown"})
+        execute = tree.collect_execute()
+        assert not any("scrollToIndex" in cmd[-1] for cmd in execute)
+
+    def test_scroll_to_item_before_attach(self, tree):
+        """scroll_to_item before attach is a no-op (no _element, no _key_to_item)."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid.set_items([{"name": "Alice"}])
+        # _key_to_item is empty before attach, so nothing happens
+        grid.scroll_to_item({"name": "Alice"})
+        # No error raised; attach should still work normally
+        grid._attach(tree)
+        execute = tree.collect_execute()
+        # Only init commands, no scrollToIndex
+        assert not any("scrollToIndex" in cmd[-1] for cmd in execute
+                       if "$connector" not in cmd[-1] and "initLazy" not in cmd[-1]
+                       and "setSelectionMode" not in cmd[-1] and "setHeaderRenderer" not in cmd[-1])
+
+    # --- set_details_visible_on_click ---
+
+    def test_set_details_visible_on_click_before_attach(self, tree):
+        """Setting details_visible_on_click before attach buffers the value."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid.set_details_visible_on_click(False)
+        grid._attach(tree)
+
+        changes = tree.collect_changes()
+        disallow = [c for c in changes if c.get("key") == "__disallowDetailsOnClick"]
+        assert len(disallow) == 1
+        assert disallow[0]["value"] is True  # inverted: False -> True
+
+    def test_set_details_visible_on_click_true_before_attach(self, tree):
+        """Setting details_visible_on_click(True) before attach does not set __disallowDetailsOnClick."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid.set_details_visible_on_click(True)
+        grid._attach(tree)
+
+        changes = tree.collect_changes()
+        # True means details ARE visible on click, so __disallowDetailsOnClick should NOT be set
+        # The _attach method only sets the property if _details_visible_on_click is False
+        disallow = [c for c in changes if c.get("key") == "__disallowDetailsOnClick"]
+        assert len(disallow) == 0
+
+    def test_set_details_visible_on_click_after_attach(self, tree):
+        """Setting details_visible_on_click after attach sets property immediately."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid._attach(tree)
+        tree.collect_changes()
+
+        grid.set_details_visible_on_click(False)
+        changes = tree.collect_changes()
+        disallow = [c for c in changes if c.get("key") == "__disallowDetailsOnClick"]
+        assert len(disallow) == 1
+        assert disallow[0]["value"] is True
+
+    # --- set_rows_draggable / is_rows_draggable ---
+
+    def test_set_rows_draggable_before_attach(self, tree):
+        """set_rows_draggable before attach buffers and is applied on attach."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid.set_rows_draggable(True)
+        assert grid.is_rows_draggable() is True
+        grid._attach(tree)
+
+        changes = tree.collect_changes()
+        drag = [c for c in changes if c.get("key") == "rowsDraggable"]
+        assert len(drag) == 1
+        assert drag[0]["value"] is True
+
+    def test_set_rows_draggable_after_attach(self, tree):
+        """set_rows_draggable after attach sets property on element."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid._attach(tree)
+        tree.collect_changes()
+
+        grid.set_rows_draggable(True)
+        changes = tree.collect_changes()
+        drag = [c for c in changes if c.get("key") == "rowsDraggable"]
+        assert len(drag) == 1
+        assert drag[0]["value"] is True
+
+    def test_is_rows_draggable_default(self):
+        """is_rows_draggable defaults to False."""
+        grid = Grid()
+        assert grid.is_rows_draggable() is False
+
+    def test_set_rows_draggable_false(self, tree):
+        """set_rows_draggable(False) after True clears the property."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid.set_rows_draggable(True)
+        grid._attach(tree)
+        tree.collect_changes()
+
+        grid.set_rows_draggable(False)
+        assert grid.is_rows_draggable() is False
+        changes = tree.collect_changes()
+        drag = [c for c in changes if c.get("key") == "rowsDraggable"]
+        assert len(drag) == 1
+        assert drag[0]["value"] is False
+
+    # --- set_drop_mode / get_drop_mode ---
+
+    def test_set_drop_mode_enum_before_attach(self, tree):
+        """set_drop_mode with GridDropMode enum before attach buffers and applies on attach."""
+        from vaadin.flow.components.constants import GridDropMode
+
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid.set_drop_mode(GridDropMode.BETWEEN)
+        assert grid.get_drop_mode() == GridDropMode.BETWEEN
+        grid._attach(tree)
+
+        changes = tree.collect_changes()
+        drop = [c for c in changes if c.get("key") == "dropMode"]
+        assert len(drop) == 1
+        assert drop[0]["value"] == "between"
+
+    def test_set_drop_mode_string_before_attach(self, tree):
+        """set_drop_mode with string before attach buffers and applies on attach."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid.set_drop_mode("on-top")
+        assert grid.get_drop_mode() == "on-top"
+        grid._attach(tree)
+
+        changes = tree.collect_changes()
+        drop = [c for c in changes if c.get("key") == "dropMode"]
+        assert len(drop) == 1
+        assert drop[0]["value"] == "on-top"
+
+    def test_set_drop_mode_after_attach(self, tree):
+        """set_drop_mode after attach sets property immediately."""
+        from vaadin.flow.components.constants import GridDropMode
+
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid._attach(tree)
+        tree.collect_changes()
+
+        grid.set_drop_mode(GridDropMode.ON_TOP_OR_BETWEEN)
+        changes = tree.collect_changes()
+        drop = [c for c in changes if c.get("key") == "dropMode"]
+        assert len(drop) == 1
+        assert drop[0]["value"] == "on-top-or-between"
+
+    def test_set_drop_mode_on_grid(self, tree):
+        """GridDropMode.ON_GRID value is correct."""
+        from vaadin.flow.components.constants import GridDropMode
+
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid.set_drop_mode(GridDropMode.ON_GRID)
+        grid._attach(tree)
+
+        changes = tree.collect_changes()
+        drop = [c for c in changes if c.get("key") == "dropMode"]
+        assert len(drop) == 1
+        assert drop[0]["value"] == "on-grid"
+
+    def test_get_drop_mode_default(self):
+        """get_drop_mode defaults to None."""
+        grid = Grid()
+        assert grid.get_drop_mode() is None
+
+    def test_set_drop_mode_none_after_attach(self, tree):
+        """set_drop_mode(None) after setting a mode clears it."""
+        from vaadin.flow.components.constants import GridDropMode
+
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid._attach(tree)
+        tree.collect_changes()
+
+        grid.set_drop_mode(GridDropMode.BETWEEN)
+        tree.collect_changes()
+
+        grid.set_drop_mode(None)
+        assert grid.get_drop_mode() is None
+        changes = tree.collect_changes()
+        drop = [c for c in changes if c.get("key") == "dropMode"]
+        assert len(drop) == 1
+        assert drop[0]["value"] is None
+
+    # --- remove_column (sort order clearing + DOM removal) ---
+
+    def test_remove_column_clears_sort_orders(self, tree):
+        """remove_column clears sort orders that reference the removed column."""
+        grid = Grid()
+        col_name = grid.add_column("name", header="Name")
+        col_email = grid.add_column("email", header="Email")
+        col_name.set_sortable(True)
+        col_email.set_sortable(True)
+        grid.set_items([{"name": "B", "email": "b@x"}, {"name": "A", "email": "a@x"}])
+        grid._attach(tree)
+        tree.collect_execute()
+
+        # Set sort on col_name
+        grid.sorters_changed([{"path": "col0", "direction": "asc"}])
+        tree.collect_execute()
+        assert len(grid._sort_orders) == 1
+        assert grid._sort_orders[0].column is col_name
+
+        # Remove col_name — sort orders for it should be cleared
+        grid.remove_column(col_name)
+        assert len(grid._sort_orders) == 0
+
+    def test_remove_column_preserves_other_sort_orders(self, tree):
+        """remove_column only clears sort orders for the removed column, not others."""
+        grid = Grid()
+        col_name = grid.add_column("name", header="Name")
+        col_email = grid.add_column("email", header="Email")
+        col_name.set_sortable(True)
+        col_email.set_sortable(True)
+        grid.set_items([{"name": "A", "email": "z@x"}])
+        grid._attach(tree)
+        tree.collect_execute()
+
+        grid.sorters_changed([
+            {"path": "col0", "direction": "asc"},
+            {"path": "col1", "direction": "desc"},
+        ])
+        tree.collect_execute()
+        assert len(grid._sort_orders) == 2
+
+        # Remove col_name — only col_email sort should remain
+        grid.remove_column(col_name)
+        assert len(grid._sort_orders) == 1
+        assert grid._sort_orders[0].column is col_email
+
+    def test_remove_column_removes_from_columns_list(self, tree):
+        """remove_column removes the column from _columns."""
+        grid = Grid()
+        col = grid.add_column("name", header="Name")
+        grid._attach(tree)
+        assert len(grid._columns) == 1
+
+        grid.remove_column(col)
+        assert len(grid._columns) == 0
+
+    def test_remove_column_removes_node_from_dom(self, tree):
+        """remove_column removes the column node from the grid's children."""
+        grid = Grid()
+        col = grid.add_column("name", header="Name")
+        grid._attach(tree)
+        tree.collect_changes()
+
+        col_node = col._node
+        assert col_node is not None
+        assert col_node in grid.element.node._children
+
+        grid.remove_column(col)
+        changes = tree.collect_changes()
+        # Should have a splice removing the column
+        splices = [c for c in changes if c.get("type") == "splice" and c.get("feat") == Feature.ELEMENT_CHILDREN_LIST]
+        remove_splices = [s for s in splices if s.get("remove", 0) > 0]
+        assert len(remove_splices) >= 1
+        assert col_node not in grid.element.node._children
+
+    def test_remove_column_before_attach(self):
+        """remove_column before attach just removes from the list (no DOM to clean)."""
+        grid = Grid()
+        col = grid.add_column("name", header="Name")
+        grid.remove_column(col)
+        assert len(grid._columns) == 0
+
+    # --- remove_all_columns ---
+
+    def test_remove_all_columns(self, tree):
+        """remove_all_columns removes all columns."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid.add_column("email", header="Email")
+        grid.add_column("role", header="Role")
+        grid._attach(tree)
+        tree.collect_changes()
+
+        assert len(grid._columns) == 3
+        grid.remove_all_columns()
+        assert len(grid._columns) == 0
+
+    def test_remove_all_columns_clears_sort_orders(self, tree):
+        """remove_all_columns clears all sort orders."""
+        grid = Grid()
+        col = grid.add_column("name", header="Name")
+        col.set_sortable(True)
+        grid.set_items([{"name": "A"}])
+        grid._attach(tree)
+        tree.collect_execute()
+
+        grid.sorters_changed([{"path": "col0", "direction": "asc"}])
+        tree.collect_execute()
+        assert len(grid._sort_orders) == 1
+
+        grid.remove_all_columns()
+        assert len(grid._sort_orders) == 0
+        assert len(grid._columns) == 0
+
+    def test_remove_all_columns_before_attach(self):
+        """remove_all_columns before attach clears the columns list."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid.add_column("email", header="Email")
+        grid.remove_all_columns()
+        assert len(grid._columns) == 0
+
+    # --- set_empty_state_text (buffering) ---
+
+    def test_set_empty_state_text_before_attach(self, tree):
+        """set_empty_state_text before attach buffers and applies on attach."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid.set_empty_state_text("No data available")
+        grid._attach(tree)
+
+        changes = tree.collect_changes()
+        empty = [c for c in changes if c.get("key") == "emptyStateText"]
+        assert len(empty) == 1
+        assert empty[0]["value"] == "No data available"
+
+    def test_set_empty_state_text_after_attach(self, tree):
+        """set_empty_state_text after attach sets property immediately."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid._attach(tree)
+        tree.collect_changes()
+
+        grid.set_empty_state_text("Nothing here")
+        changes = tree.collect_changes()
+        empty = [c for c in changes if c.get("key") == "emptyStateText"]
+        assert len(empty) == 1
+        assert empty[0]["value"] == "Nothing here"
+
+    def test_set_empty_state_text_overwrite(self, tree):
+        """Setting empty state text twice before attach uses the last value."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid.set_empty_state_text("First")
+        grid.set_empty_state_text("Second")
+        grid._attach(tree)
+
+        changes = tree.collect_changes()
+        empty = [c for c in changes if c.get("key") == "emptyStateText"]
+        # The property should have value "Second" (last set wins)
+        assert any(c["value"] == "Second" for c in empty)
+
+    # --- get_header_rows ---
+
+    def test_get_header_rows_empty(self):
+        """get_header_rows returns empty list by default."""
+        grid = Grid()
+        assert grid.get_header_rows() == []
+
+    def test_get_header_rows_after_prepend(self):
+        """get_header_rows returns rows added by prepend_header_row."""
+        grid = Grid()
+        row = grid.prepend_header_row()
+        rows = grid.get_header_rows()
+        assert len(rows) == 1
+        assert rows[0] is row
+
+    def test_get_header_rows_after_append(self):
+        """get_header_rows returns rows added by append_header_row."""
+        grid = Grid()
+        row = grid.append_header_row()
+        rows = grid.get_header_rows()
+        assert len(rows) == 1
+        assert rows[0] is row
+
+    def test_get_header_rows_multiple(self):
+        """get_header_rows returns all header rows in order."""
+        grid = Grid()
+        row1 = grid.prepend_header_row()
+        row2 = grid.append_header_row()
+        rows = grid.get_header_rows()
+        assert len(rows) == 2
+        assert rows[0] is row1
+        assert rows[1] is row2
+
+    # --- append_footer_row ---
+
+    def test_append_footer_row_returns_header_row(self):
+        """append_footer_row creates and returns a HeaderRow."""
+        grid = Grid()
+        row = grid.append_footer_row()
+        assert isinstance(row, HeaderRow)
+
+    def test_append_footer_row_added_to_header_rows(self):
+        """append_footer_row adds the row to _header_rows list."""
+        grid = Grid()
+        row = grid.append_footer_row()
+        assert row in grid._header_rows
+
+    def test_append_footer_row_multiple(self):
+        """Multiple footer rows can be appended."""
+        grid = Grid()
+        row1 = grid.append_footer_row()
+        row2 = grid.append_footer_row()
+        assert len(grid._header_rows) == 2
+        assert grid._header_rows[0] is row1
+        assert grid._header_rows[1] is row2
+
+    # --- Combined buffering tests ---
+
+    def test_all_buffered_properties_applied_on_attach(self, tree):
+        """Multiple buffered properties are all applied when the grid attaches."""
+        from vaadin.flow.components.constants import GridDropMode
+
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        grid.set_rows_draggable(True)
+        grid.set_drop_mode(GridDropMode.BETWEEN)
+        grid.set_empty_state_text("Empty!")
+        grid.set_details_visible_on_click(False)
+        grid._attach(tree)
+
+        changes = tree.collect_changes()
+        keys_found = {c["key"] for c in changes if "key" in c}
+        assert "rowsDraggable" in keys_found
+        assert "dropMode" in keys_found
+        assert "emptyStateText" in keys_found
+        assert "__disallowDetailsOnClick" in keys_found
