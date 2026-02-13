@@ -26,15 +26,15 @@ source .venv/bin/activate && python -m demo
 # Or via CLI: vaadin demo --port 8088
 # Or auto-detect: vaadin --port 8088  (finds demo/views/ automatically)
 
-# Run unit tests
-pytest tests/ --ignore=tests/ui -v
+# Run unit tests (default — UI tests are excluded)
+pytest -v
 
 # Run specific test file
 pytest tests/test_rpc_events.py -v
 
-# Run UI tests (requires running server + playwright chromium)
-# Start server first: source .venv/bin/activate && python -m demo
-pytest tests/ui/ --headed --base-url http://localhost:8088 -v
+# Run UI tests (auto-starts server if none running on :8088)
+pytest tests/ui/ -v            # headless
+pytest tests/ui/ --headed -v   # visible browser
 
 # Regenerate the frontend bundle (auto-discovers _v_fqcn components)
 vaadin --bundle
