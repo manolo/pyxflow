@@ -26,11 +26,15 @@ source .venv/bin/activate && python -m demo
 # Or via CLI: vaadin demo --port 8088
 # Or auto-detect: vaadin --port 8088  (finds demo/views/ automatically)
 
-# Run tests
-pytest tests/ -v
+# Run unit tests
+pytest tests/ --ignore=tests/ui -v
 
 # Run specific test file
 pytest tests/test_rpc_events.py -v
+
+# Run UI tests (requires running server + playwright chromium)
+# Start server first: source .venv/bin/activate && python -m demo
+pytest tests/ui/ --headed --base-url http://localhost:8088 -v
 
 # Regenerate the frontend bundle (auto-discovers _v_fqcn components)
 vaadin --bundle
@@ -55,7 +59,8 @@ vaadin-pyflow/
 ├── demo/               # Demo app + __main__.py entry point
 │   ├── views/          # View files (hello_world, about, components, grid, etc.)
 │   └── services/       # PeopleService (data access layer)
-├── tests/              # 1667 unit tests
+├── tests/              # 2092+ unit tests
+│   └── ui/             # Playwright UI tests (36 tests across 2 views)
 └── STATUS.md           # Implementation progress
 ../bundle-generator/    # Java project → frontend bundle (shared, at root level)
 ```
