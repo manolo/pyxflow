@@ -4,8 +4,8 @@
 
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
-**Lines of code:** ~17,000 (core src/), ~48,000 (total with demo + tests)
-**Tests:** 2145 unit + 307 UI (Playwright)
+**Lines of code:** ~17,000 (core src/), ~50,000 (total with demo + tests)
+**Tests:** 2274 unit + 320 UI (Playwright)
 **Last updated:** 2026-02-13
 
 ---
@@ -54,7 +54,7 @@
 - [x] HorizontalLayout - Theme, add/remove/remove_all children, margin/spacing, expand, vertical component alignment, get_flex_grow, add_and_expand, set_wrap
 - [x] FlexLayout - Pure CSS Flexbox `<div>`: flex-direction, flex-wrap, justify-content, align-items/self/content, flex-grow/shrink/basis, order, expand, remove_all
 - [x] SplitLayout - Horizontal/vertical split with primary/secondary slots, splitter position, orientation
-- [x] Dialog - Header title, modal, draggable, resizable, FlowComponentHost renderer, publishedEventHandler close, `get_header()`/`get_footer()` sections
+- [x] Dialog - Header title, modal, draggable, resizable, FlowComponentHost renderer, publishedEventHandler close, `get_header()`/`get_footer()` sections, set_top/set_left positioning, resize/dragged listeners
 - [x] Notification - Position, duration, theme variants, open/close, static show(), body attachment
 - [x] PasswordField - Password input with reveal button, ValueChangeMode
 - [x] EmailField - Email input with validation, ValueChangeMode
@@ -63,15 +63,15 @@
 - [x] RadioButtonGroup - Radio button selection
 - [x] CheckboxGroup - Multiple checkbox selection
 - [x] FormLayout - Responsive steps, colspan, FormItem (label slot), FormRow, auto-responsive, CSS custom properties
-- [x] Grid - Columns (path, header, width, flexGrow, autoWidth, resizable, sortable, textAlign), in-memory data push, single/multi selection, sorting, lazy loading/DataProvider, column reordering, LitRenderer, ComponentRenderer, header rows (column groups), column footers, `add_item_click_listener`, `add_item_double_click_listener`
+- [x] Grid - Columns (path, header, width, flexGrow, autoWidth, resizable, sortable, textAlign), in-memory data push, single/multi selection, sorting, lazy loading/DataProvider, column reordering, LitRenderer, ComponentRenderer, header rows (column groups), column footers, item click listeners, scroll_to_item, remove_column, set_rows_draggable, set_drop_mode, set_empty_state_text, set_details_visible_on_click
 - [x] ConfirmDialog - Confirm/cancel/reject actions, header/message/button text, theme, cancelable/rejectable
-- [x] ComboBox - Filtered dropdown, data push protocol, item label generator, custom value support
-- [x] DatePicker - Date selection with calendar overlay, min/max, connector init, i18n
+- [x] ComboBox - Filtered dropdown, data push protocol, item label generator, custom value support, class name generator, prefix component, overlay width
+- [x] DatePicker - Date selection with calendar overlay, min/max, connector init, i18n, week numbers, initial position, open/close, opened-change listener
 - [x] TimePicker - Time selection with dropdown, step, min/max, connector init, i18n
 - [x] Tabs - Tab container with selected index, orientation, selection change events
 - [x] Tab - Individual tab with label text
 - [x] TabSheet - Tabs + content panels with slot-based association
-- [x] MenuBar - Hierarchical menus with connector protocol, submenu support, click listeners
+- [x] MenuBar - Hierarchical menus with connector protocol, submenu support, click listeners, keep-open, disable-on-click, aria-label, separator, submenu remove/remove_all
 - [x] Upload - File upload via multipart HTTP POST, receiver callback, file reject/success/error events, max files/size, accepted types, auto-upload, drop zone, i18n
 - [x] Icon - `vaadin-icon`, auto-prefix `vaadin:`, color (CSS fill), size
 - [x] DrawerToggle - Hamburger button for AppLayout drawer, extends Button
@@ -95,7 +95,7 @@
 - [x] CustomField - Composite field wrapper, children contribute to combined value
 - [x] LoginForm - Login event (username/password), forgot-password event, error property, i18n
 - [x] LoginOverlay - Login form in overlay, opened/title/description properties, i18n
-- [x] MultiSelectComboBox - Multi-select with chips, comboBoxConnector, data provider, filtering
+- [x] MultiSelectComboBox - Multi-select with chips, comboBoxConnector, data provider, filtering, auto-expand, selected-items-on-top, keep-filter
 - [x] VirtualList - Scrollable list, virtualListConnector, LitRenderer/ComponentRenderer support
 
 ### Component Base Features
@@ -115,12 +115,12 @@
 - [x] `set_i18n(dict)` / `get_i18n()` - Localization via dict-based approach on 7 components (Upload, DatePicker, TimePicker, DateTimePicker, LoginForm, LoginOverlay, MessageInput)
 
 ### Constants & Enums
-- [x] `components/constants.py` - Central enum file with all 34 theme variant enums, layout enums, field enums
+- [x] `components/constants.py` - Central enum file with all 34 theme variant enums, layout enums, field enums, GridDropMode, AutoExpandMode
 - [x] Theme variant enums — `add_theme_variants()` / `remove_theme_variants()` on 34 components (Button, Grid, TextField, Dialog, etc.)
 - [x] `ColumnTextAlign` — START/CENTER/END enum for Grid column text alignment
 - [x] `Autocomplete` — ~50 HTML autocomplete values for TextField, PasswordField, EmailField
 - [x] `Key` — Keyboard constants (ENTER, ESCAPE, TAB, Arrow keys, F1-F12) re-exported from `core/`, `components/`
-- [x] Co-located re-exports — Variant enums importable from component files (e.g., `from button import ButtonVariant`)
+- [x] All enums importable from `components/` package and from `components/constants` module
 
 ### Field Mixins
 - [x] `HasReadOnly` mixin - `set_read_only()`, `is_read_only()` on all 16 field components + Checkbox + ListBox + MultiSelectListBox (18 total)
@@ -205,7 +205,7 @@
 
 > **For the detailed per-component API inventory (every method, [x]/[ ]), see `STATUS.API.md`.**
 >
-> API coverage: **436 methods implemented, 60 missing** (~88% complete).
+> API coverage: **~470 methods implemented, ~40 missing** (~92% complete).
 
 ### Unimplemented Features
 
@@ -214,8 +214,8 @@
 | `@PWA` annotation | Medium | Activate `sw.js` from bundle, serve `manifest.json` with configurable app name/icons |
 | Security (`--secure`) | Medium | Login screen from local config, restrict interfaces (localhost vs 0.0.0.0), HTTPS/TLS |
 | Grid Editor API | Low | Inline row editing (`get_editor`, bind fields to columns, save/cancel) |
-| Grid Drag/Drop | Low | Reorderable rows (`set_rows_draggable`, `set_drop_mode`, drag listeners) |
-| Grid item details | Low | Expandable row details (`set_item_details_renderer`, `set_details_visible_on_click`) |
+| Grid Drag/Drop listeners | Low | Drag start/end/drop event listeners (rows draggable & drop mode already implemented) |
+| Grid item details renderer | Low | Expandable row details via `set_item_details_renderer` (set_details_visible_on_click already implemented) |
 | Specialized renderers | Low | NumberRenderer, LocalDateRenderer, LocalDateTimeRenderer, NativeButtonRenderer, IconRenderer |
 | ConfigurableFilterDataProvider | Low | Advanced filtering for DataProvider |
 
@@ -223,17 +223,15 @@
 
 | Component | Missing Methods | Priority |
 |-----------|----------------|----------|
-| **Grid** | `add_component_column`, `scroll_to_index`, `remove_column`, `remove_all_columns`, `set_item_details_renderer`, `append_footer_row`, Editor API, Drag/Drop, `set_empty_state_text` | Medium |
-| **ComboBox** | `set_renderer`, `set_class_name_generator`, `set_prefix_component`, `set_overlay_width` | Medium |
-| **MultiSelectComboBox** | `set_renderer`, `set_auto_expand`, `set_selected_items_on_top`, `set_allow_custom_value` | Medium |
-| **MenuBar** | `add_item(Component)`, `close`, MenuItem: `set_keep_open`/`set_disable_on_click`/`set_aria_label`, SubMenu operations | Medium |
-| **DatePicker** | `set_locale`, `set_week_numbers_visible`, `set_initial_position`, `open`/`close`/`add_opened_change_listener` | Low |
-| **HorizontalLayout** | `add_to_start`/`add_to_middle`/`add_to_end` | Low |
+| **Grid** | `add_component_column`, `set_item_details_renderer`, Editor API, Drag/Drop listeners | Medium |
+| **ComboBox** | `set_renderer` | Low |
+| **MultiSelectComboBox** | `set_renderer` | Low |
+| **MenuBar** | `add_item(Component)`, `close` | Low |
+| **DatePicker** | `set_locale` | Low |
 | **FlexLayout** | `replace`/`add_component_at_index` | Low |
 | **Select** | `set_renderer`, `set_item_enabled_provider` | Low |
 | **CheckboxGroup/RadioButtonGroup** | `set_item_enabled_provider`, `set_renderer` | Low |
 | **ListBox/MultiSelectListBox** | `set_renderer`, `add_components` (dividers) | Low |
-| **Dialog** | `set_top`/`set_left`, `add_resize_listener`/`add_dragged_listener` | Low |
 | **Button** | `click` (server-side) | Low |
 | **Other** | Various minor methods across Tabs, Details, ContextMenu, Upload, LoginOverlay, Popover, etc. | Low |
 

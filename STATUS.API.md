@@ -103,7 +103,7 @@ All components inherit from `Component` which provides:
 | `remove_all` | [x] |
 | `set_justify_content_mode` / `set_align_items` | [x] |
 | `set_flex_grow` / `get_flex_grow` / `set_flex_shrink` | [x] |
-| `add_and_expand` / `add_to_start` / `add_to_middle` / `add_to_end` | [ ] (add_and_expand [x], add_to_* [ ]) |
+| `add_and_expand` / `add_component_as_first` / `add_component_at_index` | [x] |
 | `replace` / `add_component_at_index` / `set_box_sizing` / `set_wrap` / `is_wrap` | [x] |
 | `add_theme_variants` / `remove_theme_variants` (HorizontalLayoutVariant) | [x] |
 
@@ -255,8 +255,9 @@ All components inherit from `Component` which provides:
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` | [x] |
 | `set_clear_button_visible` / `set_auto_open` | [x] |
-| `set_locale` / `set_week_numbers_visible` / `set_initial_position` | [ ] |
-| `open` / `close` / `add_opened_change_listener` | [ ] |
+| `set_week_numbers_visible` / `set_initial_position` | [x] |
+| `open` / `close` / `add_opened_change_listener` | [x] |
+| `set_locale` | [ ] |
 | `add_theme_variants` / `remove_theme_variants` (DatePickerVariant) | [x] |
 
 ### TimePicker
@@ -269,7 +270,7 @@ All components inherit from `Component` which provides:
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` | [x] |
 | `set_clear_button_visible` / `set_auto_open` | [x] |
-| `add_opened_change_listener` | [ ] |
+| `open` / `close` / `add_opened_change_listener` | [x] |
 | `add_theme_variants` / `remove_theme_variants` (TimePickerVariant) | [x] |
 
 ### DateTimePicker
@@ -283,7 +284,7 @@ All components inherit from `Component` which provides:
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` | [x] |
 | `set_auto_open` | [x] |
-| `set_week_numbers_visible` | [ ] |
+| `set_week_numbers_visible` | [x] |
 | `add_theme_variants` / `remove_theme_variants` (DateTimePickerVariant) | [x] |
 
 ### CustomField
@@ -312,8 +313,8 @@ All components inherit from `Component` which provides:
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` / `add_custom_value_set_listener` | [x] |
 | `set_clear_button_visible` / `set_auto_open` | [x] |
-| `set_renderer` / `set_class_name_generator` | [ ] |
-| `set_prefix_component` / `set_overlay_width` | [ ] |
+| `set_class_name_generator` / `set_prefix_component` / `set_overlay_width` | [x] |
+| `set_renderer` | [ ] |
 | `add_theme_variants` / `remove_theme_variants` (ComboBoxVariant) | [x] |
 
 ### Select
@@ -341,8 +342,9 @@ All components inherit from `Component` which provides:
 | `add_value_change_listener` | [x] |
 | `set_clear_button_visible` / `set_auto_open` | [x] |
 | `deselect_all` | [x] |
-| `set_renderer` / `set_auto_expand` / `set_selected_items_on_top` | [ ] |
-| `set_allow_custom_value` | [ ] |
+| `set_auto_expand` / `set_selected_items_on_top` / `set_keep_filter` | [x] |
+| `set_allow_custom_value` | [x] |
+| `set_renderer` | [ ] |
 | `add_theme_variants` / `remove_theme_variants` (MultiSelectComboBoxVariant) | [x] |
 
 ### ListBox
@@ -420,13 +422,15 @@ All components inherit from `Component` which provides:
 | `ComponentRenderer` / `LitRenderer` / `TextRenderer` | [x] |
 | `add_item_click_listener` / `add_item_double_click_listener` | [x] |
 | `add_component_column` (shortcut) | [ ] |
-| `scroll_to_index` / `scroll_to_item` / `recalculate_column_widths` | [ ] |
-| `remove_column` / `remove_all_columns` | [ ] |
-| `set_item_details_renderer` / `set_details_visible_on_click` | [ ] |
-| `append_footer_row` / `get_header_rows` | [ ] |
+| `scroll_to_index` / `scroll_to_item` / `recalculate_column_widths` | [x] |
+| `remove_column` / `remove_all_columns` | [x] |
+| `set_details_visible_on_click` | [x] |
+| `append_footer_row` / `get_header_rows` | [x] |
+| `set_rows_draggable` / `set_drop_mode` (GridDropMode) | [x] |
+| `set_empty_state_text` / `set_empty_state_component` | [x] |
+| `set_item_details_renderer` | [ ] |
 | Editor API (`get_editor`) | [ ] |
-| Drag/drop (`set_rows_draggable` / `set_drop_mode` / listeners) | [ ] |
-| `set_empty_state_text` / `set_empty_state_component` | [ ] |
+| Drag/drop listeners (drag-start, drag-end, drop) | [ ] |
 | `add_theme_variants` / `remove_theme_variants` (GridVariant) | [x] |
 
 ### Dialog
@@ -442,8 +446,8 @@ All components inherit from `Component` which provides:
 | `get_header` / `get_footer` (section components for buttons) | [x] |
 | `remove` / `remove_all` | [x] |
 | `set_min_width` / `set_max_width` / `set_min_height` / `set_max_height` (inherited) | [x] |
-| `set_top` / `set_left` (positioning) | [ ] |
-| `add_resize_listener` / `add_dragged_listener` | [ ] |
+| `set_top` / `set_left` (positioning) | [x] |
+| `add_resize_listener` / `add_dragged_listener` | [x] |
 | `add_theme_variants` / `remove_theme_variants` (DialogVariant) | [x] |
 
 ### ConfirmDialog
@@ -605,8 +609,8 @@ All components inherit from `Component` which provides:
 | MenuItem: `is_parent_item` / `add_click_listener` | [x] |
 | `remove` / `remove_all` | [x] |
 | `add_item(Component)` / `close` | [ ] |
-| MenuItem: `set_keep_open` / `set_disable_on_click` / `set_aria_label` | [ ] |
-| SubMenu: `add_separator` / `remove` / `remove_all` | [ ] |
+| MenuItem: `set_keep_open` / `set_disable_on_click` / `set_aria_label` | [x] |
+| SubMenu: `add_separator` / `remove` / `remove_all` | [x] |
 | `add_theme_variants` / `remove_theme_variants` (MenuBarVariant) | [x] |
 
 ### ContextMenu
@@ -797,6 +801,10 @@ All components inherit from `Component` which provides:
 | Grid | item-click | `add_item_click_listener` |
 | Grid | item-double-click | `add_item_double_click_listener` |
 | MasterDetailLayout | backdrop-click, detail-escape-press | `add_backdrop_click_listener` / `add_detail_escape_press_listener` |
+| Dialog | resize, dragged | `add_resize_listener` / `add_dragged_listener` |
+| DatePicker | opened-changed | `add_opened_change_listener` |
+| TimePicker | opened-changed | `add_opened_change_listener` |
+| ConfirmDialog | opened-changed | `add_opened_change_listener` |
 
 ### Missing Events
 
@@ -808,7 +816,7 @@ All components inherit from `Component` which provides:
 | Component | Missing Event | Notes |
 |-----------|--------------|-------|
 | Text fields | key-down | `addKeyDownListener` — Enter-to-submit |
-| ComboBox/DatePicker/TimePicker/Select | opened-changed | Overlay open/close tracking |
+| ComboBox/Select | opened-changed | Overlay open/close tracking |
 | Upload | started / progress | Custom progress indicators |
 | ConfirmDialog/ContextMenu | opened-changed | Lifecycle tracking |
 | Grid | column-resize | Persist column widths |
@@ -818,7 +826,6 @@ All components inherit from `Component` which provides:
 | Component | Missing Event | Notes |
 |-----------|--------------|-------|
 | Grid | cell-focus / column-reorder / drag-drop | Rarely needed |
-| Dialog | resize / dragged | Rarely needed |
 
 ---
 
