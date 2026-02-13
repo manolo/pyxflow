@@ -1,8 +1,8 @@
 """HorizontalLayout component."""
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.constants import (  # noqa: F401 — re-export
-    Alignment, JustifyContentMode, HorizontalLayoutVariant as HorizontalLayoutVariant,
+from vaadin.flow.components.constants import (
+    Alignment, JustifyContentMode, HorizontalLayoutVariant,
 )
 
 

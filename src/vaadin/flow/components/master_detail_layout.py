@@ -4,7 +4,7 @@ from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
-from vaadin.flow.components.constants import MasterDetailLayoutVariant as MasterDetailLayoutVariant
+from vaadin.flow.components.constants import MasterDetailLayoutVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree

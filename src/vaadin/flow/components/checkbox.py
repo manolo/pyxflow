@@ -4,7 +4,7 @@ from typing import Callable
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.mixins import HasReadOnly, HasRequired
-from vaadin.flow.components.constants import CheckboxVariant as CheckboxVariant
+from vaadin.flow.components.constants import CheckboxVariant
 
 
 class Checkbox(HasReadOnly, HasRequired, Component):

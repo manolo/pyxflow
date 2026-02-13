@@ -6,7 +6,7 @@ from typing import Callable, Optional
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
-from vaadin.flow.components.constants import DateTimePickerVariant as DateTimePickerVariant
+from vaadin.flow.components.constants import DateTimePickerVariant
 
 
 class DateTimePicker(HasReadOnly, HasValidation, HasRequired, Component):

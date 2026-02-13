@@ -3,7 +3,7 @@
 from typing import TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.constants import AvatarVariant as AvatarVariant, AvatarGroupVariant as AvatarGroupVariant
+from vaadin.flow.components.constants import AvatarVariant, AvatarGroupVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree

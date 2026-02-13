@@ -3,7 +3,7 @@
 from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.constants import DialogVariant as DialogVariant
+from vaadin.flow.components.constants import DialogVariant
 from vaadin.flow.server.uidl_handler import _CLOSED_HASH
 
 if TYPE_CHECKING:

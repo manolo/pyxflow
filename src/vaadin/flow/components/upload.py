@@ -5,7 +5,7 @@ from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
-from vaadin.flow.components.constants import UploadVariant as UploadVariant
+from vaadin.flow.components.constants import UploadVariant
 from vaadin.flow.server.uidl_handler import (
     _FILE_REJECT_HASH, _UPLOAD_SUCCESS_HASH,
     _UPLOAD_ERROR_HASH, _FILE_REMOVE_HASH,

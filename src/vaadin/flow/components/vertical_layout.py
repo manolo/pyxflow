@@ -2,7 +2,7 @@
 
 from vaadin.flow.components.horizontal_layout import Alignment, JustifyContentMode
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.constants import VerticalLayoutVariant as VerticalLayoutVariant
+from vaadin.flow.components.constants import VerticalLayoutVariant
 
 
 class VerticalLayout(Component):

@@ -5,7 +5,7 @@ from typing import Callable, Generic, TypeVar, Optional, Set, TYPE_CHECKING
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 from vaadin.flow.core.state_node import Feature
-from vaadin.flow.components.constants import MultiSelectComboBoxVariant as MultiSelectComboBoxVariant
+from vaadin.flow.components.constants import MultiSelectComboBoxVariant
 from vaadin.flow.data.provider import DataProvider, Query
 
 if TYPE_CHECKING:

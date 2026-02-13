@@ -1,7 +1,7 @@
 """FlexLayout component — a div with display:flex and full Flexbox API."""
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.constants import (  # noqa: F401 — re-export
+from vaadin.flow.components.constants import (
     FlexDirection, FlexWrap, JustifyContentMode, ContentAlignment, Alignment,
 )
 

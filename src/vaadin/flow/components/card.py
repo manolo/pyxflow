@@ -3,7 +3,7 @@
 from typing import TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.constants import CardVariant as CardVariant
+from vaadin.flow.components.constants import CardVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree

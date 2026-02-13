@@ -3,7 +3,7 @@
 from typing import TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.constants import Orientation, SplitLayoutVariant as SplitLayoutVariant  # noqa: F401 — re-export
+from vaadin.flow.components.constants import Orientation, SplitLayoutVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree

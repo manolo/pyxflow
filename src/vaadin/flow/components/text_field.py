@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Callable
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
-from vaadin.flow.components.constants import ValueChangeMode, TextFieldVariant as TextFieldVariant, Autocomplete as Autocomplete
+from vaadin.flow.components.constants import ValueChangeMode, TextFieldVariant, Autocomplete
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree

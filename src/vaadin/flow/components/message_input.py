@@ -4,7 +4,7 @@ import json
 from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.constants import MessageInputVariant as MessageInputVariant
+from vaadin.flow.components.constants import MessageInputVariant
 from vaadin.flow.server.uidl_handler import _SUBMIT_HASH
 
 if TYPE_CHECKING:

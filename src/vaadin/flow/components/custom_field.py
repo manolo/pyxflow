@@ -4,7 +4,7 @@ from typing import Callable, Optional, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
-from vaadin.flow.components.constants import CustomFieldVariant as CustomFieldVariant
+from vaadin.flow.components.constants import CustomFieldVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree

@@ -6,7 +6,7 @@ from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
-from vaadin.flow.components.constants import NotificationVariant as NotificationVariant  # noqa: F401 — re-export
+from vaadin.flow.components.constants import NotificationVariant
 from vaadin.flow.server.uidl_handler import _CLOSED_HASH, _OPENED_CHANGED_HASH
 
 if TYPE_CHECKING:

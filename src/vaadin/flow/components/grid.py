@@ -7,8 +7,8 @@ from typing import Callable, TYPE_CHECKING, Any
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
 from vaadin.flow.components.renderer import Renderer, LitRenderer, ComponentRenderer
-from vaadin.flow.components.constants import (  # noqa: F401 — re-export
-    SortDirection, SelectionMode, ColumnTextAlign as ColumnTextAlign, GridVariant as GridVariant,
+from vaadin.flow.components.constants import (
+    SortDirection, SelectionMode, ColumnTextAlign, GridVariant,
 )
 from vaadin.flow.data.provider import DataProvider, ListDataProvider, Query
 from vaadin.flow.server.uidl_handler import _ITEM_CLICK_HASH

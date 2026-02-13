@@ -3,7 +3,7 @@
 from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
-from vaadin.flow.components.constants import PopoverPosition, PopoverVariant as PopoverVariant  # noqa: F401 — re-export
+from vaadin.flow.components.constants import PopoverPosition, PopoverVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
