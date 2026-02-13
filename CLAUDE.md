@@ -59,8 +59,8 @@ vaadin-pyflow/
 ├── demo/               # Demo app + __main__.py entry point
 │   ├── views/          # View files (hello_world, about, components, grid, etc.)
 │   └── services/       # PeopleService (data access layer)
-├── tests/              # 2092+ unit tests
-│   └── ui/             # Playwright UI tests (36 tests across 2 views)
+├── tests/              # 2118 unit tests (pytest runs these by default)
+│   └── ui/             # 36 Playwright UI tests (excluded by default, run via pytest tests/ui/)
 └── STATUS.md           # Implementation progress
 ../bundle-generator/    # Java project → frontend bundle (shared, at root level)
 ```
