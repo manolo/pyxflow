@@ -92,10 +92,11 @@ class Checkbox(HasReadOnly, HasRequired, Component):
 
     def _handle_change(self, event_data: dict):
         """Handle checked-changed event from client."""
-        self._checked = event_data.get("checked", self._checked)
+        if "checked" in event_data:
+            self._checked = bool(event_data["checked"])
         self._indeterminate = False  # User interaction clears indeterminate
         for listener in self._change_listeners:
-            listener(event_data)
+            listener({"value": self._checked, "from_client": True})
 
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""

@@ -112,21 +112,19 @@ class Element:
     def execute_js(self, script: str, *args):
         """Execute JavaScript on this element.
 
-        The element is available as 'this' in the script.
-        Arguments can be referenced as $0, $1, etc.
+        The element is available as $0 in the script.
+        Additional arguments can be referenced as $1, $2, etc.
 
         Args:
             script: JavaScript code to execute.
-            *args: Arguments passed to the script.
+            *args: Arguments passed to the script (Element refs or values).
         """
-        # Create an execute change for the UIDL
-        self._tree.add_change({
-            "node": self._node.id,
-            "type": "put",
-            "key": "execute",
-            "feat": Feature.ELEMENT_PROPERTY_MAP,
-            "value": {
-                "script": script,
-                "args": list(args)
-            }
-        })
+        command: list = [{"@v-node": self._node.id}]
+        for arg in args:
+            if hasattr(arg, "_node"):
+                # Element reference
+                command.append({"@v-node": arg._node.id})
+            else:
+                command.append(arg)
+        command.append(script)
+        self._tree.queue_execute(command)

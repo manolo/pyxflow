@@ -26,6 +26,7 @@ class TimePicker(HasReadOnly, HasValidation, HasRequired, Component):
         self._min: Optional[datetime.time] = None
         self._max: Optional[datetime.time] = None
         self._step: Optional[int] = None
+        self._clear_button_visible: bool = False
         self._change_listeners: list[Callable] = []
 
     def _attach(self, tree):
@@ -44,6 +45,8 @@ class TimePicker(HasReadOnly, HasValidation, HasRequired, Component):
             self.element.set_property("max", self._format_time(self._max))
         if self._step is not None:
             self.element.set_property("step", self._step)
+        if self._clear_button_visible:
+            self.element.set_property("clearButtonVisible", True)
         # Init connector
         el_ref = {"@v-node": self.element.node.id}
         tree.queue_execute([

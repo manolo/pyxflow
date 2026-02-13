@@ -44,6 +44,7 @@ class Popover(Component):
     _tag = "vaadin-popover"
 
     def __init__(self):
+        super().__init__()
         self._children: list[Component] = []
         self._target: Component | None = None
         self._position: PopoverPosition = PopoverPosition.BOTTOM

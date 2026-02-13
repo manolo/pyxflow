@@ -46,6 +46,11 @@ class NumberField(HasReadOnly, HasValidation, HasRequired, Component):
         if self._clear_button_visible:
             self.element.set_property("clearButtonVisible", True)
         self.element.add_event_listener(self._get_event_name(), self._handle_change)
+        # Flush pending prefix/suffix components
+        if hasattr(self, '_prefix_component') and self._prefix_component:
+            self.set_prefix_component(self._prefix_component)
+        if hasattr(self, '_suffix_component') and self._suffix_component:
+            self.set_suffix_component(self._suffix_component)
 
     @property
     def value(self) -> Optional[float]:
@@ -135,18 +140,19 @@ class NumberField(HasReadOnly, HasValidation, HasRequired, Component):
         self._change_listeners.append(listener)
 
     def _handle_change(self, event_data: dict):
-        """Handle change event."""
-        value_str = event_data.get("value", "")
-        if value_str == "" or value_str is None:
-            self._value = None
-        else:
-            try:
-                self._value = float(value_str)
-            except (ValueError, TypeError):
+        """Handle change event from client."""
+        value_str = event_data.get("value")
+        if value_str is not None:
+            if value_str != "":
+                try:
+                    self._value = float(value_str)
+                except (ValueError, TypeError):
+                    self._value = None
+            else:
                 self._value = None
-
+        # If "value" not in event_data, keep self._value (set by mSync)
         for listener in self._change_listeners:
-            listener(event_data)
+            listener({"value": self._value, "from_client": True})
 
     def set_clear_button_visible(self, visible: bool):
         self._clear_button_visible = visible
@@ -257,21 +263,22 @@ class IntegerField(NumberField):
                 listener({"value": value, "from_client": False})
 
     def _handle_change(self, event_data: dict):
-        """Handle change event."""
-        value_str = event_data.get("value", "")
-        if value_str == "" or value_str is None:
-            self._int_value = None
-            self._value = None
-        else:
-            try:
-                self._int_value = int(float(value_str))
-                self._value = float(self._int_value)
-            except (ValueError, TypeError):
-                self._int_value = None
+        """Handle change event from client."""
+        value_str = event_data.get("value")
+        if value_str is not None:
+            if value_str != "":
+                try:
+                    self._value = float(value_str)
+                    self._int_value = int(self._value)
+                except (ValueError, TypeError):
+                    self._value = None
+                    self._int_value = None
+            else:
                 self._value = None
-
+                self._int_value = None
+        # If "value" not in event_data, keep self._int_value (set by mSync)
         for listener in self._change_listeners:
-            listener(event_data)
+            listener({"value": self._int_value, "from_client": True})
 
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""

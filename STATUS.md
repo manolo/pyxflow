@@ -4,8 +4,8 @@
 
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
-**Lines of code:** ~15,900 (core src/), ~41,400 (total with demo + tests)
-**Tests:** 2118 unit + 36 UI (Playwright)
+**Lines of code:** ~16,000 (core src/), ~46,000 (total with demo + tests)
+**Tests:** 2118 unit + 306 UI (Playwright)
 **Last updated:** 2026-02-13
 
 ---
@@ -234,8 +234,7 @@
 | Category | Coverage | Details |
 |----------|----------|---------|
 | **Unit tests** | 2118 passing | Good coverage of all 49 components + core + data layer |
-| **UI tests** | 36 / ~447 scenarios | 2 test views implemented (buttons-icons, text-inputs). See `tests/ui/SPECS.md` for all 447 Gherkin scenarios |
-| **UI test views needed** | ~20 views | Grid, Dialog, Notification, Select, ComboBox, DatePicker, Tabs, MenuBar, Upload, Forms/Binder, Push, AppLayout, Navigation, Details/Accordion, ContextMenu, Login, SplitLayout, etc. |
+| **UI tests** | 306 passed, 3 skipped | 29 test views covering all components, layouts, navigation, push, binder, theme, etc. |
 
 ### Missing UI Test Views (from SPECS.md)
 

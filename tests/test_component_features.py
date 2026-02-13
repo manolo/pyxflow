@@ -243,33 +243,30 @@ class TestComponentExecuteJs:
         """execute_js delegates to element when attached."""
         button = Button("Click me")
         button._attach(tree)
-        tree.collect_changes()  # Clear initial changes
+        tree.collect_execute()  # Clear initial execute commands
 
         button.execute_js("this.focus()")
-        changes = tree.collect_changes()
+        cmds = tree.collect_execute()
 
-        exec_change = next(
-            (c for c in changes if c.get("key") == "execute"), None
-        )
-        assert exec_change is not None
-        assert exec_change["value"]["script"] == "this.focus()"
-        assert exec_change["value"]["args"] == []
+        assert len(cmds) == 1
+        cmd = cmds[0]
+        assert cmd[-1] == "this.focus()"  # Script is last
+        assert cmd[0] == {"@v-node": button.element.node_id}  # Element ref is first
 
     def test_execute_js_with_args_when_attached(self, tree):
         """execute_js passes arguments to element."""
         button = Button("Click me")
         button._attach(tree)
-        tree.collect_changes()
+        tree.collect_execute()
 
         button.execute_js("this.style.color = $0", "red")
-        changes = tree.collect_changes()
+        cmds = tree.collect_execute()
 
-        exec_change = next(
-            (c for c in changes if c.get("key") == "execute"), None
-        )
-        assert exec_change is not None
-        assert exec_change["value"]["script"] == "this.style.color = $0"
-        assert exec_change["value"]["args"] == ["red"]
+        assert len(cmds) == 1
+        cmd = cmds[0]
+        assert cmd[-1] == "this.style.color = $0"  # Script is last
+        assert cmd[0] == {"@v-node": button.element.node_id}
+        assert cmd[1] == "red"  # First arg
 
     def test_execute_js_buffered_before_attach(self, tree):
         """execute_js buffers calls when not yet attached."""
@@ -279,13 +276,10 @@ class TestComponentExecuteJs:
 
         # Now attach — buffered JS should be flushed
         button._attach(tree)
-        changes = tree.collect_changes()
+        cmds = tree.collect_execute()
 
-        exec_change = next(
-            (c for c in changes if c.get("key") == "execute"), None
-        )
-        assert exec_change is not None
-        assert exec_change["value"]["script"] == "this.focus()"
+        focus_cmds = [c for c in cmds if c[-1] == "this.focus()"]
+        assert len(focus_cmds) == 1
 
     def test_execute_js_buffered_multiple(self, tree):
         """Multiple buffered execute_js calls are all flushed in order."""
@@ -294,13 +288,12 @@ class TestComponentExecuteJs:
         button.execute_js("console.log($0)", "second")
 
         button._attach(tree)
-        changes = tree.collect_changes()
+        cmds = tree.collect_execute()
 
-        exec_changes = [c for c in changes if c.get("key") == "execute"]
-        scripts = [c["value"]["script"] for c in exec_changes]
-        args = [c["value"]["args"] for c in exec_changes]
-        assert scripts == ["console.log($0)", "console.log($0)"]
-        assert args == [["first"], ["second"]]
+        log_cmds = [c for c in cmds if c[-1] == "console.log($0)"]
+        assert len(log_cmds) == 2
+        assert log_cmds[0][1] == "first"
+        assert log_cmds[1][1] == "second"
 
     def test_execute_js_buffer_cleared_after_attach(self, tree):
         """Buffered JS list is cleaned up after attach."""

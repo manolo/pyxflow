@@ -210,19 +210,18 @@ class TestPromiseResolution:
         }
         handler._handle_published_event(rpc)
 
-        # element.execute_js adds changes to tree._changes
-        changes = tree.collect_changes()
-        promise_changes = [
-            c for c in changes
-            if c.get("key") == "execute"
-            and "}p" in str(c.get("value", {}).get("script", ""))
+        # element.execute_js queues execute commands via tree.queue_execute()
+        execute_cmds = tree.collect_execute()
+        promise_cmds = [
+            cmd for cmd in execute_cmds
+            if any("}p" in str(item) for item in cmd)
         ]
-        assert len(promise_changes) == 1
-        script = promise_changes[0]["value"]["script"]
-        args = promise_changes[0]["value"]["args"]
+        assert len(promise_cmds) == 1
+        cmd = promise_cmds[0]
+        script = cmd[-1]  # Script is always last element
         assert "true" in script  # resolve, not reject
-        assert 42 in args
-        assert "Hello, Alice!" in args
+        assert 42 in cmd
+        assert "Hello, Alice!" in cmd
 
     def test_promise_reject_on_exception(self):
         tree, handler, comp = self._setup_component(FailingComponent)
@@ -238,17 +237,16 @@ class TestPromiseResolution:
             handler._handle_published_event(rpc)
 
         # Even on exception, the rejection should have been queued
-        changes = tree.collect_changes()
-        promise_changes = [
-            c for c in changes
-            if c.get("key") == "execute"
-            and "}p" in str(c.get("value", {}).get("script", ""))
+        execute_cmds = tree.collect_execute()
+        promise_cmds = [
+            cmd for cmd in execute_cmds
+            if any("}p" in str(item) for item in cmd)
         ]
-        assert len(promise_changes) == 1
-        script = promise_changes[0]["value"]["script"]
-        args = promise_changes[0]["value"]["args"]
+        assert len(promise_cmds) == 1
+        cmd = promise_cmds[0]
+        script = cmd[-1]  # Script is always last element
         assert "false" in script  # reject
-        assert 7 in args
+        assert 7 in cmd
 
     def test_promise_minus_one_is_fire_and_forget(self):
         tree, handler, comp = self._setup_component()
@@ -262,13 +260,12 @@ class TestPromiseResolution:
         }
         handler._handle_published_event(rpc)
 
-        changes = tree.collect_changes()
-        promise_changes = [
-            c for c in changes
-            if c.get("key") == "execute"
-            and "}p" in str(c.get("value", {}).get("script", ""))
+        execute_cmds = tree.collect_execute()
+        promise_cmds = [
+            cmd for cmd in execute_cmds
+            if any("}p" in str(item) for item in cmd)
         ]
-        assert len(promise_changes) == 0
+        assert len(promise_cmds) == 0
 
     def test_no_promise_field_is_fire_and_forget(self):
         tree, handler, comp = self._setup_component()
@@ -281,13 +278,12 @@ class TestPromiseResolution:
         }
         handler._handle_published_event(rpc)
 
-        changes = tree.collect_changes()
-        promise_changes = [
-            c for c in changes
-            if c.get("key") == "execute"
-            and "}p" in str(c.get("value", {}).get("script", ""))
+        execute_cmds = tree.collect_execute()
+        promise_cmds = [
+            cmd for cmd in execute_cmds
+            if any("}p" in str(item) for item in cmd)
         ]
-        assert len(promise_changes) == 0
+        assert len(promise_cmds) == 0
 
 
 class TestExport:

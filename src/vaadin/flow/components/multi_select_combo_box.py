@@ -40,6 +40,7 @@ class MultiSelectComboBox(HasReadOnly, HasValidation, HasRequired, Component, Ge
         self._item_label_generator: Optional[Callable[[T], str]] = None
         self._change_listeners: list[Callable] = []
         self._update_id = 0
+        self._clear_button_visible: bool = False
         self._provider: DataProvider | None = None
         self._provider_listener_unsub: Callable | None = None
 
@@ -54,6 +55,8 @@ class MultiSelectComboBox(HasReadOnly, HasValidation, HasRequired, Component, Ge
         self.element.set_property("itemIdPath", "key")
         self.element.set_property("itemValuePath", "key")
         self.element.set_property("itemLabelPath", "label")
+        if self._clear_button_visible:
+            self.element.set_property("clearButtonVisible", True)
 
         # Register client-callable methods via Feature 19
         tree.add_change({

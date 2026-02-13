@@ -35,6 +35,7 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
         self._change_listeners: list[Callable] = []
         self._custom_value_listeners: list[Callable] = []
         self._clear_button_visible = False
+        self._auto_open_disabled = False
         self._update_id = 0
         self._provider: DataProvider | None = None
         self._provider_listener_unsub: Callable | None = None
@@ -54,6 +55,8 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
             self.element.set_property("allowCustomValue", True)
         if self._clear_button_visible:
             self.element.set_property("clearButtonVisible", True)
+        if self._auto_open_disabled:
+            self.element.set_property("autoOpenDisabled", True)
         # Register client-callable methods via Feature 19
         tree.add_change({
             "node": self.element.node_id,
@@ -245,20 +248,22 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
         self._custom_value_listeners.append(listener)
 
     def _handle_change(self, event_data: dict):
-        value_str = event_data.get("value", "")
-        if value_str:
-            try:
-                idx = int(value_str)
-                if 0 <= idx < len(self._items):
-                    self._value = self._items[idx]
-                else:
+        value_str = event_data.get("value")
+        if value_str is not None:
+            if value_str:
+                try:
+                    idx = int(value_str)
+                    if 0 <= idx < len(self._items):
+                        self._value = self._items[idx]
+                    else:
+                        self._value = None
+                except (ValueError, IndexError):
                     self._value = None
-            except (ValueError, IndexError):
+            else:
                 self._value = None
-        else:
-            self._value = None
+        # If "value" not in event_data, keep self._value (set by mSync)
         for listener in self._change_listeners:
-            listener(event_data)
+            listener({"value": self._value, "from_client": True})
 
     # --- Client-callable methods (publishedEventHandler RPC) ---
 
@@ -283,6 +288,7 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
         return self._clear_button_visible
 
     def set_auto_open(self, auto_open: bool):
+        self._auto_open_disabled = not auto_open
         if self._element:
             self.element.set_property("autoOpenDisabled", not auto_open)
 
@@ -293,6 +299,7 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
 
     def _sync_property(self, name: str, value):
         if name == "value":
+            old_value = self._value
             if value:
                 try:
                     idx = int(value)
@@ -304,3 +311,6 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
                     self._value = None
             else:
                 self._value = None
+            if self._value != old_value:
+                for listener in self._change_listeners:
+                    listener({"value": self._value, "from_client": True})

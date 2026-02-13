@@ -603,6 +603,13 @@ class Grid(Component):
         if self._selection_mode == SelectionMode.MULTI:
             self._deselect_all_items()
 
+    def select_item(self, item):
+        """Programmatically select an item by its object reference."""
+        for key, it in self._key_to_item.items():
+            if it is item or it == item:
+                self.select(key)
+                return
+
     # --- Lazy Loading ---
 
     def set_data_provider(self, provider):

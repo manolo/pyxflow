@@ -25,6 +25,7 @@ class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):
         self._placeholder = ""
         self._min: Optional[datetime.date] = None
         self._max: Optional[datetime.date] = None
+        self._clear_button_visible: bool = False
         self._change_listeners: list[Callable] = []
 
     def _attach(self, tree):
@@ -42,6 +43,8 @@ class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):
             self.element.set_property("min", self._min.isoformat())
         if self._max is not None:
             self.element.set_property("max", self._max.isoformat())
+        if self._clear_button_visible:
+            self.element.set_property("clearButtonVisible", True)
         # Init connector
         el_ref = {"@v-node": self.element.node.id}
         tree.queue_execute([

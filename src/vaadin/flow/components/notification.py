@@ -116,11 +116,6 @@ class Notification(Component):
         if self._theme_variants:
             self.element.set_attribute("theme", " ".join(sorted(self._theme_variants)))
 
-        # Attach to body (node 1), not to the current view
-        body_node = tree.get_node(1)
-        if body_node:
-            body_node.add_child(self.element.node)
-
     def _update_virtual_child_node_ids(self):
         """Update the virtualChildNodeIds property with child node IDs."""
         if not self._element:
@@ -195,6 +190,13 @@ class Notification(Component):
             if tree:
                 self._pending_server_change = True
                 self._attach(tree)
+                # Add to body node (node 1) so client can render it.
+                # This is only for the auto-attach path (Notification.show()).
+                # When a parent layout calls add(notification), the parent
+                # handles adding the node as its child — no body attach needed.
+                body_node = tree.get_node(1)
+                if body_node:
+                    body_node.add_child(self.element.node)
                 for listener in self._open_listeners:
                     listener({})
                 return

@@ -156,20 +156,25 @@ class TestNotification:
         )
         assert clear_change is not None
 
-    def test_body_attachment(self, tree):
-        """Notification is spliced to body (node 1), not to the view."""
-        n = Notification("Test")
-        n._attach(tree)
+    def test_body_attachment_via_open(self, tree):
+        """Notification.open() auto-attaches to body (node 1) via tree context."""
+        from vaadin.flow.components.notification import _set_current_tree
+        _set_current_tree(tree)
+        try:
+            n = Notification("Test")
+            n.open()
 
-        changes = tree.collect_changes()
+            changes = tree.collect_changes()
 
-        # Find splice to node 1
-        body_splice = next(
-            (c for c in changes if c.get("node") == 1 and c.get("type") == "splice" and c.get("feat") == Feature.ELEMENT_CHILDREN_LIST),
-            None
-        )
-        assert body_splice is not None
-        assert n.element.node_id in body_splice["addNodes"]
+            # Find splice to node 1
+            body_splice = next(
+                (c for c in changes if c.get("node") == 1 and c.get("type") == "splice" and c.get("feat") == Feature.ELEMENT_CHILDREN_LIST),
+                None
+            )
+            assert body_splice is not None
+            assert n.element.node_id in body_splice["addNodes"]
+        finally:
+            _set_current_tree(None)
 
     def test_event_hashes(self, tree):
         """Event listeners use correct notification-specific hashes."""

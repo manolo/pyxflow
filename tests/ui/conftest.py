@@ -21,7 +21,7 @@ DEFAULT_BASE_URL = f"http://localhost:{DEFAULT_PORT}"
 HEALTH_URL = f"{DEFAULT_BASE_URL}/?v-r=health"
 
 # Test routes that must be registered for UI tests to work
-REQUIRED_ROUTES = {"test/buttons-icons", "test/text-inputs"}
+REQUIRED_ROUTES = {"test/buttons-icons", "test/text-inputs", "test/grid-basic", "test/login"}
 
 # Root of the vaadin-pyflow project
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent

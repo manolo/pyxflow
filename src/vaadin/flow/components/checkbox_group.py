@@ -35,6 +35,11 @@ class CheckboxGroup(HasReadOnly, HasValidation, HasRequired, Component, Generic[
         # Create checkboxes for items
         self._create_checkboxes(tree)
 
+        # Set group value property to sync checked state
+        if self._value:
+            labels = [self._get_item_label(item) for item in self._value]
+            self.element.set_property("value", labels)
+
         # Register value change listener
         self.element.add_event_listener("value-changed", self._handle_value_changed)
 
