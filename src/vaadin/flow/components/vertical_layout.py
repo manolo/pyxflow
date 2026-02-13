@@ -47,7 +47,8 @@ class VerticalLayout(Component):
             component._parent = self
             component._ui = self._ui
             if self._element:
-                component._attach(self._element._tree)
+                if not component._element:
+                    component._attach(self._element._tree)
                 self.element.add_child(component.element)
 
     def remove(self, *components: Component):
@@ -155,7 +156,8 @@ class VerticalLayout(Component):
         component._parent = self
         component._ui = self._ui
         if self._element:
-            component._attach(self._element._tree)
+            if not component._element:
+                component._attach(self._element._tree)
             self.element.add_child(component.element, index)
 
     def add_component_as_first(self, component: Component):
