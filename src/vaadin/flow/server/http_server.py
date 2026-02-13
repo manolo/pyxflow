@@ -329,14 +329,19 @@ async def _push_sender(ws: web.WebSocketResponse, ui_state: dict):
         if ws.closed:
             break
 
+        # Skip if no actual changes to push.  This check MUST happen before
+        # _build_response() because that method increments syncId.  When
+        # ui.access() is called during an HTTP request handler, the changes
+        # are already consumed by the HTTP response; only notify_push() fires.
+        # Without this guard, _build_response() bumps syncId for an empty
+        # response, desynchronising client and server → next RPC triggers a
+        # full resync and the page goes blank.
+        if not tree._changes and not tree._pending_execute:
+            continue
+
         try:
             # Build UIDL response with pending changes
             response_data = handler._build_response()
-
-            # Only send if there are actual changes or execute commands
-            if not response_data.get("changes") and not response_data.get("execute"):
-                log.debug("Push: no changes, skipping (syncId=%s)", response_data.get("syncId"))
-                continue
 
             # Mark as async push (not a response to an HTTP request).
             # Without this, FlowClient calls endRequest() which throws
