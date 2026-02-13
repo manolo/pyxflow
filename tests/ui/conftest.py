@@ -1,13 +1,20 @@
 """Playwright UI test configuration.
 
 Requires a running PyFlow server: cd vaadin-pyflow && source .venv/bin/activate && python -m demo
-Pass --base-url http://localhost:8088 to pytest.
 """
 
 import pytest
 
 CONSECUTIVE_FAILURES = 0
 MAX_CONSECUTIVE = 4
+
+DEFAULT_BASE_URL = "http://localhost:8088"
+
+
+@pytest.fixture(scope="session")
+def base_url(request):
+    """Default to localhost:8088 if --base-url is not provided."""
+    return request.config.getoption("--base-url", default=None) or DEFAULT_BASE_URL
 
 
 @pytest.fixture(scope="session")
