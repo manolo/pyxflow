@@ -240,8 +240,8 @@
 
 | Category | Coverage | Details |
 |----------|----------|---------|
-| **Unit tests** | 2274 passing | Good coverage of all 49 components + core + data layer. Located in `tests/unit/` |
-| **UI tests** | 323 passed, 3 skipped | All 29 test views (in `tests/views/`) with shared SideNav layout and single browser session. UI tests in `tests/ui/` |
+| **Unit tests** | 2288 passing | Good coverage of all 49 components + core + data layer. Located in `tests/unit/` |
+| **UI tests** | 326 passed, 3 skipped | All 29 test views (in `tests/views/`) with shared SideNav layout and single browser session. UI tests in `tests/ui/` |
 
 3 skipped: 2 focus/blur event forwarding (native JS focus/blur doesn't trigger Vaadin server events), 1 ContextMenu openOnClick (needs investigation).
 

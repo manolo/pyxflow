@@ -2182,20 +2182,20 @@ Feature: WebSocket Push
     When click
     Then Span#push-access text is "accessed"
 
-  Scenario: V24.05 — Push with component add
-    Given background task adds Span("pushed") to layout
-    When click "#start"
-    Then "pushed" appears in layout
+  Scenario: V24.05 — UI.access then async push (regression)
+    Given sync ui.access() called in click handler, then async push button
+    When click "#access", wait for "accessed", click "#multi"
+    Then push-count reaches "3" (syncId not desynchronised)
 
-  Scenario: V24.06 — Push preserves existing UI state
-    Given TextField with value "keep", background task adds new component
-    When click "#start"
-    Then TextField still has "keep" AND new component appears
+  Scenario: V24.06 — Two consecutive UI.access calls (regression)
+    Given two sync ui.access() calls in sequence
+    When click "#access" twice
+    Then page still alive (no resync / blank screen)
 
-  Scenario: V24.07 — Multiple rapid pushes
-    Given task sends 10 updates rapidly (no delay)
-    When click "#start"
-    Then all 10 updates received (Span#push-count is "10")
+  Scenario: V24.07 — UI.access then background push (regression)
+    Given sync ui.access() then async background task push
+    When click "#access", wait for "accessed", click "#start"
+    Then push-result shows "done" (no syncId mismatch)
 
   # --- Nav ---
   Scenario: V24.08 — Nav to next view
