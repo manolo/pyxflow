@@ -3,11 +3,14 @@
 from vaadin.flow import Route
 from vaadin.flow.components import (
     Button, Notification, NotificationVariant, Popover, PopoverPosition,
-    RouterLink, Span, VerticalLayout,
+    Span, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/notification-popover", page_title="Test: Notification & Popover")
+@Route("test/notification-popover", page_title="Test: Notification & Popover", layout=TestMainLayout)
+@Menu(title="Notification & Popover", order=11)
 class TestNotificationPopoverView(VerticalLayout):
     def __init__(self):
         # --- Notification.show static ---
@@ -99,10 +102,6 @@ class TestNotificationPopoverView(VerticalLayout):
         pop_ev.add_open_listener(lambda e: pop_ev_val.set_text("opened"))
         pop_ev.add_close_listener(lambda e: pop_ev_val.set_text("closed"))
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Tabs & Accordion", "test/tabs-accordion")
-        nav_link.set_id("nav-next")
-
         self.add(
             btn_show,
             btn_pos,
@@ -113,5 +112,4 @@ class TestNotificationPopoverView(VerticalLayout):
             pop_prog_target, pop_prog, btn_pop_open, btn_pop_close,
             pop_pos_target, pop_pos,
             pop_ev_target, pop_ev, pop_ev_val,
-            nav_link,
         )

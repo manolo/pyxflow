@@ -2,11 +2,14 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, ConfirmDialog, Dialog, RouterLink, Span, VerticalLayout,
+    Button, ConfirmDialog, Dialog, Span, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/dialog", page_title="Test: Dialog")
+@Route("test/dialog", page_title="Test: Dialog", layout=TestMainLayout)
+@Menu(title="Dialog", order=12)
 class TestDialogView(VerticalLayout):
     def __init__(self):
         # --- Dialog open/close ---
@@ -149,10 +152,6 @@ class TestDialogView(VerticalLayout):
         btn_cd_reopen.set_id("btn-cd-reopen")
         btn_cd_reopen.add_click_listener(lambda e: cd_reopen.open())
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Notification & Popover", "test/notification-popover")
-        nav_link.set_id("nav-next")
-
         self.add(
             btn_open, dlg1,
             btn_title, dlg_title,
@@ -166,5 +165,4 @@ class TestDialogView(VerticalLayout):
             btn_cd_cancel, cd_cancel, cd_cancel_result,
             btn_cd_reject, cd_reject, cd_reject_result,
             btn_cd_reopen, cd_reopen, cd_reopen_count,
-            nav_link,
         )

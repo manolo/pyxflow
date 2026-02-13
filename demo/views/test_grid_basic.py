@@ -2,9 +2,11 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, ComponentRenderer, Grid, HorizontalLayout, LitRenderer, RouterLink,
+    Button, ComponentRenderer, Grid, HorizontalLayout, LitRenderer,
     Span, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
 class Person:
@@ -23,7 +25,8 @@ PEOPLE = [
 ]
 
 
-@Route("test/grid-basic", page_title="Test: Grid Basic")
+@Route("test/grid-basic", page_title="Test: Grid Basic", layout=TestMainLayout)
+@Menu(title="Grid Basic", order=8)
 class TestGridBasicView(VerticalLayout):
     def __init__(self):
         # --- Basic grid with columns ---
@@ -119,10 +122,6 @@ class TestGridBasicView(VerticalLayout):
         grid_reorder.set_column_reordering_allowed(True)
         grid_reorder.set_all_rows_visible(True)
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Grid Features", "test/grid-features")
-        nav_link.set_id("nav-next")
-
         self.add(
             grid1, btn_replace,
             grid_res,
@@ -133,5 +132,4 @@ class TestGridBasicView(VerticalLayout):
             grid_lit,
             grid_comp, grid_comp_result,
             grid_reorder,
-            nav_link,
         )

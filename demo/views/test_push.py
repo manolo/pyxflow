@@ -4,11 +4,14 @@ import asyncio
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, ProgressBar, RouterLink, Span, VerticalLayout,
+    Button, ProgressBar, Span, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/push", page_title="Test: Push")
+@Route("test/push", page_title="Test: Push", layout=TestMainLayout)
+@Menu(title="Push", order=24)
 class TestPushView(VerticalLayout):
     def __init__(self):
         # --- Single push update ---
@@ -81,14 +84,9 @@ class TestPushView(VerticalLayout):
 
         btn_access.add_click_listener(_on_access)
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Theme", "test/theme")
-        nav_link.set_id("nav-next")
-
         self.add(
             btn_start, push_result,
             btn_multi, push_count,
             btn_pb, pb,
             btn_access, access_result,
-            nav_link,
         )

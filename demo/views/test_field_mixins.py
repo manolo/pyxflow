@@ -2,12 +2,15 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, ComboBox, DatePicker, RouterLink, Select, Span, TextField,
+    Button, ComboBox, DatePicker, Select, Span, TextField,
     VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/field-mixins", page_title="Test: Field Mixins")
+@Route("test/field-mixins", page_title="Test: Field Mixins", layout=TestMainLayout)
+@Menu(title="Field Mixins", order=18)
 class TestFieldMixinsView(VerticalLayout):
     def __init__(self):
         # --- HasReadOnly: TextField ---
@@ -100,10 +103,6 @@ class TestFieldMixinsView(VerticalLayout):
             lambda e: mix_dp.set_required_indicator_visible(True)
         )
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Binder", "test/binder")
-        nav_link.set_id("nav-next")
-
         self.add(
             mix_tf, btn_ro_on, btn_ro_off,
             mix_sel, btn_sel_ro,
@@ -112,5 +111,4 @@ class TestFieldMixinsView(VerticalLayout):
             btn_sel_inv,
             mix_cb, btn_cb_inv,
             btn_req, btn_sel_req, btn_cb_req, btn_dp_req,
-            nav_link,
         )

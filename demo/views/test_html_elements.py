@@ -3,12 +3,15 @@
 from vaadin.flow import Route
 from vaadin.flow.components import (
     Anchor, Div, H1, H2, H3, H4, H5, H6, Hr, IFrame, Image, NativeLabel,
-    Paragraph, Pre, RouterLink, Span, VerticalLayout,
+    Paragraph, Pre, Span, VerticalLayout,
     Header, Footer, Section, Nav, Main,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/html-elements", page_title="Test: HTML Elements")
+@Route("test/html-elements", page_title="Test: HTML Elements", layout=TestMainLayout)
+@Menu(title="HTML Elements", order=16)
 class TestHtmlElementsView(VerticalLayout):
     def __init__(self):
         h1 = H1("Title")
@@ -79,10 +82,6 @@ class TestHtmlElementsView(VerticalLayout):
         main1 = Main("main")
         main1.set_id("main1")
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Component API", "test/component-api")
-        nav_link.set_id("nav-next")
-
         self.add(
             h1, h2, h3, h4, h5, h6,
             p1, sp1,
@@ -94,5 +93,4 @@ class TestHtmlElementsView(VerticalLayout):
             img1,
             lbl1,
             header1, footer1, section1, nav1, main1,
-            nav_link,
         )

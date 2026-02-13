@@ -2,11 +2,14 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, ComboBox, MultiSelectComboBox, RouterLink, Span, VerticalLayout,
+    Button, ComboBox, MultiSelectComboBox, Span, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/combo-box", page_title="Test: ComboBox")
+@Route("test/combo-box", page_title="Test: ComboBox", layout=TestMainLayout)
+@Menu(title="ComboBox", order=6)
 class TestComboBoxView(VerticalLayout):
     def __init__(self):
         # --- ComboBox renders with label ---
@@ -128,10 +131,6 @@ class TestComboBoxView(VerticalLayout):
         mscb_kf.set_items("Apple", "Banana", "Cherry")
         mscb_kf.set_keep_filter(True)
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Date & Time", "test/date-time")
-        nav_link.set_id("nav-next")
-
         self.add(
             cb1, cb1_val,
             cb_pre,
@@ -149,5 +148,4 @@ class TestComboBoxView(VerticalLayout):
             mscb_ro,
             mscb_top,
             mscb_kf,
-            nav_link,
         )

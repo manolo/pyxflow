@@ -2,11 +2,14 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, LoginForm, LoginOverlay, RouterLink, Span, VerticalLayout,
+    Button, LoginForm, LoginOverlay, Span, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/login", page_title="Test: Login")
+@Route("test/login", page_title="Test: Login", layout=TestMainLayout)
+@Menu(title="Login", order=29)
 class TestLoginView(VerticalLayout):
     def __init__(self):
         # --- LoginForm ---

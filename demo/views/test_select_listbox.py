@@ -2,12 +2,15 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, Icon, ListBox, MultiSelectListBox, RouterLink, Select, Span,
+    Button, Icon, ListBox, MultiSelectListBox, Select, Span,
     VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/select-listbox", page_title="Test: Select & ListBox")
+@Route("test/select-listbox", page_title="Test: Select & ListBox", layout=TestMainLayout)
+@Menu(title="Select & ListBox", order=5)
 class TestSelectListboxView(VerticalLayout):
     def __init__(self):
         # --- Select renders with label ---
@@ -107,10 +110,6 @@ class TestSelectListboxView(VerticalLayout):
         mslb_ro.set_items("A", "B")
         mslb_ro.set_read_only(True)
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: ComboBox", "test/combo-box")
-        nav_link.set_id("nav-next")
-
         self.add(
             sel1, sel1_val,
             sel_pre,
@@ -125,5 +124,4 @@ class TestSelectListboxView(VerticalLayout):
             mslb_pre,
             mslb_des, btn_des,
             mslb_ro,
-            nav_link,
         )

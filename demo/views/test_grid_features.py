@@ -2,8 +2,10 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, Grid, GridDropMode, RouterLink, SelectionMode, Span, VerticalLayout,
+    Button, Grid, GridDropMode, SelectionMode, Span, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
 ITEMS = [
@@ -15,7 +17,8 @@ ITEMS = [
 ]
 
 
-@Route("test/grid-features", page_title="Test: Grid Features")
+@Route("test/grid-features", page_title="Test: Grid Features", layout=TestMainLayout)
+@Menu(title="Grid Features", order=9)
 class TestGridFeaturesView(VerticalLayout):
     def __init__(self):
         # --- Single selection grid ---
@@ -110,10 +113,6 @@ class TestGridFeaturesView(VerticalLayout):
         grid_empty.set_empty_state_text("No data available")
         grid_empty.set_all_rows_visible(True)
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: TreeGrid", "test/tree-grid")
-        nav_link.set_id("nav-next")
-
         self.add(
             grid_single, sel_val, btn_sel,
             sort_val, click_val, dbl_val,
@@ -122,5 +121,4 @@ class TestGridFeaturesView(VerticalLayout):
             btn_sel_all, btn_desel_all,
             grid_dnd,
             grid_empty,
-            nav_link,
         )

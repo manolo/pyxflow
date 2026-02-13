@@ -2,12 +2,15 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, Card, MasterDetailLayout, RouterLink, Scroller, ScrollDirection,
+    Button, Card, MasterDetailLayout, Scroller, ScrollDirection,
     Span, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/card-scroller", page_title="Test: Card & Scroller")
+@Route("test/card-scroller", page_title="Test: Card & Scroller", layout=TestMainLayout)
+@Menu(title="Card & Scroller", order=10)
 class TestCardScrollerView(VerticalLayout):
     def __init__(self):
         # --- Card with title ---
@@ -56,13 +59,8 @@ class TestCardScrollerView(VerticalLayout):
         mdl.set_width("100%")
         mdl.set_height("200px")
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Upload", "test/upload")
-        nav_link.set_id("nav-next")
-
         self.add(
             card1, card2,
             scroller, scroller_h,
             mdl,
-            nav_link,
         )

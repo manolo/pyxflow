@@ -2,11 +2,14 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, ContextMenu, Div, MenuBar, RouterLink, Span, VerticalLayout,
+    Button, ContextMenu, Div, MenuBar, Span, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/menu", page_title="Test: Menu")
+@Route("test/menu", page_title="Test: Menu", layout=TestMainLayout)
+@Menu(title="Menu", order=19)
 class TestMenuView(VerticalLayout):
     def __init__(self):
         mb_result = Span("")
@@ -70,14 +73,9 @@ class TestMenuView(VerticalLayout):
         ctx2.set_open_on_click(True)
         ctx2.add_item("Action", lambda e: ctx_result.set_text("Action"))
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Layouts", "test/layouts")
-        nav_link.set_id("nav-next")
-
         self.add(
             mb, mb_result,
             mb_hover,
             ctx, ctx_result,
             ctx2,
-            nav_link,
         )

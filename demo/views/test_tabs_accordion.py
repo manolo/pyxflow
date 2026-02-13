@@ -2,12 +2,15 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Accordion, Button, Details, RouterLink, Span, Tab, TabSheet, Tabs,
+    Accordion, Button, Details, Span, Tab, TabSheet, Tabs,
     VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/tabs-accordion", page_title="Test: Tabs & Accordion")
+@Route("test/tabs-accordion", page_title="Test: Tabs & Accordion", layout=TestMainLayout)
+@Menu(title="Tabs & Accordion", order=13)
 class TestTabsAccordionView(VerticalLayout):
     def __init__(self):
         # --- Tabs render ---
@@ -86,10 +89,6 @@ class TestTabsAccordionView(VerticalLayout):
         btn_sum.set_id("btn-det-sum")
         btn_sum.add_click_listener(lambda e: det_sum.set_summary_text("New summary"))
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Menu", "test/menu")
-        nav_link.set_id("nav-next")
-
         self.add(
             tabs1, tabs1_val, btn_tab, btn_add_tab,
             tabs_vert,
@@ -97,5 +96,4 @@ class TestTabsAccordionView(VerticalLayout):
             acc, acc_val, btn_acc_open, btn_acc_close,
             det, det_val, btn_det,
             det_sum, btn_sum,
-            nav_link,
         )

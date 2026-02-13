@@ -2,13 +2,16 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, EmailField, Icon, PasswordField, RouterLink, Span,
+    Button, EmailField, Icon, PasswordField, Span,
     TextArea, TextField, VerticalLayout,
 )
 from vaadin.flow.components.value_change_mode import ValueChangeMode
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/text-inputs", page_title="Test: Text Inputs")
+@Route("test/text-inputs", page_title="Test: Text Inputs", layout=TestMainLayout)
+@Menu(title="Text Inputs", order=2)
 class TestTextInputsView(VerticalLayout):
     def __init__(self):
         # --- TextField renders with label ---
@@ -118,10 +121,6 @@ class TestTextInputsView(VerticalLayout):
         ef1_val.set_id("ef1-val")
         ef1.add_value_change_listener(lambda e: ef1_val.set_text(str(e.get("value", ""))))
 
-        # --- Nav link to next view ---
-        nav_link = RouterLink("Next: Number Inputs", "test/number-inputs")
-        nav_link.set_id("nav-next")
-
         self.add(
             tf1, tf1_val,
             tf_preset,
@@ -140,5 +139,4 @@ class TestTextInputsView(VerticalLayout):
             pf1, pf1_val,
             pf_noreveal,
             ef1, ef1_val,
-            nav_link,
         )

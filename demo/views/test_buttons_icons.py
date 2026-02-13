@@ -2,13 +2,16 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, DrawerToggle, HorizontalLayout, Icon, RouterLink, Span,
+    Button, DrawerToggle, HorizontalLayout, Icon, Span,
     TextField, VerticalLayout,
 )
 from vaadin.flow.core.keys import Key
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/buttons-icons", page_title="Test: Buttons & Icons")
+@Route("test/buttons-icons", page_title="Test: Buttons & Icons", layout=TestMainLayout)
+@Menu(title="Buttons & Icons", order=1)
 class TestButtonsIconsView(VerticalLayout):
     def __init__(self):
         # --- Button renders with text ---
@@ -98,10 +101,6 @@ class TestButtonsIconsView(VerticalLayout):
         toggle1.set_id("toggle1")
         toggle1.add_click_listener(lambda e: result5.set_text("toggled"))
 
-        # --- Nav link to next view ---
-        nav_link = RouterLink("Next: Text Inputs", "test/text-inputs")
-        nav_link.set_id("nav-next")
-
         self.add(
             btn1,
             btn_click, result,
@@ -113,7 +112,6 @@ class TestButtonsIconsView(VerticalLayout):
             btn_icon, btn_icon_after, btn_icononly,
             short_row,
             toggle1, result5,
-            nav_link,
         )
 
     def _on_shortcut(self, event):

@@ -2,11 +2,14 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    RouterLink, Span, Upload, VerticalLayout,
+    Span, Upload, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/upload", page_title="Test: Upload")
+@Route("test/upload", page_title="Test: Upload", layout=TestMainLayout)
+@Menu(title="Upload", order=22)
 class TestUploadView(VerticalLayout):
     def __init__(self):
         # --- Upload with receiver ---
@@ -41,13 +44,8 @@ class TestUploadView(VerticalLayout):
             lambda e: upload_rej_val.set_text("rejected")
         )
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Display Components", "test/display")
-        nav_link.set_id("nav-next")
-
         self.add(
             upload1, upload_result,
             upload_manual,
             upload_rej, upload_rej_val,
-            nav_link,
         )

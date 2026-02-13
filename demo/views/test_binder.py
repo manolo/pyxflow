@@ -2,10 +2,12 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, IntegerField, RouterLink, Span, TextField, VerticalLayout,
+    Button, IntegerField, Span, TextField, VerticalLayout,
 )
 from vaadin.flow.data.binder import Binder
 from vaadin.flow.data.converter import string_to_int
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
 class Person:
@@ -15,7 +17,8 @@ class Person:
         self.age = age
 
 
-@Route("test/binder", page_title="Test: Binder")
+@Route("test/binder", page_title="Test: Binder", layout=TestMainLayout)
+@Menu(title="Binder", order=21)
 class TestBinderView(VerticalLayout):
     def __init__(self):
         self._person = Person("Alice", "alice@x.com", 30)
@@ -88,14 +91,9 @@ class TestBinderView(VerticalLayout):
             lambda e: auto_sync.set_text(auto_person.name)
         )
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Navigation", "test/navigation")
-        nav_link.set_id("nav-next")
-
         self.add(
             name_tf, email_tf, age_tf,
             btn_save, result,
             dirty,
             auto_tf, auto_sync,
-            nav_link,
         )

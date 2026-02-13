@@ -2,8 +2,10 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, RouterLink, SelectionMode, Span, TreeGrid, VerticalLayout,
+    Button, SelectionMode, Span, TreeGrid, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
 ROOT1_CHILDREN = [
@@ -23,7 +25,8 @@ def _get_children(item):
     return item.get("children", [])
 
 
-@Route("test/tree-grid", page_title="Test: TreeGrid")
+@Route("test/tree-grid", page_title="Test: TreeGrid", layout=TestMainLayout)
+@Menu(title="TreeGrid", order=23)
 class TestTreeGridView(VerticalLayout):
     def __init__(self):
         tg = TreeGrid()
@@ -49,8 +52,4 @@ class TestTreeGridView(VerticalLayout):
         btn_collapse.set_id("btn-collapse")
         btn_collapse.add_click_listener(lambda e: tg.collapse(ROOT1))
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Dialog", "test/dialog")
-        nav_link.set_id("nav-next")
-
-        self.add(tg, sel_val, btn_expand, btn_collapse, nav_link)
+        self.add(tg, sel_val, btn_expand, btn_collapse)

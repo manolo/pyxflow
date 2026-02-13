@@ -4,9 +4,12 @@ from vaadin.flow import Route
 from vaadin.flow.components import (
     RouterLink, Span, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/navigation", page_title="Test: Navigation")
+@Route("test/navigation", page_title="Test: Navigation", layout=TestMainLayout)
+@Menu(title="Navigation", order=20)
 class TestNavigationView(VerticalLayout):
     def __init__(self):
         title_span = Span("Navigation view")
@@ -22,11 +25,7 @@ class TestNavigationView(VerticalLayout):
         link3 = RouterLink("Go to opt param with value", "test/nav-opt/search")
         link3.set_id("link-opt-val")
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Push", "test/push")
-        nav_link.set_id("nav-next")
-
-        self.add(title_span, link1, link2, link3, nav_link)
+        self.add(title_span, link1, link2, link3)
 
 
 @Route("test/nav-param/:id", page_title="Test: Nav Param")

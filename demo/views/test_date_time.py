@@ -4,12 +4,15 @@ from datetime import date, time, datetime
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, DatePicker, DateTimePicker, RouterLink, Span, TimePicker,
+    Button, DatePicker, DateTimePicker, Span, TimePicker,
     VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/date-time", page_title="Test: Date & Time")
+@Route("test/date-time", page_title="Test: Date & Time", layout=TestMainLayout)
+@Menu(title="Date & Time", order=7)
 class TestDateTimeView(VerticalLayout):
     def __init__(self):
         # --- DatePicker renders with label ---
@@ -93,10 +96,6 @@ class TestDateTimeView(VerticalLayout):
         dp_init.set_id("dp-init")
         dp_init.set_initial_position(date(2026, 6, 1))
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Grid Basic", "test/grid-basic")
-        nav_link.set_id("nav-next")
-
         self.add(
             dp1, dp1_val,
             dp_pre,
@@ -111,5 +110,4 @@ class TestDateTimeView(VerticalLayout):
             dtp1, dtp1_val,
             dtp_pre,
             dtp_ph,
-            nav_link,
         )

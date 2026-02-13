@@ -3,11 +3,14 @@
 from vaadin.flow import Route
 from vaadin.flow.components import (
     Avatar, AvatarGroup, AvatarGroupItem, Button, Markdown, MessageInput,
-    MessageList, MessageListItem, ProgressBar, RouterLink, Span, VerticalLayout,
+    MessageList, MessageListItem, ProgressBar, Span, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/display", page_title="Test: Display Components")
+@Route("test/display", page_title="Test: Display Components", layout=TestMainLayout)
+@Menu(title="Display", order=14)
 class TestDisplayView(VerticalLayout):
     def __init__(self):
         # --- ProgressBar ---
@@ -91,10 +94,6 @@ class TestDisplayView(VerticalLayout):
             MessageListItem(text="Hey there", user_name="Charlie"),
         )
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: HTML Elements", "test/html-elements")
-        nav_link.set_id("nav-next")
-
         self.add(
             pb1, btn_pb,
             pb_ind,
@@ -104,5 +103,4 @@ class TestDisplayView(VerticalLayout):
             md, btn_md,
             mi, mi_result,
             ml,
-            nav_link,
         )

@@ -2,11 +2,14 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, Div, RouterLink, Span, TextField, VerticalLayout,
+    Button, Div, Span, TextField, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/component-api", page_title="Test: Component API")
+@Route("test/component-api", page_title="Test: Component API", layout=TestMainLayout)
+@Menu(title="Component API", order=17)
 class TestComponentApiView(VerticalLayout):
     def __init__(self):
         # --- Visibility ---
@@ -112,10 +115,6 @@ class TestComponentApiView(VerticalLayout):
         fb_tf.add_focus_listener(lambda e: fb_ev.set_text("focus"))
         fb_tf.add_blur_listener(lambda e: fb_ev.set_text("blur"))
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Field Mixins", "test/field-mixins")
-        nav_link.set_id("nav-next")
-
         self.add(
             vis_btn, btn_hide, btn_show,
             en_btn, btn_disable, btn_enable,
@@ -129,5 +128,4 @@ class TestComponentApiView(VerticalLayout):
             aria_btn,
             focus_tf, btn_focus,
             fb_tf, fb_ev,
-            nav_link,
         )

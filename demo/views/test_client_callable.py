@@ -2,11 +2,14 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, ClientCallable, RouterLink, Span, VerticalLayout,
+    Button, ClientCallable, Span, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/client-callable", page_title="Test: ClientCallable")
+@Route("test/client-callable", page_title="Test: ClientCallable", layout=TestMainLayout)
+@Menu(title="ClientCallable", order=26)
 class TestClientCallableView(VerticalLayout):
     def __init__(self):
         self._result = Span("")
@@ -26,11 +29,7 @@ class TestClientCallableView(VerticalLayout):
             lambda e: self.execute_js("$0.$server.ping()")
         )
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: CustomField", "test/custom-field")
-        nav_link.set_id("nav-next")
-
-        self.add(self._result, btn_greet, btn_ping, nav_link)
+        self.add(self._result, btn_greet, btn_ping)
 
     @ClientCallable
     def greet(self, name):

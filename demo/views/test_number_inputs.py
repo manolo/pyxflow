@@ -2,11 +2,14 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, Icon, IntegerField, NumberField, RouterLink, Span, VerticalLayout,
+    Button, Icon, IntegerField, NumberField, Span, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/number-inputs", page_title="Test: Number Inputs")
+@Route("test/number-inputs", page_title="Test: Number Inputs", layout=TestMainLayout)
+@Menu(title="Number Inputs", order=3)
 class TestNumberInputsView(VerticalLayout):
     def __init__(self):
         # --- NumberField renders with label ---
@@ -85,10 +88,6 @@ class TestNumberInputsView(VerticalLayout):
         if_range.set_min(1)
         if_range.set_max(10)
 
-        # --- Nav link to next view ---
-        nav_link = RouterLink("Next: Checkbox & Radio", "test/checkbox-radio")
-        nav_link.set_id("nav-next")
-
         self.add(
             nf1, nf1_val,
             nf_pre,
@@ -100,5 +99,4 @@ class TestNumberInputsView(VerticalLayout):
             if_pre,
             if_step, if_step_val,
             if_range,
-            nav_link,
         )

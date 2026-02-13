@@ -2,12 +2,15 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, Checkbox, CheckboxGroup, RadioButtonGroup, RouterLink, Span,
+    Button, Checkbox, CheckboxGroup, RadioButtonGroup, Span,
     VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/checkbox-radio", page_title="Test: Checkbox & Radio")
+@Route("test/checkbox-radio", page_title="Test: Checkbox & Radio", layout=TestMainLayout)
+@Menu(title="Checkbox & Radio", order=4)
 class TestCheckboxRadioView(VerticalLayout):
     def __init__(self):
         # --- Checkbox renders with label ---
@@ -116,10 +119,6 @@ class TestCheckboxRadioView(VerticalLayout):
         rbg_req.set_items("Yes", "No")
         rbg_req.set_required_indicator_visible(True)
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Select & ListBox", "test/select-listbox")
-        nav_link.set_id("nav-next")
-
         self.add(
             cb1, cb1_val,
             cb_pre,
@@ -136,5 +135,4 @@ class TestCheckboxRadioView(VerticalLayout):
             rbg_gen,
             rbg_ro,
             rbg_req,
-            nav_link,
         )

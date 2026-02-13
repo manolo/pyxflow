@@ -2,11 +2,14 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, RouterLink, Span, VerticalLayout,
+    Button, Span, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/theme", page_title="Test: Theme")
+@Route("test/theme", page_title="Test: Theme", layout=TestMainLayout)
+@Menu(title="Theme", order=25)
 class TestThemeView(VerticalLayout):
     def __init__(self):
         theme_status = Span("light")
@@ -65,14 +68,9 @@ class TestThemeView(VerticalLayout):
         styled_btn.set_id("styled-btn")
         styled_btn.add_class_name("custom-btn")
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: ClientCallable", "test/client-callable")
-        nav_link.set_id("nav-next")
-
         self.add(
             theme_status,
             btn_dark, btn_light,
             btn_aura, btn_aura_dark,
             styled_btn,
-            nav_link,
         )

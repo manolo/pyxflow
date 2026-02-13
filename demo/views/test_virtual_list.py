@@ -2,11 +2,14 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, LitRenderer, RouterLink, Span, VerticalLayout, VirtualList,
+    Button, LitRenderer, Span, VerticalLayout, VirtualList,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/virtual-list", page_title="Test: VirtualList")
+@Route("test/virtual-list", page_title="Test: VirtualList", layout=TestMainLayout)
+@Menu(title="VirtualList", order=28)
 class TestVirtualListView(VerticalLayout):
     def __init__(self):
         # --- VirtualList with items ---
@@ -26,8 +29,4 @@ class TestVirtualListView(VerticalLayout):
         btn_replace.set_id("btn-vl-replace")
         btn_replace.add_click_listener(lambda e: vl1.set_items(new_items))
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Login", "test/login")
-        nav_link.set_id("nav-next")
-
-        self.add(vl1, btn_replace, nav_link)
+        self.add(vl1, btn_replace)

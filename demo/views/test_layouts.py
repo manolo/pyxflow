@@ -3,12 +3,15 @@
 from vaadin.flow import Route
 from vaadin.flow.components import (
     Button, FlexLayout, FlexDirection, FlexWrap, FormLayout, HorizontalLayout,
-    ResponsiveStep, RouterLink, Span, SplitLayout, TextField, VerticalLayout,
+    ResponsiveStep, Span, SplitLayout, TextField, VerticalLayout,
 )
 from vaadin.flow.components.horizontal_layout import Alignment, JustifyContentMode
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/layouts", page_title="Test: Layouts")
+@Route("test/layouts", page_title="Test: Layouts", layout=TestMainLayout)
+@Menu(title="Layouts", order=15)
 class TestLayoutsView(VerticalLayout):
     def __init__(self):
         # --- VerticalLayout spacing ---
@@ -109,10 +112,6 @@ class TestLayoutsView(VerticalLayout):
         split.set_width("100%")
         split.set_height("100px")
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: Card & Scroller", "test/card-scroller")
-        nav_link.set_id("nav-next")
-
         self.add(
             vl1, vl_nospace, vl_pad, vl_expand, vl_center,
             vl_dyn, btn_add,
@@ -122,5 +121,4 @@ class TestLayoutsView(VerticalLayout):
             fl, fl_wrap,
             form,
             split,
-            nav_link,
         )

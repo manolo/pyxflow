@@ -2,11 +2,14 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, CustomField, RouterLink, Span, TextField, VerticalLayout,
+    Button, CustomField, Span, TextField, VerticalLayout,
 )
+from vaadin.flow.menu import Menu
+from demo.views.test_main_layout import TestMainLayout
 
 
-@Route("test/custom-field", page_title="Test: CustomField")
+@Route("test/custom-field", page_title="Test: CustomField", layout=TestMainLayout)
+@Menu(title="CustomField", order=27)
 class TestCustomFieldView(VerticalLayout):
     def __init__(self):
         # --- CustomField with child fields ---
@@ -49,14 +52,9 @@ class TestCustomFieldView(VerticalLayout):
         cf_req.add(TextField("Req Field"))
         cf_req.set_required_indicator_visible(True)
 
-        # --- Nav link ---
-        nav_link = RouterLink("Next: VirtualList", "test/virtual-list")
-        nav_link.set_id("nav-next")
-
         self.add(
             cf, cf_val,
             cf_ro,
             cf_inv, btn_inv,
             cf_req,
-            nav_link,
         )
