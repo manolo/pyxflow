@@ -435,17 +435,33 @@ class UidlHandler:
         return self._build_response()
 
     def _process_rpc(self, rpc_list: list[dict[str, Any]]):
-        """Process RPC calls from client."""
+        """Process RPC calls from client.
+
+        Follows Java Flow's two-pass approach: mSync RPCs are processed first
+        so that property values (e.g. text field value) are up-to-date before
+        event handlers (e.g. click shortcuts) run.
+        """
         from vaadin.flow.components.notification import _set_current_tree
         _set_current_tree(self._tree)
         try:
+            # Pass 1: process all mSync RPCs first (property syncs)
+            other_rpcs: list[dict[str, Any]] = []
             for rpc in rpc_list:
+                try:
+                    if rpc.get("type") == "mSync":
+                        self._handle_msync(rpc)
+                    else:
+                        other_rpcs.append(rpc)
+                except Exception:
+                    log.exception("Error processing RPC: %s", rpc.get("type", "unknown"))
+                    self._show_error_notification()
+
+            # Pass 2: process events and other RPCs
+            for rpc in other_rpcs:
                 try:
                     rpc_type = rpc.get("type")
                     if rpc_type == "event":
                         self._handle_event(rpc)
-                    elif rpc_type == "mSync":
-                        self._handle_msync(rpc)
                     elif rpc_type == "publishedEventHandler":
                         self._handle_published_event(rpc)
                     elif rpc_type == "channel":
