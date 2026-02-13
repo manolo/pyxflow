@@ -266,11 +266,11 @@ python -m demo --debug        # verbose protocol logging
 ### Tests
 
 ```bash
-# Unit tests (default, ~2100 tests)
+# Unit tests (default, ~2274 tests in tests/unit/)
 pytest
 
 # Specific test file
-pytest tests/test_rpc_events.py -v
+pytest tests/unit/test_rpc_events.py -v
 ```
 
 UI integration tests require Playwright:
@@ -286,7 +286,7 @@ pytest tests/ui/
 pytest tests/ui/ --headed
 ```
 
-UI tests are excluded from the default `pytest` run. They launch a real browser against the demo server and verify component behavior end-to-end.
+UI tests are in `tests/ui/` and excluded from the default `pytest` run. They use a shared browser session with SideNav-based SPA navigation across 29 test views, each backed by a `TestMainLayout` with a menu sidebar.
 
 ### Project structure
 
@@ -298,12 +298,12 @@ src/vaadin/flow/
 └── server/         # HTTP server (aiohttp), UIDL protocol handler
 
 demo/
-├── views/          # Demo views (hello, grid, dialog, push, etc.)
+├── views/          # Demo views + 29 test views with TestMainLayout
 └── __main__.py     # python -m demo
 
 tests/
-├── *.py            # Unit tests
-└── ui/             # Playwright integration tests
+├── unit/           # Unit tests (default pytest target)
+└── ui/             # Playwright integration tests (run explicitly)
 ```
 
 ### Architecture

@@ -26,11 +26,11 @@ source .venv/bin/activate && python -m demo
 # Or via CLI: vaadin demo --port 8088
 # Or auto-detect: vaadin --port 8088  (finds demo/views/ automatically)
 
-# Run unit tests (default — UI tests are excluded)
+# Run unit tests (default — runs tests/unit/)
 pytest -v
 
 # Run specific test file
-pytest tests/test_rpc_events.py -v
+pytest tests/unit/test_rpc_events.py -v
 
 # Run UI tests (auto-starts server if none running on :8088)
 pytest tests/ui/ -v            # headless
@@ -57,10 +57,11 @@ vaadin-pyflow/
 │   ├── server/         # HTTP server (aiohttp), UIDL handler
 │   └── app.py          # FlowApp entry point
 ├── demo/               # Demo app + __main__.py entry point
-│   ├── views/          # View files (hello_world, about, components, grid, etc.)
+│   ├── views/          # Demo views + 29 test views with TestMainLayout (SideNav router layout)
 │   └── services/       # PeopleService (data access layer)
-├── tests/              # 2118 unit tests (pytest runs these by default)
-│   └── ui/             # 36 Playwright UI tests (excluded by default, run via pytest tests/ui/)
+├── tests/
+│   ├── unit/           # 2274 unit tests (default pytest target)
+│   └── ui/             # 323 Playwright UI tests (run explicitly via pytest tests/ui/)
 └── STATUS.md           # Implementation progress
 ../bundle-generator/    # Java project → frontend bundle (shared, at root level)
 ```

@@ -4,7 +4,9 @@
 
 - **Framework:** Playwright (Python)
 - **Server:** PyFlow demo app at `http://localhost:8088`
-- **Navigation:** Each test view has a RouterLink to the next view (client-side nav, no reload)
+- **Layout:** All test views share `TestMainLayout` (HorizontalLayout with SideNav + content area)
+- **Navigation:** SPA navigation via SideNav clicks; `navigate_to()` helper with `page.goto()` fallback
+- **Shared page:** Single browser context reused across all 29 test modules (session-scoped `shared_page` fixture)
 - **Fail-fast:** If >4 consecutive tests fail, abort the entire suite
 - **Parallelism:** Views are independent; tests within a view run sequentially
 - **IDs:** Every testable component gets `set_id("xxx")` for fast `#xxx` selectors

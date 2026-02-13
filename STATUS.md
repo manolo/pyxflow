@@ -5,7 +5,8 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~17,000 (core src/), ~50,000 (total with demo + tests)
-**Tests:** 2274 unit + 320 UI (Playwright)
+**Test structure:** `tests/unit/` (2274 unit tests, default `pytest`) + `tests/ui/` (323 Playwright, run explicitly)
+**Tests:** 2274 unit + 323 UI (Playwright)
 **Last updated:** 2026-02-13
 
 ---
@@ -239,8 +240,8 @@
 
 | Category | Coverage | Details |
 |----------|----------|---------|
-| **Unit tests** | 2145 passing | Good coverage of all 49 components + core + data layer |
-| **UI tests** | 307 passed, 3 skipped | All 29 test views implemented, covering all components, layouts, navigation, push, binder, theme, etc. |
+| **Unit tests** | 2274 passing | Good coverage of all 49 components + core + data layer. Located in `tests/unit/` |
+| **UI tests** | 323 passed, 3 skipped | All 29 test views with shared SideNav layout and single browser session. Located in `tests/ui/` |
 
 3 skipped: 2 focus/blur event forwarding (native JS focus/blur doesn't trigger Vaadin server events), 1 ContextMenu openOnClick (needs investigation).
 
