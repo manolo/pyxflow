@@ -110,6 +110,22 @@ Full hash table in `../specs/PROTOCOL.md`. Most common:
 
 ---
 
+## Tracking What's Missing
+
+When the user asks "qué falta" / "what's missing" / "what's pending", perform a gap analysis covering:
+
+1. **Unimplemented features** — Check `STATUS.md` § "What's Missing" → "Unimplemented Features" (PWA, Security, etc.)
+2. **Missing API methods** — Check `STATUS.API.md` for `[ ]` markers. Count `[x]` vs `[ ]` for coverage %.
+3. **Missing tests** — Compare unit test count (`pytest --co -q | tail -1`) and UI test count (`pytest tests/ui/ --co -q | tail -1`) against `STATUS.md`. Check `tests/ui/SPECS.md` for pending UI test scenarios.
+4. **LOC** — Run `find src -name '*.py' | xargs wc -l | tail -1` (core) and `find src demo tests -name '*.py' | xargs wc -l | tail -1` (total).
+
+**After ANY implementation work**, update these files:
+- `STATUS.md` — Update test counts, LOC, move items from "Missing" to "Implemented", update API coverage ratio
+- `STATUS.API.md` — Flip `[ ]` → `[x]` for newly implemented methods, update header counts
+- Keep the "What's Missing" section in STATUS.md current — it's the single source of truth for gap analysis
+
+---
+
 ## Testing with Playwright
 
 Use MCP Playwright tools to verify UI:

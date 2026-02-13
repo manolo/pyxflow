@@ -4,8 +4,8 @@
 
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
-**Lines of code:** ~14,800 (core src/), ~36,000 (total with demo + tests)
-**Tests:** 2092 passing
+**Lines of code:** ~15,900 (core src/), ~41,400 (total with demo + tests)
+**Tests:** 2118 unit + 36 UI (Playwright)
 **Last updated:** 2026-02-13
 
 ---
@@ -193,80 +193,98 @@
 
 ---
 
-## Not Implemented
+## What's Missing
 
-### All Vaadin 25 UI Components Implemented ✓
+> **For the detailed per-component API inventory (every method, [x]/[ ]), see `STATUS.API.md`.**
+>
+> API coverage: **362 methods implemented, 69 missing** (~84% complete).
 
-All ~49 real UI components from Vaadin 25 are implemented. See `../specs/COMPONENTS.md` for the full inventory.
+### Unimplemented Features
 
-### ~~Phase 8 — AppLayout & Prerequisites~~ ✓ DONE
-Icon, DrawerToggle, SideNav/SideNavItem, AppLayout, RouterLayout (`@Route(layout=...)`), layout chain in navigation.
+| Feature | Priority | Description |
+|---------|----------|-------------|
+| `@PWA` annotation | Medium | Activate `sw.js` from bundle, serve `manifest.json` with configurable app name/icons |
+| Security (`--secure`) | Medium | Login screen from local config, restrict interfaces (localhost vs 0.0.0.0), HTTPS/TLS |
+| Grid Editor API | Low | Inline row editing (`get_editor`, bind fields to columns, save/cancel) |
+| Grid Drag/Drop | Low | Reorderable rows (`set_rows_draggable`, `set_drop_mode`, drag listeners) |
+| Grid item details | Low | Expandable row details (`set_item_details_renderer`, `set_details_visible_on_click`) |
+| Specialized renderers | Low | NumberRenderer, LocalDateRenderer, LocalDateTimeRenderer, NativeButtonRenderer, IconRenderer |
+| ConfigurableFilterDataProvider | Low | Advanced filtering for DataProvider |
 
-### ~~Phase 9 — Menu System + High-Value Components~~ ✓ DONE
-`@Menu` decorator, `get_menu_entries()`, Details, Accordion, ContextMenu, DateTimePicker, Markdown. 90 new tests.
+### Missing API Methods — Summary by Component
 
-### ~~Phase 10 — Visual & Layout Components~~ ✓ DONE
-Avatar, AvatarGroup, Card, Scroller, Popover, MasterDetailLayout. SplitLayout already done in Phase 9. 85 new tests.
+| Component | Missing Methods | Priority |
+|-----------|----------------|----------|
+| **Grid** | `add_component_column`, `scroll_to_index`, `remove_column`, `remove_all_columns`, `set_item_details_renderer`, `append_footer_row`, Editor API, Drag/Drop, `set_empty_state_text` | Medium |
+| **ComboBox** | `set_renderer`, `set_class_name_generator`, `set_prefix_component`, `set_overlay_width` | Medium |
+| **MultiSelectComboBox** | `set_renderer`, `set_auto_expand`, `set_selected_items_on_top`, `set_allow_custom_value` | Medium |
+| **MenuBar** | `add_item(Component)`, `close`, MenuItem: `set_keep_open`/`set_disable_on_click`/`set_aria_label`, SubMenu operations | Medium |
+| **DatePicker** | `set_locale`, `set_week_numbers_visible`, `set_initial_position`, `open`/`close`/`add_opened_change_listener` | Low |
+| **HorizontalLayout** | `add_to_start`/`add_to_middle`/`add_to_end` | Low |
+| **FlexLayout** | `replace`/`add_component_at_index` | Low |
+| **Select** | `set_renderer`, `set_item_enabled_provider` | Low |
+| **CheckboxGroup/RadioButtonGroup** | `set_item_enabled_provider`, `set_renderer`, `add_theme_variants` | Low |
+| **ListBox/MultiSelectListBox** | `set_renderer`, `add_components` (dividers) | Low |
+| **Dialog** | `set_top`/`set_left`, `add_resize_listener`/`add_dragged_listener` | Low |
+| **Button** | `click` (server-side), `add_theme_variants(ButtonVariant)` | Low |
+| **Other** | Various minor methods across Tabs, Details, ContextMenu, Upload, LoginOverlay, Popover, etc. | Low |
 
-### ~~Phase 11 — Data & Specialized Components~~ ✓ DONE
-ListBox, MultiSelectListBox, MultiSelectComboBox, VirtualList, MessageInput, MessageList, LoginForm, LoginOverlay, CustomField. 184 new tests.
+### Missing Tests
 
-### ~~Phase 12 — WebSocket Push~~ ✓ DONE
-Atmosphere WebSocket protocol, `UI.access()` / `UI.push()` API, push sender coroutine, push demo view. See `../specs/PROTOCOL.md` § WebSocket Push.
+| Category | Coverage | Details |
+|----------|----------|---------|
+| **Unit tests** | 2118 passing | Good coverage of all 49 components + core + data layer |
+| **UI tests** | 36 / ~447 scenarios | 2 test views implemented (buttons-icons, text-inputs). See `tests/ui/SPECS.md` for all 447 Gherkin scenarios |
+| **UI test views needed** | ~20 views | Grid, Dialog, Notification, Select, ComboBox, DatePicker, Tabs, MenuBar, Upload, Forms/Binder, Push, AppLayout, Navigation, Details/Accordion, ContextMenu, Login, SplitLayout, etc. |
+
+### Missing UI Test Views (from SPECS.md)
+
+| View | Scenarios | Components Tested |
+|------|-----------|-------------------|
+| `test/grid-basic` | ~30 | Grid columns, sorting, selection, lazy data |
+| `test/grid-renderers` | ~15 | LitRenderer, ComponentRenderer, TextRenderer |
+| `test/dialog-notification` | ~25 | Dialog open/close/drag, Notification position/duration |
+| `test/select-combo` | ~20 | Select, ComboBox, MultiSelectComboBox |
+| `test/date-time` | ~20 | DatePicker, TimePicker, DateTimePicker |
+| `test/tabs-navigation` | ~15 | Tabs, TabSheet, SideNav |
+| `test/menu-context` | ~15 | MenuBar, ContextMenu |
+| `test/upload` | ~10 | Upload single/multi, drag-drop |
+| `test/forms-binder` | ~20 | Binder validation, converters, error display |
+| `test/push` | ~10 | WebSocket push, UI.access, background tasks |
+| `test/layouts` | ~15 | AppLayout, SplitLayout, FormLayout |
+| `test/details-accordion` | ~10 | Details, Accordion expand/collapse |
+| `test/login` | ~10 | LoginForm, LoginOverlay |
+| `test/checkbox-radio` | ~15 | Checkbox, CheckboxGroup, RadioButtonGroup |
+| `test/misc-components` | ~20 | Avatar, Card, Popover, ProgressBar, Markdown, etc. |
+| `test/theme-switching` | ~10 | Lumo/Aura, dark/light mode |
+| `test/routing` | ~15 | Route params, guards, navigation, error page |
+
+---
+
+## Completed Phases
+
+All 12 implementation phases are complete:
+
+1. ~~Core + basic components~~ ✓
+2. ~~Component features (setVisible, setEnabled, addClassName)~~ ✓
+3. ~~Routing (@Route, multiple views, parameters)~~ ✓
+4. ~~Feedback (Dialog, Notification)~~ ✓
+5. ~~Lumo/Aura theme loading~~ ✓
+6. ~~Grid (basic)~~ ✓
+7. ~~Grid (advanced: lazy loading, sorting, multi-select, renderers)~~ ✓
+8. ~~AppLayout & Prerequisites (Icon, DrawerToggle, SideNav, RouterLayout)~~ ✓
+9. ~~Menu System + High-Value Components (@Menu, Details, Accordion, ContextMenu, DateTimePicker, Markdown)~~ ✓
+10. ~~Visual & Layout Components (Avatar, Card, Scroller, Popover, MasterDetailLayout)~~ ✓
+11. ~~Data & Specialized Components (ListBox, MultiSelectComboBox, VirtualList, MessageInput/List, Login, CustomField)~~ ✓
+12. ~~WebSocket Push (Atmosphere protocol, UI.access, push sender)~~ ✓
+
+Plus: `@ClientCallable`, `@ColorScheme`, runtime theme switching, field mixins, Binder, `vaadin --bundle`.
 
 ### Packaging & Bundle
-- [x] PyPI-ready wheel — `pip install vaadin-pyflow` or `pip install git+https://github.com/manolo/vaadin-pyflow.git`
+- [x] PyPI-ready wheel — `pip install vaadin-pyflow`
 - [x] Bundle inside package — `src/vaadin/flow/bundle/` ships in wheel (1.5 MB compressed)
-- [x] CLI entry point — `vaadin [app_module] [--dev] [--debug] [--port N]` (app module auto-detected if omitted)
-- [x] `vaadin --bundle` — Auto-generate bundle from `_v_fqcn` component registry (Maven project, production build, WAR extraction)
-- [x] `vaadin <app> --bundle` — User projects can generate their own bundle (outputs to `<app>/bundle/`)
-- [x] `--keep` flag — Preserve `bundle-project/` for debugging or faster rebuilds (reuses Maven project, skips `clean`)
+- [x] CLI entry point — `vaadin [app_module] [--dev] [--debug] [--port N]`
+- [x] `vaadin --bundle` — Auto-generate bundle from `_v_fqcn` component registry
+- [x] `vaadin <app> --bundle` — User projects can generate their own bundle
 - [x] Bundle discovery priority — app-dir bundle > package-internal > cwd fallback
 - [x] Apache 2.0 LICENSE file
-
-### Pending
-- [x] `@ClientCallable` methods — Decorator, Feature 19 auto-registration, promise resolution/rejection
-- [ ] `@PWA` annotation — Activate `sw.js` from bundle, custom icons/manifest. Bundle-generator app may need `@PWA` annotation; server needs to serve `manifest.json` with configurable app name/icons
-- [ ] Security (`--secure` flag) — Login screen based on local config, restrict listening interfaces (localhost vs 0.0.0.0), HTTPS/TLS support
-
----
-
-## Suggested Implementation Order
-
-1. ~~**More basic components** - Checkbox, TextArea, NumberField~~ ✓ DONE
-2. ~~**Component features** - setVisible, setEnabled, addClassName~~ ✓ DONE
-3. ~~**Routing** - @Route decorator, multiple views~~ ✓ DONE
-4. ~~**Feedback components** - Dialog, Notification~~ ✓ DONE
-5. ~~**Lumo theme loading** - Extract and serve theme CSS~~ ✓ DONE
-6. ~~**Grid** - Complex but essential for data apps~~ ✓ DONE
-7. ~~**Grid advanced** - Lazy loading, sorting, multi-select, renderers~~ ✓ DONE
-8. ~~**AppLayout & Prerequisites** - Icon, AppLayout, DrawerToggle, SideNav, RouterLayout interface, `@Route(layout=...)`, layout chain~~ ✓ DONE
-9. ~~**Menu System + High-Value Components** - `@Menu`, get_menu_entries(), Details, Accordion, ContextMenu, DateTimePicker, Markdown~~ ✓ DONE
-10. ~~**Visual & Layout Components** - Avatar, AvatarGroup, Card, Scroller, Popover, MasterDetailLayout~~ ✓ DONE
-11. ~~**Data & Specialized Components** - ListBox, MultiSelectComboBox, VirtualList, MessageInput/List, Login, CustomField~~ ✓ DONE
-12. ~~**WebSocket Push** - Atmosphere protocol, `UI.access()` / `UI.push()`, push sender, push demo~~ ✓ DONE
-
----
-
-## Running the MVP
-
-```bash
-cd /Users/manolo/Github/platform/python/vaadin-pyflow
-source .venv/bin/activate
-python -m demo
-# Open http://localhost:8088
-```
-
-## Running Tests
-
-```bash
-pytest tests/ -v
-```
-
----
-
-## Architecture Reference
-
-See parent directory:
-- `/Users/manolo/Github/platform/python/CLAUDE.md` - Development guide
-- `/Users/manolo/Github/platform/python/specs/PROTOCOL.md` - Protocol specs
