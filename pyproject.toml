@@ -47,7 +47,6 @@ packages = ["src/vaadin"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = ["tests"]
+testpaths = ["tests/unit"]
 # UI tests require a browser and a running server; run them explicitly:
 #   pytest tests/ui/ --headed
-addopts = "--ignore=tests/ui"
