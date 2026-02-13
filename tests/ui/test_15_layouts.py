@@ -42,6 +42,23 @@ class TestVerticalLayout:
         expect(vl).to_contain_text("Replaced")
 
 
+class TestVerticalLayoutAddFirst:
+    @pytest.mark.spec("V15.22")
+    def test_add_component_as_first(self, view_page: Page):
+        vl = view_page.locator("#vl-first")
+        # Initially has "Second" and "Third"
+        expect(vl).to_contain_text("Second")
+        expect(vl).to_contain_text("Third")
+        # Click button to add "First" at index 0
+        view_page.locator("#btn-add-first").click()
+        expect(vl).to_contain_text("First")
+        # Verify "First" appears before "Second" in DOM order
+        texts = vl.locator("span").all_text_contents()
+        first_idx = texts.index("First") if "First" in texts else -1
+        second_idx = texts.index("Second") if "Second" in texts else -1
+        assert first_idx < second_idx, f"Expected 'First' before 'Second', got {texts}"
+
+
 class TestHorizontalLayout:
     @pytest.mark.spec("V15.09")
     def test_renders_children(self, view_page: Page):

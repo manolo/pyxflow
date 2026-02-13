@@ -2,7 +2,7 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, Grid, RouterLink, SelectionMode, Span, VerticalLayout,
+    Button, Grid, GridDropMode, RouterLink, SelectionMode, Span, VerticalLayout,
 )
 
 
@@ -92,6 +92,24 @@ class TestGridFeaturesView(VerticalLayout):
         btn_remove.set_id("btn-remove-col")
         btn_remove.add_click_listener(lambda e: grid_single.remove_column(col_email))
 
+        # --- Drag and drop ---
+        grid_dnd = Grid()
+        grid_dnd.set_id("grid-dnd")
+        grid_dnd.add_column("name", header="Name")
+        grid_dnd.add_column("age", header="Age")
+        grid_dnd.set_items(ITEMS)
+        grid_dnd.set_rows_draggable(True)
+        grid_dnd.set_drop_mode(GridDropMode.BETWEEN)
+        grid_dnd.set_all_rows_visible(True)
+
+        # --- Empty state text ---
+        grid_empty = Grid()
+        grid_empty.set_id("grid-empty")
+        grid_empty.add_column("name", header="Name")
+        grid_empty.set_items([])
+        grid_empty.set_empty_state_text("No data available")
+        grid_empty.set_all_rows_visible(True)
+
         # --- Nav link ---
         nav_link = RouterLink("Next: TreeGrid", "test/tree-grid")
         nav_link.set_id("nav-next")
@@ -102,5 +120,7 @@ class TestGridFeaturesView(VerticalLayout):
             btn_remove,
             grid_multi, multi_val,
             btn_sel_all, btn_desel_all,
+            grid_dnd,
+            grid_empty,
             nav_link,
         )

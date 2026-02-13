@@ -74,8 +74,36 @@ class TestMultiSelectComboBox:
         expect(mscb).to_have_js_property("selectedItems", [])
 
 
+class TestComboBoxPrefix:
+    @pytest.mark.spec("V06.21")
+    def test_prefix_icon_rendered(self, view_page: Page):
+        cb = view_page.locator("#cb-prefix")
+        # Check that a vaadin-icon with slot="prefix" exists inside
+        icon = cb.locator('vaadin-icon[slot="prefix"]')
+        expect(icon).to_have_count(1)
+
+
+class TestComboBoxOverlayWidth:
+    @pytest.mark.spec("V06.22")
+    def test_overlay_width(self, view_page: Page):
+        cb = view_page.locator("#cb-ow")
+        expect(cb).to_have_js_property("overlayWidth", "400px")
+
+
+class TestMultiSelectComboBoxExtras:
+    @pytest.mark.spec("V06.23")
+    def test_selected_items_on_top(self, view_page: Page):
+        mscb = view_page.locator("#mscb-top")
+        expect(mscb).to_have_js_property("selectedItemsOnTop", True)
+
+    @pytest.mark.spec("V06.24")
+    def test_keep_filter(self, view_page: Page):
+        mscb = view_page.locator("#mscb-kf")
+        expect(mscb).to_have_js_property("keepFilter", True)
+
+
 class TestNavigation:
-    @pytest.mark.spec("V06.20")
+    @pytest.mark.spec("V06.25")
     def test_nav_to_next(self, view_page: Page):
         # Ensure no overlay is blocking
         view_page.keyboard.press("Escape")

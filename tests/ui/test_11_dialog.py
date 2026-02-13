@@ -17,11 +17,11 @@ def view_page(browser, base_url):
 
 
 def _close_dialog(page: Page, dialog_id: str):
-    """Close a specific dialog by pressing Escape."""
+    """Close a specific dialog by pressing Escape and waiting for it to close."""
     dlg = page.locator(f"#{dialog_id}[opened]")
     if dlg.count() > 0:
         page.keyboard.press("Escape")
-        page.wait_for_timeout(500)
+        expect(page.locator(f"#{dialog_id}")).not_to_have_attribute("opened", "")
 
 
 class TestDialog:
@@ -32,7 +32,7 @@ class TestDialog:
         expect(dlg).to_have_attribute("opened", "", timeout=3000)
         expect(dlg).to_contain_text("Hello")
         view_page.keyboard.press("Escape")
-        view_page.wait_for_timeout(500)
+        expect(dlg).not_to_have_attribute("opened", "")
 
     @pytest.mark.spec("V11.02")
     def test_header_title(self, view_page: Page):
@@ -43,7 +43,7 @@ class TestDialog:
         # header title is set as aria-label
         expect(dlg).to_have_attribute("aria-label", "My Dialog")
         view_page.keyboard.press("Escape")
-        view_page.wait_for_timeout(500)
+        expect(dlg).not_to_have_attribute("opened", "")
 
     @pytest.mark.spec("V11.03")
     def test_header_footer(self, view_page: Page):
@@ -54,7 +54,7 @@ class TestDialog:
         expect(dlg).to_contain_text("Body")
         # Close via footer button inside the dialog
         view_page.locator("#dlg-hf vaadin-button").filter(has_text="Close").click()
-        view_page.wait_for_timeout(500)
+        expect(dlg).not_to_have_attribute("opened", "")
 
     @pytest.mark.spec("V11.05")
     def test_draggable(self, view_page: Page):
@@ -63,7 +63,7 @@ class TestDialog:
         dlg = view_page.locator("#dlg-drag")
         expect(dlg).to_have_attribute("opened", "", timeout=3000)
         view_page.keyboard.press("Escape")
-        view_page.wait_for_timeout(500)
+        expect(dlg).not_to_have_attribute("opened", "")
 
     @pytest.mark.spec("V11.06")
     def test_resizable(self, view_page: Page):
@@ -72,7 +72,7 @@ class TestDialog:
         dlg = view_page.locator("#dlg-resize")
         expect(dlg).to_have_attribute("opened", "", timeout=3000)
         view_page.keyboard.press("Escape")
-        view_page.wait_for_timeout(500)
+        expect(dlg).not_to_have_attribute("opened", "")
 
     @pytest.mark.spec("V11.11")
     def test_close_listener(self, view_page: Page):
@@ -82,6 +82,17 @@ class TestDialog:
         expect(dlg).to_have_attribute("opened", "", timeout=3000)
         view_page.keyboard.press("Escape")
         expect(view_page.locator("#dlg-closed")).to_have_text("closed", timeout=3000)
+
+
+class TestDialogResizeListener:
+    @pytest.mark.spec("V11.12")
+    def test_resize_listener_dialog_opens(self, view_page: Page):
+        view_page.locator("#btn-resize-listen").click()
+        dlg = view_page.locator("#dlg-resize-listen")
+        expect(dlg).to_have_attribute("opened", "", timeout=3000)
+        expect(dlg).to_have_js_property("resizable", True)
+        view_page.keyboard.press("Escape")
+        expect(dlg).not_to_have_attribute("opened", "")
 
 
 class TestConfirmDialog:
@@ -130,7 +141,6 @@ class TestNavigation:
     def test_nav_to_next(self, view_page: Page):
         for _ in range(3):
             view_page.keyboard.press("Escape")
-            view_page.wait_for_timeout(300)
         view_page.locator("#nav-next").evaluate("el => el.click()")
         expect(view_page).to_have_url(
             re.compile(r".*/test/notification-popover"), timeout=5000

@@ -56,6 +56,15 @@ class TestLayoutsView(VerticalLayout):
             lambda e: vl_replace.replace(old_span, Span("Replaced"))
         )
 
+        # --- VerticalLayout add_component_as_first ---
+        vl_first = VerticalLayout(Span("Second"), Span("Third"))
+        vl_first.set_id("vl-first")
+        btn_add_first = Button("Add first")
+        btn_add_first.set_id("btn-add-first")
+        btn_add_first.add_click_listener(
+            lambda e: vl_first.add_component_as_first(Span("First"))
+        )
+
         # --- HorizontalLayout ---
         hl1 = HorizontalLayout(Span("L"), Span("M"), Span("R"))
         hl1.set_id("hl1")
@@ -108,6 +117,7 @@ class TestLayoutsView(VerticalLayout):
             vl1, vl_nospace, vl_pad, vl_expand, vl_center,
             vl_dyn, btn_add,
             vl_replace, btn_replace,
+            vl_first, btn_add_first,
             hl1, hl_expand,
             fl, fl_wrap,
             form,

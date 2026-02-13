@@ -80,8 +80,27 @@ class TestColumnOps:
         expect(grid).to_be_visible()
 
 
+class TestDragDrop:
+    @pytest.mark.spec("V09.17")
+    def test_rows_draggable(self, view_page: Page):
+        grid = view_page.locator("#grid-dnd")
+        expect(grid).to_have_js_property("rowsDraggable", True)
+
+    @pytest.mark.spec("V09.18")
+    def test_drop_mode(self, view_page: Page):
+        grid = view_page.locator("#grid-dnd")
+        expect(grid).to_have_js_property("dropMode", "between")
+
+
+class TestEmptyState:
+    @pytest.mark.spec("V09.19")
+    def test_empty_state_text(self, view_page: Page):
+        grid = view_page.locator("#grid-empty")
+        expect(grid).to_have_js_property("emptyStateText", "No data available")
+
+
 class TestNavigation:
-    @pytest.mark.spec("V09.16")
+    @pytest.mark.spec("V09.20")
     def test_nav_to_next(self, view_page: Page):
         view_page.locator("#nav-next").click()
         expect(view_page).to_have_url(re.compile(r".*/test/tree-grid"), timeout=5000)

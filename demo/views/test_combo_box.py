@@ -103,6 +103,31 @@ class TestComboBoxView(VerticalLayout):
         mscb_ro.set_value({"A"})
         mscb_ro.set_read_only(True)
 
+        # --- ComboBox prefix component ---
+        from vaadin.flow.components.icon import Icon
+        cb_prefix = ComboBox("With icon")
+        cb_prefix.set_id("cb-prefix")
+        cb_prefix.set_items("Red", "Green", "Blue")
+        cb_prefix.set_prefix_component(Icon("lumo:search"))
+
+        # --- ComboBox overlay width ---
+        cb_ow = ComboBox("Wide overlay")
+        cb_ow.set_id("cb-ow")
+        cb_ow.set_items("Short", "Medium", "Long item text")
+        cb_ow.set_overlay_width("400px")
+
+        # --- MultiSelectComboBox selected items on top ---
+        mscb_top = MultiSelectComboBox("Items on top")
+        mscb_top.set_id("mscb-top")
+        mscb_top.set_items("A", "B", "C", "D")
+        mscb_top.set_selected_items_on_top(True)
+
+        # --- MultiSelectComboBox keep filter ---
+        mscb_kf = MultiSelectComboBox("Keep filter")
+        mscb_kf.set_id("mscb-kf")
+        mscb_kf.set_items("Apple", "Banana", "Cherry")
+        mscb_kf.set_keep_filter(True)
+
         # --- Nav link ---
         nav_link = RouterLink("Next: Date & Time", "test/date-time")
         nav_link.set_id("nav-next")
@@ -115,10 +140,14 @@ class TestComboBoxView(VerticalLayout):
             cb_custom, cb_cust_val,
             cb_gen,
             cb_noauto,
+            cb_prefix,
+            cb_ow,
             mscb1, mscb1_val,
             mscb_pre,
             mscb_des, btn_des,
             mscb_clr,
             mscb_ro,
+            mscb_top,
+            mscb_kf,
             nav_link,
         )

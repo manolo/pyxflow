@@ -28,12 +28,21 @@ class TestMenuView(VerticalLayout):
         paste_sub = paste_item.get_sub_menu()
         paste_sub.add_item("Paste Special", lambda e: mb_result.set_text("Paste Special"))
 
+        # --- Separator in submenu ---
+        edit_sub.add_separator()
+        edit_sub.add_item("Select All", lambda e: mb_result.set_text("Select All"))
+
         # --- MenuBar checkable ---
         bold_item = mb.add_item("Bold")
         bold_item.set_checkable(True)
         bold_item.add_click_listener(lambda e: mb_result.set_text(
             f"Bold:{bold_item.is_checked()}"
         ))
+
+        # --- MenuItem aria-label ---
+        help_item = mb.add_item("?")
+        help_item.set_aria_label("Help")
+        help_item.add_click_listener(lambda e: mb_result.set_text("Help"))
 
         # --- MenuBar open_on_hover ---
         mb_hover = MenuBar()

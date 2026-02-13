@@ -78,6 +78,21 @@ class TestDialogView(VerticalLayout):
         btn_cls.set_id("btn-cls")
         btn_cls.add_click_listener(lambda e: dlg_cls.open())
 
+        # --- Dialog resize listener ---
+        dlg_resize_val = Span("")
+        dlg_resize_val.set_id("dlg-resize-val")
+        dlg_resize_listen = Dialog()
+        dlg_resize_listen.set_id("dlg-resize-listen")
+        dlg_resize_listen.set_resizable(True)
+        dlg_resize_listen.set_header_title("Resize me")
+        dlg_resize_listen.add(Span("Drag the edges"))
+        dlg_resize_listen.add_resize_listener(
+            lambda e: dlg_resize_val.set_text("resized")
+        )
+        btn_resize_listen = Button("Open resize listener")
+        btn_resize_listen.set_id("btn-resize-listen")
+        btn_resize_listen.add_click_listener(lambda e: dlg_resize_listen.open())
+
         # --- ConfirmDialog basic ---
         cd_result = Span("")
         cd_result.set_id("cd-result")
@@ -146,6 +161,7 @@ class TestDialogView(VerticalLayout):
             btn_resize, dlg_resize,
             btn_size, dlg_size,
             btn_cls, dlg_cls, dlg_cls_val,
+            btn_resize_listen, dlg_resize_listen, dlg_resize_val,
             btn_cd, cd1, cd_result,
             btn_cd_cancel, cd_cancel, cd_cancel_result,
             btn_cd_reject, cd_reject, cd_reject_result,

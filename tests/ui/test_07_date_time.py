@@ -70,6 +70,18 @@ class TestDateTimePicker:
         expect(dtp).to_have_js_property("timePlaceholder", "Pick time")
 
 
+class TestDatePickerExtras:
+    @pytest.mark.spec("V07.16")
+    def test_week_numbers_visible(self, view_page: Page):
+        dp = view_page.locator("#dp-weeks")
+        expect(dp).to_have_js_property("showWeekNumbers", True)
+
+    @pytest.mark.spec("V07.17")
+    def test_initial_position(self, view_page: Page):
+        dp = view_page.locator("#dp-init")
+        expect(dp).to_have_js_property("initialPosition", "2026-06-01")
+
+
 class TestNavigation:
     @pytest.mark.spec("V07.18")
     def test_nav_to_next(self, view_page: Page):

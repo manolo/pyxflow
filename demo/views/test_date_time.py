@@ -83,6 +83,16 @@ class TestDateTimeView(VerticalLayout):
         dtp_ph.set_date_placeholder("Pick date")
         dtp_ph.set_time_placeholder("Pick time")
 
+        # --- DatePicker week numbers ---
+        dp_weeks = DatePicker("Week numbers")
+        dp_weeks.set_id("dp-weeks")
+        dp_weeks.set_week_numbers_visible(True)
+
+        # --- DatePicker initial position ---
+        dp_init = DatePicker("Initial position")
+        dp_init.set_id("dp-init")
+        dp_init.set_initial_position(date(2026, 6, 1))
+
         # --- Nav link ---
         nav_link = RouterLink("Next: Grid Basic", "test/grid-basic")
         nav_link.set_id("nav-next")
@@ -92,6 +102,8 @@ class TestDateTimeView(VerticalLayout):
             dp_pre,
             dp_clear,
             dp_range,
+            dp_weeks,
+            dp_init,
             tp1, tp1_val,
             tp_pre,
             tp_step,
