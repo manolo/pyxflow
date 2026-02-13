@@ -2,7 +2,8 @@
 
 from vaadin.flow import Route
 from vaadin.flow.components import (
-    Button, DrawerToggle, Icon, RouterLink, Span, VerticalLayout,
+    Button, DrawerToggle, HorizontalLayout, Icon, RouterLink, Span,
+    TextField, VerticalLayout,
 )
 from vaadin.flow.core.keys import Key
 
@@ -76,13 +77,19 @@ class TestButtonsIconsView(VerticalLayout):
         btn_icononly = Button(icon=Icon("lumo:plus"))
         btn_icononly.set_id("btn-icononly")
 
-        # --- Button click shortcut ---
+        # --- Button click shortcut with TextField ---
+        # Tests both V01.14 (Enter triggers click) and V01.18 (value synced before click)
+        self._short_field = TextField()
+        self._short_field.set_id("short-field")
+        self._short_counter = 0
         result4 = Span("")
         result4.set_id("result4")
-        btn_short = Button("Shortcut")
+        self._result4 = result4
+        btn_short = Button("Shortcut", self._on_shortcut)
         btn_short.set_id("btn-short")
-        btn_short.add_click_listener(lambda e: result4.set_text("shortcut"))
         btn_short.add_click_shortcut(Key.ENTER)
+        short_row = HorizontalLayout()
+        short_row.add(self._short_field, btn_short, result4)
 
         # --- DrawerToggle ---
         result5 = Span("")
@@ -104,7 +111,12 @@ class TestButtonsIconsView(VerticalLayout):
             btn_prog, trigger, result3,
             icon1, icon_color, icon_size,
             btn_icon, btn_icon_after, btn_icononly,
-            btn_short, result4,
+            short_row,
             toggle1, result5,
             nav_link,
         )
+
+    def _on_shortcut(self, event):
+        self._short_counter += 1
+        val = self._short_field.get_value()
+        self._result4.set_text(f"shortcut:{val}:{self._short_counter}")

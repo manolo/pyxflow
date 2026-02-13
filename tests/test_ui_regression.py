@@ -470,3 +470,85 @@ class TestClearButtonBuffering:
         changes = tree.collect_changes()
         cbv = [c for c in changes if c.get("key") == "clearButtonVisible"]
         assert any(c["value"] is True for c in cbv)
+
+
+# ── Bug 13: mSync must be processed before events in RPC batch ───────────
+
+
+class TestMSyncBeforeEvents:
+    """Java Flow's ServerRpcHandler.handleInvocations() processes all mSync
+    RPCs before events. When Enter is pressed in a TextField with a Button
+    click shortcut, the client sends [keydown, mSync, change]. Without
+    reordering, the click handler sees an empty text field value."""
+
+    def test_msync_processed_before_keydown(self, tree):
+        """Simulate an RPC batch where keydown arrives before mSync.
+        The click handler must see the synced value."""
+        from vaadin.flow.components import Button, TextField, VerticalLayout
+        from vaadin.flow.core.keys import Key
+        from vaadin.flow.server.uidl_handler import UidlHandler
+
+        layout = VerticalLayout()
+        tf = TextField("Filter")
+        results = []
+        btn = Button("Go", lambda e: results.append(tf.get_value()))
+        btn.add_click_shortcut(Key.ENTER)
+        layout.add(tf, btn)
+        layout._attach(tree)
+        tree.collect_changes()
+
+        # Build RPC batch in client order: keydown, mSync, change
+        # body_node is node 1 (the first node created by UidlHandler)
+        body_node = tree._nodes[1]
+        handler = UidlHandler.__new__(UidlHandler)
+        handler._tree = tree
+        handler._body_node = body_node
+        rpc_list = [
+            {"type": "event", "node": body_node.id, "event": "keydown", "data": {}},
+            {"type": "mSync", "node": tf.element.node_id,
+             "feature": 1, "property": "value", "value": "hello"},
+            {"type": "event", "node": tf.element.node_id, "event": "change", "data": {}},
+        ]
+
+        handler._process_rpc(rpc_list)
+
+        # The click handler must have seen "hello", not ""
+        assert len(results) == 1
+        assert results[0] == "hello"
+
+    def test_msync_order_preserved_for_multiple_syncs(self, tree):
+        """Multiple mSync RPCs should all be processed before any event."""
+        from vaadin.flow.components import Button, TextField, VerticalLayout
+        from vaadin.flow.core.keys import Key
+        from vaadin.flow.server.uidl_handler import UidlHandler
+
+        layout = VerticalLayout()
+        tf1 = TextField("A")
+        tf2 = TextField("B")
+        results = []
+
+        def on_click(e):
+            results.append((tf1.get_value(), tf2.get_value()))
+
+        btn = Button("Go", on_click)
+        btn.add_click_shortcut(Key.ENTER)
+        layout.add(tf1, tf2, btn)
+        layout._attach(tree)
+        tree.collect_changes()
+
+        body_node = tree._nodes[1]
+        handler = UidlHandler.__new__(UidlHandler)
+        handler._tree = tree
+        handler._body_node = body_node
+        rpc_list = [
+            {"type": "mSync", "node": tf1.element.node_id,
+             "feature": 1, "property": "value", "value": "aaa"},
+            {"type": "event", "node": body_node.id, "event": "keydown", "data": {}},
+            {"type": "mSync", "node": tf2.element.node_id,
+             "feature": 1, "property": "value", "value": "bbb"},
+        ]
+
+        handler._process_rpc(rpc_list)
+
+        assert len(results) == 1
+        assert results[0] == ("aaa", "bbb")

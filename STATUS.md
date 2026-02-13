@@ -5,7 +5,7 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~16,000 (core src/), ~46,000 (total with demo + tests)
-**Tests:** 2118 unit + 306 UI (Playwright)
+**Tests:** 2145 unit + 307 UI (Playwright)
 **Last updated:** 2026-02-13
 
 ---
@@ -131,7 +131,7 @@
 
 ### Server
 - [x] HTTP Server (aiohttp) - Sessions, static files
-- [x] UIDL Handler - Init, navigation, events, mSync
+- [x] UIDL Handler - Init, navigation, events, mSync (two-pass: mSync before events, matching Java Flow)
 - [x] Page reload support - State reset on init
 - [x] Multiple UIs per session - Each browser tab gets independent StateTree/UidlHandler keyed by `v-uiId`, shared CSRF token per session
 - [x] Serves index.html from bundle (Vaadin-generated)
@@ -233,8 +233,8 @@
 
 | Category | Coverage | Details |
 |----------|----------|---------|
-| **Unit tests** | 2118 passing | Good coverage of all 49 components + core + data layer |
-| **UI tests** | 306 passed, 3 skipped | All 29 test views implemented, covering all components, layouts, navigation, push, binder, theme, etc. |
+| **Unit tests** | 2145 passing | Good coverage of all 49 components + core + data layer |
+| **UI tests** | 307 passed, 3 skipped | All 29 test views implemented, covering all components, layouts, navigation, push, binder, theme, etc. |
 
 3 skipped: 2 focus/blur event forwarding (native JS focus/blur doesn't trigger Vaadin server events), 1 ContextMenu openOnClick (needs investigation).
 

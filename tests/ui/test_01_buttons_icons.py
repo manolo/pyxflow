@@ -92,7 +92,22 @@ class TestClickShortcut:
         # Click body to clear focus from previously clicked elements
         view_page.locator("body").click()
         view_page.keyboard.press("Enter")
-        expect(view_page.locator("#result4")).to_have_text("shortcut")
+        expect(view_page.locator("#result4")).to_contain_text("shortcut:")
+
+    @pytest.mark.spec("V01.18")
+    def test_shortcut_with_textfield_value(self, view_page: Page):
+        """Enter in TextField with Button shortcut must see the typed value.
+
+        Regression: mSync (value sync) must be processed before keydown event.
+        """
+        field = view_page.locator("#short-field")
+        field.click()
+        view_page.keyboard.type("hello")
+        view_page.keyboard.press("Enter")
+        expect(view_page.locator("#result4")).to_contain_text("shortcut:hello:")
+        # Second Enter — value unchanged, counter increments
+        view_page.keyboard.press("Enter")
+        expect(view_page.locator("#result4")).to_contain_text("shortcut:hello:")
 
 
 class TestDrawerToggle:

@@ -13,7 +13,7 @@
 
 | # | Route | Tests | Components |
 |---|-------|-------|------------|
-| 1 | `/test/buttons-icons` | 17 | Button, Icon, DrawerToggle |
+| 1 | `/test/buttons-icons` | 18 | Button, Icon, DrawerToggle |
 | 2 | `/test/text-inputs` | 28 | TextField, TextArea, PasswordField, EmailField |
 | 3 | `/test/number-inputs` | 15 | NumberField, IntegerField |
 | 4 | `/test/checkbox-radio` | 20 | Checkbox, CheckboxGroup, RadioButtonGroup |
@@ -43,7 +43,7 @@
 | 28 | `/test/virtual-list` | 8 | VirtualList |
 | 29 | `/test/login` | 11 | LoginForm, LoginOverlay |
 
-**Total: 447 scenarios across 29 views (V01.01–V29.11)**
+**Total: 448 scenarios across 29 views (V01.01–V29.11)**
 
 ---
 
@@ -129,7 +129,13 @@ Feature: Button & Icon
   Scenario: V01.14 — Button add_click_shortcut
     Given Button#btn-short with add_click_shortcut(Key.ENTER), listener → Span#result4
     When press Enter key
-    Then "#result4" text is "shortcut"
+    Then "#result4" text contains "shortcut:"
+
+  Scenario: V01.18 — Button shortcut with TextField value sync
+    Given TextField#short-field and Button#btn-field-short with add_click_shortcut(Key.ENTER)
+    When type "hello" in "#short-field" and press Enter
+    Then "#result6" text contains "filtered:hello:1"
+    And pressing Enter again shows counter incremented to 2
 
   # --- DrawerToggle ---
   Scenario: V01.15 — DrawerToggle renders
