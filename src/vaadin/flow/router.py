@@ -16,6 +16,9 @@ _routes: dict[str, _RouteEntry] = {}
 # Global AppShell class (set by @AppShell decorator)
 _app_shell: type | None = None
 
+# Sentinel for distinguishing "layout not specified" from "layout=None"
+_SENTINEL = object()
+
 
 def Route(path: str = "", page_title: str | None = None, layout: Type["Component"] | None = None):
     """Decorator to register a view class for a route.
@@ -58,13 +61,65 @@ def Route(path: str = "", page_title: str | None = None, layout: Type["Component
 
         # Store route info on the class for introspection
         setattr(cls, '_route_path', normalized_path)
+        setattr(cls, '_route_layout', layout)
         # Only set _page_title from @Route if explicitly provided
         if page_title is not None:
             setattr(cls, '_page_title', page_title)
         elif not hasattr(cls, '_page_title'):
             setattr(cls, '_page_title', None)
+
+        # Flush pending aliases (decorators run bottom-to-top, so aliases
+        # are registered before @Route; now we can resolve inherited layouts)
+        for alias_path, alias_layout_val in getattr(cls, '_pending_route_aliases', []):
+            alias_pnames, alias_regex = _compile_route(alias_path)
+            resolved_layout = alias_layout_val if alias_layout_val is not _SENTINEL else layout
+            resolved_title = page_title or getattr(cls, '_page_title', None)
+            _routes[alias_path] = (cls, resolved_title, alias_pnames, alias_regex, resolved_layout)
+        if hasattr(cls, '_pending_route_aliases'):
+            del cls._pending_route_aliases
+
         return cls
     return decorator
+
+
+def RouteAlias(path: str, layout: Type["Component"] | None = _SENTINEL):
+    """Decorator to register an additional path for a view.
+
+    The view must also have a @Route. Aliases share the same page title.
+    Each alias can optionally specify a different layout.
+
+    Repeatable — multiple @RouteAlias can be stacked on the same class.
+
+    Usage:
+        @Route("dashboard", layout=AdminLayout)
+        @RouteAlias("admin-dashboard")
+        @RouteAlias("public-dash", layout=PublicLayout)
+        class DashboardView(VerticalLayout):
+            pass
+    """
+    def decorator(cls: Type["Component"]) -> Type["Component"]:
+        normalized = path.strip("/")
+
+        # Track aliases on class for introspection
+        if not hasattr(cls, '_route_aliases'):
+            cls._route_aliases = []
+        cls._route_aliases.append(normalized)
+
+        # If @Route already ran (cls has _route_path), register immediately.
+        # Otherwise, store as pending — @Route will flush them.
+        if hasattr(cls, '_route_path'):
+            param_names, regex = _compile_route(normalized)
+            alias_layout = layout if layout is not _SENTINEL else getattr(cls, '_route_layout', None)
+            page_title = getattr(cls, '_page_title', None)
+            _routes[normalized] = (cls, page_title, param_names, regex, alias_layout)
+        else:
+            if not hasattr(cls, '_pending_route_aliases'):
+                cls._pending_route_aliases = []
+            cls._pending_route_aliases.append((normalized, layout))
+
+        return cls
+    return decorator
+
 
 
 def StyleSheet(*urls: str):

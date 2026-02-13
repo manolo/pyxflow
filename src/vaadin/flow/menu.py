@@ -56,6 +56,10 @@ def get_menu_entries() -> list[MenuEntry]:
 
     entries = []
     for path, (cls, page_title, param_names, regex, layout_cls) in _routes.items():
+        # Skip alias routes (only primary @Route appears in menu)
+        if path in getattr(cls, '_route_aliases', []):
+            continue
+
         # Skip if no @Menu decorator
         if not hasattr(cls, '_menu_order'):
             continue

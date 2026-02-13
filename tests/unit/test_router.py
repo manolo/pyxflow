@@ -2,7 +2,7 @@
 
 import pytest
 
-from vaadin.flow.router import Route, PageTitle, match_route, get_view_class, get_page_title, get_all_routes, clear_routes, discover_views, AppShell, Push, get_app_shell, clear_app_shell
+from vaadin.flow.router import Route, RouteAlias, PageTitle, match_route, get_view_class, get_page_title, get_all_routes, clear_routes, discover_views, AppShell, Push, get_app_shell, clear_app_shell
 from vaadin.flow.menu import get_menu_entries
 from vaadin.flow.components import VerticalLayout
 
@@ -307,6 +307,188 @@ class TestDiscoverViews:
         assert getattr(app_shell, '_push_enabled', False) is True
         assert "lumo/lumo.css" in getattr(app_shell, '_stylesheets', [])
         assert "styles/styles.css" in getattr(app_shell, '_stylesheets', [])
+
+
+class TestRouteAlias:
+    """Test @RouteAlias decorator."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        clear_routes()
+        yield
+        clear_routes()
+
+    def test_alias_registers_additional_path(self):
+        """@RouteAlias should register an additional path for the same view."""
+        @Route("dashboard")
+        @RouteAlias("admin-dashboard")
+        class DashboardView(VerticalLayout):
+            pass
+
+        assert get_view_class("dashboard") is DashboardView
+        assert get_view_class("admin-dashboard") is DashboardView
+
+    def test_multiple_aliases(self):
+        """Multiple @RouteAlias on the same class should all work."""
+        @Route("dashboard")
+        @RouteAlias("admin")
+        @RouteAlias("home")
+        class DashboardView(VerticalLayout):
+            pass
+
+        assert get_view_class("dashboard") is DashboardView
+        assert get_view_class("admin") is DashboardView
+        assert get_view_class("home") is DashboardView
+
+    def test_alias_shares_page_title(self):
+        """Alias routes should share the same page title as the primary route."""
+        @Route("dashboard", page_title="Dashboard")
+        @RouteAlias("admin-dashboard")
+        class DashboardView(VerticalLayout):
+            pass
+
+        assert get_page_title("dashboard") == "Dashboard"
+        assert get_page_title("admin-dashboard") == "Dashboard"
+
+    def test_alias_shares_page_title_decorator(self):
+        """Alias should use @PageTitle if present."""
+        @Route("dashboard")
+        @RouteAlias("admin-dashboard")
+        @PageTitle("My Dashboard")
+        class DashboardView(VerticalLayout):
+            pass
+
+        assert get_page_title("dashboard") == "My Dashboard"
+        assert get_page_title("admin-dashboard") == "My Dashboard"
+
+    def test_alias_inherits_layout(self):
+        """Alias without explicit layout should inherit from @Route."""
+        class MyLayout(VerticalLayout):
+            _is_router_layout = True
+
+        @Route("dashboard", layout=MyLayout)
+        @RouteAlias("admin-dashboard")
+        class DashboardView(VerticalLayout):
+            pass
+
+        result_primary = match_route("dashboard")
+        result_alias = match_route("admin-dashboard")
+        assert result_primary[3] is MyLayout
+        assert result_alias[3] is MyLayout
+
+    def test_alias_with_different_layout(self):
+        """Alias with explicit layout should use its own layout."""
+        class AdminLayout(VerticalLayout):
+            _is_router_layout = True
+
+        class PublicLayout(VerticalLayout):
+            _is_router_layout = True
+
+        @Route("dashboard", layout=AdminLayout)
+        @RouteAlias("public-dash", layout=PublicLayout)
+        class DashboardView(VerticalLayout):
+            pass
+
+        result_primary = match_route("dashboard")
+        result_alias = match_route("public-dash")
+        assert result_primary[3] is AdminLayout
+        assert result_alias[3] is PublicLayout
+
+    def test_alias_with_no_layout(self):
+        """Alias with layout=None should have no layout."""
+        class MyLayout(VerticalLayout):
+            _is_router_layout = True
+
+        @Route("dashboard", layout=MyLayout)
+        @RouteAlias("standalone", layout=None)
+        class DashboardView(VerticalLayout):
+            pass
+
+        result_primary = match_route("dashboard")
+        result_alias = match_route("standalone")
+        assert result_primary[3] is MyLayout
+        assert result_alias[3] is None
+
+    def test_alias_normalizes_path(self):
+        """Alias should normalize paths (strip slashes)."""
+        @Route("dashboard")
+        @RouteAlias("/admin-dashboard/")
+        class DashboardView(VerticalLayout):
+            pass
+
+        assert get_view_class("admin-dashboard") is DashboardView
+
+    def test_alias_with_parameters(self):
+        """Alias should support parameterized paths."""
+        @Route("user/:id")
+        @RouteAlias("profile/:id")
+        class UserView(VerticalLayout):
+            pass
+
+        result = match_route("profile/42")
+        assert result is not None
+        assert result[0] is UserView
+        assert result[2] == {"id": "42"}
+
+    def test_alias_stored_on_class(self):
+        """Aliases should be tracked on _route_aliases."""
+        @Route("dashboard")
+        @RouteAlias("admin")
+        @RouteAlias("home")
+        class DashboardView(VerticalLayout):
+            pass
+
+        assert hasattr(DashboardView, '_route_aliases')
+        assert "admin" in DashboardView._route_aliases
+        assert "home" in DashboardView._route_aliases
+
+    def test_alias_in_get_all_routes(self):
+        """Aliases should appear in get_all_routes."""
+        @Route("dashboard")
+        @RouteAlias("admin")
+        class DashboardView(VerticalLayout):
+            pass
+
+        routes = get_all_routes()
+        assert "dashboard" in routes
+        assert "admin" in routes
+        assert routes["dashboard"] is DashboardView
+        assert routes["admin"] is DashboardView
+
+    def test_alias_not_in_menu(self):
+        """Aliases should not generate @Menu entries (only primary @Route does)."""
+        from vaadin.flow.menu import Menu
+
+        @Route("dashboard")
+        @RouteAlias("admin-dashboard")
+        @Menu(title="Dashboard", order=0)
+        class DashboardView(VerticalLayout):
+            pass
+
+        entries = get_menu_entries()
+        paths = [e.path for e in entries]
+        assert "/dashboard" in paths
+        # Alias should NOT appear as a separate menu entry
+        assert "/admin-dashboard" not in paths
+
+    def test_alias_without_route_not_registered(self):
+        """@RouteAlias without @Route should not register (pending, never flushed)."""
+        @RouteAlias("orphan-alias")
+        class OrphanView(VerticalLayout):
+            pass
+
+        # Without @Route, alias stays pending and is not navigable
+        assert get_view_class("orphan-alias") is None
+
+    def test_alias_after_route_registers_immediately(self):
+        """@RouteAlias applied after @Route (unusual order) should register."""
+        @RouteAlias("alt-path")
+        @Route("main-path")
+        class MyView(VerticalLayout):
+            pass
+
+        assert get_view_class("main-path") is MyView
+        assert get_view_class("alt-path") is MyView
 
 
 class TestAppShellDecorator:
