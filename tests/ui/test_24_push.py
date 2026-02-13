@@ -7,13 +7,11 @@ from playwright.sync_api import Page, expect
 
 
 @pytest.fixture(scope="module")
-def view_page(browser, base_url):
-    ctx = browser.new_context(viewport={"width": 1280, "height": 720})
-    p = ctx.new_page()
-    p.goto(f"{base_url}/test/push")
-    p.wait_for_selector("#start", timeout=15000)
-    yield p
-    ctx.close()
+def view_page(shared_page, base_url):
+    """Reuse shared page — navigate via SideNav or goto fallback."""
+    from conftest import navigate_to
+    navigate_to(shared_page, base_url, "test/push", "vaadin-button")
+    yield shared_page
 
 
 class TestPush:
@@ -41,11 +39,11 @@ class TestPush:
 class TestNavigation:
     @pytest.mark.spec("V24.08")
     def test_nav_to_next(self, browser, base_url):
-        # Use a fresh page — WS push state on the test page can block SPA nav
+        """Use fresh context — push WS state blocks SPA nav on reused page."""
         ctx = browser.new_context(viewport={"width": 1280, "height": 720})
-        p = ctx.new_page()
-        p.goto(f"{base_url}/test/push")
-        p.wait_for_selector("#nav-next", timeout=15000)
-        p.locator("#nav-next").click()
-        expect(p).to_have_url(re.compile(r".*/test/theme"), timeout=5000)
+        page = ctx.new_page()
+        page.goto(f"{base_url}/test/push")
+        page.wait_for_selector("vaadin-button", timeout=15000)
+        page.locator("vaadin-side-nav-item[path='/test/theme']").click()
+        expect(page).to_have_url(re.compile(r".*/test/theme"), timeout=5000)
         ctx.close()

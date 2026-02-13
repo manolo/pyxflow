@@ -7,13 +7,11 @@ from playwright.sync_api import Page, expect
 
 
 @pytest.fixture(scope="module")
-def view_page(browser, base_url):
-    ctx = browser.new_context(viewport={"width": 1280, "height": 720})
-    p = ctx.new_page()
-    p.goto(f"{base_url}/test/menu")
-    p.wait_for_selector("vaadin-menu-bar", timeout=15000)
-    yield p
-    ctx.close()
+def view_page(shared_page, base_url):
+    """Reuse shared page — navigate via SideNav or goto fallback."""
+    from conftest import navigate_to
+    navigate_to(shared_page, base_url, "test/menu", "vaadin-menu-bar")
+    yield shared_page
 
 
 def _close_overlays(page: Page):
@@ -119,8 +117,8 @@ class TestMenuBarExtras:
 
 class TestNavigation:
     @pytest.mark.spec("V14.14")
-    def test_nav_to_next(self, view_page: Page):
+    def test_nav_via_sidenav(self, view_page: Page):
+        """Navigate to next view via SideNav link."""
         _close_overlays(view_page)
-        # Use evaluate to bypass any remaining overlays that might intercept the click
-        view_page.locator("#nav-next").evaluate("el => el.click()")
-        expect(view_page).to_have_url(re.compile(r".*/test/layouts"), timeout=5000)
+        view_page.locator("vaadin-side-nav-item[path='/test/navigation']").click()
+        expect(view_page).to_have_url(re.compile(r".*/test/navigation"), timeout=5000)

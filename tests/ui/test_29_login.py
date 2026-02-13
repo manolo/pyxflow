@@ -5,13 +5,11 @@ from playwright.sync_api import Page, expect
 
 
 @pytest.fixture(scope="module")
-def view_page(browser, base_url):
-    ctx = browser.new_context(viewport={"width": 1280, "height": 720})
-    p = ctx.new_page()
-    p.goto(f"{base_url}/test/login")
-    p.wait_for_selector("vaadin-login-form", timeout=15000)
-    yield p
-    ctx.close()
+def view_page(shared_page, base_url):
+    """Reuse shared page — navigate via SideNav or goto fallback."""
+    from conftest import navigate_to
+    navigate_to(shared_page, base_url, "test/login", "vaadin-login-form")
+    yield shared_page
 
 
 class TestLoginForm:

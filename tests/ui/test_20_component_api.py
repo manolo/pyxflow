@@ -7,13 +7,11 @@ from playwright.sync_api import Page, expect
 
 
 @pytest.fixture(scope="module")
-def view_page(browser, base_url):
-    ctx = browser.new_context(viewport={"width": 1280, "height": 720})
-    p = ctx.new_page()
-    p.goto(f"{base_url}/test/component-api")
-    p.wait_for_selector("vaadin-button", timeout=15000)
-    yield p
-    ctx.close()
+def view_page(shared_page, base_url):
+    """Reuse shared page — navigate via SideNav or goto fallback."""
+    from conftest import navigate_to
+    navigate_to(shared_page, base_url, "test/component-api", "vaadin-button")
+    yield shared_page
 
 
 class TestVisibility:
@@ -132,6 +130,7 @@ class TestFocus:
 
 class TestNavigation:
     @pytest.mark.spec("V20.22")
-    def test_nav_to_next(self, view_page: Page):
-        view_page.locator("#nav-next").click()
+    def test_nav_via_sidenav(self, view_page: Page):
+        """Navigate to next view via SideNav link."""
+        view_page.locator("vaadin-side-nav-item[path='/test/field-mixins']").click()
         expect(view_page).to_have_url(re.compile(r".*/test/field-mixins"), timeout=5000)

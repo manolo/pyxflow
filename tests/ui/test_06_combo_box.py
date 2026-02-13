@@ -7,13 +7,11 @@ from playwright.sync_api import Page, expect
 
 
 @pytest.fixture(scope="module")
-def view_page(browser, base_url):
-    ctx = browser.new_context(viewport={"width": 1280, "height": 720})
-    p = ctx.new_page()
-    p.goto(f"{base_url}/test/combo-box")
-    p.wait_for_selector("vaadin-combo-box", timeout=15000)
-    yield p
-    ctx.close()
+def view_page(shared_page, base_url):
+    """Reuse shared page — navigate via SideNav or goto fallback."""
+    from conftest import navigate_to
+    navigate_to(shared_page, base_url, "test/combo-box", "vaadin-combo-box")
+    yield shared_page
 
 
 class TestComboBox:
@@ -104,8 +102,8 @@ class TestMultiSelectComboBoxExtras:
 
 class TestNavigation:
     @pytest.mark.spec("V06.25")
-    def test_nav_to_next(self, view_page: Page):
-        # Ensure no overlay is blocking
+    def test_nav_via_sidenav(self, view_page: Page):
+        """Navigate to next view via SideNav link."""
         view_page.keyboard.press("Escape")
-        view_page.locator("#nav-next").click()
+        view_page.locator("vaadin-side-nav-item[path='/test/date-time']").click()
         expect(view_page).to_have_url(re.compile(r".*/test/date-time"), timeout=5000)

@@ -4,6 +4,7 @@ Auto-starts the PyFlow demo server unless a valid one is already running.
 """
 
 import json
+import re
 import subprocess
 import sys
 import time
@@ -12,6 +13,7 @@ from pathlib import Path
 import pytest
 import urllib.request
 import urllib.error
+from playwright.sync_api import expect
 
 CONSECUTIVE_FAILURES = 0
 MAX_CONSECUTIVE = 4
@@ -122,6 +124,45 @@ def base_url(request):
 @pytest.fixture(scope="session")
 def browser_context_args():
     return {"viewport": {"width": 1280, "height": 720}}
+
+
+def navigate_to(page, base_url, path, wait_selector, timeout=15000):
+    """Navigate to a test view, preferring SideNav click over goto.
+
+    If the SideNav has a link matching the path, click it (SPA navigation).
+    Falls back to page.goto() if SPA navigation doesn't complete.
+    """
+    if path in page.url:
+        page.wait_for_selector(wait_selector, timeout=timeout)
+        return
+    # Try SideNav link first (client-side navigation, faster)
+    nav_link = page.locator(f"vaadin-side-nav-item[path='/{path}']")
+    if nav_link.count() > 0 and nav_link.is_visible():
+        nav_link.click()
+        # Verify SPA navigation completed; fall back to goto if blocked (e.g. push WS)
+        try:
+            expect(page).to_have_url(re.compile(re.escape(path)), timeout=3000)
+        except AssertionError:
+            page.goto(f"{base_url}/{path}")
+    else:
+        page.goto(f"{base_url}/{path}")
+    page.wait_for_selector(wait_selector, timeout=timeout)
+
+
+@pytest.fixture(scope="session")
+def shared_page(browser, base_url):
+    """Single browser page reused across all test modules.
+
+    Tests navigate via SideNav links (SPA) or goto as fallback.
+    Each module's view_page fixture uses navigate_to() to reach its view.
+    """
+    ctx = browser.new_context(viewport={"width": 1280, "height": 720})
+    page = ctx.new_page()
+    # Navigate to the first view to bootstrap the SPA
+    page.goto(f"{base_url}/test/buttons-icons")
+    page.wait_for_selector("vaadin-button", timeout=15000)
+    yield page
+    ctx.close()
 
 
 def pytest_runtest_makereport(item, call):

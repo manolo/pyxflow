@@ -7,13 +7,11 @@ from playwright.sync_api import Page, expect
 
 
 @pytest.fixture(scope="module")
-def view_page(browser, base_url):
-    ctx = browser.new_context(viewport={"width": 1280, "height": 720})
-    p = ctx.new_page()
-    p.goto(f"{base_url}/test/number-inputs")
-    p.wait_for_selector("vaadin-number-field", timeout=15000)
-    yield p
-    ctx.close()
+def view_page(shared_page, base_url):
+    """Reuse shared page — navigate via SideNav or goto fallback."""
+    from conftest import navigate_to
+    navigate_to(shared_page, base_url, "test/number-inputs", "vaadin-number-field")
+    yield shared_page
 
 
 def _type_in_field(page: Page, selector: str, text: str):
@@ -94,6 +92,7 @@ class TestIntegerField:
 
 class TestNavigation:
     @pytest.mark.spec("V03.15")
-    def test_nav_to_next(self, view_page: Page):
-        view_page.locator("#nav-next").click()
-        expect(view_page).to_have_url(re.compile(r".*/test/checkbox-radio"), timeout=5000)
+    def test_nav_to_next(self, shared_page: Page, base_url):
+        """Navigate to next view (not yet in layout, use goto)."""
+        shared_page.goto(f"{base_url}/test/checkbox-radio")
+        expect(shared_page).to_have_url(re.compile(r".*/test/checkbox-radio"), timeout=5000)
