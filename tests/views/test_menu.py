@@ -5,7 +5,7 @@ from vaadin.flow.components import (
     Button, ContextMenu, Div, MenuBar, Span, VerticalLayout,
 )
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/menu", page_title="Test: Menu", layout=TestMainLayout)

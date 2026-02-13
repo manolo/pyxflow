@@ -6,7 +6,7 @@ from vaadin.flow.components import (
     VerticalLayout,
 )
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/checkbox-radio", page_title="Test: Checkbox & Radio", layout=TestMainLayout)

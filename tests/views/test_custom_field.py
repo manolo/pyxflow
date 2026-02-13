@@ -5,7 +5,7 @@ from vaadin.flow.components import (
     Button, CustomField, Span, TextField, VerticalLayout,
 )
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/custom-field", page_title="Test: CustomField", layout=TestMainLayout)

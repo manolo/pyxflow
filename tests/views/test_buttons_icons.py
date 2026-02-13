@@ -7,7 +7,7 @@ from vaadin.flow.components import (
 )
 from vaadin.flow.core.keys import Key
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/buttons-icons", page_title="Test: Buttons & Icons", layout=TestMainLayout)

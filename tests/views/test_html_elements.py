@@ -7,7 +7,7 @@ from vaadin.flow.components import (
     Header, Footer, Section, Nav, Main,
 )
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/html-elements", page_title="Test: HTML Elements", layout=TestMainLayout)

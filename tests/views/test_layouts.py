@@ -7,7 +7,7 @@ from vaadin.flow.components import (
 )
 from vaadin.flow.components.horizontal_layout import Alignment, JustifyContentMode
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/layouts", page_title="Test: Layouts", layout=TestMainLayout)

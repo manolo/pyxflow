@@ -5,7 +5,7 @@ from vaadin.flow.components import (
     RouterLink, Span, VerticalLayout,
 )
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/navigation", page_title="Test: Navigation", layout=TestMainLayout)

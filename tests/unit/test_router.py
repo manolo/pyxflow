@@ -291,15 +291,9 @@ class TestDiscoverViews:
         """After discover_views, get_menu_entries should return @Menu entries."""
         discover_views("demo.views")
         entries = get_menu_entries()
-        # 7 demo views + 29 test views = 36
-        assert len(entries) == 36
-        titles = {e.title for e in entries}
-        # Original demo entries present
-        for t in ["About", "Hello", "Components", "Grid", "Master-Detail", "Stopwatch", "File Explorer"]:
-            assert t in titles, f"Missing demo entry: {t}"
-        # Test entries present
-        for t in ["Buttons & Icons", "Text Inputs", "Login"]:
-            assert t in titles, f"Missing test entry: {t}"
+        assert len(entries) == 7
+        titles = [e.title for e in entries]
+        assert titles == ["About", "Hello", "Components", "Grid", "Master-Detail", "Stopwatch", "File Explorer"]
         # Verify sorted by (order, path)
         orders = [e.order for e in entries]
         assert orders == sorted(orders)

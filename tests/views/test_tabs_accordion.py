@@ -6,7 +6,7 @@ from vaadin.flow.components import (
     VerticalLayout,
 )
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/tabs-accordion", page_title="Test: Tabs & Accordion", layout=TestMainLayout)

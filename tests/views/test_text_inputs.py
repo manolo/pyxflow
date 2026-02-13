@@ -7,7 +7,7 @@ from vaadin.flow.components import (
 )
 from vaadin.flow.components.value_change_mode import ValueChangeMode
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/text-inputs", page_title="Test: Text Inputs", layout=TestMainLayout)

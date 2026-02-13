@@ -5,7 +5,7 @@ from vaadin.flow.components import (
     Button, Div, Span, TextField, VerticalLayout,
 )
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/component-api", page_title="Test: Component API", layout=TestMainLayout)

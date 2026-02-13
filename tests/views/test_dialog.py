@@ -5,7 +5,7 @@ from vaadin.flow.components import (
     Button, ConfirmDialog, Dialog, Span, VerticalLayout,
 )
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/dialog", page_title="Test: Dialog", layout=TestMainLayout)

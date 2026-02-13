@@ -7,7 +7,7 @@ from vaadin.flow.components import (
 from vaadin.flow.data.binder import Binder
 from vaadin.flow.data.converter import string_to_int
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 class Person:

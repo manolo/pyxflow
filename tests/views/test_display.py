@@ -6,7 +6,7 @@ from vaadin.flow.components import (
     MessageList, MessageListItem, ProgressBar, Span, VerticalLayout,
 )
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/display", page_title="Test: Display Components", layout=TestMainLayout)

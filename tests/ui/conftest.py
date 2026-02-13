@@ -1,6 +1,6 @@
 """Playwright UI test configuration.
 
-Auto-starts the PyFlow demo server unless a valid one is already running.
+Auto-starts the PyFlow test server unless a valid one is already running.
 """
 
 import json
@@ -79,7 +79,7 @@ def base_url(request):
         if missing:
             pytest.fail(
                 f"PyFlow server on port {DEFAULT_PORT} is missing test routes: {missing}\n"
-                f"Restart with:  cd vaadin-pyflow && source .venv/bin/activate && python -m demo"
+                f"Restart with:  cd vaadin-pyflow && source .venv/bin/activate && python -m tests"
             )
         yield DEFAULT_BASE_URL
         return
@@ -88,7 +88,7 @@ def base_url(request):
     proc = subprocess.Popen(
         [sys.executable, "-c",
          "import vaadin.flow.app as _a; "
-         f"_a._serve('demo.views', 'localhost', {DEFAULT_PORT}, False, dev=True)"],
+         f"_a._serve('tests.views', 'localhost', {DEFAULT_PORT}, False, dev=True)"],
         cwd=str(_PROJECT_ROOT),
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,

@@ -7,7 +7,7 @@ from vaadin.flow.components import (
     Button, ProgressBar, Span, VerticalLayout,
 )
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/push", page_title="Test: Push", layout=TestMainLayout)

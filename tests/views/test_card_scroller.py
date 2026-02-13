@@ -6,7 +6,7 @@ from vaadin.flow.components import (
     Span, VerticalLayout,
 )
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/card-scroller", page_title="Test: Card & Scroller", layout=TestMainLayout)

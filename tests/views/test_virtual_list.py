@@ -5,7 +5,7 @@ from vaadin.flow.components import (
     Button, LitRenderer, Span, VerticalLayout, VirtualList,
 )
 from vaadin.flow.menu import Menu
-from demo.views.test_main_layout import TestMainLayout
+from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/virtual-list", page_title="Test: VirtualList", layout=TestMainLayout)
