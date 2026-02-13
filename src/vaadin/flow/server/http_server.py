@@ -530,10 +530,25 @@ async def _session_cleanup_ctx(app: web.Application):
         pass
 
 
+async def _close_push_connections(app: web.Application):
+    """Close all active WebSocket push connections on shutdown.
+
+    Without this, push handlers block on ``async for msg in ws:`` and
+    push senders block on ``await _push_event.wait()``, causing Ctrl+C
+    to hang until the connections time out.
+    """
+    for session in _sessions.values():
+        for ui_state in session.get("uis", {}).values():
+            ws = ui_state.get("push_ws")
+            if ws and not ws.closed:
+                await ws.close()
+
+
 def create_app() -> web.Application:
     """Create the aiohttp application."""
     app = web.Application()
     app.cleanup_ctx.append(_session_cleanup_ctx)
+    app.on_shutdown.append(_close_push_connections)
 
     # Routes
     app.router.add_get("/", handle_root)
