@@ -234,29 +234,9 @@
 | Category | Coverage | Details |
 |----------|----------|---------|
 | **Unit tests** | 2118 passing | Good coverage of all 49 components + core + data layer |
-| **UI tests** | 306 passed, 3 skipped | 29 test views covering all components, layouts, navigation, push, binder, theme, etc. |
+| **UI tests** | 306 passed, 3 skipped | All 29 test views implemented, covering all components, layouts, navigation, push, binder, theme, etc. |
 
-### Missing UI Test Views (from SPECS.md)
-
-| View | Scenarios | Components Tested |
-|------|-----------|-------------------|
-| `test/grid-basic` | ~30 | Grid columns, sorting, selection, lazy data |
-| `test/grid-renderers` | ~15 | LitRenderer, ComponentRenderer, TextRenderer |
-| `test/dialog-notification` | ~25 | Dialog open/close/drag, Notification position/duration |
-| `test/select-combo` | ~20 | Select, ComboBox, MultiSelectComboBox |
-| `test/date-time` | ~20 | DatePicker, TimePicker, DateTimePicker |
-| `test/tabs-navigation` | ~15 | Tabs, TabSheet, SideNav |
-| `test/menu-context` | ~15 | MenuBar, ContextMenu |
-| `test/upload` | ~10 | Upload single/multi, drag-drop |
-| `test/forms-binder` | ~20 | Binder validation, converters, error display |
-| `test/push` | ~10 | WebSocket push, UI.access, background tasks |
-| `test/layouts` | ~15 | AppLayout, SplitLayout, FormLayout |
-| `test/details-accordion` | ~10 | Details, Accordion expand/collapse |
-| `test/login` | ~10 | LoginForm, LoginOverlay |
-| `test/checkbox-radio` | ~15 | Checkbox, CheckboxGroup, RadioButtonGroup |
-| `test/misc-components` | ~20 | Avatar, Card, Popover, ProgressBar, Markdown, etc. |
-| `test/theme-switching` | ~10 | Lumo/Aura, dark/light mode |
-| `test/routing` | ~15 | Route params, guards, navigation, error page |
+3 skipped: 2 focus/blur event forwarding (native JS focus/blur doesn't trigger Vaadin server events), 1 ContextMenu openOnClick (needs investigation).
 
 ---
 
