@@ -53,16 +53,28 @@ class PushTestBase(AioHTTPTestCase):
 class TestPushAuth(PushTestBase):
     """Test push authentication and rejection."""
 
-    async def test_push_without_session_returns_403(self):
-        """WebSocket push without session cookie returns 403."""
+    async def test_push_without_session_returns_session_expired(self):
+        """Long-polling push without session returns sessionExpired JSON."""
         resp = await self.client.request("GET", "/VAADIN/push")
+        assert resp.status == 200
+        text = await resp.text()
+        assert '"sessionExpired":true' in text
+
+    async def test_push_ws_without_session_returns_403(self):
+        """WebSocket upgrade push without session returns 403."""
+        resp = await self.client.request(
+            "GET", "/VAADIN/push",
+            headers={"Upgrade": "websocket"},
+        )
         assert resp.status == 403
 
-    async def test_push_wrong_push_id_returns_403(self):
-        """WebSocket push with wrong v-pushId returns 403."""
+    async def test_push_wrong_push_id_returns_session_expired(self):
+        """Long-polling push with wrong v-pushId returns sessionExpired."""
         await self._init_session()
         resp = await self.client.request("GET", "/VAADIN/push?v-pushId=wrong")
-        assert resp.status == 403
+        assert resp.status == 200
+        text = await resp.text()
+        assert '"sessionExpired":true' in text
 
 
 class TestPushHandshake(PushTestBase):

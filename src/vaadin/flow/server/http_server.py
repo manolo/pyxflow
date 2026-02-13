@@ -142,6 +142,18 @@ def _session_expired_response() -> web.Response:
     )
 
 
+def _push_session_expired(request: web.Request) -> web.Response:
+    """Return the right response for an expired push session.
+
+    Long-polling requests get a sessionExpired JSON so FlowClient reloads.
+    WebSocket upgrade requests get a 403 — the WS upgrade fails, Atmosphere
+    falls back to long-polling, which then receives sessionExpired.
+    """
+    if request.headers.get("Upgrade", "").lower() == "websocket":
+        return web.Response(status=403)
+    return _session_expired_response()
+
+
 async def handle_uidl(request: web.Request) -> web.Response:
     """Handle POST /?v-r=uidl - process UIDL request."""
     session_id = request.cookies.get("JSESSIONID")
@@ -244,23 +256,23 @@ async def handle_push(request: web.Request) -> web.Response:
     Each browser tab has its own push WebSocket, keyed by v-uiId.
     """
     session_id = request.cookies.get("JSESSIONID")
-    if not session_id or session_id not in _sessions:
-        return web.Response(status=403)
+    session = _sessions.get(session_id) if session_id else None
 
-    session = _sessions[session_id]
+    if session is None:
+        return _push_session_expired(request)
 
     # Route to the correct UI by v-uiId
     ui_id = int(request.query.get("v-uiId", "0"))
     ui_state = session["uis"].get(ui_id)
     if ui_state is None:
-        return web.Response(status=403)
+        return _push_session_expired(request)
 
     handler: UidlHandler = ui_state["handler"]
 
     # Validate push ID
     push_id = request.query.get("v-pushId", "")
     if push_id != getattr(handler, "_push_id", None):
-        return web.Response(status=403)
+        return _push_session_expired(request)
 
     # Cancel existing push sender for this UI if reconnecting
     old_task = ui_state.get("push_sender_task")
