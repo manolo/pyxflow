@@ -133,6 +133,10 @@ def pytest_runtest_makereport(item, call):
             CONSECUTIVE_FAILURES = 0
 
 
+def pytest_configure(config):
+    config.addinivalue_line("markers", "spec(*ids): links test to SPECS.md scenario IDs (e.g. V01.01)")
+
+
 def pytest_runtest_setup(item):
     if CONSECUTIVE_FAILURES > MAX_CONSECUTIVE:
         pytest.skip(f"ABORT: {CONSECUTIVE_FAILURES} consecutive failures")

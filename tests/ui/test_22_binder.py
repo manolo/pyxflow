@@ -30,6 +30,7 @@ def _type_in_field(page: Page, selector: str, text: str):
 
 
 class TestReadBean:
+    @pytest.mark.spec("V22.01")
     def test_populates_fields(self, view_page: Page):
         expect(view_page.locator("#name")).to_have_js_property("value", "Alice")
         expect(view_page.locator("#email")).to_have_js_property("value", "alice@x.com")
@@ -37,6 +38,7 @@ class TestReadBean:
 
 
 class TestWriteBean:
+    @pytest.mark.spec("V22.03")
     def test_writes_form_to_object(self, view_page: Page):
         _type_in_field(view_page, "#name", "Bob")
         _type_in_field(view_page, "#email", "bob@x.com")
@@ -46,11 +48,13 @@ class TestWriteBean:
 
 
 class TestValidation:
+    @pytest.mark.spec("V22.04")
     def test_required_blocks_save(self, view_page: Page):
         _type_in_field(view_page, "#name", "")
         view_page.locator("#save").click()
         expect(view_page.locator("#name")).to_have_js_property("invalid", True)
 
+    @pytest.mark.spec("V22.07")
     def test_valid_saves(self, view_page: Page):
         _type_in_field(view_page, "#name", "Valid")
         _type_in_field(view_page, "#email", "v@x.com")
@@ -60,12 +64,14 @@ class TestValidation:
 
 
 class TestDirtyTracking:
+    @pytest.mark.spec("V22.09")
     def test_dirty_after_change(self, view_page: Page):
         _type_in_field(view_page, "#name", "Changed")
         expect(view_page.locator("#dirty")).to_have_text("true")
 
 
 class TestNavigation:
+    @pytest.mark.spec("V22.15")
     def test_nav_to_next(self, view_page: Page):
         view_page.locator("#nav-next").click()
         expect(view_page).to_have_url(re.compile(r".*/test/navigation"), timeout=5000)

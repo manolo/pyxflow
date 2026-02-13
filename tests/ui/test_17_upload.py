@@ -17,24 +17,29 @@ def view_page(browser, base_url):
 
 
 class TestUpload:
+    @pytest.mark.spec("V17.01")
     def test_renders(self, view_page: Page):
         upload = view_page.locator("#upload1")
         expect(upload).to_be_visible()
 
+    @pytest.mark.spec("V17.03")
     def test_max_files(self, view_page: Page):
         upload = view_page.locator("#upload1")
         expect(upload).to_have_js_property("maxFiles", 2)
 
+    @pytest.mark.spec("V17.05")
     def test_accepted_file_types(self, view_page: Page):
         upload = view_page.locator("#upload1")
         expect(upload).to_have_js_property("accept", ".txt,.csv")
 
+    @pytest.mark.spec("V17.06")
     def test_auto_upload_disabled(self, view_page: Page):
         upload = view_page.locator("#upload-manual")
         expect(upload).to_have_js_property("noAuto", True)
 
 
 class TestNavigation:
+    @pytest.mark.spec("V17.10")
     def test_nav_to_next(self, view_page: Page):
         view_page.locator("#nav-next").click()
         expect(view_page).to_have_url(re.compile(r".*/test/display"), timeout=5000)

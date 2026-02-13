@@ -17,11 +17,13 @@ def view_page(browser, base_url):
 
 
 class TestVirtualList:
+    @pytest.mark.spec("V28.01")
     def test_renders_items(self, view_page: Page):
         vl = view_page.locator("#vl1")
         expect(vl).to_be_visible()
         expect(vl).to_contain_text("Item 0")
 
+    @pytest.mark.spec("V28.05")
     def test_replace_items(self, view_page: Page):
         view_page.locator("#btn-vl-replace").click()
         vl = view_page.locator("#vl1")
@@ -29,6 +31,7 @@ class TestVirtualList:
 
 
 class TestNavigation:
+    @pytest.mark.spec("V28.08")
     def test_nav_to_next(self, view_page: Page):
         view_page.locator("#nav-next").click()
         expect(view_page).to_have_url(re.compile(r".*/test/login"), timeout=5000)

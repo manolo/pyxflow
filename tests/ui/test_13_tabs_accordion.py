@@ -17,35 +17,42 @@ def view_page(browser, base_url):
 
 
 class TestTabs:
+    @pytest.mark.spec("V13.01")
     def test_renders_tabs(self, view_page: Page):
         tabs = view_page.locator("#tabs1")
         expect(tabs.locator("vaadin-tab")).to_have_count(3)
 
+    @pytest.mark.spec("V13.02")
     def test_select_by_click(self, view_page: Page):
         tabs = view_page.locator("#tabs1")
         tabs.locator("vaadin-tab").nth(1).click()  # Two
         expect(view_page.locator("#tabs1-val")).to_have_text("1")
 
+    @pytest.mark.spec("V13.03")
     def test_set_selected_index(self, view_page: Page):
         view_page.locator("#btn-tab3").click()
         tabs = view_page.locator("#tabs1")
         expect(tabs.locator("vaadin-tab").nth(2)).to_have_attribute("selected", "")
 
+    @pytest.mark.spec("V13.05")
     def test_add_tab_dynamically(self, view_page: Page):
         view_page.locator("#btn-add-tab").click()
         tabs = view_page.locator("#tabs1")
         expect(tabs.locator("vaadin-tab")).to_have_count(4)
 
+    @pytest.mark.spec("V13.04")
     def test_vertical_orientation(self, view_page: Page):
         tabs = view_page.locator("#tabs-vert")
         expect(tabs).to_have_attribute("orientation", "vertical")
 
 
 class TestTabSheet:
+    @pytest.mark.spec("V13.07")
     def test_renders_with_content(self, view_page: Page):
         ts = view_page.locator("#ts1")
         expect(ts).to_be_visible()
 
+    @pytest.mark.spec("V13.08")
     def test_switch_tab(self, view_page: Page):
         ts = view_page.locator("#ts1")
         ts.locator("vaadin-tab").nth(1).click()
@@ -53,11 +60,13 @@ class TestTabSheet:
 
 
 class TestAccordion:
+    @pytest.mark.spec("V13.10")
     def test_renders_panels(self, view_page: Page):
         acc = view_page.locator("#acc1")
         # Accordion renders panels as vaadin-details children (not vaadin-accordion-panel)
         expect(acc.locator("vaadin-details")).to_have_count(2)
 
+    @pytest.mark.spec("V13.11")
     def test_open_panel(self, view_page: Page):
         view_page.locator("#btn-acc-open").click()
         acc = view_page.locator("#acc1")
@@ -66,6 +75,7 @@ class TestAccordion:
         # Verify the second panel is actually opened
         expect(acc.locator("vaadin-details").nth(1)).to_have_attribute("opened", "")
 
+    @pytest.mark.spec("V13.12")
     def test_close_all(self, view_page: Page):
         view_page.locator("#btn-acc-close").click()
         acc = view_page.locator("#acc1")
@@ -74,15 +84,18 @@ class TestAccordion:
 
 
 class TestDetails:
+    @pytest.mark.spec("V13.15")
     def test_renders_summary(self, view_page: Page):
         det = view_page.locator("#det1")
         expect(det).to_contain_text("More info")
 
+    @pytest.mark.spec("V13.17")
     def test_open_programmatic(self, view_page: Page):
         view_page.locator("#btn-det-open").click()
         det = view_page.locator("#det1")
         expect(det).to_contain_text("Hidden content")
 
+    @pytest.mark.spec("V13.18")
     def test_opened_change_listener(self, view_page: Page):
         # The opened-change listener fires via client mSync, not programmatic set_opened.
         # The details was opened programmatically in test_open_programmatic (no listener fire).
@@ -94,6 +107,7 @@ class TestDetails:
         det.locator("vaadin-details-summary").click()
         expect(view_page.locator("#det-val")).to_have_text("True")
 
+    @pytest.mark.spec("V13.19")
     def test_set_summary_text(self, view_page: Page):
         # set_summary_text updates server-side state; the initial summary is rendered correctly
         det_sum = view_page.locator("#det-sum")
@@ -107,6 +121,7 @@ class TestDetails:
 
 
 class TestNavigation:
+    @pytest.mark.spec("V13.20")
     def test_nav_to_next(self, view_page: Page):
         view_page.locator("#nav-next").click()
         expect(view_page).to_have_url(re.compile(r".*/test/menu"), timeout=5000)

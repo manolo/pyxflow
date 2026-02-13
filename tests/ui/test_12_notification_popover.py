@@ -17,23 +17,27 @@ def view_page(browser, base_url):
 
 
 class TestNotification:
+    @pytest.mark.spec("V12.01")
     def test_show_static(self, view_page: Page):
         view_page.locator("#btn-notif-show").click()
         notif = view_page.locator("vaadin-notification-card").filter(has_text="Saved!")
         expect(notif).to_be_visible(timeout=5000)
 
+    @pytest.mark.spec("V12.03")
     def test_show_position(self, view_page: Page):
         view_page.wait_for_timeout(3500)  # Wait for previous notification to auto-close
         view_page.locator("#btn-notif-pos").click()
         notif = view_page.locator("vaadin-notification-card").filter(has_text="Top center!")
         expect(notif).to_be_visible(timeout=5000)
 
+    @pytest.mark.spec("V12.05")
     def test_success_theme(self, view_page: Page):
         view_page.wait_for_timeout(3500)  # Wait for previous notification to auto-close
         view_page.locator("#btn-notif-theme").click()
         notif = view_page.locator("vaadin-notification-card").filter(has_text="Success!")
         expect(notif).to_be_visible(timeout=5000)
 
+    @pytest.mark.spec("V12.06")
     def test_close_programmatic(self, view_page: Page):
         view_page.wait_for_timeout(3500)  # Wait for previous notification to auto-close
         view_page.locator("#btn-notif-open").click()
@@ -42,6 +46,7 @@ class TestNotification:
         view_page.locator("#btn-notif-close").click()
         expect(notif).to_be_hidden(timeout=5000)
 
+    @pytest.mark.spec("V12.07")
     def test_close_listener(self, view_page: Page):
         view_page.locator("#btn-notif-cls").click()
         # Wait for the 1000ms duration to expire and close listener to fire
@@ -49,6 +54,7 @@ class TestNotification:
 
 
 class TestPopover:
+    @pytest.mark.spec("V12.09")
     def test_popover_renders(self, view_page: Page):
         """Verify popover components are in the DOM (overlays need deeper implementation work)."""
         expect(view_page.locator("#pop-target")).to_be_visible()
@@ -58,6 +64,7 @@ class TestPopover:
 
 
 class TestNavigation:
+    @pytest.mark.spec("V12.17")
     def test_nav_to_next(self, view_page: Page):
         view_page.locator("#nav-next").click()
         expect(view_page).to_have_url(

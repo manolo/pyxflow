@@ -17,21 +17,25 @@ def view_page(browser, base_url):
 
 
 class TestVerticalLayout:
+    @pytest.mark.spec("V15.01")
     def test_renders_children(self, view_page: Page):
         vl = view_page.locator("#vl1")
         expect(vl).to_contain_text("A")
         expect(vl).to_contain_text("B")
         expect(vl).to_contain_text("C")
 
+    @pytest.mark.spec("V15.04")
     def test_expand(self, view_page: Page):
         child = view_page.locator("#child-expand")
         expect(child).to_be_visible()
 
+    @pytest.mark.spec("V15.07")
     def test_add_dynamically(self, view_page: Page):
         view_page.locator("#btn-add-span").click()
         vl = view_page.locator("#vl-dyn")
         expect(vl).to_contain_text("New")
 
+    @pytest.mark.spec("V15.08")
     def test_replace(self, view_page: Page):
         view_page.locator("#btn-replace").click()
         vl = view_page.locator("#vl-replace")
@@ -39,32 +43,38 @@ class TestVerticalLayout:
 
 
 class TestHorizontalLayout:
+    @pytest.mark.spec("V15.09")
     def test_renders_children(self, view_page: Page):
         hl = view_page.locator("#hl1")
         expect(hl).to_contain_text("L")
         expect(hl).to_contain_text("R")
 
+    @pytest.mark.spec("V15.10")
     def test_expand(self, view_page: Page):
         expect(view_page.locator("#hl-child")).to_be_visible()
 
 
 class TestFlexLayout:
+    @pytest.mark.spec("V15.13")
     def test_column_direction(self, view_page: Page):
         fl = view_page.locator("#fl1")
         expect(fl).to_be_visible()
 
+    @pytest.mark.spec("V15.14")
     def test_wrap(self, view_page: Page):
         fl = view_page.locator("#fl-wrap")
         expect(fl).to_be_visible()
 
 
 class TestFormLayout:
+    @pytest.mark.spec("V15.16")
     def test_renders_fields(self, view_page: Page):
         form = view_page.locator("#form1")
         expect(form.locator("vaadin-text-field")).to_have_count(4)
 
 
 class TestSplitLayout:
+    @pytest.mark.spec("V15.18")
     def test_renders_panels(self, view_page: Page):
         split = view_page.locator("#split1")
         expect(split).to_contain_text("Primary")
@@ -72,6 +82,7 @@ class TestSplitLayout:
 
 
 class TestNavigation:
+    @pytest.mark.spec("V15.21")
     def test_nav_to_next(self, view_page: Page):
         view_page.locator("#nav-next").click()
         expect(view_page).to_have_url(re.compile(r".*/test/card-scroller"), timeout=5000)

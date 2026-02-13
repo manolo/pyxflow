@@ -15,10 +15,12 @@ def view_page(browser, base_url):
 
 
 class TestLoginForm:
+    @pytest.mark.spec("V29.01")
     def test_renders(self, view_page: Page):
         lf = view_page.locator("#lf1")
         expect(lf).to_be_visible()
 
+    @pytest.mark.spec("V29.02")
     def test_submit(self, view_page: Page):
         lf = view_page.locator("#lf1")
         # Type into username/password fields inside login form
@@ -31,15 +33,18 @@ class TestLoginForm:
 
 
 class TestLoginOverlay:
+    @pytest.mark.spec("V29.06")
     def test_open(self, view_page: Page):
         view_page.locator("#btn-lo").click()
         overlay = view_page.locator("vaadin-login-overlay-wrapper")
         expect(overlay).to_be_visible()
 
+    @pytest.mark.spec("V29.07")
     def test_title(self, view_page: Page):
         lo = view_page.locator("#lo1")
         expect(lo).to_have_js_property("title", "Test App")
 
+    @pytest.mark.spec("V29.10")
     def test_close(self, view_page: Page):
         # Dismiss the modal overlay first with Escape, then close programmatically
         view_page.keyboard.press("Escape")
@@ -49,5 +54,6 @@ class TestLoginOverlay:
 
 
 class TestAllDone:
+    @pytest.mark.spec("V29.11")
     def test_all_views_visited(self, view_page: Page):
         expect(view_page.locator("#all-done")).to_have_text("All UI test views visited")

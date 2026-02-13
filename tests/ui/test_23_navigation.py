@@ -17,15 +17,18 @@ def view_page(browser, base_url):
 
 
 class TestRouting:
+    @pytest.mark.spec("V23.01")
     def test_view_renders(self, view_page: Page):
         expect(view_page.locator("#nav-title")).to_have_text("Navigation view")
 
+    @pytest.mark.spec("V23.04")
     def test_page_title(self, view_page: Page):
         title = view_page.evaluate("() => document.title")
         assert "Navigation" in title
 
 
 class TestRouteParam:
+    @pytest.mark.spec("V23.02")
     def test_param_route(self, view_page: Page):
         view_page.locator("#link-param").click()
         expect(view_page).to_have_url(re.compile(r".*/test/nav-param/42"), timeout=5000)
@@ -35,6 +38,7 @@ class TestRouteParam:
 
 
 class TestOptionalParam:
+    @pytest.mark.spec("V23.03")
     def test_opt_param_empty(self, view_page: Page):
         view_page.locator("#link-opt").click()
         expect(view_page).to_have_url(re.compile(r".*/test/nav-opt$"), timeout=5000)
@@ -42,6 +46,7 @@ class TestOptionalParam:
         view_page.locator("#nav-back").click()
         expect(view_page).to_have_url(re.compile(r".*/test/navigation"), timeout=5000)
 
+    @pytest.mark.spec("V23.03")
     def test_opt_param_value(self, view_page: Page):
         view_page.locator("#link-opt-val").click()
         expect(view_page).to_have_url(re.compile(r".*/test/nav-opt/search"), timeout=5000)
@@ -51,6 +56,7 @@ class TestOptionalParam:
 
 
 class TestNavigation:
+    @pytest.mark.spec("V23.14")
     def test_nav_to_next(self, view_page: Page):
         view_page.locator("#nav-next").click()
         expect(view_page).to_have_url(re.compile(r".*/test/push"), timeout=5000)

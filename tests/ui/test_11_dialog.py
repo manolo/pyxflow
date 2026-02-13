@@ -25,6 +25,7 @@ def _close_dialog(page: Page, dialog_id: str):
 
 
 class TestDialog:
+    @pytest.mark.spec("V11.01")
     def test_open_close(self, view_page: Page):
         view_page.locator("#btn-open").click()
         dlg = view_page.locator("#dlg1")
@@ -33,6 +34,7 @@ class TestDialog:
         view_page.keyboard.press("Escape")
         view_page.wait_for_timeout(500)
 
+    @pytest.mark.spec("V11.02")
     def test_header_title(self, view_page: Page):
         _close_dialog(view_page, "dlg1")
         view_page.locator("#btn-title").click()
@@ -43,6 +45,7 @@ class TestDialog:
         view_page.keyboard.press("Escape")
         view_page.wait_for_timeout(500)
 
+    @pytest.mark.spec("V11.03")
     def test_header_footer(self, view_page: Page):
         _close_dialog(view_page, "dlg-title")
         view_page.locator("#btn-hf").click()
@@ -53,6 +56,7 @@ class TestDialog:
         view_page.locator("#dlg-hf vaadin-button").filter(has_text="Close").click()
         view_page.wait_for_timeout(500)
 
+    @pytest.mark.spec("V11.05")
     def test_draggable(self, view_page: Page):
         _close_dialog(view_page, "dlg-hf")
         view_page.locator("#btn-drag").click()
@@ -61,6 +65,7 @@ class TestDialog:
         view_page.keyboard.press("Escape")
         view_page.wait_for_timeout(500)
 
+    @pytest.mark.spec("V11.06")
     def test_resizable(self, view_page: Page):
         _close_dialog(view_page, "dlg-drag")
         view_page.locator("#btn-resize").click()
@@ -69,6 +74,7 @@ class TestDialog:
         view_page.keyboard.press("Escape")
         view_page.wait_for_timeout(500)
 
+    @pytest.mark.spec("V11.11")
     def test_close_listener(self, view_page: Page):
         _close_dialog(view_page, "dlg-resize")
         view_page.locator("#btn-cls").click()
@@ -79,6 +85,7 @@ class TestDialog:
 
 
 class TestConfirmDialog:
+    @pytest.mark.spec("V11.13")
     def test_confirm(self, view_page: Page):
         view_page.locator("#btn-cd").click()
         dlg = view_page.locator("#cd1[opened]")
@@ -87,6 +94,7 @@ class TestConfirmDialog:
         dlg.locator("vaadin-button").filter(has_text="Yes").click()
         expect(view_page.locator("#cd-result")).to_have_text("confirmed", timeout=3000)
 
+    @pytest.mark.spec("V11.14")
     def test_cancel(self, view_page: Page):
         view_page.locator("#btn-cd-cancel").click()
         dlg = view_page.locator("#cd-cancel[opened]")
@@ -94,6 +102,7 @@ class TestConfirmDialog:
         dlg.locator("vaadin-button").filter(has_text="No").click()
         expect(view_page.locator("#cd-cancel-result")).to_have_text("cancelled", timeout=3000)
 
+    @pytest.mark.spec("V11.15")
     def test_reject(self, view_page: Page):
         view_page.locator("#btn-cd-reject").click()
         dlg = view_page.locator("#cd-reject[opened]")
@@ -101,6 +110,7 @@ class TestConfirmDialog:
         dlg.locator("vaadin-button").filter(has_text="Never").click()
         expect(view_page.locator("#cd-reject-result")).to_have_text("rejected", timeout=3000)
 
+    @pytest.mark.spec("V11.17")
     def test_reopen(self, view_page: Page):
         view_page.locator("#btn-cd-reopen").click()
         dlg = view_page.locator("#cd-reopen[opened]")
@@ -116,6 +126,7 @@ class TestConfirmDialog:
 
 
 class TestNavigation:
+    @pytest.mark.spec("V11.18")
     def test_nav_to_next(self, view_page: Page):
         for _ in range(3):
             view_page.keyboard.press("Escape")

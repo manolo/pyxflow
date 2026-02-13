@@ -24,12 +24,14 @@ def _close_overlays(page: Page):
 
 
 class TestMenuBar:
+    @pytest.mark.spec("V14.01")
     def test_renders_items(self, view_page: Page):
         mb = view_page.locator("#mb1")
         expect(mb).to_be_visible()
         expect(mb).to_contain_text("File")
         expect(mb).to_contain_text("Edit")
 
+    @pytest.mark.spec("V14.02")
     def test_click_top_item(self, view_page: Page):
         _close_overlays(view_page)
         # Click the File button to open its submenu
@@ -42,6 +44,7 @@ class TestMenuBar:
         view_page.keyboard.press("Escape")
         view_page.wait_for_timeout(300)
 
+    @pytest.mark.spec("V14.03")
     def test_click_sub_item(self, view_page: Page):
         _close_overlays(view_page)
         # Open the File submenu
@@ -53,12 +56,14 @@ class TestMenuBar:
         new_item.click()
         expect(view_page.locator("#mb-result")).to_have_text("New", timeout=3000)
 
+    @pytest.mark.spec("V14.07")
     def test_open_on_hover(self, view_page: Page):
         _close_overlays(view_page)
         expect(view_page.locator("#mb-hover")).to_have_js_property("openOnHover", True)
 
 
 class TestContextMenu:
+    @pytest.mark.spec("V14.08")
     def test_right_click_opens(self, view_page: Page):
         _close_overlays(view_page)
         view_page.locator("#ctx-target").click(button="right")
@@ -71,6 +76,7 @@ class TestContextMenu:
         view_page.keyboard.press("Escape")
         view_page.wait_for_timeout(300)
 
+    @pytest.mark.spec("V14.09")
     def test_click_item(self, view_page: Page):
         _close_overlays(view_page)
         # Open context menu on the target
@@ -81,6 +87,7 @@ class TestContextMenu:
         copy_item.click()
         expect(view_page.locator("#ctx-result")).to_have_text("Copy", timeout=3000)
 
+    @pytest.mark.spec("V14.10")
     @pytest.mark.skip(reason="ContextMenu openOnClick not working — needs investigation")
     def test_open_on_click(self, view_page: Page):
         _close_overlays(view_page)
@@ -92,6 +99,7 @@ class TestContextMenu:
 
 
 class TestNavigation:
+    @pytest.mark.spec("V14.14")
     def test_nav_to_next(self, view_page: Page):
         _close_overlays(view_page)
         # Use evaluate to bypass any remaining overlays that might intercept the click
