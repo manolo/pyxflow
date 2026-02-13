@@ -21,36 +21,33 @@ class TestNotification:
     def test_show_static(self, view_page: Page):
         view_page.locator("#btn-notif-show").click()
         notif = view_page.locator("vaadin-notification-card").filter(has_text="Saved!")
-        expect(notif).to_be_visible(timeout=5000)
+        expect(notif).to_be_visible(timeout=1500)
 
     @pytest.mark.spec("V12.03")
     def test_show_position(self, view_page: Page):
-        view_page.wait_for_timeout(3500)  # Wait for previous notification to auto-close
         view_page.locator("#btn-notif-pos").click()
         notif = view_page.locator("vaadin-notification-card").filter(has_text="Top center!")
-        expect(notif).to_be_visible(timeout=5000)
+        expect(notif).to_be_visible(timeout=1500)
 
     @pytest.mark.spec("V12.05")
     def test_success_theme(self, view_page: Page):
-        view_page.wait_for_timeout(3500)  # Wait for previous notification to auto-close
         view_page.locator("#btn-notif-theme").click()
         notif = view_page.locator("vaadin-notification-card").filter(has_text="Success!")
-        expect(notif).to_be_visible(timeout=5000)
+        expect(notif).to_be_visible(timeout=1500)
 
     @pytest.mark.spec("V12.06")
     def test_close_programmatic(self, view_page: Page):
-        view_page.wait_for_timeout(3500)  # Wait for previous notification to auto-close
         view_page.locator("#btn-notif-open").click()
         notif = view_page.locator("vaadin-notification-card").filter(has_text="Permanent")
-        expect(notif).to_be_visible(timeout=5000)
+        expect(notif).to_be_visible(timeout=1500)
         view_page.locator("#btn-notif-close").click()
-        expect(notif).to_be_hidden(timeout=5000)
+        expect(notif).to_be_hidden(timeout=1500)
 
     @pytest.mark.spec("V12.07")
     def test_close_listener(self, view_page: Page):
         view_page.locator("#btn-notif-cls").click()
         # Wait for the 1000ms duration to expire and close listener to fire
-        expect(view_page.locator("#notif-closed")).to_have_text("closed", timeout=5000)
+        expect(view_page.locator("#notif-closed")).to_have_text("closed", timeout=1500)
 
 
 class TestPopover:
@@ -68,5 +65,5 @@ class TestNavigation:
     def test_nav_to_next(self, view_page: Page):
         view_page.locator("#nav-next").click()
         expect(view_page).to_have_url(
-            re.compile(r".*/test/tabs-accordion"), timeout=5000
+            re.compile(r".*/test/tabs-accordion"), timeout=1500
         )

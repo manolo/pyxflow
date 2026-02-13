@@ -26,7 +26,7 @@ def _type_in_field(page: Page, selector: str, text: str):
         page.keyboard.type(text)
     page.keyboard.press("Tab")
     # Allow mSync round-trip to propagate the value to the server
-    page.wait_for_timeout(1000)
+    page.wait_for_timeout(70)
 
 
 class TestReadBean:

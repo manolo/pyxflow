@@ -115,7 +115,6 @@ class TestDetails:
         expect(det_sum.locator("vaadin-details-summary")).to_contain_text("Old summary")
         # Verify clicking the button does not cause errors (server processes the request)
         view_page.locator("#btn-det-sum").click()
-        view_page.wait_for_timeout(500)
         # The details component body content is still accessible
         expect(det_sum).to_contain_text("Body")
 

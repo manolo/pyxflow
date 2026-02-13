@@ -22,7 +22,7 @@ class TestPushView(VerticalLayout):
                 ui = self.get_ui()
                 if ui is None:
                     return
-                await asyncio.sleep(0.5)
+                await asyncio.sleep(0.05)
                 ui.access(lambda: push_result.set_text("done"))
 
             asyncio.create_task(_bg())
@@ -41,7 +41,7 @@ class TestPushView(VerticalLayout):
                 if ui is None:
                     return
                 for i in range(1, 4):
-                    await asyncio.sleep(0.3)
+                    await asyncio.sleep(0.05)
                     ui.access(lambda n=i: push_count.set_text(str(n)))
 
             asyncio.create_task(_bg())
@@ -61,7 +61,7 @@ class TestPushView(VerticalLayout):
                 if ui is None:
                     return
                 for step in range(1, 6):
-                    await asyncio.sleep(0.2)
+                    await asyncio.sleep(0.05)
                     ui.access(lambda v=step / 5: pb.set_value(v))
 
             asyncio.create_task(_bg())

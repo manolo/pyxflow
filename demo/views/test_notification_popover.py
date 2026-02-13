@@ -14,7 +14,7 @@ class TestNotificationPopoverView(VerticalLayout):
         btn_show = Button("Show notification")
         btn_show.set_id("btn-notif-show")
         btn_show.add_click_listener(
-            lambda e: Notification.show("Saved!", 3000)
+            lambda e: Notification.show("Saved!", 1000)
         )
 
         # --- Notification with position ---
@@ -22,7 +22,7 @@ class TestNotificationPopoverView(VerticalLayout):
         btn_pos.set_id("btn-notif-pos")
         btn_pos.add_click_listener(
             lambda e: Notification.show(
-                "Top center!", 3000, position=Notification.Position.TOP_CENTER
+                "Top center!", 1000, position=Notification.Position.TOP_CENTER
             )
         )
 
@@ -31,7 +31,7 @@ class TestNotificationPopoverView(VerticalLayout):
         btn_theme.set_id("btn-notif-theme")
 
         def _show_success(e):
-            n = Notification("Success!", 3000)
+            n = Notification("Success!", 1000)
             n.add_theme_variants(NotificationVariant.LUMO_SUCCESS)
             n.open()
 
@@ -50,7 +50,7 @@ class TestNotificationPopoverView(VerticalLayout):
         # --- Notification close listener ---
         notif_cls_val = Span("")
         notif_cls_val.set_id("notif-closed")
-        notif_cls = Notification("Will close", 1000)
+        notif_cls = Notification("Will close", 500)
         notif_cls.add_close_listener(lambda e: notif_cls_val.set_text("closed"))
         btn_notif_cls = Button("Open with close listener")
         btn_notif_cls.set_id("btn-notif-cls")
