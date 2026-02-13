@@ -4,6 +4,7 @@ from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
+from vaadin.flow.components.constants import MasterDetailLayoutVariant as MasterDetailLayoutVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -275,3 +276,11 @@ class MasterDetailLayout(Component):
             if not hasattr(self, "_pending_escape_listeners"):
                 self._pending_escape_listeners: list[Callable] = []
             self._pending_escape_listeners.append(listener)
+
+    def add_theme_variants(self, *variants: MasterDetailLayoutVariant):
+        """Add theme variants to the master detail layout."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: MasterDetailLayoutVariant):
+        """Remove theme variants from the master detail layout."""
+        self.remove_theme_name(*variants)

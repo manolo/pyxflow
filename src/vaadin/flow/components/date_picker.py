@@ -6,6 +6,7 @@ from typing import Callable, Optional
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
+from vaadin.flow.components.constants import DatePickerVariant as DatePickerVariant
 
 
 class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):
@@ -148,6 +149,14 @@ class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):
 
     def get_i18n(self) -> dict | None:
         return getattr(self, "_i18n", None)
+
+    def add_theme_variants(self, *variants: DatePickerVariant):
+        """Add theme variants to the date picker."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: DatePickerVariant):
+        """Remove theme variants from the date picker."""
+        self.remove_theme_name(*variants)
 
     def _sync_property(self, name: str, value):
         if name == "value":

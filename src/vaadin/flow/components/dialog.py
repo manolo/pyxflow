@@ -4,6 +4,7 @@ from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
+from vaadin.flow.components.constants import DialogVariant as DialogVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -330,6 +331,14 @@ class Dialog(Component):
         """Set the dialog left position (e.g., '100px')."""
         if self._element:
             self.element.get_style().set("--vaadin-dialog-overlay-offset-left", left)
+
+    def add_theme_variants(self, *variants: DialogVariant):
+        """Add theme variants to the dialog."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: DialogVariant):
+        """Remove theme variants from the dialog."""
+        self.remove_theme_name(*variants)
 
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""

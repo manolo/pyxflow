@@ -1,53 +1,9 @@
 """FlexLayout component — a div with display:flex and full Flexbox API."""
 
-from enum import Enum
-
 from vaadin.flow.core.component import Component
-
-
-class FlexDirection(Enum):
-    """Flex direction values (flex-direction CSS property)."""
-    ROW = "row"
-    ROW_REVERSE = "row-reverse"
-    COLUMN = "column"
-    COLUMN_REVERSE = "column-reverse"
-
-
-class FlexWrap(Enum):
-    """Flex wrap values (flex-wrap CSS property)."""
-    NOWRAP = "nowrap"
-    WRAP = "wrap"
-    WRAP_REVERSE = "wrap-reverse"
-
-
-class JustifyContentMode(Enum):
-    """Justify content values (justify-content CSS property)."""
-    START = "flex-start"
-    END = "flex-end"
-    CENTER = "center"
-    BETWEEN = "space-between"
-    AROUND = "space-around"
-    EVENLY = "space-evenly"
-
-
-class ContentAlignment(Enum):
-    """Content alignment values (align-content CSS property)."""
-    START = "flex-start"
-    END = "flex-end"
-    CENTER = "center"
-    STRETCH = "stretch"
-    SPACE_BETWEEN = "space-between"
-    SPACE_AROUND = "space-around"
-
-
-class Alignment(Enum):
-    """Item alignment values (align-items / align-self CSS property)."""
-    START = "flex-start"
-    END = "flex-end"
-    CENTER = "center"
-    STRETCH = "stretch"
-    BASELINE = "baseline"
-    AUTO = "auto"
+from vaadin.flow.components.constants import (  # noqa: F401 — re-export
+    FlexDirection, FlexWrap, JustifyContentMode, ContentAlignment, Alignment,
+)
 
 
 class FlexLayout(Component):

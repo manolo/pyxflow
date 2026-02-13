@@ -6,6 +6,7 @@ from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
+from vaadin.flow.components.constants import NotificationVariant as NotificationVariant  # noqa: F401 — re-export
 from vaadin.flow.server.uidl_handler import _CLOSED_HASH, _OPENED_CHANGED_HASH
 
 if TYPE_CHECKING:
@@ -25,16 +26,6 @@ def _set_current_tree(tree: "StateTree | None"):
 def _get_current_tree() -> "StateTree | None":
     """Get the current tree context."""
     return getattr(_current_tree_local, "tree", None)
-
-
-class NotificationVariant(Enum):
-    """Theme variants for Notification."""
-
-    LUMO_PRIMARY = "primary"
-    LUMO_CONTRAST = "contrast"
-    LUMO_SUCCESS = "success"
-    LUMO_ERROR = "error"
-    LUMO_WARNING = "warning"
 
 
 class Notification(Component):

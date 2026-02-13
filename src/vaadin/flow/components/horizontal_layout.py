@@ -1,27 +1,9 @@
 """HorizontalLayout component."""
 
-from enum import Enum
-
 from vaadin.flow.core.component import Component
-
-
-class Alignment(Enum):
-    """Alignment options."""
-    START = "flex-start"
-    END = "flex-end"
-    CENTER = "center"
-    STRETCH = "stretch"
-    BASELINE = "baseline"
-
-
-class JustifyContentMode(Enum):
-    """Justify content mode options."""
-    START = "flex-start"
-    END = "flex-end"
-    CENTER = "center"
-    BETWEEN = "space-between"
-    AROUND = "space-around"
-    EVENLY = "space-evenly"
+from vaadin.flow.components.constants import (  # noqa: F401 — re-export
+    Alignment, JustifyContentMode, HorizontalLayoutVariant as HorizontalLayoutVariant,
+)
 
 
 class HorizontalLayout(Component):
@@ -201,3 +183,11 @@ class HorizontalLayout(Component):
         if self._spacing:
             themes.append("spacing")
         self.element.set_attribute("theme", " ".join(themes))
+
+    def add_theme_variants(self, *variants: HorizontalLayoutVariant):
+        """Add theme variants to the horizontal layout."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: HorizontalLayoutVariant):
+        """Remove theme variants from the horizontal layout."""
+        self.remove_theme_name(*variants)

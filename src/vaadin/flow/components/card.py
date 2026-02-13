@@ -3,6 +3,7 @@
 from typing import TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.constants import CardVariant as CardVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -177,3 +178,11 @@ class Card(Component):
             self._footer_children.append(comp)
             if self._element:
                 self._attach_slotted(comp, "footer", self._element._tree)
+
+    def add_theme_variants(self, *variants: CardVariant):
+        """Add theme variants to the card."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: CardVariant):
+        """Remove theme variants from the card."""
+        self.remove_theme_name(*variants)

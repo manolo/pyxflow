@@ -5,6 +5,7 @@ from typing import Callable, Generic, TypeVar, Optional, Set, TYPE_CHECKING
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 from vaadin.flow.core.state_node import Feature
+from vaadin.flow.components.constants import MultiSelectComboBoxVariant as MultiSelectComboBoxVariant
 from vaadin.flow.data.provider import DataProvider, Query
 
 if TYPE_CHECKING:
@@ -285,6 +286,14 @@ class MultiSelectComboBox(HasReadOnly, HasValidation, HasRequired, Component, Ge
     def set_allow_custom_value(self, allow: bool):
         if self._element:
             self.element.set_property("allowCustomValue", allow)
+
+    def add_theme_variants(self, *variants: MultiSelectComboBoxVariant):
+        """Add theme variants to the multi-select combo box."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: MultiSelectComboBoxVariant):
+        """Remove theme variants from the multi-select combo box."""
+        self.remove_theme_name(*variants)
 
     def _sync_property(self, name: str, value):
         if name == "selectedItems":

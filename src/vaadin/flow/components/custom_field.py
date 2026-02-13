@@ -4,6 +4,7 @@ from typing import Callable, Optional, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
+from vaadin.flow.components.constants import CustomFieldVariant as CustomFieldVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -104,6 +105,14 @@ class CustomField(HasReadOnly, HasValidation, HasRequired, Component):
         self._value = value
         for listener in self._change_listeners:
             listener({"value": value})
+
+    def add_theme_variants(self, *variants: CustomFieldVariant):
+        """Add theme variants to the custom field."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: CustomFieldVariant):
+        """Remove theme variants from the custom field."""
+        self.remove_theme_name(*variants)
 
     def _sync_property(self, name: str, value):
         if name == "value":

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.element import Element
 from vaadin.flow.core.state_node import Feature
+from vaadin.flow.components.constants import SideNavVariant as SideNavVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -215,3 +216,11 @@ class SideNav(Component):
         """Remove all navigation items."""
         for item in list(self._items):
             self.remove(item)
+
+    def add_theme_variants(self, *variants: SideNavVariant):
+        """Add theme variants to the side nav."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: SideNavVariant):
+        """Remove theme variants from the side nav."""
+        self.remove_theme_name(*variants)

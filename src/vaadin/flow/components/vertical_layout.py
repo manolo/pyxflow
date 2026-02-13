@@ -2,6 +2,7 @@
 
 from vaadin.flow.components.horizontal_layout import Alignment, JustifyContentMode
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.constants import VerticalLayoutVariant as VerticalLayoutVariant
 
 
 class VerticalLayout(Component):
@@ -179,3 +180,11 @@ class VerticalLayout(Component):
         if self._spacing:
             themes.append("spacing")
         self.element.set_attribute("theme", " ".join(themes))
+
+    def add_theme_variants(self, *variants: VerticalLayoutVariant):
+        """Add theme variants to the vertical layout."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: VerticalLayoutVariant):
+        """Remove theme variants from the vertical layout."""
+        self.remove_theme_name(*variants)

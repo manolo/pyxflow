@@ -4,7 +4,7 @@ from typing import Callable
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
-from vaadin.flow.components.value_change_mode import ValueChangeMode
+from vaadin.flow.components.constants import ValueChangeMode, TextAreaVariant as TextAreaVariant
 
 
 class TextArea(HasReadOnly, HasValidation, HasRequired, Component):
@@ -177,6 +177,14 @@ class TextArea(HasReadOnly, HasValidation, HasRequired, Component):
         elif self._value_change_mode == ValueChangeMode.ON_BLUR:
             return "blur"
         return "change"
+
+    def add_theme_variants(self, *variants: TextAreaVariant):
+        """Add theme variants to the text area."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: TextAreaVariant):
+        """Remove theme variants from the text area."""
+        self.remove_theme_name(*variants)
 
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""

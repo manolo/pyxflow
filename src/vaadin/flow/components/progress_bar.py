@@ -1,6 +1,7 @@
 """ProgressBar component."""
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.constants import ProgressBarVariant as ProgressBarVariant
 
 
 class ProgressBar(Component):
@@ -71,3 +72,11 @@ class ProgressBar(Component):
         self._indeterminate = indeterminate
         if self._element:
             self.element.set_property("indeterminate", indeterminate)
+
+    def add_theme_variants(self, *variants: ProgressBarVariant):
+        """Add theme variants to the progress bar."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: ProgressBarVariant):
+        """Remove theme variants from the progress bar."""
+        self.remove_theme_name(*variants)

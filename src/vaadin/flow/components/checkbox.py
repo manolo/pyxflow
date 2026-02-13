@@ -4,6 +4,7 @@ from typing import Callable
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.mixins import HasReadOnly, HasRequired
+from vaadin.flow.components.constants import CheckboxVariant as CheckboxVariant
 
 
 class Checkbox(HasReadOnly, HasRequired, Component):
@@ -97,6 +98,14 @@ class Checkbox(HasReadOnly, HasRequired, Component):
         self._indeterminate = False  # User interaction clears indeterminate
         for listener in self._change_listeners:
             listener({"value": self._checked, "from_client": True})
+
+    def add_theme_variants(self, *variants: CheckboxVariant):
+        """Add theme variants to the checkbox."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: CheckboxVariant):
+        """Remove theme variants from the checkbox."""
+        self.remove_theme_name(*variants)
 
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""

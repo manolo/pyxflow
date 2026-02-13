@@ -3,6 +3,7 @@
 from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.constants import DialogVariant as DialogVariant
 from vaadin.flow.server.uidl_handler import _CLOSED_HASH
 
 if TYPE_CHECKING:
@@ -229,6 +230,14 @@ class ConfirmDialog(Component):
             self.element.set_property("opened", False)
         for listener in self._reject_listeners:
             listener(event_data)
+
+    def add_theme_variants(self, *variants: DialogVariant):
+        """Add theme variants to the confirm dialog."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: DialogVariant):
+        """Remove theme variants from the confirm dialog."""
+        self.remove_theme_name(*variants)
 
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""

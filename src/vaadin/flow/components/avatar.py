@@ -3,6 +3,7 @@
 from typing import TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.constants import AvatarVariant as AvatarVariant, AvatarGroupVariant as AvatarGroupVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -72,6 +73,14 @@ class Avatar(Component):
 
     def get_color_index(self) -> int | None:
         return self._color_index
+
+    def add_theme_variants(self, *variants: AvatarVariant):
+        """Add theme variants to the avatar."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: AvatarVariant):
+        """Remove theme variants from the avatar."""
+        self.remove_theme_name(*variants)
 
 
 class AvatarGroupItem:
@@ -147,3 +156,11 @@ class AvatarGroup(Component):
 
     def get_max_items_visible(self) -> int | None:
         return self._max_items_visible
+
+    def add_theme_variants(self, *variants: AvatarGroupVariant):
+        """Add theme variants to the avatar group."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: AvatarGroupVariant):
+        """Remove theme variants from the avatar group."""
+        self.remove_theme_name(*variants)

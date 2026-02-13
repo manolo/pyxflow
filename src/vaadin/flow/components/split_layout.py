@@ -1,17 +1,12 @@
 """SplitLayout component."""
 
-from enum import Enum
 from typing import TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.constants import Orientation, SplitLayoutVariant as SplitLayoutVariant  # noqa: F401 — re-export
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
-
-
-class Orientation(Enum):
-    HORIZONTAL = "horizontal"
-    VERTICAL = "vertical"
 
 
 class SplitLayout(Component):
@@ -176,3 +171,11 @@ class SplitLayout(Component):
             self.element.remove_child(self._secondary.element)
         self._primary = None
         self._secondary = None
+
+    def add_theme_variants(self, *variants: SplitLayoutVariant):
+        """Add theme variants to the split layout."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: SplitLayoutVariant):
+        """Remove theme variants from the split layout."""
+        self.remove_theme_name(*variants)

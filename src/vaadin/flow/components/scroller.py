@@ -1,19 +1,12 @@
 """Scroller component."""
 
-from enum import Enum
 from typing import TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.constants import ScrollDirection, ScrollerVariant as ScrollerVariant  # noqa: F401 — re-export
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
-
-
-class ScrollDirection(str, Enum):
-    VERTICAL = "vertical"
-    HORIZONTAL = "horizontal"
-    BOTH = "both"
-    NONE = "none"
 
 
 class Scroller(Component):
@@ -88,3 +81,11 @@ class Scroller(Component):
 
     def get_scroll_direction(self) -> ScrollDirection:
         return self._scroll_direction
+
+    def add_theme_variants(self, *variants: ScrollerVariant):
+        """Add theme variants to the scroller."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: ScrollerVariant):
+        """Remove theme variants from the scroller."""
+        self.remove_theme_name(*variants)

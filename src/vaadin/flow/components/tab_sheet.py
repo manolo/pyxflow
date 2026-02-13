@@ -5,6 +5,7 @@ from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.tabs import Tab, Tabs
+from vaadin.flow.components.constants import TabSheetVariant as TabSheetVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -136,6 +137,14 @@ class TabSheet(Component):
     def get_component(self, tab: Tab) -> Component | None:
         """Get the content component associated with a tab."""
         return self._tab_to_content.get(tab)
+
+    def add_theme_variants(self, *variants: TabSheetVariant):
+        """Add theme variants to the tab sheet."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: TabSheetVariant):
+        """Remove theme variants from the tab sheet."""
+        self.remove_theme_name(*variants)
 
     def _on_tab_selected(self, event_data: dict):
         """Forward selection events to listeners."""

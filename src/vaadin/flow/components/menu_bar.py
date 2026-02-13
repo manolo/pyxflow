@@ -4,6 +4,7 @@ from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
+from vaadin.flow.components.constants import MenuBarVariant as MenuBarVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -246,6 +247,14 @@ class MenuBar(Component):
     def remove_all(self):
         """Remove all root-level menu items."""
         self._items.clear()
+
+    def add_theme_variants(self, *variants: MenuBarVariant):
+        """Add theme variants to the menu bar."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: MenuBarVariant):
+        """Remove theme variants from the menu bar."""
+        self.remove_theme_name(*variants)
 
 
 class _ItemElement:

@@ -5,6 +5,7 @@ from typing import Callable, Generic, TypeVar, Optional, TYPE_CHECKING
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
 from vaadin.flow.core.state_node import Feature
+from vaadin.flow.components.constants import ComboBoxVariant as ComboBoxVariant
 from vaadin.flow.data.provider import DataProvider, Query
 
 if TYPE_CHECKING:
@@ -296,6 +297,14 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
         """Set the overlay width (e.g. '300px')."""
         if self._element:
             self.element.set_property("overlayWidth", width)
+
+    def add_theme_variants(self, *variants: ComboBoxVariant):
+        """Add theme variants to the combo box."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: ComboBoxVariant):
+        """Remove theme variants from the combo box."""
+        self.remove_theme_name(*variants)
 
     def _sync_property(self, name: str, value):
         if name == "value":

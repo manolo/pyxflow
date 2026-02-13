@@ -4,6 +4,7 @@ from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
+from vaadin.flow.components.constants import ButtonVariant as ButtonVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.components.icon import Icon
@@ -132,6 +133,14 @@ class Button(Component):
     def click(self):
         """Trigger a click event programmatically (server-side)."""
         self._handle_click({})
+
+    def add_theme_variants(self, *variants: ButtonVariant):
+        """Add theme variants to the button."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: ButtonVariant):
+        """Remove theme variants from the button."""
+        self.remove_theme_name(*variants)
 
     def _handle_click(self, event_data: dict):
         """Handle click event."""

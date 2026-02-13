@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Callable
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
-from vaadin.flow.components.value_change_mode import ValueChangeMode
+from vaadin.flow.components.constants import ValueChangeMode, TextFieldVariant as TextFieldVariant, Autocomplete as Autocomplete
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -213,6 +213,24 @@ class TextField(HasReadOnly, HasValidation, HasRequired, Component):
         elif self._value_change_mode == ValueChangeMode.ON_BLUR:
             return "blur"
         return "change"
+
+    def set_autocomplete(self, autocomplete: "Autocomplete | str"):
+        """Set the autocomplete hint for the browser."""
+        self._autocomplete = autocomplete
+        if self._element:
+            self.element.set_attribute("autocomplete", autocomplete)
+
+    def get_autocomplete(self) -> str | None:
+        """Get the autocomplete hint."""
+        return getattr(self, "_autocomplete", None)
+
+    def add_theme_variants(self, *variants: TextFieldVariant):
+        """Add theme variants to the text field."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: TextFieldVariant):
+        """Remove theme variants from the text field."""
+        self.remove_theme_name(*variants)
 
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""

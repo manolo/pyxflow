@@ -4,6 +4,7 @@ from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
+from vaadin.flow.components.constants import TabsVariant as TabsVariant, TabVariant as TabVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -54,6 +55,14 @@ class Tab(Component):
         """Set flex-grow for this tab."""
         if self._element:
             self.element.get_style().set("flex-grow", str(flex_grow))
+
+    def add_theme_variants(self, *variants: TabVariant):
+        """Add theme variants to the tab."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: TabVariant):
+        """Remove theme variants from the tab."""
+        self.remove_theme_name(*variants)
 
 
 class Tabs(Component):
@@ -226,6 +235,14 @@ class Tabs(Component):
         The selected property should already be synced via mSync before this call.
         """
         self._update_tab_selection()
+
+    def add_theme_variants(self, *variants: TabsVariant):
+        """Add theme variants to the tabs."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: TabsVariant):
+        """Remove theme variants from the tabs."""
+        self.remove_theme_name(*variants)
 
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""

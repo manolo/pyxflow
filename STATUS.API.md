@@ -1,7 +1,7 @@
 # PyFlow API Inventory — Python vs Java Vaadin 25
 
-**Generated: 2026-02-12**
-**Python components: 49 | Tests: 2118 unit + 306 UI | LOC: ~16,000 (core)**
+**Generated: 2026-02-13**
+**Python components: 49 | Tests: 2145 unit + 307 UI | LOC: ~17,000 (core)**
 
 Legend: `[x]` = implemented, `[ ]` = missing
 
@@ -50,6 +50,19 @@ All components inherit from `Component` which provides:
 | `set_i18n` / `get_i18n` (per-component localization) | [x] 7 components (Upload, DatePicker, TimePicker, DateTimePicker, LoginForm, LoginOverlay, MessageInput) |
 | Constructor overloads with initial value + listener | [ ] |
 
+## Constants & Enums
+
+| Enum | Location | Status |
+|------|----------|--------|
+| 34 theme variant enums (ButtonVariant, GridVariant, etc.) | `constants.py`, re-exported from component files | [x] |
+| `ColumnTextAlign` (START, CENTER, END) | `constants.py` / `grid.py` | [x] |
+| `Autocomplete` (~50 HTML values) | `constants.py` / `text_field.py` | [x] |
+| `Key` (keyboard constants) | `core/keys.py`, re-exported from `core/` and `components/` | [x] |
+| Layout enums (FlexDirection, FlexWrap, JustifyContentMode, etc.) | `constants.py` / original files | [x] |
+| `ValueChangeMode` (EAGER, LAZY, TIMEOUT, ON_BLUR, ON_CHANGE) | `constants.py` | [x] |
+| `SortDirection`, `SelectionMode` | `constants.py` / `grid.py` | [x] |
+| `PopoverPosition`, `ScrollDirection`, `Orientation` | `constants.py` / component files | [x] |
+
 ---
 
 ## Layout Components
@@ -77,6 +90,7 @@ All components inherit from `Component` which provides:
 | `set_flex_grow` / `get_flex_grow` / `set_flex_shrink` | [x] |
 | `add_and_expand` / `replace` / `add_component_at_index` | [x] |
 | `set_wrap` / `is_wrap` / `set_box_sizing` | [x] |
+| `add_theme_variants` / `remove_theme_variants` (VerticalLayoutVariant) | [x] |
 
 ### HorizontalLayout
 | Feature | Status |
@@ -91,6 +105,7 @@ All components inherit from `Component` which provides:
 | `set_flex_grow` / `get_flex_grow` / `set_flex_shrink` | [x] |
 | `add_and_expand` / `add_to_start` / `add_to_middle` / `add_to_end` | [ ] (add_and_expand [x], add_to_* [ ]) |
 | `replace` / `add_component_at_index` / `set_box_sizing` / `set_wrap` / `is_wrap` | [x] |
+| `add_theme_variants` / `remove_theme_variants` (HorizontalLayoutVariant) | [x] |
 
 ### FlexLayout
 | Feature | Status |
@@ -124,6 +139,7 @@ All components inherit from `Component` which provides:
 | `set_primary_style` / `set_secondary_style` / `remove_all` | [x] |
 | `add_splitter_drag_end_listener` | [x] |
 | `remove(component)` | [x] |
+| `add_theme_variants` / `remove_theme_variants` (SplitLayoutVariant) | [x] |
 
 ### Scroller
 | Feature | Status |
@@ -131,6 +147,7 @@ All components inherit from `Component` which provides:
 | `add` / `set_content` / `get_content` | [x] |
 | `set_scroll_direction` / `get_scroll_direction` | [x] |
 | `remove_all` | [x] |
+| `add_theme_variants` / `remove_theme_variants` (ScrollerVariant) | [x] |
 
 ### Card
 | Feature | Status |
@@ -141,6 +158,7 @@ All components inherit from `Component` which provides:
 | `get_media` / `get_header` / `get_header_prefix` / `get_header_suffix` | [x] |
 | `remove` / `remove_all` | [x] |
 | `set_title_heading_level` | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (CardVariant) | [x] |
 
 ---
 
@@ -169,6 +187,8 @@ All components inherit from `Component` which provides:
 | `set_max_length` / `set_min_length` | [x] |
 | `set_suffix_component` | [x] |
 | `set_autoselect` | [x] |
+| `set_autocomplete` / `get_autocomplete` (Autocomplete enum) | [x] |
+| `add_theme_variants` / `remove_theme_variants` (TextFieldVariant) | [x] |
 
 ### TextArea
 | Feature | Status |
@@ -183,6 +203,7 @@ All components inherit from `Component` which provides:
 | `set_clear_button_visible` | [x] |
 | `set_prefix_component` / `set_suffix_component` | [x] |
 | `set_pattern` | [x] |
+| `add_theme_variants` / `remove_theme_variants` (TextAreaVariant) | [x] |
 
 ### EmailField
 | Feature | Status |
@@ -195,6 +216,7 @@ All components inherit from `Component` which provides:
 | `add_value_change_listener` | [x] |
 | `set_min_length` / `set_max_length` | [x] |
 | `set_prefix_component` / `set_suffix_component` | [x] |
+| `set_autocomplete` / `get_autocomplete` (Autocomplete enum) | [x] |
 
 ### PasswordField
 | Feature | Status |
@@ -208,6 +230,7 @@ All components inherit from `Component` which provides:
 | `set_clear_button_visible` | [x] |
 | `set_min_length` / `set_max_length` | [x] |
 | `set_pattern` / `set_prefix_component` | [x] |
+| `set_autocomplete` / `get_autocomplete` (Autocomplete enum) | [x] |
 
 ### NumberField / IntegerField
 | Feature | Status |
@@ -234,6 +257,7 @@ All components inherit from `Component` which provides:
 | `set_clear_button_visible` / `set_auto_open` | [x] |
 | `set_locale` / `set_week_numbers_visible` / `set_initial_position` | [ ] |
 | `open` / `close` / `add_opened_change_listener` | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (DatePickerVariant) | [x] |
 
 ### TimePicker
 | Feature | Status |
@@ -246,6 +270,7 @@ All components inherit from `Component` which provides:
 | `add_value_change_listener` | [x] |
 | `set_clear_button_visible` / `set_auto_open` | [x] |
 | `add_opened_change_listener` | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (TimePickerVariant) | [x] |
 
 ### DateTimePicker
 | Feature | Status |
@@ -259,6 +284,7 @@ All components inherit from `Component` which provides:
 | `add_value_change_listener` | [x] |
 | `set_auto_open` | [x] |
 | `set_week_numbers_visible` | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (DateTimePickerVariant) | [x] |
 
 ### CustomField
 | Feature | Status |
@@ -269,6 +295,7 @@ All components inherit from `Component` which provides:
 | `set_error_message` / `set_invalid` (HasValidation) | [x] |
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `remove_all` | [x] |
+| `add_theme_variants` / `remove_theme_variants` (CustomFieldVariant) | [x] |
 
 ---
 
@@ -287,6 +314,7 @@ All components inherit from `Component` which provides:
 | `set_clear_button_visible` / `set_auto_open` | [x] |
 | `set_renderer` / `set_class_name_generator` | [ ] |
 | `set_prefix_component` / `set_overlay_width` | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (ComboBoxVariant) | [x] |
 
 ### Select
 | Feature | Status |
@@ -299,6 +327,7 @@ All components inherit from `Component` which provides:
 | `set_empty_selection_allowed` / `set_empty_selection_caption` | [x] |
 | `set_renderer` / `set_item_enabled_provider` | [ ] |
 | `set_prefix_component` / `set_overlay_width` | [x] |
+| `add_theme_variants` / `remove_theme_variants` (SelectVariant) | [x] |
 
 ### MultiSelectComboBox
 | Feature | Status |
@@ -314,6 +343,7 @@ All components inherit from `Component` which provides:
 | `deselect_all` | [x] |
 | `set_renderer` / `set_auto_expand` / `set_selected_items_on_top` | [ ] |
 | `set_allow_custom_value` | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (MultiSelectComboBoxVariant) | [x] |
 
 ### ListBox
 | Feature | Status |
@@ -341,6 +371,7 @@ All components inherit from `Component` which provides:
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` | [x] |
 | `set_label_component` / `set_autofocus` | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (CheckboxVariant) | [x] |
 
 ### CheckboxGroup
 | Feature | Status |
@@ -352,7 +383,7 @@ All components inherit from `Component` which provides:
 | `add_value_change_listener` | [x] |
 | `select` / `deselect` / `deselect_all` | [x] |
 | `set_item_enabled_provider` / `set_renderer` | [ ] |
-| `add_theme_variants` (LUMO_VERTICAL) | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (CheckboxGroupVariant) | [x] |
 
 ### RadioButtonGroup
 | Feature | Status |
@@ -363,7 +394,7 @@ All components inherit from `Component` which provides:
 | `set_required_indicator_visible` (HasRequired) | [x] |
 | `add_value_change_listener` | [x] |
 | `set_item_enabled_provider` / `set_renderer` | [ ] |
-| `add_theme_variants` (LUMO_VERTICAL) | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (RadioGroupVariant) | [x] |
 
 ---
 
@@ -396,6 +427,7 @@ All components inherit from `Component` which provides:
 | Editor API (`get_editor`) | [ ] |
 | Drag/drop (`set_rows_draggable` / `set_drop_mode` / listeners) | [ ] |
 | `set_empty_state_text` / `set_empty_state_component` | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (GridVariant) | [x] |
 
 ### Dialog
 | Feature | Status |
@@ -412,6 +444,7 @@ All components inherit from `Component` which provides:
 | `set_min_width` / `set_max_width` / `set_min_height` / `set_max_height` (inherited) | [x] |
 | `set_top` / `set_left` (positioning) | [ ] |
 | `add_resize_listener` / `add_dragged_listener` | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (DialogVariant) | [x] |
 
 ### ConfirmDialog
 | Feature | Status |
@@ -425,6 +458,7 @@ All components inherit from `Component` which provides:
 | `set_close_on_esc` | [x] |
 | Rich content (Component in header/text) | [ ] |
 | `add_opened_change_listener` | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (DialogVariant) | [x] |
 
 ### Notification
 | Feature | Status |
@@ -450,6 +484,7 @@ All components inherit from `Component` which provides:
 | `interrupt_upload` | [ ] |
 | `set_i18n` | [x] |
 | progress / started / all-finished listeners | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (UploadVariant) | [x] |
 
 ### LoginForm
 | Feature | Status |
@@ -485,8 +520,8 @@ All components inherit from `Component` which provides:
 | `set_autofocus` | [x] |
 | `set_hover_delay` / `set_focus_delay` / `set_hide_delay` | [x] |
 | `remove` / `remove_all` | [x] |
-| `set_backdrop_visible` | [ ] |
-| `set_role` / `add_theme_variants` (ARROW, NO_PADDING) | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (PopoverVariant) | [x] |
+| `set_role` / `set_backdrop_visible` | [ ] |
 
 ---
 
@@ -502,7 +537,7 @@ All components inherit from `Component` which provides:
 | `remove_all` | [x] |
 | `add_tab_at_index` / `add_tab_as_first` | [ ] |
 | `set_flex_grow_for_enclosed_tabs` | [ ] |
-| `add_theme_variants` (TabsVariant) | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (TabsVariant) | [x] |
 
 ### Tab
 | Feature | Status |
@@ -510,7 +545,7 @@ All components inherit from `Component` which provides:
 | `set_label` / `get_label` / `is_selected` | [x] |
 | `set_selected` / `set_flex_grow` | [x] |
 | `set_enabled` | [ ] |
-| `add_theme_variants` (TabVariant) | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (TabVariant) | [x] |
 
 ### TabSheet
 | Feature | Status |
@@ -521,6 +556,7 @@ All components inherit from `Component` which provides:
 | `get_tab_count` / `get_tab_at` / `get_index_of` | [x] |
 | `get_tab(content)` / `get_component(tab)` | [ ] |
 | `set_prefix_component` (HasPrefix) | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (TabSheetVariant) | [x] |
 
 ### SideNav
 | Feature | Status |
@@ -529,6 +565,7 @@ All components inherit from `Component` which provides:
 | `is_expanded` / `set_expanded` | [x] |
 | `get_items` / `remove` / `remove_all` | [x] |
 | `set_auto_expand` / `is_auto_expand` | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (SideNavVariant) | [x] |
 
 ### SideNavItem
 | Feature | Status |
@@ -548,7 +585,7 @@ All components inherit from `Component` which provides:
 | `get_summary` (Component) / `get_content` | [x] |
 | `remove` / `remove_all` | [x] |
 | `add_component_at_index` | [ ] |
-| `add_theme_variants` (DetailsVariant) | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (DetailsVariant) | [x] |
 
 ### Accordion
 | Feature | Status |
@@ -557,6 +594,7 @@ All components inherit from `Component` which provides:
 | `get_opened_index` / `get_opened_panel` / `get_panels` | [x] |
 | `add_opened_change_listener` | [x] |
 | `add(AccordionPanel)` / `remove(panel)` / `open(panel)` | [x] |
+| `add_theme_variants` / `remove_theme_variants` (DetailsVariant) | [x] |
 
 ### MenuBar
 | Feature | Status |
@@ -569,6 +607,7 @@ All components inherit from `Component` which provides:
 | `add_item(Component)` / `close` | [ ] |
 | MenuItem: `set_keep_open` / `set_disable_on_click` / `set_aria_label` | [ ] |
 | SubMenu: `add_separator` / `remove` / `remove_all` | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (MenuBarVariant) | [x] |
 
 ### ContextMenu
 | Feature | Status |
@@ -593,6 +632,7 @@ All components inherit from `Component` which provides:
 | `set_orientation` / `get_orientation` | [x] |
 | `set_containment` | [x] |
 | `add_backdrop_click_listener` / `add_detail_escape_press_listener` | [x] |
+| `add_theme_variants` / `remove_theme_variants` (MasterDetailLayoutVariant) | [x] |
 
 ---
 
@@ -607,7 +647,7 @@ All components inherit from `Component` which provides:
 | `set_disable_on_click` / `is_disable_on_click` | [x] |
 | `set_autofocus` / `is_autofocus` | [x] |
 | `click` (server-side) / `click_in_client` | [ ] |
-| `add_theme_variants` (ButtonVariant) | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (ButtonVariant) | [x] |
 
 ### Icon
 | Feature | Status |
@@ -627,18 +667,21 @@ All components inherit from `Component` which provides:
 | `set_image` / `get_image` / `set_color_index` / `get_color_index` | [x] |
 | AvatarGroup: `set_items` / `get_items` / `set_max_items_visible` / `get_max_items_visible` | [x] |
 | `set_image_handler` / `set_i18n` | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (AvatarVariant) | [x] |
 
 ### ProgressBar (100% complete)
 | Feature | Status |
 |---------|--------|
 | `set_value` / `get_value` / `set_min` / `get_min` / `set_max` / `get_max` | [x] |
 | `set_indeterminate` / `is_indeterminate` | [x] |
+| `add_theme_variants` / `remove_theme_variants` (ProgressBarVariant) | [x] |
 
 ### MessageInput
 | Feature | Status |
 |---------|--------|
 | `add_submit_listener` | [x] |
 | `set_i18n` | [x] |
+| `add_theme_variants` / `remove_theme_variants` (MessageInputVariant) | [x] |
 
 ### MessageList (100% complete)
 | Feature | Status |
@@ -651,6 +694,7 @@ All components inherit from `Component` which provides:
 |---------|--------|
 | `set_items` / `get_items` / `set_renderer` | [x] |
 | `set_data_provider` (lazy loading) | [ ] |
+| `add_theme_variants` / `remove_theme_variants` (VirtualListVariant) | [x] |
 
 ### Markdown (100% complete)
 | Feature | Status |

@@ -5,6 +5,7 @@ from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
+from vaadin.flow.components.constants import UploadVariant as UploadVariant
 from vaadin.flow.server.uidl_handler import (
     _FILE_REJECT_HASH, _UPLOAD_SUCCESS_HASH,
     _UPLOAD_ERROR_HASH, _FILE_REMOVE_HASH,
@@ -269,3 +270,11 @@ class Upload(Component):
 
     def get_i18n(self) -> dict | None:
         return getattr(self, "_i18n", None)
+
+    def add_theme_variants(self, *variants: UploadVariant):
+        """Add theme variants to the upload."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: UploadVariant):
+        """Remove theme variants from the upload."""
+        self.remove_theme_name(*variants)

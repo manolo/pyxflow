@@ -4,7 +4,7 @@
 
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
-**Lines of code:** ~16,000 (core src/), ~46,000 (total with demo + tests)
+**Lines of code:** ~17,000 (core src/), ~48,000 (total with demo + tests)
 **Tests:** 2145 unit + 307 UI (Playwright)
 **Last updated:** 2026-02-13
 
@@ -114,6 +114,14 @@
 - [x] `ValueChangeMode` - Controls when text fields sync to server (EAGER/LAZY/TIMEOUT/ON_BLUR/ON_CHANGE). Applied to TextField, TextArea, EmailField, PasswordField, NumberField
 - [x] `set_i18n(dict)` / `get_i18n()` - Localization via dict-based approach on 7 components (Upload, DatePicker, TimePicker, DateTimePicker, LoginForm, LoginOverlay, MessageInput)
 
+### Constants & Enums
+- [x] `components/constants.py` - Central enum file with all 34 theme variant enums, layout enums, field enums
+- [x] Theme variant enums — `add_theme_variants()` / `remove_theme_variants()` on 34 components (Button, Grid, TextField, Dialog, etc.)
+- [x] `ColumnTextAlign` — START/CENTER/END enum for Grid column text alignment
+- [x] `Autocomplete` — ~50 HTML autocomplete values for TextField, PasswordField, EmailField
+- [x] `Key` — Keyboard constants (ENTER, ESCAPE, TAB, Arrow keys, F1-F12) re-exported from `core/`, `components/`
+- [x] Co-located re-exports — Variant enums importable from component files (e.g., `from button import ButtonVariant`)
+
 ### Field Mixins
 - [x] `HasReadOnly` mixin - `set_read_only()`, `is_read_only()` on all 16 field components + Checkbox + ListBox + MultiSelectListBox (18 total)
 - [x] `HasValidation` mixin - `set_invalid()`, `is_invalid()`, `set_error_message()`, `get_error_message()` on all 14 field components + CustomField
@@ -197,7 +205,7 @@
 
 > **For the detailed per-component API inventory (every method, [x]/[ ]), see `STATUS.API.md`.**
 >
-> API coverage: **362 methods implemented, 69 missing** (~84% complete).
+> API coverage: **436 methods implemented, 60 missing** (~88% complete).
 
 ### Unimplemented Features
 
@@ -223,10 +231,10 @@
 | **HorizontalLayout** | `add_to_start`/`add_to_middle`/`add_to_end` | Low |
 | **FlexLayout** | `replace`/`add_component_at_index` | Low |
 | **Select** | `set_renderer`, `set_item_enabled_provider` | Low |
-| **CheckboxGroup/RadioButtonGroup** | `set_item_enabled_provider`, `set_renderer`, `add_theme_variants` | Low |
+| **CheckboxGroup/RadioButtonGroup** | `set_item_enabled_provider`, `set_renderer` | Low |
 | **ListBox/MultiSelectListBox** | `set_renderer`, `add_components` (dividers) | Low |
 | **Dialog** | `set_top`/`set_left`, `add_resize_listener`/`add_dragged_listener` | Low |
-| **Button** | `click` (server-side), `add_theme_variants(ButtonVariant)` | Low |
+| **Button** | `click` (server-side) | Low |
 | **Other** | Various minor methods across Tabs, Details, ContextMenu, Upload, LoginOverlay, Popover, etc. | Low |
 
 ### Missing Tests

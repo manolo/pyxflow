@@ -5,6 +5,7 @@ from typing import Callable, Generic, TypeVar, Optional, TYPE_CHECKING
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
 from vaadin.flow.components.renderer import Renderer, LitRenderer, ComponentRenderer
+from vaadin.flow.components.constants import VirtualListVariant as VirtualListVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -223,3 +224,11 @@ class VirtualList(Component, Generic[T]):
     def set_viewport_range(self, start: int, length: int):
         """Called by client when the visible range changes."""
         self._push_data(start, length)
+
+    def add_theme_variants(self, *variants: VirtualListVariant):
+        """Add theme variants to the virtual list."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: VirtualListVariant):
+        """Remove theme variants from the virtual list."""
+        self.remove_theme_name(*variants)

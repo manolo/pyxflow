@@ -4,6 +4,7 @@ import json
 from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.constants import MessageInputVariant as MessageInputVariant
 from vaadin.flow.server.uidl_handler import _SUBMIT_HASH
 
 if TYPE_CHECKING:
@@ -53,3 +54,11 @@ class MessageInput(Component):
         value = event_data.get("event.detail.value", "")
         for listener in self._submit_listeners:
             listener({"value": value})
+
+    def add_theme_variants(self, *variants: MessageInputVariant):
+        """Add theme variants to the message input."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: MessageInputVariant):
+        """Remove theme variants from the message input."""
+        self.remove_theme_name(*variants)

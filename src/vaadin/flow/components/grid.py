@@ -2,23 +2,19 @@
 
 import json
 import re
-from enum import Enum
 from typing import Callable, TYPE_CHECKING, Any
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.core.state_node import Feature
 from vaadin.flow.components.renderer import Renderer, LitRenderer, ComponentRenderer
+from vaadin.flow.components.constants import (  # noqa: F401 — re-export
+    SortDirection, SelectionMode, ColumnTextAlign as ColumnTextAlign, GridVariant as GridVariant,
+)
 from vaadin.flow.data.provider import DataProvider, ListDataProvider, Query
 from vaadin.flow.server.uidl_handler import _ITEM_CLICK_HASH
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
-
-
-class SortDirection(Enum):
-    """Sort direction for grid columns."""
-    ASCENDING = "asc"
-    DESCENDING = "desc"
 
 
 class GridSortOrder:
@@ -35,13 +31,6 @@ class GridSortOrder:
     @property
     def direction(self) -> SortDirection:
         return self._direction
-
-
-class SelectionMode(Enum):
-    """Grid selection mode."""
-    SINGLE = "SINGLE"
-    MULTI = "MULTI"
-    NONE = "NONE"
 
 
 class Column:
@@ -121,7 +110,7 @@ class Column:
         self._sortable = sortable
         return self
 
-    def set_text_align(self, align: str) -> "Column":
+    def set_text_align(self, align: "ColumnTextAlign | str") -> "Column":
         """Set column text alignment ('start', 'center', 'end')."""
         self._text_align = align
         if self._node:
@@ -1162,6 +1151,14 @@ class Grid(Component):
         """Called by client to request a data range."""
         if self._data_provider or self._data_provider_obj:
             self._fetch_and_push(start, length)
+
+    def add_theme_variants(self, *variants: GridVariant):
+        """Add theme variants to the grid."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: GridVariant):
+        """Remove theme variants from the grid."""
+        self.remove_theme_name(*variants)
 
 
 class TreeGrid(Grid):

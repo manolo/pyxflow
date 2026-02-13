@@ -4,6 +4,7 @@ from typing import Callable, Generic, TypeVar, Optional
 
 from vaadin.flow.core.component import Component
 from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
+from vaadin.flow.components.constants import RadioGroupVariant as RadioGroupVariant
 from vaadin.flow.core.state_node import Feature
 
 T = TypeVar('T')
@@ -120,6 +121,14 @@ class RadioButtonGroup(HasReadOnly, HasValidation, HasRequired, Component, Gener
         This handler is a no-op — change listeners fire from _sync_property.
         """
         pass
+
+    def add_theme_variants(self, *variants: RadioGroupVariant):
+        """Add theme variants to the radio button group."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: RadioGroupVariant):
+        """Remove theme variants from the radio button group."""
+        self.remove_theme_name(*variants)
 
     def _sync_property(self, name: str, value):
         """Handle property sync from client."""

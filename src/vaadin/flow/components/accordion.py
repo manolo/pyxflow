@@ -4,6 +4,7 @@ from typing import Callable, TYPE_CHECKING
 
 from vaadin.flow.components.details import Details
 from vaadin.flow.core.component import Component
+from vaadin.flow.components.constants import DetailsVariant as DetailsVariant
 
 if TYPE_CHECKING:
     from vaadin.flow.core.state_tree import StateTree
@@ -124,6 +125,14 @@ class Accordion(Component):
 
     def _handle_opened_changed(self, event_data: dict):
         pass
+
+    def add_theme_variants(self, *variants: DetailsVariant):
+        """Add theme variants to the accordion."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: DetailsVariant):
+        """Remove theme variants from the accordion."""
+        self.remove_theme_name(*variants)
 
     def _sync_property(self, name: str, value):
         if name == "opened":
