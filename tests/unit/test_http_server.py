@@ -234,3 +234,89 @@ class TestUidlEncoder:
         data = {"a": 1, "b": "text", "c": True, "d": None, "e": [1, 2]}
         result = json.dumps(data, cls=_UidlEncoder)
         assert json.loads(result) == data
+
+    def test_unknown_type_falls_back_to_str(self):
+        """Unknown types are serialized as str() instead of raising."""
+        from vaadin.flow.server.http_server import _UidlEncoder
+        import json
+        from decimal import Decimal
+        result = json.dumps({"val": Decimal("3.14")}, cls=_UidlEncoder)
+        assert result == '{"val": "3.14"}'
+
+
+class TestCriticalErrorJson:
+    """Test the meta.appError response for unrecoverable errors."""
+
+    def test_critical_error_json_format(self):
+        """Should produce for(;;);[{syncId:-1, meta:{appError:...}}]."""
+        from vaadin.flow.server.http_server import _critical_error_json
+        import json
+        result = _critical_error_json("Error", "Something broke")
+        assert result.startswith("for(;;);[")
+        assert result.endswith("]")
+        json_str = result[len("for(;;);["):-1]
+        data = json.loads(json_str)
+        assert data["syncId"] == -1
+        assert data["changes"] == []
+        assert data["meta"]["appError"]["caption"] == "Error"
+        assert data["meta"]["appError"]["message"] == "Something broke"
+        assert data["meta"]["appError"]["details"] is None
+        assert data["meta"]["appError"]["url"] is None
+
+    def test_critical_error_json_all_none(self):
+        """All-None fields should produce valid JSON (client refreshes silently)."""
+        from vaadin.flow.server.http_server import _critical_error_json
+        import json
+        result = _critical_error_json()
+        json_str = result[len("for(;;);["):-1]
+        data = json.loads(json_str)
+        app_error = data["meta"]["appError"]
+        assert all(v is None for v in app_error.values())
+
+    def test_critical_error_json_with_url(self):
+        """URL field should be passed through for redirect."""
+        from vaadin.flow.server.http_server import _critical_error_json
+        import json
+        result = _critical_error_json(url="/login")
+        json_str = result[len("for(;;);["):-1]
+        data = json.loads(json_str)
+        assert data["meta"]["appError"]["url"] == "/login"
+
+
+class TestUidlErrorHandling(AioHTTPTestCase):
+    """Test that UIDL errors return meta.appError instead of HTTP 500."""
+
+    async def get_application(self):
+        from vaadin.flow.server.http_server import create_app
+        return create_app()
+
+    async def test_uidl_error_returns_app_error_not_500(self):
+        """If handle_uidl raises, response is meta.appError with syncId=-1."""
+        import json
+        from unittest.mock import patch
+
+        # Establish session
+        init_resp = await self.client.request("GET", "/?v-r=init&location=&query=")
+        init_data = await init_resp.json()
+        csrf = init_data["appConfig"]["uidl"]["Vaadin-Security-Key"]
+
+        payload = {"csrfToken": csrf, "rpc": [], "syncId": 0, "clientId": 0}
+
+        # Patch handle_uidl on the UidlHandler to raise
+        with patch(
+            "vaadin.flow.server.uidl_handler.UidlHandler.handle_uidl",
+            side_effect=RuntimeError("boom"),
+        ):
+            resp = await self.client.request(
+                "POST", "/?v-r=uidl&v-uiId=0", json=payload,
+            )
+
+        # Must be 200 (not 500) with meta.appError
+        assert resp.status == 200
+        text = await resp.text()
+        assert text.startswith("for(;;);")
+        json_str = text[len("for(;;);["):-1]
+        data = json.loads(json_str)
+        assert data["syncId"] == -1
+        assert "appError" in data["meta"]
+        assert data["meta"]["appError"]["caption"] == "Internal error"

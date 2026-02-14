@@ -22,14 +22,53 @@ SESSION_TIMEOUT = 1800  # 30 minutes (matches Java servlet default)
 
 
 class _UidlEncoder(json.JSONEncoder):
-    """JSON encoder that handles date/datetime in UIDL responses."""
+    """JSON encoder that handles Python types in UIDL responses.
+
+    Must never raise — a serialization error after _build_response() has
+    consumed tree changes would leave the client with a blank screen and
+    no way to recover (the changes are gone).
+    """
 
     def default(self, o):
         if isinstance(o, datetime.datetime):
             return o.isoformat()
         if isinstance(o, datetime.date):
             return o.isoformat()
-        return super().default(o)
+        try:
+            return super().default(o)
+        except TypeError:
+            log.warning("Unsupported type %s in UIDL response, converting to str", type(o).__name__)
+            return str(o)
+
+def _critical_error_json(
+    caption: str | None = None,
+    message: str | None = None,
+    details: str | None = None,
+    url: str | None = None,
+) -> str:
+    """Build a UIDL response that triggers FlowClient's critical error overlay.
+
+    Matches Java's VaadinService.createCriticalNotificationJSON().
+    The client shows a fixed overlay (top-right, z-index 10000) with the error
+    info.  Click or ESC redirects to ``url`` or refreshes the page (if url is
+    None).  After displaying, UIState is set to TERMINATED.
+
+    If all four fields are None the client refreshes immediately without
+    showing any message (Java's default for unhandled internal errors).
+    """
+    app_error = {
+        "caption": caption,
+        "message": message,
+        "details": details,
+        "url": url,
+    }
+    response = {
+        "syncId": -1,
+        "changes": [],
+        "meta": {"appError": app_error},
+    }
+    return f"for(;;);[{json.dumps(response)}]"
+
 
 # Session storage (in-memory for now)
 _sessions: dict[str, dict[str, Any]] = {}
@@ -201,16 +240,22 @@ async def handle_uidl(request: web.Request) -> web.Response:
     handler: UidlHandler = ui_state["handler"]
     try:
         response_data = handler.handle_uidl(payload)
-
-        # Wrap response with XSS protection prefix
+        # _UidlEncoder has a str() fallback so json.dumps should never raise.
+        # User code errors are already caught in _process_rpc() which shows
+        # an error notification before _build_response() consumes tree changes.
         response_text = f"for(;;);[{json.dumps(response_data, cls=_UidlEncoder)}]"
     except Exception:
-        log.exception("Error processing UIDL request")
-        # Return a valid UIDL error so FlowClient shows a notification
-        # instead of a raw 500 that causes a blank screen.
-        handler._show_error_notification()
-        response_data = handler._build_response()
-        response_text = f"for(;;);[{json.dumps(response_data, cls=_UidlEncoder)}]"
+        # Safety net for truly unexpected errors (serialization bugs, etc.).
+        # At this point _build_response() may have already consumed tree changes,
+        # so we can't add a Notification (it would be the only content → blank page).
+        # Instead, send meta.appError with syncId=-1 — FlowClient shows an error
+        # overlay and refreshes on click/ESC.  Matches Java's
+        # VaadinService.handleExceptionDuringRequest() behavior.
+        log.exception("Unexpected error processing UIDL request")
+        response_text = _critical_error_json(
+            "Internal error",
+            "An internal error has occurred. Click to reload.",
+        )
 
     log.debug("Response: %s...", response_text[:500])
     return web.Response(
@@ -485,9 +530,13 @@ def get_index_html() -> str:
                 "margin: 0;\n      overflow: hidden;"
             )
             # Enable experimental feature flags before bundle loads
+            # + CSS for v-system-error overlay (Java's BootstrapHandler injects this;
+            # FlowClient creates a div.v-system-error on meta.appError responses)
             html = html.replace(
                 "</head>",
-                '  <script>window.Vaadin=window.Vaadin||{};window.Vaadin.featureFlags=window.Vaadin.featureFlags||{};window.Vaadin.featureFlags.masterDetailLayoutComponent=true;</script>\n</head>'
+                '  <script>window.Vaadin=window.Vaadin||{};window.Vaadin.featureFlags=window.Vaadin.featureFlags||{};window.Vaadin.featureFlags.masterDetailLayoutComponent=true;</script>\n'
+                '  <style>.v-system-error{color:indianred;pointer-events:auto;position:absolute;background:#fff;top:1em;right:1em;border:1px solid #000;padding:1em;z-index:10000;max-width:calc(100vw - 4em);max-height:calc(100vh - 4em);overflow:auto}.v-system-error .caption{color:red;font-weight:700}</style>\n'
+                '</head>'
             )
             # Apply @ColorScheme from AppShell to <html> tag
             from vaadin.flow.router import get_app_shell
