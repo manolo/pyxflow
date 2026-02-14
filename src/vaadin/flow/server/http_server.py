@@ -1,6 +1,7 @@
 """HTTP Server for Vaadin Flow."""
 
 import asyncio
+import datetime
 import json
 import logging
 import secrets
@@ -18,6 +19,17 @@ from vaadin.flow.core.state_tree import StateTree
 log = logging.getLogger("vaadin.flow")
 
 SESSION_TIMEOUT = 1800  # 30 minutes (matches Java servlet default)
+
+
+class _UidlEncoder(json.JSONEncoder):
+    """JSON encoder that handles date/datetime in UIDL responses."""
+
+    def default(self, o):
+        if isinstance(o, datetime.datetime):
+            return o.isoformat()
+        if isinstance(o, datetime.date):
+            return o.isoformat()
+        return super().default(o)
 
 # Session storage (in-memory for now)
 _sessions: dict[str, dict[str, Any]] = {}
@@ -190,7 +202,7 @@ async def handle_uidl(request: web.Request) -> web.Response:
     response_data = handler.handle_uidl(payload)
 
     # Wrap response with XSS protection prefix
-    response_text = f"for(;;);[{json.dumps(response_data)}]"
+    response_text = f"for(;;);[{json.dumps(response_data, cls=_UidlEncoder)}]"
     log.debug("Response: %s...", response_text[:500])
     return web.Response(
         text=response_text,
@@ -360,7 +372,7 @@ async def _push_sender(ws: web.WebSocketResponse, ui_state: dict):
             # IllegalStateException when no request is active.
             response_data["meta"] = {"async": True}
 
-            response_json = json.dumps(response_data)
+            response_json = json.dumps(response_data, cls=_UidlEncoder)
             message = f"for(;;);[{response_json}]"
             # Atmosphere trackMessageLength format: <length>|<message>
             prefixed = f"{len(message)}|{message}"

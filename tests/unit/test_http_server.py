@@ -207,3 +207,30 @@ class TestSessionCleanup:
 
         assert "upload-1" not in _upload_handlers
         assert "upload-2" in _upload_handlers
+
+
+class TestUidlEncoder:
+    """Test that UIDL JSON encoder handles Python types."""
+
+    def test_date_serialized_as_iso(self):
+        import datetime
+        from vaadin.flow.server.http_server import _UidlEncoder
+        import json
+        d = datetime.date(2025, 6, 15)
+        result = json.dumps({"col": d}, cls=_UidlEncoder)
+        assert result == '{"col": "2025-06-15"}'
+
+    def test_datetime_serialized_as_iso(self):
+        import datetime
+        from vaadin.flow.server.http_server import _UidlEncoder
+        import json
+        dt = datetime.datetime(2025, 6, 15, 14, 30, 0)
+        result = json.dumps({"col": dt}, cls=_UidlEncoder)
+        assert result == '{"col": "2025-06-15T14:30:00"}'
+
+    def test_normal_types_unchanged(self):
+        from vaadin.flow.server.http_server import _UidlEncoder
+        import json
+        data = {"a": 1, "b": "text", "c": True, "d": None, "e": [1, 2]}
+        result = json.dumps(data, cls=_UidlEncoder)
+        assert json.loads(result) == data
