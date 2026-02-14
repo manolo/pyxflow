@@ -1,6 +1,6 @@
 """Shared layout for all test views — provides SideNav menu."""
 
-from vaadin.flow import AppShell, Push, StyleSheet, ColorScheme
+from vaadin.flow import AppShell, Push, StyleSheet
 from vaadin.flow.components import HorizontalLayout, SideNav, SideNavItem, VerticalLayout
 from vaadin.flow.menu import get_menu_entries
 
@@ -8,7 +8,6 @@ from vaadin.flow.menu import get_menu_entries
 @AppShell
 @Push
 @StyleSheet("lumo/lumo.css")
-@ColorScheme("dark")
 class TestMainLayout(HorizontalLayout):
     """Simple router layout: SideNav on the left, content on the right."""
 
