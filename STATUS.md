@@ -5,9 +5,9 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~17,000 (core src/), ~50,000 (total with demo + tests)
-**Test structure:** `tests/unit/` (2274 unit tests, default `pytest`) + `tests/ui/` (323 Playwright, run explicitly)
-**Tests:** 2274 unit + 323 UI (Playwright)
-**Last updated:** 2026-02-13
+**Test structure:** `tests/unit/` (2297 unit tests, default `pytest`) + `tests/ui/` (323 Playwright, run explicitly)
+**Tests:** 2297 unit + 323 UI (Playwright)
+**Last updated:** 2026-02-14
 
 ---
 
@@ -215,6 +215,7 @@
 | `@PWA` annotation | Medium | Activate `sw.js` from bundle, serve `manifest.json` with configurable app name/icons |
 | Security (`--secure`) | Medium | Login screen from local config, restrict interfaces (localhost vs 0.0.0.0), HTTPS/TLS |
 | Grid Editor API | Low | Inline row editing (`get_editor`, bind fields to columns, save/cancel) |
+| `HasErrorParameter` error views | Medium | Navigate to error view on unhandled exceptions (Java's `DefaultErrorHandler` + `ErrorHandlerUtil`). Currently shows Notification instead. |
 | Grid Drag/Drop listeners | Low | Drag start/end/drop event listeners (rows draggable & drop mode already implemented) |
 | Grid item details renderer | Low | Expandable row details via `set_item_details_renderer` (set_details_visible_on_click already implemented) |
 | Specialized renderers | Low | NumberRenderer, LocalDateRenderer, LocalDateTimeRenderer, NativeButtonRenderer, IconRenderer |
@@ -240,7 +241,7 @@
 
 | Category | Coverage | Details |
 |----------|----------|---------|
-| **Unit tests** | 2288 passing | Good coverage of all 49 components + core + data layer. Located in `tests/unit/` |
+| **Unit tests** | 2297 passing | Good coverage of all 49 components + core + data layer. Located in `tests/unit/` |
 | **UI tests** | 326 passed, 3 skipped | All 29 test views (in `tests/views/`) with shared SideNav layout and single browser session. UI tests in `tests/ui/` |
 
 3 skipped: 2 focus/blur event forwarding (native JS focus/blur doesn't trigger Vaadin server events), 1 ContextMenu openOnClick (needs investigation).
