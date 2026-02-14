@@ -122,6 +122,14 @@ _SELECTED_ITEMS_CHANGED_HASH = compute_event_hash(_SELECTED_ITEMS_CHANGED_CONFIG
 _SPLITTER_DRAGEND_CONFIG = {}
 _SPLITTER_DRAGEND_HASH = compute_event_hash(_SPLITTER_DRAGEND_CONFIG)
 
+# Focus/Blur event configuration (for FocusNotifier/BlurNotifier)
+# Empty config — no event data needed.  These use the same empty config
+# as _CLOSED_CONFIG, so they share the same hash.
+_FOCUS_CONFIG = {}
+_FOCUS_HASH = compute_event_hash(_FOCUS_CONFIG)
+_BLUR_CONFIG = {}
+_BLUR_HASH = compute_event_hash(_BLUR_CONFIG)
+
 # =============================================================================
 # UI Navigation Event Configurations
 # =============================================================================

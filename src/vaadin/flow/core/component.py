@@ -144,10 +144,12 @@ class Component:
         # Apply deferred focus/blur listeners
         if getattr(self, "_focus_listeners", None) and not getattr(self, "_focus_event_registered", False):
             self._focus_event_registered = True
-            self._element.add_event_listener("focus", self._dispatch_focus)
+            from vaadin.flow.server.uidl_handler import _FOCUS_HASH
+            self._element.add_event_listener("focus", self._dispatch_focus, hash_key=_FOCUS_HASH)
         if getattr(self, "_blur_listeners", None) and not getattr(self, "_blur_event_registered", False):
             self._blur_event_registered = True
-            self._element.add_event_listener("blur", self._dispatch_blur)
+            from vaadin.flow.server.uidl_handler import _BLUR_HASH
+            self._element.add_event_listener("blur", self._dispatch_blur, hash_key=_BLUR_HASH)
         # Apply deferred class names
         if self._class_names:
             self._update_class_attribute()
@@ -500,7 +502,8 @@ class Component:
         self._focus_listeners.append(listener)
         if self._element is not None and not getattr(self, "_focus_event_registered", False):
             self._focus_event_registered = True
-            self._element.add_event_listener("focus", self._dispatch_focus)
+            from vaadin.flow.server.uidl_handler import _FOCUS_HASH
+            self._element.add_event_listener("focus", self._dispatch_focus, hash_key=_FOCUS_HASH)
 
     def _dispatch_focus(self, event_data: dict):
         for listener in getattr(self, "_focus_listeners", []):
@@ -513,7 +516,8 @@ class Component:
         self._blur_listeners.append(listener)
         if self._element is not None and not getattr(self, "_blur_event_registered", False):
             self._blur_event_registered = True
-            self._element.add_event_listener("blur", self._dispatch_blur)
+            from vaadin.flow.server.uidl_handler import _BLUR_HASH
+            self._element.add_event_listener("blur", self._dispatch_blur, hash_key=_BLUR_HASH)
 
     def _dispatch_blur(self, event_data: dict):
         for listener in getattr(self, "_blur_listeners", []):

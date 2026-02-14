@@ -115,13 +115,11 @@ class TestAria:
 
 class TestFocus:
     @pytest.mark.spec("V20.21")
-    @pytest.mark.skip(reason="Focus/blur events need DOM event forwarding investigation")
     def test_focus_listener(self, view_page: Page):
         view_page.locator("#fb-tf").evaluate("el => el.focus()")
         expect(view_page.locator("#fb-ev")).to_have_text("focus")
 
     @pytest.mark.spec("V20.21")
-    @pytest.mark.skip(reason="Focus/blur events need DOM event forwarding investigation")
     def test_blur_listener(self, view_page: Page):
         view_page.locator("#fb-tf").evaluate("el => el.focus()")
         view_page.locator("#fb-tf").evaluate("el => el.blur()")

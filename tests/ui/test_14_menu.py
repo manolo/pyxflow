@@ -84,7 +84,6 @@ class TestContextMenu:
         expect(view_page.locator("#ctx-result")).to_have_text("Copy", timeout=3000)
 
     @pytest.mark.spec("V14.10")
-    @pytest.mark.skip(reason="ContextMenu openOnClick not working — needs investigation")
     def test_open_on_click(self, view_page: Page):
         _close_overlays(view_page)
         view_page.locator("#ctx-target2").click()

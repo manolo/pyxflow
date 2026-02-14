@@ -96,7 +96,7 @@ class ContextMenu(Component):
         super()._attach(tree)
 
         if self._open_on_click:
-            self.element.set_property("openOnClick", True)
+            self.element.set_property("openOn", "click")
 
         # Init connector: contextMenuConnector.initLazy(element, appId)
         client_key = tree._app_id.split("-")[0]
@@ -223,7 +223,7 @@ class ContextMenu(Component):
         """Set whether to open on left-click instead of right-click."""
         self._open_on_click = open_on_click
         if self._element:
-            self.element.set_property("openOnClick", open_on_click)
+            self.element.set_property("openOn", "click" if open_on_click else "vaadin-contextmenu")
 
     def get_target(self) -> Component | None:
         """Get the target component."""

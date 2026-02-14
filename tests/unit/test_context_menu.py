@@ -108,13 +108,13 @@ class TestContextMenu:
         menu = ContextMenu()
         menu.set_open_on_click(True)
         menu._attach(tree)
-        assert menu.element.get_property("openOnClick") is True
+        assert menu.element.get_property("openOn") == "click"
 
     def test_open_on_click_after_attach(self, tree):
         menu = ContextMenu()
         menu._attach(tree)
         menu.set_open_on_click(True)
-        assert menu.element.get_property("openOnClick") is True
+        assert menu.element.get_property("openOn") == "click"
 
     def test_disabled_item(self, tree):
         menu = ContextMenu()
