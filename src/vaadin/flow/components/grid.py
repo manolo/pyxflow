@@ -941,23 +941,18 @@ class Grid(Component):
         if selected_item_ids:
             self._selected_keys = new_selected
 
-        # updateSize
-        tree.queue_execute([
-            grid_ref, len(connector_items),
-            "return $0.$connector.updateSize($1)",
-        ])
-
-        # set items (push all at index 0)
-        tree.queue_execute([
-            grid_ref, 0, connector_items,
-            "return $0.$connector.set($1, $2)",
-        ])
-
-        # confirm update
         self._update_id += 1
+
+        # Push data as a single atomic script to prevent intermediate renders.
+        # reset() clears both the connector page cache AND the DataProvider
+        # rootCache.  Combined into one script so the grid can't re-render
+        # between reset() and updateSize().
         tree.queue_execute([
-            grid_ref, self._update_id,
-            "return $0.$connector.confirm($1)",
+            grid_ref, len(connector_items), connector_items, self._update_id,
+            "$0.$connector.reset();"
+            "$0.$connector.updateSize($1);"
+            "if($2.length)$0.$connector.set(0,$2);"
+            "$0.$connector.confirm($3)",
         ])
 
     def _add_renderer_data(self, tree: "StateTree", col: Column, connector_item: dict, item: dict, key: str):
