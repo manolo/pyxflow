@@ -131,6 +131,18 @@ class TestComboBoxView(VerticalLayout):
         mscb_kf.set_items("Apple", "Banana", "Cherry")
         mscb_kf.set_keep_filter(True)
 
+        # --- ComboBox clear + re-select roundtrip ---
+        cb_round = ComboBox("Roundtrip")
+        cb_round.set_id("cb-round")
+        cb_round.set_items("Apple", "Banana", "Cherry")
+        cb_round.set_value("Apple")
+        cb_round.set_clear_button_visible(True)
+        cb_round_val = Span("Apple")
+        cb_round_val.set_id("cb-round-val")
+        cb_round.add_value_change_listener(
+            lambda e: cb_round_val.set_text(str(e.get("value", "")))
+        )
+
         self.add(
             cb1, cb1_val,
             cb_pre,
@@ -141,6 +153,7 @@ class TestComboBoxView(VerticalLayout):
             cb_noauto,
             cb_prefix,
             cb_ow,
+            cb_round, cb_round_val,
             mscb1, mscb1_val,
             mscb_pre,
             mscb_des, btn_des,

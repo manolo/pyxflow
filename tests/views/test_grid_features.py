@@ -113,12 +113,18 @@ class TestGridFeaturesView(VerticalLayout):
         grid_empty.set_empty_state_text("No data available")
         grid_empty.set_all_rows_visible(True)
 
+        # --- Remove all columns ---
+        btn_remove_all = Button("Remove all columns")
+        btn_remove_all.set_id("btn-remove-all-col")
+        btn_remove_all.add_click_listener(lambda e: grid_multi.remove_all_columns())
+
         self.add(
             grid_single, sel_val, btn_sel,
             sort_val, click_val, dbl_val,
             btn_remove,
             grid_multi, multi_val,
             btn_sel_all, btn_desel_all,
+            btn_remove_all,
             grid_dnd,
             grid_empty,
         )

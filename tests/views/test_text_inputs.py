@@ -121,6 +121,21 @@ class TestTextInputsView(VerticalLayout):
         ef1_val.set_id("ef1-val")
         ef1.add_value_change_listener(lambda e: ef1_val.set_text(str(e.get("value", ""))))
 
+        # --- TextField required ---
+        tf_req = TextField("Required")
+        tf_req.set_id("tf-req")
+        tf_req.set_required_indicator_visible(True)
+
+        # --- TextField clear + re-type same value ---
+        tf_same = TextField("Same value")
+        tf_same.set_id("tf-same")
+        tf_same.set_value("test")
+        tf_same_val = Span("")
+        tf_same_val.set_id("tf-same-val")
+        tf_same.add_value_change_listener(
+            lambda e: tf_same_val.set_text(str(e.get("value", "")))
+        )
+
         self.add(
             tf1, tf1_val,
             tf_preset,
@@ -134,6 +149,8 @@ class TestTextInputsView(VerticalLayout):
             tf_help,
             tf_tip,
             tf_lbl, btn_lbl,
+            tf_req,
+            tf_same, tf_same_val,
             ta1, ta1_val,
             ta_clear, ta_clear_val,
             pf1, pf1_val,

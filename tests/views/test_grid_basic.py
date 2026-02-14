@@ -32,9 +32,9 @@ class TestGridBasicView(VerticalLayout):
         # --- Basic grid with columns ---
         grid1 = Grid()
         grid1.set_id("grid1")
-        grid1.add_column("name", header="Name").set_auto_width(True)
+        grid1.add_column("name", header="Name").set_auto_width(True).set_key("name-col")
         grid1.add_column("age", header="Age").set_width("100px")
-        col_email = grid1.add_column("email", header="Email").set_flex_grow(2)
+        grid1.add_column("email", header="Email").set_flex_grow(2)
         grid1.set_items([{"name": p.name, "age": p.age, "email": p.email} for p in PEOPLE])
         grid1.set_all_rows_visible(True)
 
@@ -60,12 +60,12 @@ class TestGridBasicView(VerticalLayout):
         grid_align.set_items([{"name": "Test", "age": 99}])
         grid_align.set_all_rows_visible(True)
 
-        # --- Column set_frozen ---
+        # --- Column set_frozen / set_frozen_to_end ---
         grid_frozen = Grid()
         grid_frozen.set_id("grid-frozen")
         grid_frozen.add_column("name", header="Frozen").set_frozen(True).set_width("150px")
         grid_frozen.add_column("age", header="Age").set_width("300px")
-        grid_frozen.add_column("email", header="Email").set_width("300px")
+        grid_frozen.add_column("email", header="Email").set_frozen_to_end(True).set_width("150px")
         grid_frozen.set_items([{"name": "Test", "age": 1, "email": "t@t.com"}])
         grid_frozen.set_all_rows_visible(True)
 
@@ -122,8 +122,13 @@ class TestGridBasicView(VerticalLayout):
         grid_reorder.set_column_reordering_allowed(True)
         grid_reorder.set_all_rows_visible(True)
 
+        # --- Clear button (empty state test) ---
+        btn_clear = Button("Clear data")
+        btn_clear.set_id("btn-clear")
+        btn_clear.add_click_listener(lambda e: grid1.set_items([]))
+
         self.add(
-            grid1, btn_replace,
+            grid1, btn_replace, btn_clear,
             grid_res,
             grid_align,
             grid_frozen,

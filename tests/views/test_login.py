@@ -53,13 +53,7 @@ class TestLoginView(VerticalLayout):
         btn_lo_close.set_id("btn-lo-close")
         btn_lo_close.add_click_listener(lambda e: lo.close())
 
-        # --- All done ---
-        all_done = Span("All UI test views visited")
-        all_done.set_id("all-done")
-
-        # --- No nav link (last view) ---
         self.add(
             lf, lf_result, lf_forgot,
             btn_lo, lo, lo_result, btn_lo_close,
-            all_done,
         )

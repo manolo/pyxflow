@@ -48,6 +48,21 @@ class TestSelectListboxView(VerticalLayout):
         sel_gen.set_items("us", "uk")
         sel_gen.set_item_label_generator(str.upper)
 
+        # --- Select empty selection value span ---
+        sel_empty_val = Span("")
+        sel_empty_val.set_id("sel-empty-val")
+        sel_empty.add_value_change_listener(
+            lambda e: sel_empty_val.set_text(
+                str(e.get("value", "")) if e.get("value") else "empty"
+            )
+        )
+
+        # --- Select required ---
+        sel_req = Select("Required")
+        sel_req.set_id("sel-req")
+        sel_req.set_items("US", "UK")
+        sel_req.set_required_indicator_visible(True)
+
         # --- Select read_only ---
         sel_ro = Select("ReadOnly")
         sel_ro.set_id("sel-ro")
@@ -114,8 +129,9 @@ class TestSelectListboxView(VerticalLayout):
             sel1, sel1_val,
             sel_pre,
             sel_ph,
-            sel_empty,
+            sel_empty, sel_empty_val,
             sel_gen,
+            sel_req,
             sel_ro,
             lb1, lb1_val,
             lb_pre,
