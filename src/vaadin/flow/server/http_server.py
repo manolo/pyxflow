@@ -199,10 +199,19 @@ async def handle_uidl(request: web.Request) -> web.Response:
     # Process UIDL
     log.debug("RPC: %s", payload.get("rpc", []))
     handler: UidlHandler = ui_state["handler"]
-    response_data = handler.handle_uidl(payload)
+    try:
+        response_data = handler.handle_uidl(payload)
 
-    # Wrap response with XSS protection prefix
-    response_text = f"for(;;);[{json.dumps(response_data, cls=_UidlEncoder)}]"
+        # Wrap response with XSS protection prefix
+        response_text = f"for(;;);[{json.dumps(response_data, cls=_UidlEncoder)}]"
+    except Exception:
+        log.exception("Error processing UIDL request")
+        # Return a valid UIDL error so FlowClient shows a notification
+        # instead of a raw 500 that causes a blank screen.
+        handler._show_error_notification()
+        response_data = handler._build_response()
+        response_text = f"for(;;);[{json.dumps(response_data, cls=_UidlEncoder)}]"
+
     log.debug("Response: %s...", response_text[:500])
     return web.Response(
         text=response_text,
