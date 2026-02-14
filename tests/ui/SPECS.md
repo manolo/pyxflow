@@ -16,36 +16,37 @@
 | # | Route | Tests | Components |
 |---|-------|-------|------------|
 | 1 | `/test/buttons-icons` | 18 | Button, Icon, DrawerToggle |
-| 2 | `/test/text-inputs` | 28 | TextField, TextArea, PasswordField, EmailField |
+| 2 | `/test/text-inputs` | 33 | TextField, TextArea, PasswordField, EmailField |
 | 3 | `/test/number-inputs` | 15 | NumberField, IntegerField |
-| 4 | `/test/checkbox-radio` | 20 | Checkbox, CheckboxGroup, RadioButtonGroup |
-| 5 | `/test/select-listbox` | 18 | Select, ListBox, MultiSelectListBox |
-| 6 | `/test/combo-box` | 20 | ComboBox, MultiSelectComboBox |
-| 7 | `/test/date-time` | 18 | DatePicker, TimePicker, DateTimePicker |
-| 8 | `/test/grid-basic` | 20 | Grid (columns, data, renderers) |
-| 9 | `/test/grid-features` | 16 | Grid (selection, sorting, click, columns ops) |
+| 4 | `/test/checkbox-radio` | 22 | Checkbox, CheckboxGroup, RadioButtonGroup |
+| 5 | `/test/select-listbox` | 20 | Select, ListBox, MultiSelectListBox |
+| 6 | `/test/combo-box` | 24 | ComboBox, MultiSelectComboBox |
+| 7 | `/test/date-time` | 36 | DatePicker, TimePicker, DateTimePicker |
+| 8 | `/test/grid-basic` | 25 | Grid (columns, data, renderers) |
+| 9 | `/test/grid-features` | 22 | Grid (selection, sorting, click, columns ops, details) |
 | 10 | `/test/tree-grid` | 10 | TreeGrid |
-| 11 | `/test/dialog` | 18 | Dialog, ConfirmDialog |
-| 12 | `/test/notification-popover` | 17 | Notification, Popover |
+| 11 | `/test/dialog` | 22 | Dialog, ConfirmDialog |
+| 12 | `/test/notification-popover` | 19 | Notification, Popover |
 | 13 | `/test/tabs-accordion` | 20 | Tabs, TabSheet, Accordion, Details |
-| 14 | `/test/menu` | 14 | MenuBar, ContextMenu |
+| 14 | `/test/menu` | 18 | MenuBar, ContextMenu |
 | 15 | `/test/layouts` | 21 | VerticalLayout, HorizontalLayout, FlexLayout, FormLayout, SplitLayout |
-| 16 | `/test/card-scroller` | 13 | Card, Scroller, MasterDetailLayout |
-| 17 | `/test/upload` | 10 | Upload |
+| 16 | `/test/card-scroller` | 14 | Card, Scroller, MasterDetailLayout |
+| 17 | `/test/upload` | 13 | Upload |
 | 18 | `/test/display` | 17 | ProgressBar, Avatar, AvatarGroup, Markdown, MessageInput, MessageList |
 | 19 | `/test/html-elements` | 16 | H1-H6, Paragraph, Span, Div, Anchor, IFrame, Hr, Pre, Image, NativeLabel |
 | 20 | `/test/component-api` | 22 | Base Component API (visibility, enabled, classes, styles, size, tooltip, aria, theme) |
 | 21 | `/test/field-mixins` | 17 | HasReadOnly, HasValidation, HasRequired |
-| 22 | `/test/binder` | 15 | Binder, validators, converters, dirty tracking |
+| 22 | `/test/binder` | 23 | Binder, validators, converters, dirty tracking, field types |
 | 23 | `/test/navigation` | 14 | @Route, params, AppLayout, SideNav, RouterLink, page title |
 | 24 | `/test/push` | 8 | WebSocket push, UI.access() |
 | 25 | `/test/theme` | 10 | Theme switching, @StyleSheet, @ColorScheme |
 | 26 | `/test/client-callable` | 6 | @ClientCallable |
 | 27 | `/test/custom-field` | 8 | CustomField |
-| 28 | `/test/virtual-list` | 8 | VirtualList |
-| 29 | `/test/login` | 11 | LoginForm, LoginOverlay |
+| 28 | `/test/virtual-list` | 11 | VirtualList |
+| 29 | `/test/login` | 14 | LoginForm, LoginOverlay |
+| 30 | `/test/server-errors` | 13 | Error notification, meta.appError, JSON serialization, push errors, HasErrorParameter |
 
-**Total: 448 scenarios across 29 views (V01.01–V29.11)**
+**Total: 531 scenarios across 30 views (V01.01–V30.13)**
 
 ---
 
@@ -290,8 +291,35 @@ Feature: Text Input Fields
     When type "abc" rapidly
     Then only one value-change event fires after 500ms pause
 
+  # --- Value roundtrip (mSync regression) ---
+  Scenario: V02.28 — TextField value preserved after focus/blur cycle
+    Given TextField#tf-round with value "hello"
+    When click "#tf-round" to focus, then click elsewhere to blur
+    Then get_value() still returns "hello" (not None)
+    And Span#tf-round-val text is "hello"
+
+  Scenario: V02.29 — TextField required client-side validation
+    Given TextField#tf-req with set_required_indicator_visible(True)
+    When focus "#tf-req", leave empty, blur
+    Then "#tf-req" shows invalid state (client validates required)
+
+  Scenario: V02.30 — TextField clear and re-type same value
+    Given TextField#tf-same with value "test"
+    When clear field, type "test" again, blur
+    Then value-change fires and Span#tf-same-val text is "test"
+
+  Scenario: V02.31 — TextArea set_max_length
+    Given TextArea with set_max_length(50)
+    When type more than 50 characters
+    Then input is limited to 50 characters
+
+  Scenario: V02.32 — TextField set_value then user edits
+    Given TextField with set_value("initial"), value_change_listener
+    When user clears and types "edited"
+    Then value-change event has from_client=True and value="edited"
+
   # --- Nav ---
-  Scenario: V02.28 — Nav to next view
+  Scenario: V02.33 — Nav to next view
     When click link "Next: Number Inputs"
     Then URL contains "/test/number-inputs"
 ```
@@ -467,8 +495,19 @@ Feature: Checkbox & RadioButtonGroup
     Given RadioButtonGroup with set_required_indicator_visible(True)
     Then required indicator visible
 
+  # --- Value roundtrip (mSync regression) ---
+  Scenario: V04.20 — CheckboxGroup deselect then re-select same item
+    Given CheckboxGroup with "Red" selected
+    When uncheck "Red", then check "Red" again
+    Then Span#cbg1-val text contains "Red"
+
+  Scenario: V04.21 — RadioButtonGroup value preserved after re-selection
+    Given RadioButtonGroup with "M" selected
+    When select "L", then select "M" again
+    Then Span#rbg1-val text is "M"
+
   # --- Nav ---
-  Scenario: V04.20 — Nav to next view
+  Scenario: V04.22 — Nav to next view
     When click link "Next: Select & ListBox"
     Then URL contains "/test/select-listbox"
 ```
@@ -554,8 +593,20 @@ Feature: Select & ListBox
     When click item
     Then selection does NOT change
 
+  # --- Value roundtrip (mSync regression) ---
+  Scenario: V05.18 — Select change value multiple times
+    Given Select#sel-multi with items "US","UK","DE"
+    When select "UK", then select "DE", then select "US"
+    Then Span#sel-multi-val text is "US" (final value)
+
+  Scenario: V05.19 — Select required validation
+    Given Select with set_required_indicator_visible(True), no value selected
+    Then required indicator visible
+    When select "UK" then clear selection
+    Then invalid state shown
+
   # --- Nav ---
-  Scenario: V05.18 — Nav to next view
+  Scenario: V05.20 — Nav to next view
     When click link "Next: ComboBox"
     Then URL contains "/test/combo-box"
 ```
@@ -653,8 +704,29 @@ Feature: ComboBox & MultiSelectComboBox
     Given set_read_only(True)
     Then cannot open dropdown or modify selection
 
+  # --- Value roundtrip (mSync regression) ---
+  Scenario: V06.20 — ComboBox clear and re-select same value
+    Given ComboBox#cb-round with value "Apple"
+    When click clear button, then re-select "Apple"
+    Then Span#cb-round-val text is "Apple" (not None)
+
+  Scenario: V06.21 — ComboBox required validation
+    Given ComboBox with set_required_indicator_visible(True), value set
+    When clear value and blur
+    Then field shows invalid state (required)
+
+  Scenario: V06.22 — ComboBox set_value then user changes
+    Given ComboBox with set_value("Banana"), value_change_listener
+    When user selects "Cherry"
+    Then value-change event fires with value "Cherry" and from_client=True
+
+  Scenario: V06.23 — MultiSelectComboBox value roundtrip
+    Given MultiSelectComboBox with set_value({"A","B"})
+    When deselect "A", then re-select "A"
+    Then value contains "A" and "B"
+
   # --- Nav ---
-  Scenario: V06.20 — Nav to next view
+  Scenario: V06.24 — Nav to next view
     When click link "Next: Date & Time"
     Then URL contains "/test/date-time"
 ```
@@ -744,8 +816,113 @@ Feature: DatePicker, TimePicker, DateTimePicker
     When open calendar
     Then month names are localized
 
+  # --- DatePicker value roundtrip (mSync regression — THE BUG) ---
+  Scenario: V07.18 — DatePicker value survives mSync+change cycle
+    Given DatePicker#dp-round with value_change_listener → Span#dp-round-val
+    When type "2025-06-15" into "#dp-round" and blur
+    Then Span#dp-round-val text is "2025-06-15"
+    And get_value() returns date(2025, 6, 15) (not None)
+
+  Scenario: V07.19 — DatePicker clear then set same value
+    Given DatePicker#dp-same with set_value(date(2025, 3, 10))
+    When click clear button to clear value
+    Then value is None
+    When type "2025-03-10" and blur
+    Then value is date(2025, 3, 10) again
+
+  Scenario: V07.20 — DatePicker calendar pick preserves value
+    Given DatePicker#dp-pick, open calendar
+    When click a date cell in the calendar popup
+    Then Span#dp-pick-val shows the selected date (not empty/None)
+
+  # --- DatePicker open/close ---
+  Scenario: V07.21 — DatePicker open/close programmatic
+    Given DatePicker#dp-oc, Button#dp-open calling dp.open(), Button#dp-close calling dp.close()
+    When click "#dp-open"
+    Then calendar overlay is visible
+    When click "#dp-close"
+    Then calendar overlay is hidden
+
+  Scenario: V07.22 — DatePicker opened-change listener
+    Given DatePicker#dp-ocl with add_opened_change_listener → Span#dp-oc-ev
+    When open and close calendar
+    Then Span#dp-oc-ev tracks open/close events
+
+  # --- DatePicker extra features ---
+  Scenario: V07.23 — DatePicker week numbers
+    Given DatePicker#dp-wn with set_week_numbers_visible(True)
+    When open calendar
+    Then week numbers column visible in calendar
+
+  Scenario: V07.24 — DatePicker initial position
+    Given DatePicker#dp-ip with set_initial_position(date(2025, 6, 1)), no value
+    When open calendar
+    Then calendar opens showing June 2025
+
+  Scenario: V07.25 — DatePicker auto_open disabled
+    Given DatePicker#dp-noauto with set_auto_open(False)
+    When focus "#dp-noauto"
+    Then calendar does NOT open automatically
+
+  Scenario: V07.26 — DatePicker required validation
+    Given DatePicker#dp-req with set_required_indicator_visible(True)
+    When focus, leave empty, blur
+    Then field shows invalid state (client validates required)
+
+  # --- TimePicker value roundtrip (mSync regression) ---
+  Scenario: V07.27 — TimePicker value survives mSync+change cycle
+    Given TimePicker#tp-round with value_change_listener → Span#tp-round-val
+    When type "14:30" into "#tp-round" and blur
+    Then Span#tp-round-val text is "14:30"
+    And get_value() returns time(14, 30) (not None)
+
+  Scenario: V07.28 — TimePicker clear then re-set same value
+    Given TimePicker#tp-same with set_value(time(9, 0))
+    When clear, then type "09:00" and blur
+    Then value is time(9, 0) again
+
+  # --- TimePicker open/close ---
+  Scenario: V07.29 — TimePicker open/close programmatic
+    Given TimePicker#tp-oc, Button#tp-open calling tp.open(), Button#tp-close calling tp.close()
+    When click "#tp-open"
+    Then time dropdown is visible
+    When click "#tp-close"
+    Then time dropdown is hidden
+
+  Scenario: V07.30 — TimePicker opened-change listener
+    Given TimePicker#tp-ocl with add_opened_change_listener → Span#tp-oc-ev
+    When open and close
+    Then Span#tp-oc-ev tracks open/close events
+
+  # --- DateTimePicker value roundtrip (mSync regression) ---
+  Scenario: V07.31 — DateTimePicker value survives mSync+change cycle
+    Given DateTimePicker#dtp-round with value_change_listener → Span#dtp-round-val
+    When set date "2025-06-15" and time "14:30" and blur
+    Then Span#dtp-round-val shows "2025-06-15T14:30"
+    And get_value() returns datetime(2025, 6, 15, 14, 30) (not None)
+
+  Scenario: V07.32 — DateTimePicker clear and re-set
+    Given DateTimePicker#dtp-same with set_value(datetime(2025, 1, 1, 9, 0))
+    When clear date part, then re-enter "2025-01-01" and "09:00"
+    Then value is datetime(2025, 1, 1, 9, 0) again
+
+  Scenario: V07.33 — DateTimePicker step precision
+    Given DateTimePicker#dtp-step with set_step(3600) (1 hour)
+    When open time dropdown
+    Then time options are at 1-hour intervals
+
+  Scenario: V07.34 — DateTimePicker required validation
+    Given DateTimePicker#dtp-req with set_required_indicator_visible(True)
+    When focus, leave empty, blur
+    Then field shows invalid state
+
+  Scenario: V07.35 — DateTimePicker week numbers
+    Given DateTimePicker#dtp-wn with set_week_numbers_visible(True)
+    When open date part calendar
+    Then week numbers column visible
+
   # --- Nav ---
-  Scenario: V07.18 — Nav to next view
+  Scenario: V07.36 — Nav to next view
     When click link "Next: Grid Basic"
     Then URL contains "/test/grid-basic"
 ```
@@ -846,8 +1023,32 @@ Feature: Grid — Columns & Data
     When scroll down
     Then new rows load lazily
 
+  # --- Data refresh ---
+  Scenario: V08.20 — Grid set_items replaces and re-renders
+    Given grid with 5 items, Button#refresh calling grid.set_items(new_5_items)
+    When click "#refresh"
+    Then grid shows new data, old data gone
+
+  Scenario: V08.21 — Grid empty state
+    Given grid with items, Button#clear calling grid.set_items([])
+    When click "#clear"
+    Then grid shows no data rows (empty)
+
+  Scenario: V08.22 — Grid all_rows_visible mode
+    Given Grid#grid-arv with set_all_rows_visible(True) and 3 items
+    Then grid height fits exactly 3 rows (no scrollbar)
+
+  Scenario: V08.23 — Grid column set_key and get by key
+    Given column with set_key("name-col")
+    Then grid.get_column_by_key("name-col") returns the column
+
+  Scenario: V08.24 — Grid column set_sortable with data provider
+    Given grid with CallbackDataProvider, sortable column
+    When click column header to sort
+    Then data provider receives sort order, rows re-rendered
+
   # --- Nav ---
-  Scenario: V08.20 — Nav to next view
+  Scenario: V08.25 — Nav to next view
     When click link "Next: Grid Features"
     Then URL contains "/test/grid-features"
 ```
@@ -939,8 +1140,45 @@ Feature: Grid — Selection, Sorting, Events
     When click button
     Then only "Name" and "Age" columns remain
 
+  # --- Details row ---
+  Scenario: V09.16 — Grid details row open/close
+    Given grid.set_item_details_renderer(LitRenderer("<div>Details: ${item.name}</div>"))
+    When click row "Alice"
+    Then details row expands showing "Details: Alice"
+    When click "Alice" again
+    Then details row collapses
+
+  # --- Scroll ---
+  Scenario: V09.17 — Grid scroll to index
+    Given grid with 100 items
+    When grid.scroll_to_index(90) via Button
+    Then row 90 is visible in viewport
+
+  # --- Column header component ---
+  Scenario: V09.18 — Grid column set_header_component
+    Given column with set_header_component(Button("Sort"))
+    Then header contains a clickable Button instead of text
+
+  # --- Items with active sort ---
+  Scenario: V09.19 — Grid set_items preserves sort
+    Given grid sorted by Name ascending
+    When grid.set_items(new_items) via Button
+    Then new items are displayed sorted by Name ascending
+
+  # --- Remove all columns ---
+  Scenario: V09.20 — Grid remove_all_columns
+    Given Button calling grid.remove_all_columns()
+    When click button
+    Then grid has no columns
+
+  # --- Recalculate widths ---
+  Scenario: V09.21 — Grid recalculate_column_widths
+    Given grid with auto-width columns, Button calling grid.recalculate_column_widths()
+    When click button
+    Then column widths adjust to current content
+
   # --- Nav ---
-  Scenario: V09.16 — Nav to next view
+  Scenario: V09.22 — Nav to next view
     When click link "Next: TreeGrid"
     Then URL contains "/test/tree-grid"
 ```
@@ -1101,8 +1339,30 @@ Feature: Dialog & ConfirmDialog
     When open, confirm, then open again
     Then dialog opens again correctly
 
+  # --- Dialog edge cases ---
+  Scenario: V11.18 — Dialog initially opened
+    Given Dialog with set_opened(True) during __init__
+    Then dialog is visible immediately on view load
+
+  Scenario: V11.19 — Multiple dialogs stacked
+    Given Dialog#dlg-a and Dialog#dlg-b, both open
+    When open dlg-a, then open dlg-b
+    Then both overlays visible, dlg-b on top
+    When close dlg-b
+    Then dlg-a still visible
+
+  Scenario: V11.20 — ConfirmDialog close on Escape
+    Given ConfirmDialog with set_cancelable(True)
+    When open then press Escape
+    Then cancel listener fires and dialog closes
+
+  Scenario: V11.21 — Dialog add_close_listener detects Esc vs button
+    Given Dialog with add_close_listener tracking close action
+    When open, press Escape
+    Then close event indicates user action (not programmatic)
+
   # --- Nav ---
-  Scenario: V11.18 — Nav to next view
+  Scenario: V11.22 — Nav to next view
     When click link "Next: Notification & Popover"
     Then URL contains "/test/notification-popover"
 ```
@@ -1198,8 +1458,19 @@ Feature: Notification & Popover
     When open then close
     Then Span#pop-ev tracks "opened,closed"
 
+  # --- Edge cases ---
+  Scenario: V12.17 — Multiple simultaneous notifications
+    Given Button opening 3 notifications at once (TOP_START, BOTTOM_END, MIDDLE)
+    When click button
+    Then all 3 notifications visible simultaneously in their positions
+
+  Scenario: V12.18 — Popover with form content
+    Given Popover containing TextField + Button, target=Button#pop-form-target
+    When open popover, type in TextField, click inner Button
+    Then Span#pop-form-val shows typed value (events work inside popover)
+
   # --- Nav ---
-  Scenario: V12.17 — Nav to next view
+  Scenario: V12.19 — Nav to next view
     When click link "Next: Tabs & Accordion"
     Then URL contains "/test/tabs-accordion"
 ```
@@ -1376,8 +1647,31 @@ Feature: MenuBar & ContextMenu
     Given item "Cut" disabled
     Then "Cut" appears grayed out
 
+  # --- Dynamic items ---
+  Scenario: V14.14 — MenuBar add item dynamically
+    Given MenuBar, Button#add-menu calling menu_bar.add_item("Help")
+    When click "#add-menu"
+    Then "Help" button appears in menu bar
+
+  Scenario: V14.15 — MenuBar item visibility toggle
+    Given MenuItem "Open" initially visible, Button#toggle-vis calling item.set_visible(False)
+    When click "File" → "Open" is visible
+    When click "#toggle-vis", then click "File" again
+    Then "Open" is NOT in submenu
+
+  Scenario: V14.16 — ContextMenu dynamic items
+    Given ContextMenu, Button#add-ctx calling context_menu.add_item("Select All")
+    When click "#add-ctx", then right-click target
+    Then "Select All" appears in menu
+
+  Scenario: V14.17 — MenuBar overflow into "..." menu
+    Given MenuBar with 10 items in narrow container
+    Then overflow items grouped under "..." (overflow button)
+    When click "..."
+    Then hidden items visible in submenu
+
   # --- Nav ---
-  Scenario: V14.14 — Nav to next view
+  Scenario: V14.18 — Nav to next view
     When click link "Next: Layouts"
     Then URL contains "/test/layouts"
 ```
@@ -1596,8 +1890,25 @@ Feature: Upload
     When upload large file
     Then Span#upload-rej shows rejection reason
 
+  # --- Upload edge cases ---
+  Scenario: V17.10 — Upload clear_file_list
+    Given file already uploaded, Button calling upload.clear_file_list()
+    When click button
+    Then file list is empty
+
+  Scenario: V17.11 — Upload multiple files sequentially
+    Given Upload with set_max_files(3)
+    When upload file1, then file2
+    Then both files listed as succeeded
+    And Span#upload-count text is "2"
+
+  Scenario: V17.12 — Upload started_listener
+    Given add_started_listener → Span#upload-start
+    When upload a file
+    Then Span#upload-start shows filename before upload completes
+
   # --- Nav ---
-  Scenario: V17.10 — Nav to next view
+  Scenario: V17.13 — Nav to next view
     When click link "Next: Display Components"
     Then URL contains "/test/display"
 ```
@@ -2072,8 +2383,54 @@ Feature: Binder — Data Binding & Validation
     When all invalid, click save
     Then all 3 fields show errors simultaneously
 
+  # --- Binder with date/time fields (mSync regression — THE BUG) ---
+  Scenario: V22.15 — Binder with DatePicker saves correct value
+    Given Binder with DatePicker#bind-dp bound to person.birthday
+    When type "2025-06-15" in DatePicker and click "#save"
+    Then person.birthday is date(2025, 6, 15) (not None)
+    And Span#binder-result contains "2025-06-15"
+
+  Scenario: V22.16 — Binder with TimePicker saves correct value
+    Given Binder with TimePicker#bind-tp bound to person.start_time
+    When type "14:30" in TimePicker and click "#save"
+    Then person.start_time is time(14, 30) (not None)
+    And Span#binder-result contains "14:30"
+
+  Scenario: V22.17 — Binder with DateTimePicker saves correct value
+    Given Binder with DateTimePicker#bind-dtp bound to person.appointment
+    When set date "2025-06-15" and time "14:30" and click "#save"
+    Then person.appointment is datetime(2025, 6, 15, 14, 30) (not None)
+
+  Scenario: V22.18 — Binder with Select saves correct value
+    Given Binder with Select#bind-sel bound to person.country
+    When select "UK" and click "#save"
+    Then person.country is "UK" (not None)
+
+  Scenario: V22.19 — Binder with ComboBox saves correct value
+    Given Binder with ComboBox#bind-cb bound to person.city
+    When select "London" and click "#save"
+    Then person.city is "London" (not None)
+
+  # --- Binder reset and re-read ---
+  Scenario: V22.20 — Binder read_bean after write_bean
+    Given form with filled data, binder.write_bean(person)
+    When binder.read_bean(other_person)
+    Then fields show other_person's values (not previous)
+
+  Scenario: V22.21 — Binder clear all fields via read_bean(None)
+    Given form with data populated
+    When Button calling binder.read_bean(None)
+    Then all fields empty
+    And Span#dirty shows "false"
+
+  Scenario: V22.22 — Binder validate_and_save all field types
+    Given form with TextField, EmailField, IntegerField, DatePicker, Select
+    When fill all fields with valid data and click "#save"
+    Then all values saved correctly to bean (none are None)
+    And Span#binder-result shows all values
+
   # --- Nav ---
-  Scenario: V22.15 — Nav to next view
+  Scenario: V22.23 — Nav to next view
     When click link "Next: Navigation"
     Then URL contains "/test/navigation"
 ```
@@ -2386,8 +2743,23 @@ Feature: VirtualList
     Given set_item_label_generator(lambda x: x.upper())
     Then items displayed in uppercase
 
+  # --- VirtualList edge cases ---
+  Scenario: V28.08 — VirtualList scroll to index
+    Given VirtualList with 500 items, Button calling vl.scroll_to_index(450)
+    When click button
+    Then item 450 is visible in viewport
+
+  Scenario: V28.09 — VirtualList data provider refresh
+    Given VirtualList with DataProvider, Button calling dp.refresh_all()
+    When modify underlying data, click button
+    Then list shows updated items
+
+  Scenario: V28.10 — VirtualList empty state
+    Given VirtualList with set_items([])
+    Then list renders with no visible items (empty)
+
   # --- Nav ---
-  Scenario: V28.08 — Nav to next view
+  Scenario: V28.11 — Nav to next view
     When click link "Next: Login"
     Then URL contains "/test/login"
 ```
@@ -2446,8 +2818,129 @@ Feature: LoginForm & LoginOverlay
     When close
     Then overlay hidden
 
+  # --- Login edge cases ---
+  Scenario: V29.11 — LoginForm submit via Enter in username field
+    Given LoginForm with add_login_listener
+    When type "admin" in username, press Enter
+    Then login event does NOT fire (need password too)
+
+  Scenario: V29.12 — LoginForm submit via Enter in password field
+    Given LoginForm with add_login_listener
+    When type "admin" in username, "pass123" in password, press Enter in password field
+    Then login event fires with "admin:pass123"
+
+  Scenario: V29.13 — LoginForm set_enabled(False) disables submit
+    Given LoginForm with set_enabled(False)
+    Then submit button is disabled
+    When try to submit
+    Then login event does NOT fire
+
+  # --- Nav ---
+  Scenario: V29.14 — Nav to next view
+    When click link "Next: Server Errors"
+    Then URL contains "/test/server-errors"
+```
+
+---
+
+## View 30: `/test/server-errors`
+
+```gherkin
+Feature: Server Error Handling & Session Resilience
+
+  # --- Error notification via _show_error_notification() ---
+  # Per-RPC errors in handle_uidl are caught and shown as a Notification
+  # (error theme, position=MIDDLE, 5s duration). Other RPCs in the batch
+  # still execute — partial failure, not total failure.
+
+  Scenario: V30.01 — Click handler exception shows error notification
+    Given Button#err-click whose click handler raises RuntimeError("Test error")
+    When click "#err-click"
+    Then vaadin-notification with error theme appears at middle position
+    And notification text contains "internal error"
+    And app remains functional (not blank screen)
+
+  Scenario: V30.02 — Value-change handler exception shows error notification
+    Given TextField#err-tf whose value_change_listener raises Exception
+    When type "test" and blur
+    Then error notification appears
+    And other components still work (click Button#healthy → Span#healthy-result updates)
+
+  Scenario: V30.03 — Partial RPC failure: first RPC fails, second succeeds
+    Given TextField#err-tf (value-change raises) and Button#healthy (click → Span#result)
+    When type in "#err-tf", blur, then click "#healthy"
+    Then error notification from TextField, BUT Span#result updates from Button click
+    (Both RPCs processed — error doesn't abort batch)
+
+  Scenario: V30.04 — Navigation error shows notification
+    Given SideNav link to /test/broken-init whose __init__ raises Exception
+    When click link to broken view
+    Then error notification appears (not blank page)
+    And SideNav still works (click link to another working view succeeds)
+
+  # --- meta.appError critical error overlay ---
+  # Safety net: when handle_uidl() itself throws (e.g., serialization bug AFTER
+  # tree changes consumed), returns meta.appError with syncId=-1.
+  # Client shows .v-system-error overlay (top-right, red). Click/ESC refreshes page.
+
+  Scenario: V30.05 — meta.appError shows system error overlay
+    Given Button#err-fatal that causes unrecoverable error (execute_js injecting bad state)
+    When trigger the fatal error
+    Then .v-system-error overlay appears (red box, top-right)
+    And clicking overlay or pressing Escape refreshes the page
+
+  # --- UIDL JSON serialization (bulletproof _UidlEncoder) ---
+  # The encoder must NEVER raise — handles date, datetime, unknown types via str() fallback.
+  # A serialization error after tree changes are consumed would leave a blank screen.
+
+  Scenario: V30.06 — Date/datetime values serialize correctly in UIDL
+    Given DatePicker#ser-dp with set_value(date(2025,6,15))
+    And DateTimePicker#ser-dtp with set_value(datetime(2025,6,15,14,30))
+    Then both render correct values (JSON contains ISO format strings)
+    And no serialization errors in server logs
+
+  Scenario: V30.07 — Unknown Python types fall back to str() (no crash)
+    Given component property set to an unusual Python object (e.g. via execute_js return)
+    Then UIDL response is valid JSON (str() fallback used)
+    And client renders without error
+
+  # --- Session resilience ---
+  Scenario: V30.08 — Multiple rapid clicks don't corrupt state
+    Given Button#rapid with click counter → Span#rapid-count
+    When click "#rapid" 10 times rapidly
+    Then Span#rapid-count text is "10" (all clicks processed, no lost/duplicate)
+
+  Scenario: V30.09 — Navigation works after error notification
+    Given error occurred (from V30.01), error notification shown
+    When click SideNav link to another test view
+    Then navigation succeeds, new view renders correctly
+
+  # --- Push error handling ---
+  Scenario: V30.10 — Push callback exception doesn't break session
+    Given Button#err-push that triggers UI.access(callback_that_raises)
+    When click "#err-push"
+    Then error notification appears
+    And subsequent push updates still work (click Button#push-ok → Span#push-ok updates via push)
+
+  Scenario: V30.11 — Concurrent push and user RPC don't interfere
+    Given push background task updating Span#push-val every 500ms
+    And Button#user-click with click listener → Span#click-val
+    When click "#user-click" while push is active
+    Then both Span#push-val and Span#click-val update correctly
+
+  # --- HasErrorParameter (not yet implemented — future) ---
+  # When implemented: route exceptions navigate to error views implementing
+  # HasErrorParameter<T>. Until then, generic notification is shown.
+
+  Scenario: V30.12 — HasErrorParameter view catches navigation error
+    Given @Route("/test/will-fail") view that raises in __init__
+    And ErrorView implementing HasErrorParameter<Exception> registered
+    When navigate to /test/will-fail
+    Then ErrorView renders with exception message (not generic notification)
+    Note: PENDING — requires HasErrorParameter implementation
+
   # --- Final ---
-  Scenario: V29.11 — All tests complete
+  Scenario: V30.13 — All tests complete
     Then Span#all-done text is "All UI test views visited"
 ```
 
