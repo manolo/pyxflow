@@ -29,6 +29,7 @@ class DateTimePicker(HasReadOnly, HasValidation, HasRequired, Component):
         self._min: Optional[datetime.datetime] = None
         self._max: Optional[datetime.datetime] = None
         self._step: Optional[int] = None
+        self._auto_open_disabled: bool = False
         self._change_listeners: list[Callable] = []
 
     def _attach(self, tree):
@@ -49,6 +50,8 @@ class DateTimePicker(HasReadOnly, HasValidation, HasRequired, Component):
             self.element.set_property("max", self._format_datetime(self._max))
         if self._step is not None:
             self.element.set_property("step", self._step)
+        if self._auto_open_disabled:
+            self.element.set_property("autoOpenDisabled", True)
         # Init connectors for internal date-picker and time-picker sub-fields
         el_ref = {"@v-node": self.element.node.id}
         tree.queue_execute([
@@ -148,6 +151,7 @@ class DateTimePicker(HasReadOnly, HasValidation, HasRequired, Component):
             listener({"value": self._value, "from_client": True})
 
     def set_auto_open(self, auto_open: bool):
+        self._auto_open_disabled = not auto_open
         if self._element:
             self.element.set_property("autoOpenDisabled", not auto_open)
 

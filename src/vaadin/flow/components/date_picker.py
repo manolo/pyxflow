@@ -27,6 +27,7 @@ class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):
         self._min: Optional[datetime.date] = None
         self._max: Optional[datetime.date] = None
         self._clear_button_visible: bool = False
+        self._auto_open_disabled: bool = False
         self._change_listeners: list[Callable] = []
 
     def _attach(self, tree):
@@ -46,6 +47,8 @@ class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):
             self.element.set_property("max", self._max.isoformat())
         if self._clear_button_visible:
             self.element.set_property("clearButtonVisible", True)
+        if self._auto_open_disabled:
+            self.element.set_property("autoOpenDisabled", True)
         if getattr(self, "_week_numbers_visible", False):
             self.element.set_property("showWeekNumbers", True)
         if getattr(self, "_initial_position", None):
@@ -141,6 +144,7 @@ class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):
 
     def set_auto_open(self, auto_open: bool):
         """Set whether the dropdown opens automatically on focus."""
+        self._auto_open_disabled = not auto_open
         if self._element:
             self.element.set_property("autoOpenDisabled", not auto_open)
 
