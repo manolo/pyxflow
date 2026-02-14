@@ -15,38 +15,38 @@
 
 | # | Route | Tests | Components |
 |---|-------|-------|------------|
-| 1 | `/test/buttons-icons` | 18 | Button, Icon, DrawerToggle |
-| 2 | `/test/text-inputs` | 33 | TextField, TextArea, PasswordField, EmailField |
-| 3 | `/test/number-inputs` | 15 | NumberField, IntegerField |
-| 4 | `/test/checkbox-radio` | 22 | Checkbox, CheckboxGroup, RadioButtonGroup |
-| 5 | `/test/select-listbox` | 20 | Select, ListBox, MultiSelectListBox |
-| 6 | `/test/combo-box` | 24 | ComboBox, MultiSelectComboBox |
-| 7 | `/test/date-time` | 36 | DatePicker, TimePicker, DateTimePicker |
-| 8 | `/test/grid-basic` | 25 | Grid (columns, data, renderers) |
-| 9 | `/test/grid-features` | 22 | Grid (selection, sorting, click, columns ops, details) |
-| 10 | `/test/tree-grid` | 10 | TreeGrid |
-| 11 | `/test/dialog` | 22 | Dialog, ConfirmDialog |
-| 12 | `/test/notification-popover` | 19 | Notification, Popover |
-| 13 | `/test/tabs-accordion` | 20 | Tabs, TabSheet, Accordion, Details |
-| 14 | `/test/menu` | 18 | MenuBar, ContextMenu |
-| 15 | `/test/layouts` | 21 | VerticalLayout, HorizontalLayout, FlexLayout, FormLayout, SplitLayout |
-| 16 | `/test/card-scroller` | 14 | Card, Scroller, MasterDetailLayout |
-| 17 | `/test/upload` | 13 | Upload |
-| 18 | `/test/display` | 17 | ProgressBar, Avatar, AvatarGroup, Markdown, MessageInput, MessageList |
-| 19 | `/test/html-elements` | 16 | H1-H6, Paragraph, Span, Div, Anchor, IFrame, Hr, Pre, Image, NativeLabel |
-| 20 | `/test/component-api` | 22 | Base Component API (visibility, enabled, classes, styles, size, tooltip, aria, theme) |
-| 21 | `/test/field-mixins` | 17 | HasReadOnly, HasValidation, HasRequired |
-| 22 | `/test/binder` | 23 | Binder, validators, converters, dirty tracking, field types |
-| 23 | `/test/navigation` | 14 | @Route, params, AppLayout, SideNav, RouterLink, page title |
+| 1 | `/test/buttons-icons` | 17 | Button, Icon, DrawerToggle |
+| 2 | `/test/text-inputs` | 26 | TextField, TextArea, PasswordField, EmailField |
+| 3 | `/test/number-inputs` | 14 | NumberField, IntegerField |
+| 4 | `/test/checkbox-radio` | 21 | Checkbox, CheckboxGroup, RadioButtonGroup |
+| 5 | `/test/select-listbox` | 17 | Select, ListBox, MultiSelectListBox |
+| 6 | `/test/combo-box` | 16 | ComboBox, MultiSelectComboBox |
+| 7 | `/test/date-time` | 20 | DatePicker, TimePicker, DateTimePicker |
+| 8 | `/test/grid-basic` | 14 | Grid (columns, data, renderers) |
+| 9 | `/test/grid-features` | 17 | Grid (selection, sorting, click, columns ops, details) |
+| 10 | `/test/tree-grid` | 5 | TreeGrid |
+| 11 | `/test/dialog` | 14 | Dialog, ConfirmDialog |
+| 12 | `/test/notification-popover` | 9 | Notification, Popover |
+| 13 | `/test/tabs-accordion` | 15 | Tabs, TabSheet, Accordion, Details |
+| 14 | `/test/menu` | 10 | MenuBar, ContextMenu |
+| 15 | `/test/layouts` | 12 | VerticalLayout, HorizontalLayout, FlexLayout, FormLayout, SplitLayout |
+| 16 | `/test/card-scroller` | 11 | Card, Scroller, MasterDetailLayout |
+| 17 | `/test/upload` | 5 | Upload |
+| 18 | `/test/display` | 15 | ProgressBar, Avatar, AvatarGroup, Markdown, MessageInput, MessageList |
+| 19 | `/test/html-elements` | 21 | H1-H6, Paragraph, Span, Div, Anchor, IFrame, Hr, Pre, Image, NativeLabel |
+| 20 | `/test/component-api` | 18 | Base Component API (visibility, enabled, classes, styles, size, tooltip, aria, theme) |
+| 21 | `/test/field-mixins` | 13 | HasReadOnly, HasValidation, HasRequired |
+| 22 | `/test/binder` | 20 | Binder, validators, converters, dirty tracking, field types |
+| 23 | `/test/navigation` | 10 | @Route, params, AppLayout, SideNav, RouterLink, page title |
 | 24 | `/test/push` | 8 | WebSocket push, UI.access() |
-| 25 | `/test/theme` | 10 | Theme switching, @StyleSheet, @ColorScheme |
-| 26 | `/test/client-callable` | 6 | @ClientCallable |
-| 27 | `/test/custom-field` | 8 | CustomField |
-| 28 | `/test/virtual-list` | 11 | VirtualList |
-| 29 | `/test/login` | 14 | LoginForm, LoginOverlay |
-| 30 | `/test/server-errors` | 13 | Error notification, meta.appError, JSON serialization, push errors, HasErrorParameter |
+| 25 | `/test/theme` | 8 | Theme switching, @StyleSheet, @ColorScheme |
+| 26 | `/test/client-callable` | 3 | @ClientCallable |
+| 27 | `/test/custom-field` | 6 | CustomField |
+| 28 | `/test/virtual-list` | 5 | VirtualList |
+| 29 | `/test/login` | 8 | LoginForm, LoginOverlay |
+| 30 | `/test/server-errors` | 8 | Error notification, meta.appError, JSON serialization, session resilience |
 
-**Total: 531 scenarios across 30 views (V01.01–V30.13)**
+**Total: 386 tests across 30 views (383 pass, 3 skip)**
 
 ---
 

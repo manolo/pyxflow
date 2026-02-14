@@ -61,8 +61,8 @@ vaadin-pyflow/
 │   └── services/       # PeopleService (data access layer)
 ├── tests/
 │   ├── views/          # 29 test views with TestMainLayout (independent app, python -m tests)
-│   ├── unit/           # 2274 unit tests (default pytest target)
-│   └── ui/             # 323 Playwright UI tests (run explicitly via pytest tests/ui/)
+│   ├── unit/           # 2297 unit tests (default pytest target)
+│   └── ui/             # 383 Playwright UI tests (run explicitly via pytest tests/ui/)
 └── STATUS.md           # Implementation progress
 ../bundle-generator/    # Java project → frontend bundle (shared, at root level)
 ```
