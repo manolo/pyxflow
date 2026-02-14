@@ -88,7 +88,9 @@ class TestTimePicker:
         events = []
         tp.add_value_change_listener(lambda e: events.append(e))
 
-        tp._handle_change({"value": "14:30"})
+        # Real protocol: mSync sets value first, then change event fires listeners
+        tp._sync_property("value", "14:30")
+        tp._handle_change({})
         assert len(events) == 1
         assert tp.value == datetime.time(14, 30)
 
@@ -96,7 +98,8 @@ class TestTimePicker:
         tp = TimePicker()
         tp._attach(tree)
 
-        tp._handle_change({"value": "14:30:45"})
+        tp._sync_property("value", "14:30:45")
+        tp._handle_change({})
         assert tp.value == datetime.time(14, 30, 45)
 
     def test_change_listener_empty(self, tree):
@@ -104,7 +107,8 @@ class TestTimePicker:
         tp.set_value(datetime.time(12, 0))
         tp._attach(tree)
 
-        tp._handle_change({"value": ""})
+        tp._sync_property("value", "")
+        tp._handle_change({})
         assert tp.value is None
 
     def test_sync_property(self, tree):

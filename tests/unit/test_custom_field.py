@@ -123,14 +123,18 @@ class TestCustomField:
 
         events = []
         cf.add_value_change_listener(lambda e: events.append(e))
-        cf._handle_change({"value": "test"})
+        # Real protocol: mSync sets value first, then change event fires listeners
+        cf._sync_property("value", "test")
+        cf._handle_change({})
         assert len(events) == 1
         assert events[0]["value"] == "test"
 
     def test_value_change_listener_updates_internal(self, tree):
         cf = CustomField()
         cf._attach(tree)
-        cf._handle_change({"value": "updated"})
+        # Real protocol: mSync sets value first
+        cf._sync_property("value", "updated")
+        cf._handle_change({})
         assert cf._value == "updated"
 
     def test_sync_property_value(self):

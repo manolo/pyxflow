@@ -101,10 +101,12 @@ class CustomField(HasReadOnly, HasValidation, HasRequired, Component):
         self._change_listeners.append(listener)
 
     def _handle_change(self, event_data: dict):
-        value = event_data.get("value", "")
-        self._value = value
+        """Handle change event.
+
+        Value arrives via mSync (_sync_property), not event_data.
+        """
         for listener in self._change_listeners:
-            listener({"value": value})
+            listener({"value": self._value, "from_client": True})
 
     def add_theme_variants(self, *variants: CustomFieldVariant):
         """Add theme variants to the custom field."""

@@ -134,10 +134,12 @@ class TimePicker(HasReadOnly, HasValidation, HasRequired, Component):
         self._change_listeners.append(listener)
 
     def _handle_change(self, event_data: dict):
-        value_str = event_data.get("value", "")
-        self._value = self._parse_time(value_str)
+        """Handle change event.
+
+        Value arrives via mSync (_sync_property), not event_data.
+        """
         for listener in self._change_listeners:
-            listener(event_data)
+            listener({"value": self._value, "from_client": True})
 
     def set_clear_button_visible(self, visible: bool):
         self._clear_button_visible = visible

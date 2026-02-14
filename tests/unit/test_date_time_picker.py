@@ -88,14 +88,17 @@ class TestDateTimePicker:
         dtp._attach(tree)
         events = []
         dtp.add_value_change_listener(lambda e: events.append(e))
-        dtp._handle_change({"value": "2025-06-15T14:30"})
+        # Real protocol: mSync sets value first, then change event fires listeners
+        dtp._sync_property("value", "2025-06-15T14:30")
+        dtp._handle_change({})
         assert len(events) == 1
         assert dtp.get_value() == datetime.datetime(2025, 6, 15, 14, 30)
 
     def test_handle_change_empty(self, tree):
         dtp = DateTimePicker()
         dtp._attach(tree)
-        dtp._handle_change({"value": ""})
+        dtp._sync_property("value", "")
+        dtp._handle_change({})
         assert dtp.get_value() is None
 
     def test_sync_property(self, tree):

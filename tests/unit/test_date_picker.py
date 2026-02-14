@@ -80,7 +80,9 @@ class TestDatePicker:
         events = []
         dp.add_value_change_listener(lambda e: events.append(e))
 
-        dp._handle_change({"value": "2025-06-15"})
+        # Real protocol: mSync sets value first, then change event fires listeners
+        dp._sync_property("value", "2025-06-15")
+        dp._handle_change({})
         assert len(events) == 1
         assert dp.value == datetime.date(2025, 6, 15)
 
@@ -89,14 +91,17 @@ class TestDatePicker:
         dp.set_value(datetime.date(2025, 1, 1))
         dp._attach(tree)
 
-        dp._handle_change({"value": ""})
+        # Real protocol: mSync clears value first
+        dp._sync_property("value", "")
+        dp._handle_change({})
         assert dp.value is None
 
     def test_change_listener_invalid(self, tree):
         dp = DatePicker()
         dp._attach(tree)
 
-        dp._handle_change({"value": "not-a-date"})
+        dp._sync_property("value", "not-a-date")
+        dp._handle_change({})
         assert dp.value is None
 
     def test_sync_property(self, tree):
