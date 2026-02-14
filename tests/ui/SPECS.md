@@ -46,7 +46,7 @@
 | 29 | `/test/login` | 8 | LoginForm, LoginOverlay |
 | 30 | `/test/server-errors` | 8 | Error notification, meta.appError, JSON serialization, session resilience |
 
-**Total: 386 tests across 30 views (383 pass, 3 skip)**
+**Total: 386 tests across 30 views (386 pass, 0 skip)**
 
 ---
 
