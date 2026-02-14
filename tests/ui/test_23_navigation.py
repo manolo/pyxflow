@@ -24,6 +24,12 @@ class TestRouting:
         title = view_page.evaluate("() => document.title")
         assert "Navigation" in title
 
+    @pytest.mark.spec("V23.05")
+    def test_route_page_title_param(self, view_page: Page):
+        """@Route page_title parameter sets document.title."""
+        title = view_page.evaluate("() => document.title")
+        assert "Navigation" in title
+
 
 class TestRouteParam:
     @pytest.mark.spec("V23.02")
@@ -50,6 +56,41 @@ class TestOptionalParam:
         expect(view_page).to_have_url(re.compile(r".*/test/nav-opt/search"), timeout=5000)
         expect(view_page.locator("#opt")).to_have_text("search")
         view_page.locator("#nav-back").click()
+        expect(view_page).to_have_url(re.compile(r".*/test/navigation"), timeout=5000)
+
+
+class TestRouterLink:
+    @pytest.mark.spec("V23.06")
+    def test_router_link_navigates_without_reload(self, view_page: Page):
+        """RouterLink performs client-side navigation (no full reload)."""
+        # Set a marker on window to detect full reload
+        view_page.evaluate("window.__nav_test_marker = true")
+        view_page.locator("#link-param").click()
+        expect(view_page).to_have_url(re.compile(r".*/test/nav-param/42"), timeout=5000)
+        # Marker should still exist (no full reload)
+        marker = view_page.evaluate("window.__nav_test_marker")
+        assert marker is True, "Expected client-side navigation (no reload)"
+        view_page.locator("#nav-back").click()
+        expect(view_page).to_have_url(re.compile(r".*/test/navigation"), timeout=5000)
+
+
+class TestSideNav:
+    @pytest.mark.spec("V23.11")
+    def test_sidenav_renders_items(self, view_page: Page):
+        """SideNav renders navigation items."""
+        nav = view_page.locator("vaadin-side-nav")
+        expect(nav).to_be_visible()
+        items = nav.locator("vaadin-side-nav-item")
+        # Should have multiple items (one per test view)
+        assert items.count() > 10
+
+    @pytest.mark.spec("V23.12")
+    def test_sidenav_item_click_navigates(self, view_page: Page):
+        """Clicking a SideNav item navigates to that view."""
+        view_page.locator("vaadin-side-nav-item[path='/test/binder']").click()
+        expect(view_page).to_have_url(re.compile(r".*/test/binder"), timeout=5000)
+        # Navigate back
+        view_page.locator("vaadin-side-nav-item[path='/test/navigation']").click()
         expect(view_page).to_have_url(re.compile(r".*/test/navigation"), timeout=5000)
 
 

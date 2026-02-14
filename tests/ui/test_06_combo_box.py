@@ -41,7 +41,6 @@ class TestComboBox:
         """Test selecting an item — run last so overlay doesn't interfere."""
         cb = view_page.locator("#cb1")
         cb.click()
-        # Wait for overlay, then click the option directly
         view_page.locator("vaadin-combo-box-item").filter(has_text="Banana").click()
         expect(view_page.locator("#cb1-val")).to_have_text("Banana", timeout=5000)
 
@@ -76,7 +75,6 @@ class TestComboBoxPrefix:
     @pytest.mark.spec("V06.21")
     def test_prefix_icon_rendered(self, view_page: Page):
         cb = view_page.locator("#cb-prefix")
-        # Check that a vaadin-icon with slot="prefix" exists inside
         icon = cb.locator('vaadin-icon[slot="prefix"]')
         expect(icon).to_have_count(1)
 

@@ -26,8 +26,10 @@ class TestGridColumns:
     def test_set_items_replaces(self, view_page: Page):
         view_page.locator("#btn-replace").click()
         grid = view_page.locator("#grid1")
-        # After replace, grid should contain "Zoe"
-        expect(grid).to_contain_text("Zoe")
+        # After replace, grid size should be 1 and only 1 row rendered
+        expect(grid).to_have_js_property("size", 1)
+        rendered = grid.evaluate("el => el._getRenderedRows().length")
+        assert rendered == 1
 
     @pytest.mark.spec("V08.08")
     def test_resizable_column(self, view_page: Page):
@@ -44,6 +46,21 @@ class TestGridColumns:
         grid = view_page.locator("#grid-frozen")
         expect(grid).to_be_visible()
 
+    @pytest.mark.spec("V08.11")
+    def test_frozen_to_end(self, view_page: Page):
+        """Column set_frozen_to_end makes the column stick to the right."""
+        grid = view_page.locator("#grid-frozen")
+        # grid-frozen has email column with frozen_to_end
+        expect(grid).to_be_visible()
+        # Verify frozenToEnd is set on a column
+        frozen_end = grid.evaluate(
+            """el => {
+                const cols = el.querySelectorAll('vaadin-grid-column');
+                return Array.from(cols).some(c => c.frozenToEnd);
+            }"""
+        )
+        assert frozen_end is True
+
     @pytest.mark.spec("V08.12")
     def test_hidden_column(self, view_page: Page):
         grid = view_page.locator("#grid-vis")
@@ -53,6 +70,24 @@ class TestGridColumns:
     def test_footer_text(self, view_page: Page):
         grid = view_page.locator("#grid-foot")
         expect(grid).to_contain_text("Total: 5")
+
+    @pytest.mark.spec("V08.21")
+    def test_empty_state(self, view_page: Page):
+        """Grid set_items([]) clears all rows."""
+        grid = view_page.locator("#grid1")
+        view_page.locator("#btn-clear").click()
+        # Grid size should be 0 and no rendered rows.
+        # Note: vaadin-grid pools physical <tr> rows (hidden, not destroyed),
+        # so textContent still has stale cell text.  Check JS state instead.
+        expect(grid).to_have_js_property("size", 0)
+        rendered = grid.evaluate("el => el._getRenderedRows().length")
+        assert rendered == 0
+
+    @pytest.mark.spec("V08.22")
+    def test_all_rows_visible(self, view_page: Page):
+        """Grid with all_rows_visible has allRowsVisible property set."""
+        grid = view_page.locator("#grid1")
+        expect(grid).to_have_js_property("allRowsVisible", True)
 
 
 class TestGridRenderers:
@@ -77,7 +112,7 @@ class TestGridReorder:
 
 
 class TestNavigation:
-    @pytest.mark.spec("V08.20")
+    @pytest.mark.spec("V08.25")
     def test_nav_via_sidenav(self, view_page: Page):
         """Navigate to next view via SideNav link."""
         view_page.locator("vaadin-side-nav-item[path='/test/grid-features']").click()

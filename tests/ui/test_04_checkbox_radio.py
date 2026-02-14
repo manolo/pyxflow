@@ -98,6 +98,13 @@ class TestRadioButtonGroup:
         group = view_page.locator("#rbg-pre")
         expect(group.locator("vaadin-radio-button").nth(1)).to_have_js_property("checked", True)
 
+    @pytest.mark.spec("V04.16")
+    def test_change_selection(self, view_page: Page):
+        """Changing selection updates value (single select)."""
+        group = view_page.locator("#rbg1")
+        group.locator("vaadin-radio-button").nth(0).click()  # S
+        expect(view_page.locator("#rbg1-val")).to_have_text("S")
+
     @pytest.mark.spec("V04.17")
     def test_item_label_generator(self, view_page: Page):
         group = view_page.locator("#rbg-gen")
@@ -111,9 +118,18 @@ class TestRadioButtonGroup:
     def test_required(self, view_page: Page):
         expect(view_page.locator("#rbg-req")).to_have_js_property("required", True)
 
+    @pytest.mark.spec("V04.21")
+    def test_reselect_preserves_value(self, view_page: Page):
+        """Select different, then re-select original — value updates."""
+        group = view_page.locator("#rbg1")
+        group.locator("vaadin-radio-button").nth(2).click()  # L
+        expect(view_page.locator("#rbg1-val")).to_have_text("L")
+        group.locator("vaadin-radio-button").nth(1).click()  # M
+        expect(view_page.locator("#rbg1-val")).to_have_text("M")
+
 
 class TestNavigation:
-    @pytest.mark.spec("V04.20")
+    @pytest.mark.spec("V04.22")
     def test_nav_via_sidenav(self, view_page: Page):
         """Navigate to next view via SideNav link."""
         view_page.locator("vaadin-side-nav-item[path='/test/select-listbox']").click()

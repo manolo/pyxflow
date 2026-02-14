@@ -15,10 +15,14 @@ def view_page(shared_page, base_url):
 
 
 def _type_in_field(page: Page, selector: str, text: str):
-    """Click a field, type text, then Tab to trigger change event."""
+    """Click a field, clear it, type text, then Tab to trigger change event."""
     page.locator(selector).click()
-    page.keyboard.type(text)
+    page.keyboard.press("Meta+a")
+    page.keyboard.press("Backspace")
+    if text:
+        page.keyboard.type(text)
     page.keyboard.press("Tab")
+    page.wait_for_timeout(70)
 
 
 class TestTextField:
@@ -68,6 +72,15 @@ class TestTextField:
         expect(tf.locator("vaadin-icon[slot='prefix']")).to_be_visible()
         expect(tf.locator("span[slot='suffix']")).to_be_visible()
 
+    @pytest.mark.spec("V02.10")
+    def test_eager_value_change(self, view_page: Page):
+        """EAGER mode fires value-change per keystroke."""
+        _type_in_field(view_page, "#tf-eager", "")  # clear first
+        view_page.locator("#tf-eager").click()
+        view_page.keyboard.type("ab", delay=50)
+        view_page.wait_for_timeout(200)
+        expect(view_page.locator("#tf-eager-val")).to_have_text("ab", timeout=3000)
+
     @pytest.mark.spec("V02.23")
     def test_helper_text(self, view_page: Page):
         tf = view_page.locator("#tf-help")
@@ -77,6 +90,18 @@ class TestTextField:
     def test_set_label_dynamic(self, view_page: Page):
         view_page.locator("#btn-lbl").click()
         expect(view_page.locator("#tf-lbl")).to_have_js_property("label", "New")
+
+    @pytest.mark.spec("V02.29")
+    def test_required(self, view_page: Page):
+        expect(view_page.locator("#tf-req")).to_have_js_property("required", True)
+
+    @pytest.mark.spec("V02.30")
+    def test_clear_and_retype_same_value(self, view_page: Page):
+        """Clear field, type same value again, value-change fires."""
+        _type_in_field(view_page, "#tf-same", "")  # clear
+        view_page.wait_for_timeout(100)
+        _type_in_field(view_page, "#tf-same", "test")
+        expect(view_page.locator("#tf-same-val")).to_have_text("test", timeout=3000)
 
 
 class TestTextArea:
@@ -106,6 +131,12 @@ class TestPasswordField:
         _type_in_field(view_page, "#pf1", "secret123")
         expect(view_page.locator("#pf1-val")).to_have_text("secret123")
 
+    @pytest.mark.spec("V02.17")
+    def test_reveal_button_visible(self, view_page: Page):
+        """Default PasswordField has reveal button visible."""
+        pf = view_page.locator("#pf1")
+        expect(pf).to_have_js_property("revealButtonHidden", False)
+
     @pytest.mark.spec("V02.18")
     def test_reveal_button_hidden(self, view_page: Page):
         pf = view_page.locator("#pf-noreveal")
@@ -117,6 +148,18 @@ class TestEmailField:
     def test_renders_with_label(self, view_page: Page):
         expect(view_page.locator("#ef1")).to_have_js_property("label", "Email")
 
+    @pytest.mark.spec("V02.20")
+    def test_invalid_email(self, view_page: Page):
+        """Typing invalid email triggers client-side invalid state."""
+        _type_in_field(view_page, "#ef1", "not-an-email")
+        expect(view_page.locator("#ef1")).to_have_js_property("invalid", True)
+
+    @pytest.mark.spec("V02.21")
+    def test_valid_email(self, view_page: Page):
+        """Valid email clears invalid state."""
+        _type_in_field(view_page, "#ef1", "user@example.com")
+        expect(view_page.locator("#ef1")).to_have_js_property("invalid", False)
+
     @pytest.mark.spec("V02.22")
     def test_type_and_read(self, view_page: Page):
         _type_in_field(view_page, "#ef1", "a@b.com")
@@ -124,7 +167,7 @@ class TestEmailField:
 
 
 class TestNavigation:
-    @pytest.mark.spec("V02.28")
+    @pytest.mark.spec("V02.33")
     def test_nav_via_sidenav(self, view_page: Page):
         """Navigate to next view via SideNav link."""
         view_page.locator("vaadin-side-nav-item[path='/test/number-inputs']").click()

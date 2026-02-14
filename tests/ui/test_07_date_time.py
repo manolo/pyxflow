@@ -34,6 +34,26 @@ class TestDatePicker:
         expect(dp).to_have_js_property("max", "2025-12-31")
 
 
+class TestDatePickerExtras:
+    @pytest.mark.spec("V07.16")
+    def test_week_numbers_visible(self, view_page: Page):
+        dp = view_page.locator("#dp-weeks")
+        expect(dp).to_have_js_property("showWeekNumbers", True)
+
+    @pytest.mark.spec("V07.17")
+    def test_initial_position(self, view_page: Page):
+        dp = view_page.locator("#dp-init")
+        expect(dp).to_have_js_property("initialPosition", "2026-06-01")
+
+    @pytest.mark.spec("V07.25")
+    def test_auto_open_disabled(self, view_page: Page):
+        expect(view_page.locator("#dp-noauto")).to_have_js_property("autoOpenDisabled", True)
+
+    @pytest.mark.spec("V07.26")
+    def test_required(self, view_page: Page):
+        expect(view_page.locator("#dp-req")).to_have_js_property("required", True)
+
+
 class TestTimePicker:
     @pytest.mark.spec("V07.06")
     def test_renders_with_label(self, view_page: Page):
@@ -46,6 +66,12 @@ class TestTimePicker:
     @pytest.mark.spec("V07.09")
     def test_step(self, view_page: Page):
         expect(view_page.locator("#tp-step")).to_have_js_property("step", 1800)
+
+    @pytest.mark.spec("V07.10")
+    def test_min_max(self, view_page: Page):
+        tp = view_page.locator("#tp-range")
+        expect(tp).to_have_js_property("min", "09:00")
+        expect(tp).to_have_js_property("max", "17:00")
 
     @pytest.mark.spec("V07.11")
     def test_clear_button(self, view_page: Page):
@@ -67,21 +93,23 @@ class TestDateTimePicker:
         expect(dtp).to_have_js_property("datePlaceholder", "Pick date")
         expect(dtp).to_have_js_property("timePlaceholder", "Pick time")
 
-
-class TestDatePickerExtras:
     @pytest.mark.spec("V07.16")
-    def test_week_numbers_visible(self, view_page: Page):
-        dp = view_page.locator("#dp-weeks")
-        expect(dp).to_have_js_property("showWeekNumbers", True)
+    def test_min_max(self, view_page: Page):
+        dtp = view_page.locator("#dtp-range")
+        expect(dtp).to_have_js_property("min", "2025-01-01T00:00")
+        expect(dtp).to_have_js_property("max", "2025-12-31T23:59")
 
-    @pytest.mark.spec("V07.17")
-    def test_initial_position(self, view_page: Page):
-        dp = view_page.locator("#dp-init")
-        expect(dp).to_have_js_property("initialPosition", "2026-06-01")
+    @pytest.mark.spec("V07.33")
+    def test_step(self, view_page: Page):
+        expect(view_page.locator("#dtp-step")).to_have_js_property("step", 3600)
+
+    @pytest.mark.spec("V07.34")
+    def test_required(self, view_page: Page):
+        expect(view_page.locator("#dtp-req")).to_have_js_property("required", True)
 
 
 class TestNavigation:
-    @pytest.mark.spec("V07.18")
+    @pytest.mark.spec("V07.36")
     def test_nav_via_sidenav(self, view_page: Page):
         """Navigate to next view via SideNav link."""
         view_page.locator("vaadin-side-nav-item[path='/test/grid-basic']").click()

@@ -23,7 +23,6 @@ class TestSelect:
     def test_choose_item(self, view_page: Page):
         sel = view_page.locator("#sel1")
         sel.click()
-        # Items are in the Select's light DOM (rendered by selectConnector)
         sel.locator("vaadin-select-item").nth(1).click()
         expect(view_page.locator("#sel1-val")).to_have_text("UK")
 
@@ -35,9 +34,25 @@ class TestSelect:
     def test_placeholder(self, view_page: Page):
         expect(view_page.locator("#sel-ph")).to_have_js_property("placeholder", "Choose...")
 
+    @pytest.mark.spec("V05.06")
+    def test_item_label_generator(self, view_page: Page):
+        """Select with item_label_generator=str.upper shows uppercase labels."""
+        sel = view_page.locator("#sel-gen")
+        sel.click()
+        view_page.wait_for_timeout(200)
+        # Items should show "US", "UK" (uppercased)
+        items = sel.locator("vaadin-select-item")
+        expect(items.nth(0)).to_contain_text("US")
+        expect(items.nth(1)).to_contain_text("UK")
+        view_page.keyboard.press("Escape")
+
     @pytest.mark.spec("V05.08")
     def test_read_only(self, view_page: Page):
         expect(view_page.locator("#sel-ro")).to_have_js_property("readonly", True)
+
+    @pytest.mark.spec("V05.19")
+    def test_required(self, view_page: Page):
+        expect(view_page.locator("#sel-req")).to_have_js_property("required", True)
 
 
 class TestListBox:
@@ -96,7 +111,7 @@ class TestMultiSelectListBox:
 
 
 class TestNavigation:
-    @pytest.mark.spec("V05.18")
+    @pytest.mark.spec("V05.20")
     def test_nav_via_sidenav(self, view_page: Page):
         """Navigate to next view via SideNav link."""
         view_page.locator("vaadin-side-nav-item[path='/test/combo-box']").click()
