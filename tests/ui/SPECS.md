@@ -53,6 +53,11 @@
 ## Global: Test Runner Config
 
 ```
+Rule: pytest --all runs unit + UI tests together
+  - Default `pytest` runs only tests/unit/
+  - `pytest --all` adds tests/ui/ to collection (2309 unit + 386 UI)
+  - `pytest tests/ui/` runs UI tests only
+
 Rule: Fail-fast on 4+ consecutive failures
   - Track consecutive failure count globally
   - On each pass, reset counter to 0

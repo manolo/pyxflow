@@ -266,8 +266,11 @@ python -m demo --debug        # verbose protocol logging
 ### Tests
 
 ```bash
-# Unit tests (default, ~2274 tests in tests/unit/)
+# Unit tests (default)
 pytest
+
+# All tests — unit + UI (auto-starts server if needed)
+pytest --all
 
 # Specific test file
 pytest tests/unit/test_rpc_events.py -v
@@ -279,14 +282,14 @@ UI integration tests require Playwright:
 pip install playwright pytest-playwright
 playwright install chromium
 
-# Run UI tests (auto-starts the server if needed)
+# Run UI tests only (auto-starts the server if needed)
 pytest tests/ui/
 
 # With visible browser
 pytest tests/ui/ --headed
 ```
 
-UI tests are in `tests/ui/` and excluded from the default `pytest` run. They use a shared browser session with SideNav-based SPA navigation across 29 test views in `tests/views/`, each backed by a `TestMainLayout` with a menu sidebar. The test server auto-starts via `python -m tests`.
+UI tests are in `tests/ui/` and excluded from the default `pytest` run. Use `pytest --all` to run everything in one go. They use a shared browser session with SPA navigation across 29 test views in `tests/views/`, each backed by a `TestMainLayout` with a menu sidebar. The test server auto-starts via `python -m tests`.
 
 ### Project structure
 

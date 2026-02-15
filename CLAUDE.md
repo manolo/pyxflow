@@ -29,10 +29,13 @@ source .venv/bin/activate && python -m demo
 # Run unit tests (default — runs tests/unit/)
 pytest -v
 
+# Run ALL tests (unit + UI — auto-starts server if needed)
+pytest --all -v
+
 # Run specific test file
 pytest tests/unit/test_rpc_events.py -v
 
-# Run UI tests (auto-starts server if none running on :8088)
+# Run UI tests only (auto-starts server if none running on :8088)
 pytest tests/ui/ -v            # headless
 pytest tests/ui/ --headed -v   # visible browser
 
