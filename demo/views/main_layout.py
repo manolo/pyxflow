@@ -25,3 +25,5 @@ class MainLayout(AppLayout):
             icon = Icon(entry.icon) if entry.icon else None
             nav.add_item(SideNavItem(entry.title, entry.path, icon))
         self.add_to_drawer(nav)
+
+        self.set_primary_section("drawer")

@@ -115,8 +115,7 @@ class HorizontalLayout(Component):
     def set_justify_content_mode(self, mode: JustifyContentMode):
         """Set justify-content-mode on the layout."""
         self._justify_content_mode = mode
-        if self._element:
-            self.element.get_style().set("justify-content", mode.value)
+        self.get_style().set("justify-content", mode.value)
 
     def get_justify_content_mode(self) -> JustifyContentMode | None:
         return getattr(self, "_justify_content_mode", None)
@@ -124,8 +123,7 @@ class HorizontalLayout(Component):
     def set_align_items(self, alignment: Alignment):
         """Set the default alignment perpendicular to the layout direction."""
         self._default_alignment = alignment
-        if self._element:
-            self.element.get_style().set("align-items", alignment.value)
+        self.get_style().set("align-items", alignment.value)
 
     def get_align_items(self) -> Alignment | None:
         return self._default_alignment
