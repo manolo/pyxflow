@@ -1,0 +1,47 @@
+/* ===== About View ===== */
+.about-view {
+  padding: 0;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ── Hero ── */
+.about-hero {
+  text-align: center;
+  padding: var(--vaadin-padding-xl, 3rem) var(--vaadin-padding-l, 1.5rem);
+}
+
+.about-logo {
+  width: 120px;
+  margin: 0 auto var(--vaadin-gap-m, 1rem);
+  filter: drop-shadow(0 4px 12px rgba(22, 118, 243, 0.25));
+}
+
+.about-title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0 0 0.75rem;
+  background: linear-gradient(135deg, var(--vaadin-text-color, #fff), var(--lumo-primary-color, #1676f3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.about-subtitle {
+  font-size: 1.1rem;
+  color: var(--vaadin-text-color-secondary, #8899aa);
+  max-width: 560px;
+  margin: 0 auto var(--vaadin-gap-l, 1.5rem);
+  line-height: 1.6;
+}
+
+/* ── Architecture image ── */
+.about-arch-img {
+  display: block;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  border-radius: var(--vaadin-radius-l, 12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
