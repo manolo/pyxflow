@@ -51,14 +51,11 @@ class ComponentsDemoView(VerticalLayout):
 
         # --- Theme Selector (ListBox) ---
         section = self.add_section("ListBox")
-        list_box = ListBox()
-        list_box.set_items("Lumo Light", "Lumo Dark", "Aura Light", "Aura Dark")
-        list_box.set_value("Lumo Dark")
-        list_box.add_value_change_listener(
-            lambda e: (ui := self.get_ui()) and e.get('value') and ui.set_theme(*e['value'].lower().split())
-        )
-        section.add(Span("Select Theme"))
-        section.add(list_box)
+        self.theme_label = Span()
+        self._theme_list_box = ListBox()
+        self._theme_list_box.set_items("Lumo Light", "Lumo Dark", "Aura Light", "Aura Dark")
+        section.add(self.theme_label)
+        section.add(self._theme_list_box)
 
         # --- Progress ---
         section = self.add_section("ProgressBar")
@@ -804,6 +801,23 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         virtual_list.get_style().set("border-radius", "var(--vaadin-radius-m)")
         section.add(virtual_list)
         section.add(self.vl_label)
+
+    def _attach(self, tree):
+        super()._attach(tree)
+        ui = self.get_ui()
+        t, v = ui.get_theme(), ui.get_theme_variant()
+        self.theme_label.set_text(f"Current: {t}-{v}")
+        self._theme_list_box.set_value(f"{t.capitalize()} {v.capitalize()}")
+        self._theme_list_box.add_value_change_listener(self._on_theme_change)
+
+    def _on_theme_change(self, event):
+        value = event.get("value")
+        if not value:
+            return
+        ui = self.get_ui()
+        if ui:
+            ui.set_theme(*value.lower().split())
+            self.theme_label.set_text(f"Current: {ui.get_theme()}-{ui.get_theme_variant()}")
 
     def _on_message_submit(self, event):
         self.messages.append(MessageListItem(event["value"], user_name="You"))

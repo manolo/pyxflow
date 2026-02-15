@@ -5,8 +5,8 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~17,000 (core src/), ~51,000 (total with demo + tests)
-**Test structure:** `tests/unit/` (2305 unit tests, default `pytest`) + `tests/ui/` (386 Playwright, run explicitly)
-**Tests:** 2305 unit + 386 UI (Playwright)
+**Test structure:** `tests/unit/` (2314 unit tests, default `pytest`) + `tests/ui/` (388 Playwright, run explicitly)
+**Tests:** 2314 unit + 388 UI (Playwright)
 **Last updated:** 2026-02-15
 
 ---
@@ -143,6 +143,7 @@
 - [x] UIDL Handler - Init, navigation, events, mSync (two-pass: mSync before events, matching Java Flow)
 - [x] Page reload support - State reset on init
 - [x] Multiple UIs per session - Each browser tab gets independent StateTree/UidlHandler keyed by `v-uiId`, shared CSRF token per session
+- [x] UI singleton per tab - UI instance persists across navigations (like Java Flow), preserving theme state and other UI-level settings
 - [x] Serves index.html from bundle (Vaadin-generated)
 - [x] Lumo/Aura theme CSS - Extracted from JARs, served at `/lumo/*` and `/aura/*`, loaded via `@StyleSheet` on layout
 - [x] `@StyleSheet` decorator - Load custom CSS via UIDL EAGER dependencies, served from app's `styles/` directory

@@ -617,6 +617,12 @@ class UI:
         self._root: Component | None = None
         self._theme: str = "lumo"
         self._variant: str = "light"
+        # Initialize from @ColorScheme on @AppShell if set
+        from vaadin.flow.router import get_app_shell
+        app_shell = get_app_shell()
+        cs = getattr(app_shell, '_color_scheme', None) if app_shell else None
+        if cs and cs != "normal":
+            self._variant = "dark" if "dark" in cs else "light"
 
     @property
     def tree(self) -> "StateTree":

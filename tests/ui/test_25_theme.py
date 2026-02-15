@@ -52,6 +52,34 @@ class TestThemeSwitching:
         expect(view_page.locator("#theme-status")).to_have_text("lumo-light")
 
 
+class TestThemePersistsAcrossNavigation:
+    @pytest.mark.spec("V25.11")
+    def test_theme_survives_navigation(self, view_page: Page):
+        """Theme set on one view should persist when navigating away and back."""
+        # Set to Aura light
+        view_page.locator("#btn-aura").click()
+        expect(view_page.locator("#theme-status")).to_have_text("aura-light")
+
+        # Navigate to another view
+        view_page.locator("vaadin-side-nav-item[path='/test/client-callable']").click()
+        expect(view_page).to_have_url(re.compile(r".*/test/client-callable"), timeout=5000)
+
+        # Navigate back to theme view
+        view_page.locator("vaadin-side-nav-item[path='/test/theme']").click()
+        expect(view_page).to_have_url(re.compile(r".*/test/theme"), timeout=5000)
+
+        # Theme should still be aura-light (UI singleton preserves state)
+        expect(view_page.locator("#theme-status")).to_have_text("aura-light")
+
+    @pytest.mark.spec("V25.12")
+    def test_reset_restores_captured_initial(self, view_page: Page):
+        """Reset restores the theme captured at view attach (aura-light after nav back)."""
+        # After navigating back with aura-light, _attach captured it as _initial_theme.
+        # So reset restores to aura-light, proving the capture works correctly.
+        view_page.locator("#btn-reset").click()
+        expect(view_page.locator("#theme-status")).to_have_text("aura-light")
+
+
 class TestNavigation:
     @pytest.mark.spec("V25.10")
     def test_nav_via_sidenav(self, view_page: Page):

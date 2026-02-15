@@ -39,14 +39,14 @@
 | 22 | `/test/binder` | 20 | Binder, validators, converters, dirty tracking, field types |
 | 23 | `/test/navigation` | 10 | @Route, params, AppLayout, SideNav, RouterLink, page title |
 | 24 | `/test/push` | 8 | WebSocket push, UI.access() |
-| 25 | `/test/theme` | 8 | Theme switching, @StyleSheet, @ColorScheme |
+| 25 | `/test/theme` | 10 | Theme switching, @StyleSheet, @ColorScheme, persistence across navigation |
 | 26 | `/test/client-callable` | 3 | @ClientCallable |
 | 27 | `/test/custom-field` | 6 | CustomField |
 | 28 | `/test/virtual-list` | 5 | VirtualList |
 | 29 | `/test/login` | 8 | LoginForm, LoginOverlay |
 | 30 | `/test/server-errors` | 8 | Error notification, meta.appError, JSON serialization, session resilience |
 
-**Total: 386 tests across 30 views (386 pass, 0 skip)**
+**Total: 388 tests across 30 views (388 pass, 0 skip)**
 
 ---
 
@@ -55,7 +55,7 @@
 ```
 Rule: pytest --all runs unit + UI tests together
   - Default `pytest` runs only tests/unit/
-  - `pytest --all` adds tests/ui/ to collection (2309 unit + 386 UI)
+  - `pytest --all` adds tests/ui/ to collection (2314 unit + 388 UI)
   - `pytest tests/ui/` runs UI tests only
 
 Rule: Fail-fast on 4+ consecutive failures
@@ -2620,6 +2620,17 @@ Feature: Theme Switching & Styles
     Given CSS rule ".custom-btn { background: green; }" in stylesheet
     And Button with add_class_name("custom-btn")
     Then button has green background
+
+  # --- Theme persistence (UI singleton per session) ---
+  Scenario: V25.11 — Theme persists across navigation
+    Given set theme to Aura light
+    When navigate to another view and back
+    Then theme is still Aura light (UI singleton preserves state)
+
+  Scenario: V25.12 — Reset captures current theme at attach
+    Given view re-attached with aura-light theme
+    When click "Reset theme"
+    Then theme restored to aura-light (captured at last _attach)
 
   # --- Nav ---
   Scenario: V25.10 — Nav to next view

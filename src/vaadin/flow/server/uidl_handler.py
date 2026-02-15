@@ -242,6 +242,9 @@ class UidlHandler:
         self._layout: Any = None  # Persistent layout instance for RouterLayout
         self._layout_class: type | None = None  # Class of current layout
         self._current_route: str | None = None  # Track current route for re-navigation
+        # UI is a singleton per session (like Java Flow's VaadinSession → UI)
+        from vaadin.flow.core.component import UI
+        self._ui = UI(tree)
 
         # Node references
         self._body_node: Any = None
@@ -604,8 +607,7 @@ class UidlHandler:
         from vaadin.flow.components.notification import _set_current_tree
         _set_current_tree(self._tree)
         try:
-            from vaadin.flow.core.component import UI
-            ui = UI(self._tree)
+            ui = self._ui
 
             if layout_class is not None:
                 # --- Layout mode ---
