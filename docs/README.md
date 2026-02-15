@@ -104,6 +104,14 @@ web/
 ├── CLAUDE.md               # Instrucciones para modificar con Claude Code
 └── README.md               # Este archivo
 ```
+## Generar logos con Geminy o grok
+
+Haz una imagen: cambia el logo de python para que una de las serpientes parezca una curly bracket right y la otra un greater than no quiero que ponga nada, solo los dibujos, y solo 2 serpientes (2 cabezas y ojos)
+
+o
+
+hazme un logo modificado de vaadin que es }> para que parezcan dos serpientes, quiero que cada letra sean una serpiente, no extra serpientes, tiene que quedar que parezca el logo de vaadin pero cada simbolo del logo sea una serpiente con esa forma, es decir una serpiente es una llave en esta posicion } y la otra un mayor-que > separados por un espacio pequeño, no añadas mas elelementos a la escena, es muy importante que el logo parezca el original en forma que se puedan superponer y solo cambie que uno esta hecho con serpientes, cada parte tiene que tener cabeza y cola, es decir dos serpientes. Tiene que ser tipo dibujo, no realistico. Usa colores Azul: #3776AB Amarillo: #FFD43B
+
 
 ## Verificación
 
