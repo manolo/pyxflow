@@ -5,9 +5,9 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~17,000 (core src/), ~51,000 (total with demo + tests)
-**Test structure:** `tests/unit/` (2297 unit tests, default `pytest`) + `tests/ui/` (386 Playwright, run explicitly)
-**Tests:** 2297 unit + 386 UI (Playwright)
-**Last updated:** 2026-02-14
+**Test structure:** `tests/unit/` (2305 unit tests, default `pytest`) + `tests/ui/` (386 Playwright, run explicitly)
+**Tests:** 2305 unit + 386 UI (Playwright)
+**Last updated:** 2026-02-15
 
 ---
 
@@ -163,7 +163,7 @@
 
 ### Theme
 - [x] Lumo/Aura theme support — `@StyleSheet("lumo/lumo.css")` or `@StyleSheet("aura/aura.css")` on layout
-- [x] Runtime theme switching — `UI.set_theme(theme, variant)` swaps theme CSS and dark/light mode at runtime
+- [x] Runtime theme switching — `UI.set_theme(theme, variant)` / `UI.get_theme()` / `UI.get_theme_variant()` — full get/set API
 - [x] Theme-agnostic CSS — Demo styles use `--vaadin-*` base properties with `--lumo-*` fallbacks
 - [x] `@ColorScheme` decorator — Set initial color scheme on `@AppShell` (dark/light/system), modifies `<html>` attributes at bootstrap (no flash)
 - [x] `UI.set_color_scheme(value)` — Runtime color scheme switching (dark/light/system/normal)

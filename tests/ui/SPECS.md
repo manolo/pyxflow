@@ -2597,10 +2597,10 @@ Feature: Theme Switching & Styles
     When click
     Then Aura dark active, color-scheme: dark applied
 
-  # --- @ColorScheme ---
-  Scenario: V25.06 — Initial color scheme from decorator
-    Given @ColorScheme("dark") on AppShell
-    Then app starts in dark mode
+  Scenario: V25.06 — Reset to initial theme
+    Given theme changed during tests (e.g. Aura dark)
+    When click "Reset theme" (calls UI.set_theme with saved initial values)
+    Then theme restored to what it was before test module ran
 
   # --- @StyleSheet ---
   Scenario: V25.07 — Global stylesheet loaded
