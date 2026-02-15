@@ -10,12 +10,16 @@ from vaadin.flow.menu import get_menu_entries, get_page_header
 class MainLayout(AppLayout):
     def __init__(self):
         # Navbar
-        self._page_header = H1("PyFlow")
+        self._page_header = H2("PyFlow")
         self.add_to_navbar(DrawerToggle(), self._page_header)
 
         # Drawer with SideNav — populated from @Menu-annotated routes
         nav = SideNav()
-        name = H1("PyFlow")
+        logo = Image("/static/logo.png", "PyFlow")
+        logo.get_style().set("height", "32px")
+        name = HorizontalLayout()
+        name.add(logo, H2("PyFlow"))
+        name.set_align_items(FlexAlignment.CENTER)
         name.get_style().set("padding", "10px")
         for entry in get_menu_entries():
             icon = Icon(entry.icon) if entry.icon else None
