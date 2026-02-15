@@ -11,7 +11,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/push", page_title="Test: Push", layout=TestMainLayout)
-@Menu(title="Push", order=24)
+@Menu(title="24 Push", order=24)
 class TestPushView(VerticalLayout):
     def __init__(self):
         # --- Single push update ---

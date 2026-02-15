@@ -10,7 +10,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/tabs-accordion", page_title="Test: Tabs & Accordion", layout=TestMainLayout)
-@Menu(title="Tabs & Accordion", order=13)
+@Menu(title="13 Tabs & Accordion", order=13)
 class TestTabsAccordionView(VerticalLayout):
     def __init__(self):
         # --- Tabs render ---

@@ -9,7 +9,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/dialog", page_title="Test: Dialog", layout=TestMainLayout)
-@Menu(title="Dialog", order=12)
+@Menu(title="12 Dialog", order=12)
 class TestDialogView(VerticalLayout):
     def __init__(self):
         # --- Dialog open/close ---

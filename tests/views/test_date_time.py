@@ -12,7 +12,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/date-time", page_title="Test: Date & Time", layout=TestMainLayout)
-@Menu(title="Date & Time", order=7)
+@Menu(title="07 Date & Time", order=7)
 class TestDateTimeView(VerticalLayout):
     def __init__(self):
         # --- DatePicker renders with label ---

@@ -9,7 +9,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/client-callable", page_title="Test: ClientCallable", layout=TestMainLayout)
-@Menu(title="ClientCallable", order=26)
+@Menu(title="26 ClientCallable", order=26)
 class TestClientCallableView(VerticalLayout):
     def __init__(self):
         self._result = Span("")

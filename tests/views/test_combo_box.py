@@ -9,7 +9,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/combo-box", page_title="Test: ComboBox", layout=TestMainLayout)
-@Menu(title="ComboBox", order=6)
+@Menu(title="06 ComboBox", order=6)
 class TestComboBoxView(VerticalLayout):
     def __init__(self):
         # --- ComboBox renders with label ---

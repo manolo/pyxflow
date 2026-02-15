@@ -11,7 +11,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/layouts", page_title="Test: Layouts", layout=TestMainLayout)
-@Menu(title="Layouts", order=15)
+@Menu(title="15 Layouts", order=15)
 class TestLayoutsView(VerticalLayout):
     def __init__(self):
         # --- VerticalLayout spacing ---

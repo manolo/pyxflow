@@ -9,7 +9,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/upload", page_title="Test: Upload", layout=TestMainLayout)
-@Menu(title="Upload", order=22)
+@Menu(title="22 Upload", order=22)
 class TestUploadView(VerticalLayout):
     def __init__(self):
         # --- Upload with receiver ---

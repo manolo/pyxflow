@@ -9,7 +9,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/number-inputs", page_title="Test: Number Inputs", layout=TestMainLayout)
-@Menu(title="Number Inputs", order=3)
+@Menu(title="03 Number Inputs", order=3)
 class TestNumberInputsView(VerticalLayout):
     def __init__(self):
         # --- NumberField renders with label ---

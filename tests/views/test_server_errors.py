@@ -11,7 +11,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/server-errors", page_title="Test: Server Errors", layout=TestMainLayout)
-@Menu(title="Server Errors", order=30)
+@Menu(title="30 Server Errors", order=30)
 class TestServerErrorsView(VerticalLayout):
     def __init__(self):
         # --- V30.01: Click handler that raises ---

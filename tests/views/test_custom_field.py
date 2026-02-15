@@ -9,7 +9,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/custom-field", page_title="Test: CustomField", layout=TestMainLayout)
-@Menu(title="CustomField", order=27)
+@Menu(title="27 CustomField", order=27)
 class TestCustomFieldView(VerticalLayout):
     def __init__(self):
         # --- CustomField with child fields ---

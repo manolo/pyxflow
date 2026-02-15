@@ -9,7 +9,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/component-api", page_title="Test: Component API", layout=TestMainLayout)
-@Menu(title="Component API", order=17)
+@Menu(title="17 Component API", order=17)
 class TestComponentApiView(VerticalLayout):
     def __init__(self):
         # --- Visibility ---

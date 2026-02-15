@@ -11,7 +11,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/text-inputs", page_title="Test: Text Inputs", layout=TestMainLayout)
-@Menu(title="Text Inputs", order=2)
+@Menu(title="02 Text Inputs", order=2)
 class TestTextInputsView(VerticalLayout):
     def __init__(self):
         # --- TextField renders with label ---

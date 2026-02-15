@@ -11,7 +11,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/html-elements", page_title="Test: HTML Elements", layout=TestMainLayout)
-@Menu(title="HTML Elements", order=16)
+@Menu(title="16 HTML Elements", order=16)
 class TestHtmlElementsView(VerticalLayout):
     def __init__(self):
         h1 = H1("Title")

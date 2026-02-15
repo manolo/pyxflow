@@ -10,7 +10,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/field-mixins", page_title="Test: Field Mixins", layout=TestMainLayout)
-@Menu(title="Field Mixins", order=18)
+@Menu(title="18 Field Mixins", order=18)
 class TestFieldMixinsView(VerticalLayout):
     def __init__(self):
         # --- HasReadOnly: TextField ---

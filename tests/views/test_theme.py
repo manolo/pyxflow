@@ -9,7 +9,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/theme", page_title="Test: Theme", layout=TestMainLayout)
-@Menu(title="Theme", order=25)
+@Menu(title="25 Theme", order=25)
 class TestThemeView(VerticalLayout):
     def __init__(self):
         theme_status = Span()

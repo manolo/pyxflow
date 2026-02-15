@@ -9,7 +9,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/navigation", page_title="Test: Navigation", layout=TestMainLayout)
-@Menu(title="Navigation", order=20)
+@Menu(title="20 Navigation", order=20)
 class TestNavigationView(VerticalLayout):
     def __init__(self):
         title_span = Span("Navigation view")

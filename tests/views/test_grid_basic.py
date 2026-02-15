@@ -26,7 +26,7 @@ PEOPLE = [
 
 
 @Route("test/grid-basic", page_title="Test: Grid Basic", layout=TestMainLayout)
-@Menu(title="Grid Basic", order=8)
+@Menu(title="08 Grid Basic", order=8)
 class TestGridBasicView(VerticalLayout):
     def __init__(self):
         # --- Basic grid with columns ---

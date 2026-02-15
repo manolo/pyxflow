@@ -10,7 +10,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/select-listbox", page_title="Test: Select & ListBox", layout=TestMainLayout)
-@Menu(title="Select & ListBox", order=5)
+@Menu(title="05 Select & ListBox", order=5)
 class TestSelectListboxView(VerticalLayout):
     def __init__(self):
         # --- Select renders with label ---

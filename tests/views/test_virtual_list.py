@@ -9,7 +9,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/virtual-list", page_title="Test: VirtualList", layout=TestMainLayout)
-@Menu(title="VirtualList", order=28)
+@Menu(title="28 VirtualList", order=28)
 class TestVirtualListView(VerticalLayout):
     def __init__(self):
         # --- VirtualList with items ---

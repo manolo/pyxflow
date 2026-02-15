@@ -12,7 +12,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 @Route("test/buttons-icons", page_title="Test: Buttons & Icons", layout=TestMainLayout)
 @RouteAlias("")
-@Menu(title="Buttons & Icons", order=1)
+@Menu(title="01 Buttons & Icons", order=1)
 class TestButtonsIconsView(VerticalLayout):
     def __init__(self):
         # --- Button renders with text ---

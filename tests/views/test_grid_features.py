@@ -18,7 +18,7 @@ ITEMS = [
 
 
 @Route("test/grid-features", page_title="Test: Grid Features", layout=TestMainLayout)
-@Menu(title="Grid Features", order=9)
+@Menu(title="09 Grid Features", order=9)
 class TestGridFeaturesView(VerticalLayout):
     def __init__(self):
         # --- Single selection grid ---

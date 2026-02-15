@@ -9,7 +9,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/login", page_title="Test: Login", layout=TestMainLayout)
-@Menu(title="Login", order=29)
+@Menu(title="29 Login", order=29)
 class TestLoginView(VerticalLayout):
     def __init__(self):
         # --- LoginForm ---

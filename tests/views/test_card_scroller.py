@@ -10,7 +10,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/card-scroller", page_title="Test: Card & Scroller", layout=TestMainLayout)
-@Menu(title="Card & Scroller", order=10)
+@Menu(title="10 Card & Scroller", order=10)
 class TestCardScrollerView(VerticalLayout):
     def __init__(self):
         # --- Card with title ---

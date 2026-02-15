@@ -26,7 +26,7 @@ class Person:
 
 
 @Route("test/binder", page_title="Test: Binder", layout=TestMainLayout)
-@Menu(title="Binder", order=21)
+@Menu(title="21 Binder", order=21)
 class TestBinderView(VerticalLayout):
     def __init__(self):
         self._person = Person("Alice", "alice@x.com", 30,

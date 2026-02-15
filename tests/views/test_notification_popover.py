@@ -10,7 +10,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/notification-popover", page_title="Test: Notification & Popover", layout=TestMainLayout)
-@Menu(title="Notification & Popover", order=11)
+@Menu(title="11 Notification & Popover", order=11)
 class TestNotificationPopoverView(VerticalLayout):
     def __init__(self):
         # --- Notification.show static ---

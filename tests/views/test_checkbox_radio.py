@@ -10,7 +10,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/checkbox-radio", page_title="Test: Checkbox & Radio", layout=TestMainLayout)
-@Menu(title="Checkbox & Radio", order=4)
+@Menu(title="04 Checkbox & Radio", order=4)
 class TestCheckboxRadioView(VerticalLayout):
     def __init__(self):
         # --- Checkbox renders with label ---

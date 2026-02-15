@@ -10,7 +10,7 @@ from tests.views.test_main_layout import TestMainLayout
 
 
 @Route("test/display", page_title="Test: Display Components", layout=TestMainLayout)
-@Menu(title="Display", order=14)
+@Menu(title="14 Display", order=14)
 class TestDisplayView(VerticalLayout):
     def __init__(self):
         # --- ProgressBar ---

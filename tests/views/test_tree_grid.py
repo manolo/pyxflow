@@ -26,7 +26,7 @@ def _get_children(item):
 
 
 @Route("test/tree-grid", page_title="Test: TreeGrid", layout=TestMainLayout)
-@Menu(title="TreeGrid", order=23)
+@Menu(title="23 TreeGrid", order=23)
 class TestTreeGridView(VerticalLayout):
     def __init__(self):
         tg = TreeGrid()
