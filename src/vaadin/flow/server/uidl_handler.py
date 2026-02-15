@@ -532,20 +532,20 @@ class UidlHandler:
                     from vaadin.flow.components.router_link import RouterLink
                     from vaadin.flow.components.vertical_layout import VerticalLayout
 
+                    self.get_style().set("padding", "1em")
                     self.add(H3(f"Could not navigate to '{route}'"))
                     links = VerticalLayout()
                     links.set_padding(False)
                     links.set_spacing(False)
-                    for path, (view_cls, title, *_rest) in sorted(_routes.items()):
+                    for path in sorted(_routes):
                         label = f"/{path}" if path else "/"
-                        if title:
-                            label += f" — {title}"
                         links.add(RouterLink(label, f"/{path}"))
                     self.add(Paragraph("Available routes:"), links)
         else:
             class _NotFoundView(Div):
                 def __init__(self):
                     super().__init__()
+                    self.get_style().set("padding", "1em")
                     self.add(
                         H3(f"Could not navigate to '{route}'"),
                         Paragraph("Check that the route exists and is correctly registered."),
