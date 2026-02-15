@@ -283,6 +283,48 @@ class TestCriticalErrorJson:
         assert data["meta"]["appError"]["url"] == "/login"
 
 
+class TestDevModeMetaTag:
+    """Test pyflow-views meta tag injection in dev mode."""
+
+    def setup_method(self):
+        import vaadin.flow.server.http_server as _http
+        self._http = _http
+        self._orig_dev = _http._dev_mode
+        self._orig_views = _http._views_module
+
+    def teardown_method(self):
+        self._http._dev_mode = self._orig_dev
+        self._http._views_module = self._orig_views
+
+    def test_meta_tag_present_in_dev_mode(self):
+        """Dev mode with views_module should inject pyflow-views meta tag."""
+        self._http._dev_mode = True
+        self._http._views_module = "tests.views"
+        html = self._http.get_index_html()
+        assert '<meta name="pyflow-views" content="tests.views">' in html
+
+    def test_meta_tag_absent_in_production(self):
+        """Production mode should NOT include pyflow-views meta tag."""
+        self._http._dev_mode = False
+        self._http._views_module = "tests.views"
+        html = self._http.get_index_html()
+        assert "pyflow-views" not in html
+
+    def test_meta_tag_absent_when_no_views_module(self):
+        """Dev mode without views_module should NOT include meta tag."""
+        self._http._dev_mode = True
+        self._http._views_module = ""
+        html = self._http.get_index_html()
+        assert "pyflow-views" not in html
+
+    def test_meta_tag_content_matches_module(self):
+        """Meta tag content should reflect the actual views module."""
+        self._http._dev_mode = True
+        self._http._views_module = "demo.views"
+        html = self._http.get_index_html()
+        assert '<meta name="pyflow-views" content="demo.views">' in html
+
+
 class TestUidlErrorHandling(AioHTTPTestCase):
     """Test that UIDL errors return meta.appError instead of HTTP 500."""
 
