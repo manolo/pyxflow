@@ -1,3 +1,31 @@
+/* ── Demo description card ── */
+.demo-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  margin: 0.75rem;
+  border-radius: var(--lumo-border-radius-m);
+  background: var(--lumo-primary-color-10pct);
+  border-left: 3px solid var(--lumo-primary-color);
+  color: var(--lumo-secondary-text-color);
+  font-size: var(--lumo-font-size-s);
+  line-height: 1.5;
+}
+
+.demo-hint vaadin-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--lumo-primary-text-color);
+  margin-top: 1px;
+}
+
+.components-view > .demo-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
 .master-detail-view .editor-layout {
   display: flex;
   flex-direction: column;

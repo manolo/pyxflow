@@ -58,10 +58,17 @@ class PushDemoView(VerticalLayout):
         btn_row.add_class_name("sw-buttons")
         btn_row.set_spacing(False)
 
+        # --- Hint ---
+        hint = Div()
+        hint.add_class_name("demo-hint")
+        hint.add(Icon("vaadin:info-circle"), Span(
+            "WebSocket Push \u2014 the server updates the display every second "
+            "via UI.access(), no polling needed."))
+
         # --- Layout ---
         self.add_class_name("sw-view")
         self.set_padding(False)
-        self.add(circle, btn_row)
+        self.add(hint, circle, btn_row)
 
     def _update_display(self):
         h = self._elapsed // 3600

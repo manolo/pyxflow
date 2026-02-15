@@ -6,7 +6,9 @@ log = logging.getLogger("vaadin.flow")
 from demo.services import people_service
 from demo.views.main_layout import MainLayout
 from vaadin.flow.components import (
+    Div,
     Grid,
+    Icon,
     SortDirection,
     Span,
     VerticalLayout,
@@ -22,7 +24,13 @@ _ALL_PEOPLE = [p.to_dict() for p in people_service.find_all()]
 class GridDemoView(VerticalLayout):
     def __init__(self):
         self.set_height_full()
-        self.add(Span("Data is fetched on demand as you scroll."))
+
+        hint = Div()
+        hint.add_class_name("demo-hint")
+        hint.add(Icon("vaadin:info-circle"), Span(
+            "Lazy data provider \u2014 rows are fetched on demand as you scroll, "
+            "with server-side sorting and single-row selection."))
+        self.add(hint)
 
         self.grid = Grid()
         self.grid.add_column("name", header="Name").set_auto_width(True).set_sortable(True)

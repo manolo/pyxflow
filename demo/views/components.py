@@ -31,6 +31,13 @@ class CrudPerson:
 @Menu(title="Components", order=2, icon="vaadin:grid-small")
 class ComponentsDemoView(VerticalLayout):
     def __init__(self):
+        hint = Div()
+        hint.add_class_name("demo-hint")
+        hint.add(Icon("vaadin:info-circle"), Span(
+            "Component showcase \u2014 a selection of Vaadin components "
+            "arranged in a responsive CSS grid layout."))
+        self.add(hint)
+
         self.add_class_name("components-view")
         self.click_count = 0
 

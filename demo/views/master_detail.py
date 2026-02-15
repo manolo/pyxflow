@@ -10,8 +10,10 @@ from vaadin.flow.components import (
     FormLayout,
     Grid,
     HorizontalLayout,
+    Icon,
     Notification,
     NotificationVariant,
+    Span,
     TextField,
     TextRenderer,
 )
@@ -25,6 +27,13 @@ class MasterDetailView(Div):
     def __init__(self):
         self.add_class_name("master-detail-view")
         self.set_size_full()
+
+        hint = Div()
+        hint.add_class_name("demo-hint")
+        hint.add(Icon("vaadin:info-circle"), Span(
+            "Master-Detail pattern \u2014 select a row in the Grid to edit it "
+            "in the side form, powered by Binder with validation."))
+        self.add(hint)
 
         self.sample_person: SamplePerson | None = None
 

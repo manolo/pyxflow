@@ -4,7 +4,7 @@ import subprocess
 import sys
 
 from vaadin.flow import Menu, Route
-from vaadin.flow.components import Button, TreeGrid, VerticalLayout
+from vaadin.flow.components import Button, Div, Icon, Span, TreeGrid, VerticalLayout
 from vaadin.flow.core.component import ClientCallable
 from demo.views.main_layout import MainLayout
 
@@ -51,6 +51,13 @@ def _get_children(item: dict) -> list[dict]:
 class FileExplorerView(VerticalLayout):
     def __init__(self):
         self.set_height_full()
+
+        hint = Div()
+        hint.add_class_name("demo-hint")
+        hint.add(Icon("vaadin:info-circle"), Span(
+            "@ClientCallable \u2014 TreeGrid with hierarchical browsing; "
+            "double-click calls a server method directly from the browser."))
+        self.add(hint)
 
         self.tree_grid = TreeGrid()
         self._name_col = self.tree_grid.add_hierarchy_column(

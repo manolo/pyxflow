@@ -1,8 +1,11 @@
 from vaadin.flow import Menu, Route
 from vaadin.flow.components import (
     Button,
+    Div,
     HorizontalLayout,
+    Icon,
     Notification,
+    Span,
     TextField,
     VerticalLayout,
 )
@@ -14,9 +17,16 @@ from demo.views.main_layout import MainLayout
 @Menu(title="Hello", order=1, icon="vaadin:hand")
 class HelloWorldView(VerticalLayout):
     def __init__(self):
+        hint = Div()
+        hint.add_class_name("demo-hint")
+        hint.add(Icon("vaadin:info-circle"), Span(
+            "Simplest Vaadin view \u2014 type a name, click the button, "
+            "and the server sends a notification back to the browser."))
+        self.add(hint)
+
         self.name = TextField("Your name")
-        self.say_hello = Button("Say hello")
-        self.say_hello.add_click_listener(self._on_click)
+        self.say_hello = Button("Say hello", lambda e:
+            Notification.show(f"Hello {self.name.value}", 5000, Notification.Position.MIDDLE))
 
         self.container = HorizontalLayout(self.name, self.say_hello)
         self.container.set_margin(True)
@@ -24,6 +34,3 @@ class HelloWorldView(VerticalLayout):
             Alignment.END, self.name, self.say_hello
         )
         self.add(self.container)
-
-    def _on_click(self, event):
-        Notification.show(f"Hello {self.name.value}", 0, Notification.Position.BOTTOM_CENTER)
