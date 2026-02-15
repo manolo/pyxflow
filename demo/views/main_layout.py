@@ -15,7 +15,7 @@ class MainLayout(AppLayout):
 
         # Drawer with SideNav — populated from @Menu-annotated routes
         nav = SideNav()
-        logo = Image("/static/logo2.png", "PyFlow")
+        logo = Image("/images/logo2.png", "PyFlow")
         logo.get_style().set("height", "60px")
         name = HorizontalLayout()
         name.add(logo, H2("PyFlow"))

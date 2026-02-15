@@ -628,8 +628,6 @@ def create_app() -> web.Application:
     app.router.add_get("/VAADIN/{path:.*}", handle_static)
     app.router.add_get("/lumo/{path:.*}", handle_theme)
     app.router.add_get("/aura/{path:.*}", handle_theme)
-    app.router.add_get("/styles/{path:.*}", handle_styles)
-    app.router.add_get("/static/{path:.*}", handle_app_static)
     # Catch-all for other routes (e.g., /about) - serve index.html
     app.router.add_get("/{path:.*}", handle_route)
     app.router.add_post("/{path:.*}", handle_route_post)
@@ -650,53 +648,33 @@ async def handle_theme(request: web.Request) -> web.Response:
     return web.Response(text="Not found", status=404)
 
 
-async def handle_styles(request: web.Request) -> web.Response:
-    """Handle static file requests for /styles/*.
-
-    Serves CSS files from the app package's styles/ directory
-    (e.g. demo/styles/ when running ``python -m demo``).
-    """
-    if _app_directory is None:
-        return web.Response(text="Not found", status=404)
-    path = request.match_info.get("path", "")
-    file_path = _app_directory / "styles" / path
-    # Security: ensure resolved path stays within styles directory
-    styles_dir = (_app_directory / "styles").resolve()
-    resolved = file_path.resolve()
-    if not str(resolved).startswith(str(styles_dir)):
-        return web.Response(text="Forbidden", status=403)
-    if resolved.is_file() and resolved.suffix == ".css":
-        return web.FileResponse(resolved, headers={"Content-Type": "text/css", "Cache-Control": "no-cache"})  # type: ignore[return-value]
-    return web.Response(text="Not found", status=404)
-
-
-async def handle_app_static(request: web.Request) -> web.Response:
-    """Handle static file requests for /static/*.
-
-    Serves files from the app package's static/ directory
-    (e.g. demo/static/ when running ``python -m demo``).
-    """
-    if _app_directory is None:
-        return web.Response(text="Not found", status=404)
-    path = request.match_info.get("path", "")
-    file_path = _app_directory / "static" / path
-    static_dir = (_app_directory / "static").resolve()
-    resolved = file_path.resolve()
-    if not str(resolved).startswith(str(static_dir)):
-        return web.Response(text="Forbidden", status=403)
-    if resolved.is_file():
-        content_type = guess_content_type(resolved)
-        return web.FileResponse(resolved, headers={"Content-Type": content_type, "Cache-Control": "no-cache"})  # type: ignore[return-value]
-    return web.Response(text="Not found", status=404)
-
 
 async def handle_route(request: web.Request) -> web.Response:
-    """Handle GET for any route - serve index.html (client handles routing)."""
+    """Handle GET for any route.
+
+    Paths with a file extension (e.g. /favicon.ico, /styles/app.css) are
+    looked up in the app's static/ directory and return 404 if not found.
+    Paths without an extension are treated as client-side routes and get
+    index.html so the SPA router can handle them.
+    """
     # Check if this is an init request
     if request.query.get("v-r") == "init":
         return await handle_init(request)
 
-    # Serve index.html - the client will handle the routing
+    path = request.match_info.get("path", "")
+
+    # Path has a file extension → serve from static/ or 404
+    if path and "." in path.rsplit("/", 1)[-1]:
+        if _app_directory is not None:
+            file_path = _app_directory / "static" / path
+            static_dir = (_app_directory / "static").resolve()
+            resolved = file_path.resolve()
+            if str(resolved).startswith(str(static_dir)) and resolved.is_file():
+                content_type = guess_content_type(resolved)
+                return web.FileResponse(resolved, headers={"Content-Type": content_type, "Cache-Control": "no-cache"})  # type: ignore[return-value]
+        return web.Response(status=404)
+
+    # No extension → serve index.html for client-side routing
     html = get_index_html()
     return web.Response(text=html, content_type="text/html")
 
