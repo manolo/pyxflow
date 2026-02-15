@@ -3,7 +3,6 @@
 Auto-starts the PyFlow test server unless a valid one is already running.
 """
 
-import json
 import re
 import subprocess
 import sys
@@ -20,35 +19,32 @@ MAX_CONSECUTIVE = 4
 
 DEFAULT_PORT = 8088
 DEFAULT_BASE_URL = f"http://localhost:{DEFAULT_PORT}"
-HEALTH_URL = f"{DEFAULT_BASE_URL}/?v-r=health"
-
-# Test routes that must be registered for UI tests to work
-REQUIRED_ROUTES = {"test/buttons-icons", "test/text-inputs", "test/grid-basic", "test/login"}
 
 # Root of the vaadin-pyflow project
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
-# Sentinel: port is occupied but not a valid PyFlow health response
-_PORT_OCCUPIED = object()
+# The views module that the test server must be running
+_EXPECTED_VIEWS = "tests.views"
 
 
 def _check_server():
     """Check if a server is running on the default port.
 
     Returns:
-        dict — valid health JSON from a PyFlow server
-        _PORT_OCCUPIED — something is listening but not a valid PyFlow health endpoint
+        True — a PyFlow test server is responding (correct views module)
+        str — a PyFlow server with wrong views module (e.g. "demo.views")
+        False — something is listening but not a PyFlow dev server
         None — nothing is listening (connection refused)
     """
     try:
-        resp = urllib.request.urlopen(HEALTH_URL, timeout=2)
-        data = json.loads(resp.read())
-        if isinstance(data, dict) and data.get("pyflow"):
-            return data
-        return _PORT_OCCUPIED
-    except (json.JSONDecodeError, ValueError):
-        # Got a response but not valid JSON → port occupied by something else
-        return _PORT_OCCUPIED
+        resp = urllib.request.urlopen(f"{DEFAULT_BASE_URL}/", timeout=2)
+        html = resp.read().decode("utf-8", errors="replace")
+        # In dev mode, PyFlow injects <meta name="pyflow-views" content="...">
+        m = re.search(r'<meta\s+name="pyflow-views"\s+content="([^"]+)"', html)
+        if m:
+            return True if m.group(1) == _EXPECTED_VIEWS else m.group(1)
+        # No meta tag — either not PyFlow, or PyFlow in production mode
+        return False
     except (urllib.error.URLError, OSError):
         # Connection refused → nothing running
         return None
@@ -62,29 +58,29 @@ def base_url(request):
         yield explicit
         return
 
-    health = _check_server()
+    status = _check_server()
 
-    # Port occupied by something that's not a valid PyFlow server
-    if health is _PORT_OCCUPIED:
+    # Wrong PyFlow app (e.g. demo instead of tests)
+    if isinstance(status, str):
         pytest.fail(
-            f"Port {DEFAULT_PORT} is in use but not responding to PyFlow health check.\n"
+            f"Port {DEFAULT_PORT} is running '{status}' but UI tests need '{_EXPECTED_VIEWS}'.\n"
+            f"Stop it and run:  cd vaadin-pyflow && python -m tests"
+        )
+
+    # Port occupied by something that's not a PyFlow dev server
+    if status is False:
+        pytest.fail(
+            f"Port {DEFAULT_PORT} is in use but not a PyFlow dev server.\n"
             f"Kill it:  lsof -ti :{DEFAULT_PORT} | xargs kill -9\n"
             f"Or use a different port:  pytest tests/ui/ --base-url http://localhost:XXXX"
         )
 
-    # Valid PyFlow server — check routes
-    if health is not None:
-        registered = set(health.get("routes", []))
-        missing = REQUIRED_ROUTES - registered
-        if missing:
-            pytest.fail(
-                f"PyFlow server on port {DEFAULT_PORT} is missing test routes: {missing}\n"
-                f"Restart with:  cd vaadin-pyflow && source .venv/bin/activate && python -m tests"
-            )
+    # Valid PyFlow test server already running
+    if status is True:
         yield DEFAULT_BASE_URL
         return
 
-    # Nothing running — auto-start the demo server
+    # Nothing running — auto-start the test server
     proc = subprocess.Popen(
         [sys.executable, "-c",
          "import vaadin.flow.app as _a; "
@@ -97,8 +93,7 @@ def base_url(request):
     deadline = time.monotonic() + 15
     ready = False
     while time.monotonic() < deadline:
-        health = _check_server()
-        if isinstance(health, dict):
+        if _check_server() is True:
             ready = True
             break
         if proc.poll() is not None:

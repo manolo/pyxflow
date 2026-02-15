@@ -273,6 +273,7 @@ def _serve(views: str, host: str, port: int, debug: bool, *, dev: bool = False, 
     import vaadin.flow.server.http_server as _http
 
     _http._dev_mode = dev
+    _http._views_module = views
     discover_views(views)
 
     # Resolve app package directory (e.g. "demo.views" → demo/)

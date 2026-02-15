@@ -82,6 +82,9 @@ _app_directory: Path | None = None
 # Dev mode flag — enables detailed not-found view with route list
 _dev_mode: bool = False
 
+# Views module name (e.g. "demo.views", "tests.views") — set by _serve()
+_views_module: str = ""
+
 def set_app_directory(directory: Path):
     """Set the app package directory for serving styles etc."""
     global _app_directory
@@ -125,23 +128,10 @@ async def handle_root(request: web.Request) -> web.Response:
     vr = request.query.get("v-r")
     if vr == "init":
         return await handle_init(request)
-    if vr == "health":
-        return await handle_health(request)
 
     # Serve index.html from bundle
     html = get_index_html()
     return web.Response(text=html, content_type="text/html")
-
-
-async def handle_health(request: web.Request) -> web.Response:
-    """Handle GET /?v-r=health — return server info and registered routes."""
-    from vaadin.flow.router import get_all_routes
-    routes = sorted(get_all_routes().keys())
-    return web.json_response({
-        "pyflow": True,
-        "dev": _dev_mode,
-        "routes": routes,
-    })
 
 
 async def handle_init(request: web.Request) -> web.Response:
@@ -545,6 +535,12 @@ def get_index_html() -> str:
             if color_scheme and color_scheme != "normal":
                 theme_attr = color_scheme.replace(' ', '-')
                 html = html.replace('<html', f'<html theme="{theme_attr}" style="color-scheme: {color_scheme};"', 1)
+            # In dev mode, inject a meta tag identifying the views module
+            if _dev_mode and _views_module:
+                html = html.replace(
+                    '<base href="/">',
+                    f'<base href="/">\n  <meta name="pyflow-views" content="{_views_module}">'
+                )
             return html
 
     # Fallback if no bundle found
