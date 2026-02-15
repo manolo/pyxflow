@@ -12,8 +12,17 @@ from tests.views.test_main_layout import TestMainLayout
 @Menu(title="Theme", order=25)
 class TestThemeView(VerticalLayout):
     def __init__(self):
-        theme_status = Span("light")
+        theme_status = Span()
         theme_status.set_id("theme-status")
+
+        def _update_status():
+            ui = self.get_ui()
+            if ui:
+                t, v = ui.get_theme(), ui.get_theme_variant()
+                theme_status.set_text(f"{t}-{v}")
+
+        # Show initial theme on attach
+        self._update_status = _update_status
 
         # --- Switch to dark ---
         btn_dark = Button("Dark mode")
@@ -23,7 +32,7 @@ class TestThemeView(VerticalLayout):
             ui = self.get_ui()
             if ui:
                 ui.set_theme_variant("dark")
-                theme_status.set_text("dark")
+                _update_status()
 
         btn_dark.add_click_listener(_set_dark)
 
@@ -35,7 +44,7 @@ class TestThemeView(VerticalLayout):
             ui = self.get_ui()
             if ui:
                 ui.set_theme_variant("light")
-                theme_status.set_text("light")
+                _update_status()
 
         btn_light.add_click_listener(_set_light)
 
@@ -47,7 +56,7 @@ class TestThemeView(VerticalLayout):
             ui = self.get_ui()
             if ui:
                 ui.set_theme("aura", "light")
-                theme_status.set_text("aura-light")
+                _update_status()
 
         btn_aura.add_click_listener(_set_aura)
 
@@ -59,21 +68,21 @@ class TestThemeView(VerticalLayout):
             ui = self.get_ui()
             if ui:
                 ui.set_theme("aura", "dark")
-                theme_status.set_text("aura-dark")
+                _update_status()
 
         btn_aura_dark.add_click_listener(_set_aura_dark)
 
-        # --- Reset to Lumo light (for cleanup after Aura tests) ---
-        btn_lumo = Button("Lumo light")
-        btn_lumo.set_id("btn-lumo")
+        # --- Reset to initial theme ---
+        btn_reset = Button("Reset theme")
+        btn_reset.set_id("btn-reset")
 
-        def _set_lumo(e):
+        def _reset(e):
             ui = self.get_ui()
             if ui:
-                ui.set_theme("lumo", "light")
-                theme_status.set_text("light")
+                ui.set_theme(self._initial_theme, self._initial_variant)
+                _update_status()
 
-        btn_lumo.add_click_listener(_set_lumo)
+        btn_reset.add_click_listener(_reset)
 
         # --- CSS class for style test ---
         styled_btn = Button("Custom styled")
@@ -84,5 +93,13 @@ class TestThemeView(VerticalLayout):
             theme_status,
             btn_dark, btn_light,
             btn_aura, btn_aura_dark,
-            btn_lumo, styled_btn,
+            btn_reset, styled_btn,
         )
+
+    def _attach(self, tree):
+        super()._attach(tree)
+        ui = self.get_ui()
+        if ui:
+            self._initial_theme = ui.get_theme()
+            self._initial_variant = ui.get_theme_variant()
+            self._update_status()

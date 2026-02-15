@@ -615,6 +615,8 @@ class UI:
     def __init__(self, tree: "StateTree"):
         self._tree = tree
         self._root: Component | None = None
+        self._theme: str = "lumo"
+        self._variant: str = "light"
 
     @property
     def tree(self) -> "StateTree":
@@ -641,6 +643,14 @@ class UI:
 
     _THEME_CSS = {"lumo": "lumo/lumo.css", "aura": "aura/aura.css"}
 
+    def get_theme(self) -> str:
+        """Get the current theme name ("lumo" or "aura")."""
+        return self._theme
+
+    def get_theme_variant(self) -> str:
+        """Get the current theme variant ("light" or "dark")."""
+        return self._variant
+
     def set_theme(self, theme: str, variant: str = "light") -> None:
         """Switch theme and color variant at runtime.
 
@@ -653,6 +663,8 @@ class UI:
         """
         if not theme:
             return
+        self._theme = theme
+        self._variant = variant
         new_href = self._THEME_CSS[theme]
         other_href = self._THEME_CSS["aura" if theme == "lumo" else "lumo"]
         is_dark = "1" if variant == "dark" else ""
@@ -693,6 +705,8 @@ class UI:
         """
         if value == "system":
             value = "light dark"
+        if value and value not in ("normal", "light dark"):
+            self._variant = "dark" if "dark" in value else "light"
         if not value or value == "normal":
             js = (
                 "return (function(){"
@@ -719,6 +733,7 @@ class UI:
         Args:
             variant: "light" or "dark".
         """
+        self._variant = variant
         theme_attr = variant if variant == "dark" else ""
         js = (
             "return (async function() {"

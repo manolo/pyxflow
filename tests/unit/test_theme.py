@@ -89,3 +89,59 @@ class TestSetThemeVariant:
         cmd = tree.collect_execute()[0]
         assert cmd[0] == ""
         assert "removeAttribute" in cmd[1]
+
+
+class TestGetTheme:
+    """Test UI.get_theme() and UI.get_theme_variant()."""
+
+    def _make_ui(self):
+        tree = StateTree()
+        return UI(tree), tree
+
+    def test_defaults(self):
+        ui, _ = self._make_ui()
+        assert ui.get_theme() == "lumo"
+        assert ui.get_theme_variant() == "light"
+
+    def test_after_set_theme_aura_dark(self):
+        ui, _ = self._make_ui()
+        ui.set_theme("aura", "dark")
+        assert ui.get_theme() == "aura"
+        assert ui.get_theme_variant() == "dark"
+
+    def test_after_set_theme_lumo_dark(self):
+        ui, _ = self._make_ui()
+        ui.set_theme("lumo", "dark")
+        assert ui.get_theme() == "lumo"
+        assert ui.get_theme_variant() == "dark"
+
+    def test_after_set_theme_variant(self):
+        ui, _ = self._make_ui()
+        ui.set_theme_variant("dark")
+        assert ui.get_theme() == "lumo"  # theme unchanged
+        assert ui.get_theme_variant() == "dark"
+
+    def test_roundtrip(self):
+        ui, _ = self._make_ui()
+        ui.set_theme("aura", "dark")
+        ui.set_theme("lumo", "light")
+        assert ui.get_theme() == "lumo"
+        assert ui.get_theme_variant() == "light"
+
+    def test_set_color_scheme_dark(self):
+        ui, _ = self._make_ui()
+        ui.set_color_scheme("dark")
+        assert ui.get_theme_variant() == "dark"
+
+    def test_set_color_scheme_light(self):
+        ui, _ = self._make_ui()
+        ui.set_color_scheme("dark")
+        ui.set_color_scheme("light")
+        assert ui.get_theme_variant() == "light"
+
+    def test_set_empty_theme_ignored(self):
+        ui, _ = self._make_ui()
+        ui.set_theme("aura", "dark")
+        ui.set_theme("")  # no-op
+        assert ui.get_theme() == "aura"
+        assert ui.get_theme_variant() == "dark"

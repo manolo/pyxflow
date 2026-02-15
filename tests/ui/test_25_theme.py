@@ -18,16 +18,18 @@ class TestThemeSwitching:
     @pytest.mark.spec("V25.01")
     def test_initial_state(self, view_page: Page):
         expect(view_page.locator("#theme-status")).to_be_visible()
+        # Default app theme is Lumo light
+        expect(view_page.locator("#theme-status")).to_have_text("lumo-light")
 
     @pytest.mark.spec("V25.02")
     def test_switch_to_dark(self, view_page: Page):
         view_page.locator("#btn-dark").click()
-        expect(view_page.locator("#theme-status")).to_have_text("dark")
+        expect(view_page.locator("#theme-status")).to_have_text("lumo-dark")
 
     @pytest.mark.spec("V25.03")
     def test_switch_to_light(self, view_page: Page):
         view_page.locator("#btn-light").click()
-        expect(view_page.locator("#theme-status")).to_have_text("light")
+        expect(view_page.locator("#theme-status")).to_have_text("lumo-light")
 
     @pytest.mark.spec("V25.04")
     def test_switch_to_aura(self, view_page: Page):
@@ -43,12 +45,11 @@ class TestThemeSwitching:
     def test_custom_styled_button(self, view_page: Page):
         expect(view_page.locator("#styled-btn")).to_be_visible()
 
-    # Reset to Lumo light for subsequent tests (btn-lumo calls set_theme("lumo", "light"),
-    # not just set_theme_variant — needed after Aura tests to switch back to Lumo)
+    # Restore theme to whatever it was before this test module ran
     @pytest.mark.spec("V25.06")
-    def test_reset_to_lumo(self, view_page: Page):
-        view_page.locator("#btn-lumo").click()
-        expect(view_page.locator("#theme-status")).to_have_text("light")
+    def test_reset_theme(self, view_page: Page):
+        view_page.locator("#btn-reset").click()
+        expect(view_page.locator("#theme-status")).to_have_text("lumo-light")
 
 
 class TestNavigation:
