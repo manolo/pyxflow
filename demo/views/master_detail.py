@@ -52,7 +52,7 @@ class MasterDetailView(Div):
 
         # Populate role ComboBox from data
         roles = sorted({p.role for p in sample_person_service.find_all() if p.role})
-        self.role.set_items(roles)
+        self.role.set_items(*roles)
 
         # When a row is selected or deselected, populate form
         self.grid.add_selection_listener(self._on_select)
