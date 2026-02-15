@@ -278,8 +278,12 @@ class TestSameRouteNavigationSkipped:
         ]
         assert len(tags2) == 0, "Second navigation should not create new components"
 
-    def test_second_navigation_no_execute_commands(self, session):
-        """Second navigation should not have execute commands."""
+    def test_second_navigation_sends_server_connected(self, session):
+        """Same-route navigation must still send serverConnected.
+
+        Without serverConnected, FlowClient's React Router stays in
+        "navigating" state and all subsequent SPA navigations are blocked.
+        """
         # First navigation
         payload1 = {
             "csrfToken": session["csrf"],
@@ -295,7 +299,7 @@ class TestSameRouteNavigationSkipped:
         }
         response1 = session["handler"].handle_uidl(payload1)
 
-        # Second navigation
+        # Second navigation to same route
         payload2 = {
             "csrfToken": session["csrf"],
             "rpc": [{
@@ -310,8 +314,10 @@ class TestSameRouteNavigationSkipped:
         }
         response2 = session["handler"].handle_uidl(payload2)
 
-        # Second response should not have execute commands
-        assert "execute" not in response2 or len(response2.get("execute", [])) == 0
+        # Must have exactly one execute command: serverConnected
+        execute = response2.get("execute", [])
+        assert len(execute) == 1
+        assert "serverConnected" in execute[0][-1]
 
 
 class TestNavigationViewComponents:

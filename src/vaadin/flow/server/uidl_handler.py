@@ -571,8 +571,15 @@ class UidlHandler:
         if not route and initial_route:
             route = initial_route
 
-        # Same route as current → skip (no-op for same-page navigation)
+        # Same route as current → skip view recreation but still send
+        # serverConnected so FlowClient's navigation state machine completes.
+        # Without serverConnected, React Router stays in "navigating" state
+        # and all subsequent SPA navigations are silently blocked.
         if self._view is not None and route == self._current_route:
+            self._pending_execute.append(
+                [False, {"@v-node": self._container_node.id},
+                 "return (async function() { this.serverConnected($0)}).apply($1)"]
+            )
             return
 
         # Use router to find view class and params
