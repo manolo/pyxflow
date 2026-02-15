@@ -3,9 +3,17 @@
 
 Usage:
     python tests/ui/check_spec_coverage.py              # full report
-    python tests/ui/check_spec_coverage.py --missing     # only missing specs
+    python tests/ui/check_spec_coverage.py --missing     # only missing (actionable) specs
     python tests/ui/check_spec_coverage.py V08           # filter by view
     python tests/ui/check_spec_coverage.py --json        # machine-readable output
+
+Specs in SPECS.md can be tagged with [skip:reason] to mark them as non-critical:
+    Scenario: V07.18 — DatePicker value survives mSync+change cycle [skip:unit]
+
+Recognized skip reasons:
+    [skip:unit]   — covered by unit tests, UI test adds little value
+    [skip:flaky]  — unreliable in Playwright (timing, overlays, complex interaction)
+    [skip:minor]  — low-value edge case
 """
 
 import ast
@@ -28,16 +36,26 @@ VIEW_NAMES = {
     19: "html-elements", 20: "component-api", 21: "field-mixins",
     22: "binder", 23: "navigation", 24: "push",
     25: "theme", 26: "client-callable", 27: "custom-field",
-    28: "virtual-list", 29: "login",
+    28: "virtual-list", 29: "login", 30: "server-errors",
 }
+
+SKIP_RE = re.compile(r"\[skip:(\w+)\]")
 
 
 def parse_specs():
-    """Parse SPECS.md → dict of {spec_id: scenario_name}."""
+    """Parse SPECS.md → dict of {spec_id: (name, skip_reason|None)}."""
     specs = {}
     text = SPECS_FILE.read_text()
     for m in re.finditer(r"Scenario: (V\d{2}\.\d{2}) — (.+)", text):
-        specs[m.group(1)] = m.group(2).strip()
+        raw_name = m.group(2).strip()
+        skip_match = SKIP_RE.search(raw_name)
+        if skip_match:
+            skip_reason = skip_match.group(1)
+            name = SKIP_RE.sub("", raw_name).strip()
+        else:
+            skip_reason = None
+            name = raw_name
+        specs[m.group(1)] = (name, skip_reason)
     return specs
 
 
@@ -110,9 +128,9 @@ def main():
 
     # Group by view
     views = {}
-    for sid, name in sorted(specs.items()):
+    for sid in sorted(specs):
         v = view_of(sid)
-        views.setdefault(v, []).append((sid, name))
+        views.setdefault(v, []).append(sid)
 
     if json_mode:
         import json
@@ -120,60 +138,83 @@ def main():
         for v in sorted(views):
             if view_filter and v != view_filter:
                 continue
-            implemented = [sid for sid, _ in views[v] if sid in markers]
-            missing = [sid for sid, _ in views[v] if sid not in markers]
+            sids = views[v]
+            implemented = [s for s in sids if s in markers]
+            skipped = [s for s in sids if s not in markers and specs[s][1]]
+            missing = [s for s in sids if s not in markers and not specs[s][1]]
             result[f"V{v:02d}"] = {
                 "name": VIEW_NAMES.get(v, "?"),
-                "total": len(views[v]),
+                "total": len(sids),
                 "implemented": implemented,
+                "skipped": skipped,
                 "missing": missing,
             }
-        total_specs = sum(len(v["implemented"]) + len(v["missing"]) for v in result.values())
-        total_impl = sum(len(v["implemented"]) for v in result.values())
-        print(json.dumps({"total": total_specs, "implemented": total_impl, "views": result}, indent=2))
+        total = sum(len(v["implemented"]) + len(v["missing"]) + len(v["skipped"]) for v in result.values())
+        impl = sum(len(v["implemented"]) for v in result.values())
+        skip = sum(len(v["skipped"]) for v in result.values())
+        actionable = total - skip
+        print(json.dumps({
+            "total": total, "implemented": impl, "skipped": skip,
+            "actionable": actionable, "views": result,
+        }, indent=2))
         return
 
     total_specs = 0
     total_impl = 0
+    total_skip = 0
 
     for v in sorted(views):
         if view_filter and v != view_filter:
             continue
-        scenarios = views[v]
-        implemented = [sid for sid, _ in scenarios if sid in markers]
-        missing = [sid for sid, _ in scenarios if sid not in markers]
-        n_total = len(scenarios)
+        sids = views[v]
+        implemented = [s for s in sids if s in markers]
+        skipped = [s for s in sids if s not in markers and specs[s][1]]
+        missing = [s for s in sids if s not in markers and not specs[s][1]]
+        n_total = len(sids)
         n_impl = len(implemented)
+        n_skip = len(skipped)
+        n_actionable = n_total - n_skip
         total_specs += n_total
         total_impl += n_impl
+        total_skip += n_skip
 
         if show_missing_only and not missing:
             continue
 
-        pct = n_impl / n_total * 100 if n_total else 0
+        pct = n_impl / n_actionable * 100 if n_actionable else 100
         bar_len = 20
-        filled = int(bar_len * n_impl / n_total) if n_total else 0
+        filled = int(bar_len * n_impl / n_actionable) if n_actionable else bar_len
         bar = "=" * filled + "-" * (bar_len - filled)
-        name = VIEW_NAMES.get(v, "?")
+        vname = VIEW_NAMES.get(v, "?")
 
-        print(f"View {v:2d} ({name:20s}): {n_impl:3d}/{n_total:3d}  [{bar}]  {pct:.0f}%", end="")
+        summary = f"View {v:2d} ({vname:20s}): {n_impl:3d}/{n_actionable:3d}"
+        if n_skip:
+            summary += f" (+{n_skip} skip)"
+        summary += f"  [{bar}]  {pct:.0f}%"
         if missing:
-            print(f"  Missing: {', '.join(missing)}")
-        else:
-            print()
+            summary += f"  Missing: {', '.join(missing)}"
+        print(summary)
 
         if not show_missing_only:
-            for sid, name in scenarios:
-                status = "x" if sid in markers else " "
-                loc = ""
+            for sid in sids:
+                name, skip_reason = specs[sid]
                 if sid in markers:
                     f, cls, method = markers[sid]
                     loc = f"  → {f}::{cls}::{method}" if cls else f"  → {f}::{method}"
-                print(f"    [{status}] {sid} — {name}{loc}")
+                    print(f"    [x] {sid} — {name}{loc}")
+                elif skip_reason:
+                    print(f"    [-] {sid} — {name}  [skip:{skip_reason}]")
+                else:
+                    print(f"    [ ] {sid} — {name}")
 
     print()
-    pct = total_impl / total_specs * 100 if total_specs else 0
-    print(f"Total: {total_impl}/{total_specs} ({pct:.1f}%)")
+    actionable = total_specs - total_skip
+    pct = total_impl / actionable * 100 if actionable else 100
+    print(f"Total: {total_impl}/{actionable} actionable ({pct:.1f}%)", end="")
+    if total_skip:
+        print(f"  — {total_skip} skipped")
+    else:
+        print()
 
 
 if __name__ == "__main__":

@@ -93,6 +93,41 @@ class TestContextMenu:
         expect(view_page.locator("#ctx-result")).to_have_text("Action", timeout=3000)
 
 
+class TestMenuBarAdvanced:
+    @pytest.mark.spec("V14.04")
+    def test_nested_submenu(self, view_page: Page):
+        """MenuBar nested submenu: Edit → Paste → Paste Special."""
+        _close_overlays(view_page)
+        mb = view_page.locator("#mb1")
+        mb.locator("vaadin-menu-bar-button", has_text="Edit").click()
+        paste = view_page.get_by_role("menuitem", name="Paste")
+        expect(paste).to_be_visible(timeout=3000)
+        paste.hover()
+        ps = view_page.get_by_role("menuitem", name="Paste Special")
+        expect(ps).to_be_visible(timeout=3000)
+        ps.click()
+        expect(view_page.locator("#mb-result")).to_have_text("Paste Special", timeout=3000)
+
+    @pytest.mark.spec("V14.05")
+    def test_disabled_item(self, view_page: Page):
+        """MenuBar disabled item (Open) is rendered but not clickable."""
+        _close_overlays(view_page)
+        mb = view_page.locator("#mb1")
+        mb.locator("vaadin-menu-bar-button", has_text="File").click()
+        open_item = view_page.get_by_role("menuitem", name="Open")
+        expect(open_item).to_be_visible(timeout=3000)
+        expect(open_item).to_have_attribute("disabled", "")
+        view_page.keyboard.press("Escape")
+
+    @pytest.mark.spec("V14.06")
+    def test_checkable_item(self, view_page: Page):
+        """MenuBar checkable item (Bold) toggles checked state."""
+        _close_overlays(view_page)
+        mb = view_page.locator("#mb1")
+        mb.locator("vaadin-menu-bar-button", has_text="Bold").click()
+        expect(view_page.locator("#mb-result")).to_contain_text("Bold:", timeout=3000)
+
+
 class TestMenuBarExtras:
     @pytest.mark.spec("V14.12")
     def test_separator_in_submenu(self, view_page: Page):

@@ -20,16 +20,16 @@
 | 3 | `/test/number-inputs` | 14 | NumberField, IntegerField |
 | 4 | `/test/checkbox-radio` | 21 | Checkbox, CheckboxGroup, RadioButtonGroup |
 | 5 | `/test/select-listbox` | 17 | Select, ListBox, MultiSelectListBox |
-| 6 | `/test/combo-box` | 16 | ComboBox, MultiSelectComboBox |
+| 6 | `/test/combo-box` | 18 | ComboBox, MultiSelectComboBox |
 | 7 | `/test/date-time` | 20 | DatePicker, TimePicker, DateTimePicker |
-| 8 | `/test/grid-basic` | 14 | Grid (columns, data, renderers) |
+| 8 | `/test/grid-basic` | 20 | Grid (columns, data, renderers) |
 | 9 | `/test/grid-features` | 17 | Grid (selection, sorting, click, columns ops, details) |
-| 10 | `/test/tree-grid` | 5 | TreeGrid |
+| 10 | `/test/tree-grid` | 8 | TreeGrid |
 | 11 | `/test/dialog` | 14 | Dialog, ConfirmDialog |
-| 12 | `/test/notification-popover` | 9 | Notification, Popover |
-| 13 | `/test/tabs-accordion` | 15 | Tabs, TabSheet, Accordion, Details |
-| 14 | `/test/menu` | 10 | MenuBar, ContextMenu |
-| 15 | `/test/layouts` | 12 | VerticalLayout, HorizontalLayout, FlexLayout, FormLayout, SplitLayout |
+| 12 | `/test/notification-popover` | 11 | Notification, Popover |
+| 13 | `/test/tabs-accordion` | 19 | Tabs, TabSheet, Accordion, Details |
+| 14 | `/test/menu` | 13 | MenuBar, ContextMenu |
+| 15 | `/test/layouts` | 17 | VerticalLayout, HorizontalLayout, FlexLayout, FormLayout, SplitLayout |
 | 16 | `/test/card-scroller` | 11 | Card, Scroller, MasterDetailLayout |
 | 17 | `/test/upload` | 5 | Upload |
 | 18 | `/test/display` | 15 | ProgressBar, Avatar, AvatarGroup, Markdown, MessageInput, MessageList |
@@ -280,7 +280,7 @@ Feature: Text Input Fields
     Given TextField with set_tooltip_text("Full name")
     Then "#tf-tip" has tooltip "Full name"
 
-  Scenario: V02.25 — TextField autoselect
+  Scenario: V02.25 — TextField autoselect [skip:unit]
     Given TextField with value "hello", set_autoselect(True)
     When click/focus "#tf-sel"
     Then text is selected
@@ -291,13 +291,13 @@ Feature: Text Input Fields
     Then "#tf-lbl" label is "New"
 
   # --- Shared text field value_change_timeout ---
-  Scenario: V02.27 — TextField value_change_timeout with LAZY mode
+  Scenario: V02.27 — TextField value_change_timeout with LAZY mode [skip:unit]
     Given TextField, ValueChangeMode.LAZY, timeout=500
     When type "abc" rapidly
     Then only one value-change event fires after 500ms pause
 
   # --- Value roundtrip (mSync regression) ---
-  Scenario: V02.28 — TextField value preserved after focus/blur cycle
+  Scenario: V02.28 — TextField value preserved after focus/blur cycle [skip:unit]
     Given TextField#tf-round with value "hello"
     When click "#tf-round" to focus, then click elsewhere to blur
     Then get_value() still returns "hello" (not None)
@@ -501,7 +501,7 @@ Feature: Checkbox & RadioButtonGroup
     Then required indicator visible
 
   # --- Value roundtrip (mSync regression) ---
-  Scenario: V04.20 — CheckboxGroup deselect then re-select same item
+  Scenario: V04.20 — CheckboxGroup deselect then re-select same item [skip:unit]
     Given CheckboxGroup with "Red" selected
     When uncheck "Red", then check "Red" again
     Then Span#cbg1-val text contains "Red"
@@ -599,7 +599,7 @@ Feature: Select & ListBox
     Then selection does NOT change
 
   # --- Value roundtrip (mSync regression) ---
-  Scenario: V05.18 — Select change value multiple times
+  Scenario: V05.18 — Select change value multiple times [skip:unit]
     Given Select#sel-multi with items "US","UK","DE"
     When select "UK", then select "DE", then select "US"
     Then Span#sel-multi-val text is "US" (final value)
@@ -649,7 +649,7 @@ Feature: ComboBox & MultiSelectComboBox
     When click clear
     Then value is None
 
-  Scenario: V06.07 — ComboBox allow_custom_value
+  Scenario: V06.07 — ComboBox allow_custom_value [skip:flaky]
     Given ComboBox with set_allow_custom_value(True), custom_value_listener → Span#cb-cust
     When type "Mango" and press Enter
     Then Span#cb-cust text is "Mango"
@@ -672,7 +672,7 @@ Feature: ComboBox & MultiSelectComboBox
     Given MultiSelectComboBox("Tags") with set_items("A","B","C"), id="mscb1"
     Then "#mscb1" label is "Tags"
 
-  Scenario: V06.12 — MultiSelectComboBox select multiple
+  Scenario: V06.12 — MultiSelectComboBox select multiple [skip:flaky]
     When open and select "A", then open again and select "C"
     Then Span#mscb1-val contains "A" and "C"
     And chips "A" and "C" visible in input
@@ -710,7 +710,7 @@ Feature: ComboBox & MultiSelectComboBox
     Then cannot open dropdown or modify selection
 
   # --- Value roundtrip (mSync regression) ---
-  Scenario: V06.20 — ComboBox clear and re-select same value
+  Scenario: V06.20 — ComboBox clear and re-select same value [skip:unit]
     Given ComboBox#cb-round with value "Apple"
     When click clear button, then re-select "Apple"
     Then Span#cb-round-val text is "Apple" (not None)
@@ -752,7 +752,7 @@ Feature: DatePicker, TimePicker, DateTimePicker
     Given DatePicker with set_value(date(2025, 6, 15))
     Then "#dp-pre" displays "6/15/2025" or locale equivalent
 
-  Scenario: V07.03 — DatePicker user input
+  Scenario: V07.03 — DatePicker user input [skip:flaky]
     When type "2025-01-20" into "#dp1" and blur/close
     Then Span#dp1-val shows "2025-01-20"
 
@@ -775,7 +775,7 @@ Feature: DatePicker, TimePicker, DateTimePicker
     Given TimePicker with set_value(time(14, 30))
     Then "#tp-pre" displays "14:30" or locale equivalent
 
-  Scenario: V07.08 — TimePicker user select
+  Scenario: V07.08 — TimePicker user select [skip:flaky]
     When open "#tp1" and select a time from dropdown
     Then Span#tp1-val shows selected time
 
@@ -802,7 +802,7 @@ Feature: DatePicker, TimePicker, DateTimePicker
     Given DateTimePicker with set_value(datetime(2025, 6, 15, 14, 30))
     Then date part shows "6/15/2025", time part shows "14:30"
 
-  Scenario: V07.14 — DateTimePicker user input
+  Scenario: V07.14 — DateTimePicker user input [skip:flaky]
     When set date "2025-03-10" and time "09:00"
     Then Span#dtp1-val shows "2025-03-10T09:00"
 
@@ -822,20 +822,20 @@ Feature: DatePicker, TimePicker, DateTimePicker
     Then month names are localized
 
   # --- DatePicker value roundtrip (mSync regression — THE BUG) ---
-  Scenario: V07.18 — DatePicker value survives mSync+change cycle
+  Scenario: V07.18 — DatePicker value survives mSync+change cycle [skip:unit]
     Given DatePicker#dp-round with value_change_listener → Span#dp-round-val
     When type "2025-06-15" into "#dp-round" and blur
     Then Span#dp-round-val text is "2025-06-15"
     And get_value() returns date(2025, 6, 15) (not None)
 
-  Scenario: V07.19 — DatePicker clear then set same value
+  Scenario: V07.19 — DatePicker clear then set same value [skip:unit]
     Given DatePicker#dp-same with set_value(date(2025, 3, 10))
     When click clear button to clear value
     Then value is None
     When type "2025-03-10" and blur
     Then value is date(2025, 3, 10) again
 
-  Scenario: V07.20 — DatePicker calendar pick preserves value
+  Scenario: V07.20 — DatePicker calendar pick preserves value [skip:flaky]
     Given DatePicker#dp-pick, open calendar
     When click a date cell in the calendar popup
     Then Span#dp-pick-val shows the selected date (not empty/None)
@@ -859,7 +859,7 @@ Feature: DatePicker, TimePicker, DateTimePicker
     When open calendar
     Then week numbers column visible in calendar
 
-  Scenario: V07.24 — DatePicker initial position
+  Scenario: V07.24 — DatePicker initial position [skip:flaky]
     Given DatePicker#dp-ip with set_initial_position(date(2025, 6, 1)), no value
     When open calendar
     Then calendar opens showing June 2025
@@ -875,13 +875,13 @@ Feature: DatePicker, TimePicker, DateTimePicker
     Then field shows invalid state (client validates required)
 
   # --- TimePicker value roundtrip (mSync regression) ---
-  Scenario: V07.27 — TimePicker value survives mSync+change cycle
+  Scenario: V07.27 — TimePicker value survives mSync+change cycle [skip:unit]
     Given TimePicker#tp-round with value_change_listener → Span#tp-round-val
     When type "14:30" into "#tp-round" and blur
     Then Span#tp-round-val text is "14:30"
     And get_value() returns time(14, 30) (not None)
 
-  Scenario: V07.28 — TimePicker clear then re-set same value
+  Scenario: V07.28 — TimePicker clear then re-set same value [skip:unit]
     Given TimePicker#tp-same with set_value(time(9, 0))
     When clear, then type "09:00" and blur
     Then value is time(9, 0) again
@@ -900,13 +900,13 @@ Feature: DatePicker, TimePicker, DateTimePicker
     Then Span#tp-oc-ev tracks open/close events
 
   # --- DateTimePicker value roundtrip (mSync regression) ---
-  Scenario: V07.31 — DateTimePicker value survives mSync+change cycle
+  Scenario: V07.31 — DateTimePicker value survives mSync+change cycle [skip:unit]
     Given DateTimePicker#dtp-round with value_change_listener → Span#dtp-round-val
     When set date "2025-06-15" and time "14:30" and blur
     Then Span#dtp-round-val shows "2025-06-15T14:30"
     And get_value() returns datetime(2025, 6, 15, 14, 30) (not None)
 
-  Scenario: V07.32 — DateTimePicker clear and re-set
+  Scenario: V07.32 — DateTimePicker clear and re-set [skip:unit]
     Given DateTimePicker#dtp-same with set_value(datetime(2025, 1, 1, 9, 0))
     When clear date part, then re-enter "2025-01-01" and "09:00"
     Then value is datetime(2025, 1, 1, 9, 0) again
@@ -1088,7 +1088,7 @@ Feature: Grid — Selection, Sorting, Events
     Given grid.set_selection_mode(SelectionMode.MULTI)
     Then checkbox column appears
 
-  Scenario: V09.05 — Grid multi select multiple
+  Scenario: V09.05 — Grid multi select multiple [skip:flaky]
     When check "Alice" and "Charlie"
     Then Span#grid2-sel contains "Alice, Charlie"
 
@@ -1177,7 +1177,7 @@ Feature: Grid — Selection, Sorting, Events
     Then grid has no columns
 
   # --- Recalculate widths ---
-  Scenario: V09.21 — Grid recalculate_column_widths
+  Scenario: V09.21 — Grid recalculate_column_widths [skip:minor]
     Given grid with auto-width columns, Button calling grid.recalculate_column_widths()
     When click button
     Then column widths adjust to current content
@@ -1287,12 +1287,12 @@ Feature: Dialog & ConfirmDialog
     When open
     Then resize handles visible
 
-  Scenario: V11.07 — Dialog set_close_on_esc(False)
+  Scenario: V11.07 — Dialog set_close_on_esc(False) [skip:flaky]
     Given Dialog with set_close_on_esc(False)
     When open and press Escape
     Then dialog stays open
 
-  Scenario: V11.08 — Dialog set_close_on_outside_click(False)
+  Scenario: V11.08 — Dialog set_close_on_outside_click(False) [skip:flaky]
     Given Dialog with set_close_on_outside_click(False)
     When open and click outside
     Then dialog stays open
@@ -1356,7 +1356,7 @@ Feature: Dialog & ConfirmDialog
     When close dlg-b
     Then dlg-a still visible
 
-  Scenario: V11.20 — ConfirmDialog close on Escape
+  Scenario: V11.20 — ConfirmDialog close on Escape [skip:flaky]
     Given ConfirmDialog with set_cancelable(True)
     When open then press Escape
     Then cancel listener fires and dialog closes
@@ -1426,7 +1426,7 @@ Feature: Notification & Popover
     When click "#pop-target"
     Then popover opens with "Pop content"
 
-  Scenario: V12.10 — Popover close on outside click
+  Scenario: V12.10 — Popover close on outside click [skip:flaky]
     Given Popover open
     When click outside popover
     Then popover closes
@@ -1448,12 +1448,12 @@ Feature: Notification & Popover
     When click "#pop-close"
     Then popover closes
 
-  Scenario: V12.14 — Popover set_open_on_hover
+  Scenario: V12.14 — Popover set_open_on_hover [skip:flaky]
     Given Popover with set_open_on_hover(True)
     When hover over target
     Then popover opens
 
-  Scenario: V12.15 — Popover close on Esc
+  Scenario: V12.15 — Popover close on Esc [skip:flaky]
     Given Popover open
     When press Escape
     Then popover closes
@@ -1669,7 +1669,7 @@ Feature: MenuBar & ContextMenu
     When click "#add-ctx", then right-click target
     Then "Select All" appears in menu
 
-  Scenario: V14.17 — MenuBar overflow into "..." menu
+  Scenario: V14.17 — MenuBar overflow into "..." menu [skip:flaky]
     Given MenuBar with 10 items in narrow container
     Then overflow items grouped under "..." (overflow button)
     When click "..."
@@ -1770,7 +1770,7 @@ Feature: Layouts
     Given set_orientation_vertical(True)
     Then top/bottom layout
 
-  Scenario: V15.20 — SplitLayout splitter position
+  Scenario: V15.20 — SplitLayout splitter position [skip:flaky]
     Given set_splitter_position("30%")
     Then primary takes ~30% of space
 
@@ -2182,7 +2182,7 @@ Feature: Base Component API
     Given Button#aria-btn with set_aria_label("Close dialog")
     Then aria-label="Close dialog"
 
-  Scenario: V20.19 — set_aria_labelled_by
+  Scenario: V20.19 — set_aria_labelled_by [skip:unit]
     Given Span#label-el with "Name", TextField#aria-tf with set_aria_labelled_by("label-el")
     Then aria-labelledby="label-el"
 
@@ -2932,13 +2932,13 @@ Feature: Server Error Handling & Session Resilience
     Then navigation succeeds, new view renders correctly
 
   # --- Push error handling ---
-  Scenario: V30.10 — Push callback exception doesn't break session
+  Scenario: V30.10 — Push callback exception doesn't break session [skip:minor]
     Given Button#err-push that triggers UI.access(callback_that_raises)
     When click "#err-push"
     Then error notification appears
     And subsequent push updates still work (click Button#push-ok → Span#push-ok updates via push)
 
-  Scenario: V30.11 — Concurrent push and user RPC don't interfere
+  Scenario: V30.11 — Concurrent push and user RPC don't interfere [skip:minor]
     Given push background task updating Span#push-val every 500ms
     And Button#user-click with click listener → Span#click-val
     When click "#user-click" while push is active

@@ -57,6 +57,39 @@ class TestVerticalLayoutAddFirst:
         assert first_idx < second_idx, f"Expected 'First' before 'Second', got {texts}"
 
 
+class TestVerticalLayoutStyles:
+    @pytest.mark.spec("V15.02")
+    def test_set_spacing_false(self, view_page: Page):
+        """VerticalLayout with set_spacing(False) has no gap."""
+        vl = view_page.locator("#vl-nospace")
+        expect(vl).to_be_visible()
+        # theme attribute should NOT contain "spacing"
+        theme = vl.evaluate("el => el.getAttribute('theme') || ''")
+        assert "spacing" not in theme
+
+    @pytest.mark.spec("V15.03")
+    def test_set_padding(self, view_page: Page):
+        """VerticalLayout with set_padding(True) has padding theme."""
+        vl = view_page.locator("#vl-pad")
+        expect(vl).to_be_visible()
+        theme = vl.evaluate("el => el.getAttribute('theme') || ''")
+        assert "padding" in theme
+
+    @pytest.mark.spec("V15.05")
+    def test_justify_content_center(self, view_page: Page):
+        """VerticalLayout with justify_content_mode CENTER."""
+        vl = view_page.locator("#vl-center")
+        jc = vl.evaluate("el => getComputedStyle(el).justifyContent")
+        assert "center" in jc
+
+    @pytest.mark.spec("V15.06")
+    def test_align_items_center(self, view_page: Page):
+        """VerticalLayout with default horizontal alignment CENTER."""
+        vl = view_page.locator("#vl-center")
+        ai = vl.evaluate("el => getComputedStyle(el).alignItems")
+        assert "center" in ai
+
+
 class TestHorizontalLayout:
     @pytest.mark.spec("V15.09")
     def test_renders_children(self, view_page: Page):
@@ -86,6 +119,14 @@ class TestFormLayout:
     def test_renders_fields(self, view_page: Page):
         form = view_page.locator("#form1")
         expect(form.locator("vaadin-text-field")).to_have_count(4)
+
+    @pytest.mark.spec("V15.17")
+    def test_responsive_steps(self, view_page: Page):
+        """FormLayout with responsive steps has responsiveSteps property."""
+        form = view_page.locator("#form1")
+        steps = form.evaluate("el => el.responsiveSteps")
+        assert isinstance(steps, list)
+        assert len(steps) > 0
 
 
 class TestSplitLayout:

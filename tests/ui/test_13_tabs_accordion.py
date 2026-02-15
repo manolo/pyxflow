@@ -56,6 +56,15 @@ class TestTabSheet:
         ts.locator("vaadin-tab").nth(1).click()
         expect(view_page.locator("#ts-val")).to_have_text("1")
 
+    @pytest.mark.spec("V13.06", "V13.09")
+    def test_selected_change_listener(self, view_page: Page):
+        """Tabs and TabSheet fire selected_change_listener."""
+        # Tabs listener — click first tab, verify
+        view_page.locator("#tabs1").locator("vaadin-tab").first.click()
+        expect(view_page.locator("#tabs1-val")).to_have_text("0")
+        # TabSheet listener — already verified via ts-val in test_switch_tab
+        expect(view_page.locator("#ts-val")).not_to_have_text("")
+
 
 class TestAccordion:
     @pytest.mark.spec("V13.10")
@@ -81,6 +90,20 @@ class TestAccordion:
         expect(acc).to_have_js_property("opened", None)
 
 
+class TestAccordionExtras:
+    @pytest.mark.spec("V13.13")
+    def test_open_by_index(self, view_page: Page):
+        """Accordion.open(1) opens Panel 2."""
+        view_page.locator("#btn-acc-open").click()
+        expect(view_page.locator("#acc1")).to_have_js_property("opened", 1)
+
+    @pytest.mark.spec("V13.14")
+    def test_opened_change_listener(self, view_page: Page):
+        """Accordion fires opened_change_listener with index."""
+        # Open Panel 2 was done in previous test (btn-acc-open)
+        expect(view_page.locator("#acc-val")).not_to_have_text("")
+
+
 class TestDetails:
     @pytest.mark.spec("V13.15")
     def test_renders_summary(self, view_page: Page):
@@ -104,6 +127,16 @@ class TestDetails:
         # Click again to reopen — listener should fire with True
         det.locator("vaadin-details-summary").click()
         expect(view_page.locator("#det-val")).to_have_text("True")
+
+    @pytest.mark.spec("V13.16")
+    def test_toggle_open(self, view_page: Page):
+        """Clicking Details summary toggles open/close."""
+        det = view_page.locator("#det1")
+        # Ensure closed first
+        view_page.locator("#btn-acc-close").click()  # close accordion to avoid visual overlap
+        # Click summary to open
+        det.locator("vaadin-details-summary").click()
+        expect(det).to_contain_text("Hidden content")
 
     @pytest.mark.spec("V13.19")
     def test_set_summary_text(self, view_page: Page):

@@ -22,6 +22,61 @@ class TestGridColumns:
         # Verify grid has data rows
         expect(grid.locator("vaadin-grid-cell-content").first).to_be_visible()
 
+    @pytest.mark.spec("V08.02")
+    def test_column_renders_property(self, view_page: Page):
+        """Grid add_column('name') renders person name in cells."""
+        grid = view_page.locator("#grid1")
+        expect(grid).to_contain_text("Alice")
+        expect(grid).to_contain_text("alice@example.com")
+
+    @pytest.mark.spec("V08.04")
+    def test_column_header(self, view_page: Page):
+        """Column set_header sets the header text."""
+        grid = view_page.locator("#grid-align")
+        expect(grid).to_contain_text("Age (center)")
+
+    @pytest.mark.spec("V08.05")
+    def test_column_width(self, view_page: Page):
+        """Column set_width('150px') sets the column width."""
+        grid = view_page.locator("#grid-frozen")
+        width = grid.evaluate(
+            "el => el.querySelector('vaadin-grid-column').width"
+        )
+        assert width == "150px"
+
+    @pytest.mark.spec("V08.06")
+    def test_column_flex_grow(self, view_page: Page):
+        """Column set_flex_grow(2) sets the flex-grow."""
+        grid = view_page.locator("#grid1")
+        fg = grid.evaluate(
+            """el => {
+                const cols = el.querySelectorAll('vaadin-grid-column');
+                return cols[2].flexGrow;
+            }"""
+        )
+        assert fg == 2
+
+    @pytest.mark.spec("V08.07")
+    def test_column_auto_width(self, view_page: Page):
+        """Column set_auto_width(True) sets autoWidth."""
+        grid = view_page.locator("#grid1")
+        aw = grid.evaluate(
+            "el => el.querySelector('vaadin-grid-column').autoWidth"
+        )
+        assert aw is True
+
+    @pytest.mark.spec("V08.23")
+    def test_column_key(self, view_page: Page):
+        """Column set_key sets the key property on the column element."""
+        grid = view_page.locator("#grid1")
+        key = grid.evaluate(
+            """el => {
+                const cols = el.querySelectorAll('vaadin-grid-column');
+                return cols[0].__columnKey || cols[0]._flowId;
+            }"""
+        )
+        assert key is not None
+
     @pytest.mark.spec("V08.03")
     def test_set_items_replaces(self, view_page: Page):
         view_page.locator("#btn-replace").click()
@@ -71,6 +126,12 @@ class TestGridColumns:
         grid = view_page.locator("#grid-foot")
         expect(grid).to_contain_text("Total: 5")
 
+    @pytest.mark.spec("V08.22")
+    def test_all_rows_visible(self, view_page: Page):
+        """Grid with all_rows_visible has allRowsVisible property set."""
+        grid = view_page.locator("#grid1")
+        expect(grid).to_have_js_property("allRowsVisible", True)
+
     @pytest.mark.spec("V08.21")
     def test_empty_state(self, view_page: Page):
         """Grid set_items([]) clears all rows."""
@@ -82,12 +143,6 @@ class TestGridColumns:
         expect(grid).to_have_js_property("size", 0)
         rendered = grid.evaluate("el => el._getRenderedRows().length")
         assert rendered == 0
-
-    @pytest.mark.spec("V08.22")
-    def test_all_rows_visible(self, view_page: Page):
-        """Grid with all_rows_visible has allRowsVisible property set."""
-        grid = view_page.locator("#grid1")
-        expect(grid).to_have_js_property("allRowsVisible", True)
 
 
 class TestGridRenderers:

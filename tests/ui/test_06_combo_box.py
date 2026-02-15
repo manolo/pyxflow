@@ -43,6 +43,32 @@ class TestComboBox:
         cb.click()
         view_page.locator("vaadin-combo-box-item").filter(has_text="Banana").click()
         expect(view_page.locator("#cb1-val")).to_have_text("Banana", timeout=5000)
+        view_page.keyboard.press("Escape")
+
+
+class TestComboBoxFiltering:
+    @pytest.mark.spec("V06.04")
+    def test_type_to_filter(self, view_page: Page):
+        """Typing in ComboBox filters the dropdown items."""
+        view_page.keyboard.press("Escape")
+        cb = view_page.locator("#cb1")
+        cb.click()
+        # Clear any existing value, then type filter text
+        view_page.keyboard.press("Meta+a")
+        view_page.keyboard.type("Ban")
+        # Verify filtered result — get_by_role ignores hidden overlay items
+        expect(view_page.get_by_role("option", name="Banana")).to_be_visible()
+        view_page.keyboard.press("Escape")
+
+    @pytest.mark.spec("V06.08")
+    def test_item_label_generator(self, view_page: Page):
+        """ComboBox with item_label_generator displays custom labels."""
+        view_page.keyboard.press("Escape")
+        cb = view_page.locator("#cb-gen")
+        cb.click()
+        # get_by_role ignores hidden overlay items from other combo-boxes
+        expect(view_page.get_by_role("option", name="Apple")).to_be_visible()
+        view_page.keyboard.press("Escape")
 
 
 class TestMultiSelectComboBox:
@@ -66,6 +92,7 @@ class TestMultiSelectComboBox:
     @pytest.mark.spec("V06.15")
     def test_deselect_all(self, view_page: Page):
         """Test deselect — run last since it modifies state."""
+        view_page.keyboard.press("Escape")
         view_page.locator("#btn-mscb-des").click()
         mscb = view_page.locator("#mscb-des")
         expect(mscb).to_have_js_property("selectedItems", [])

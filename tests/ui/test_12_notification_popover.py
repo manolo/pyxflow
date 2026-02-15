@@ -80,6 +80,24 @@ class TestPopover:
         expect(pop).to_have_js_property("opened", False, timeout=3000)
 
 
+class TestPopoverExtras:
+    @pytest.mark.spec("V12.11")
+    def test_popover_position(self, view_page: Page):
+        """Popover with set_position(TOP) has position property."""
+        pop = view_page.locator("#pop-pos")
+        pos = pop.evaluate("el => el.position")
+        assert pos == "top"
+
+    @pytest.mark.spec("V12.16")
+    def test_popover_open_close_listeners(self, view_page: Page):
+        """Popover fires open/close listeners."""
+        view_page.locator("#pop-ev-target").click()
+        # Use span#pop-ev to avoid matching the vaadin-popover with same ID
+        expect(view_page.locator("span#pop-ev")).to_have_text("opened", timeout=3000)
+        view_page.keyboard.press("Escape")
+        expect(view_page.locator("span#pop-ev")).to_have_text("closed", timeout=3000)
+
+
 class TestNavigation:
     @pytest.mark.spec("V12.19")
     def test_nav_via_sidenav(self, view_page: Page):
