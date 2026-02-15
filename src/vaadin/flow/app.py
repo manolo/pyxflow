@@ -70,17 +70,23 @@ class FlowApp:
         watch_dir = Path(".").resolve()
         print(f"  Dev mode: watching {watch_dir} for Python file changes", flush=True)
 
+        # Check if something is already listening on the port
+        probe = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            probe.connect((self._host, self._port))
+            probe.close()
+            print(f"\n  ERROR: Port {self._port} is already in use.")
+            print(f"  Kill the other process:  lsof -ti :{self._port} | xargs kill -9\n")
+            return
+        except ConnectionRefusedError:
+            pass  # Nothing listening — good
+        finally:
+            probe.close()
+
         # Create listening socket in the parent — survives child restarts
         srv_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         srv_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        try:
-            srv_sock.bind((self._host, self._port))
-        except OSError as e:
-            if e.errno == 48:
-                print(f"\n  ERROR: Port {self._port} is already in use.")
-                print(f"  Kill the other process:  lsof -ti :{self._port} | xargs kill -9\n")
-                return
-            raise
+        srv_sock.bind((self._host, self._port))
         srv_sock.listen(128)
         srv_sock.set_inheritable(True)
         fd = srv_sock.fileno()

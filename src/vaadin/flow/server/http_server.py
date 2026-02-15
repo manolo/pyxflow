@@ -755,6 +755,19 @@ def run_server(host: str = "localhost", port: int = 8080, debug: bool = False, s
     if sock is not None:
         web.run_app(app, sock=sock, shutdown_timeout=0)
     else:
+        # Check if something is already listening on the port
+        import socket
+        probe = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            probe.connect((host, port))
+            probe.close()
+            print(f"\n  ERROR: Port {port} is already in use.")
+            print(f"  Kill the other process:  lsof -ti :{port} | xargs kill -9\n")
+            return
+        except ConnectionRefusedError:
+            pass
+        finally:
+            probe.close()
         web.run_app(app, host=host, port=port, reuse_address=True, shutdown_timeout=0)
 
 
