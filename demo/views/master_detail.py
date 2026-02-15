@@ -4,6 +4,7 @@ from vaadin.flow import Menu, Route
 from vaadin.flow.components import (
     Button,
     Checkbox,
+    ComboBox,
     DatePicker,
     Div,
     FormLayout,
@@ -48,6 +49,10 @@ class MasterDetailView(Div):
         # Load data
         self._all_people = [p.to_dict() for p in sample_person_service.find_all()]
         self.grid.set_items(self._all_people)
+
+        # Populate role ComboBox from data
+        roles = sorted({p.role for p in sample_person_service.find_all() if p.role})
+        self.role.set_items(roles)
 
         # When a row is selected or deselected, populate form
         self.grid.add_selection_listener(self._on_select)
@@ -107,7 +112,7 @@ class MasterDetailView(Div):
         self.phone = TextField("Phone")
         self.date_of_birth = DatePicker("Date Of Birth")
         self.occupation = TextField("Occupation")
-        self.role = TextField("Role")
+        self.role = ComboBox("Role")
         self.important = Checkbox("Important")
         form_layout.add(
             self.first_name,
