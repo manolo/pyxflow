@@ -176,3 +176,32 @@ def pytest_configure(config):
 def pytest_runtest_setup(item):
     if CONSECUTIVE_FAILURES > MAX_CONSECUTIVE:
         pytest.skip(f"ABORT: {CONSECUTIVE_FAILURES} consecutive failures")
+
+
+# ── Console error checking ──────────────────────────────────────────────
+# Views where console errors are expected (e.g. server error handling tests)
+_VIEWS_WITH_EXPECTED_ERRORS = {"test_30_server_errors"}
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _assert_no_console_errors(shared_page, request):
+    """Capture JS console errors during each view's tests.
+
+    Fails at module teardown if any unexpected errors were logged.
+    This catches bugs like execute_js scripts using wrong `this` context.
+    """
+    errors: list[str] = []
+
+    def _on_console(msg):
+        if msg.type == "error":
+            errors.append(msg.text)
+
+    shared_page.on("console", _on_console)
+    yield
+    shared_page.remove_listener("console", _on_console)
+
+    module_name = request.node.name
+    if module_name in _VIEWS_WITH_EXPECTED_ERRORS:
+        return
+    if errors:
+        pytest.fail(f"Unexpected browser console errors:\n" + "\n".join(errors))

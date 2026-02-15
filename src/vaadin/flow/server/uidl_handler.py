@@ -933,12 +933,12 @@ class UidlHandler:
                     try:
                         result = method(*args)
                         component.element.execute_js(
-                            "this.$server['}p']($0, true, $1)",
+                            "$0.$server['}p']($1, true, $2)",
                             promise_id, result
                         )
                     except Exception:
                         component.element.execute_js(
-                            "this.$server['}p']($0, false)",
+                            "$0.$server['}p']($1, false)",
                             promise_id
                         )
                         raise

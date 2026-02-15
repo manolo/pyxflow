@@ -223,6 +223,35 @@ class TestPromiseResolution:
         assert 42 in cmd
         assert "Hello, Alice!" in cmd
 
+    def test_promise_resolve_uses_element_ref_not_this(self):
+        """Ensure promise resolution uses $0.$server (element) not this.$server.
+
+        In execute commands, `this` is the FlowClient context object (getNode,
+        $appId, registry...), NOT the element.  The element is `$0`.  Using
+        `this.$server` causes TypeError because contextObject.$server is undefined.
+        """
+        tree, handler, comp = self._setup_component()
+
+        rpc = {
+            "type": "publishedEventHandler",
+            "node": comp.element.node_id,
+            "templateEventMethodName": "greet",
+            "templateEventMethodArgs": ["Test"],
+            "promise": 0,
+        }
+        handler._handle_published_event(rpc)
+
+        execute_cmds = tree.collect_execute()
+        promise_cmds = [
+            cmd for cmd in execute_cmds
+            if any("}p" in str(item) for item in cmd)
+        ]
+        assert len(promise_cmds) == 1
+        script = promise_cmds[0][-1]
+        # Must use $0.$server (element), never this.$server (context object)
+        assert "$0.$server" in script
+        assert "this.$server" not in script
+
     def test_promise_reject_on_exception(self):
         tree, handler, comp = self._setup_component(FailingComponent)
 
@@ -247,6 +276,29 @@ class TestPromiseResolution:
         script = cmd[-1]  # Script is always last element
         assert "false" in script  # reject
         assert 7 in cmd
+
+    def test_promise_reject_uses_element_ref_not_this(self):
+        """Rejection must also use $0.$server, not this.$server."""
+        tree, handler, comp = self._setup_component(FailingComponent)
+
+        rpc = {
+            "type": "publishedEventHandler",
+            "node": comp.element.node_id,
+            "templateEventMethodName": "failingMethod",
+            "templateEventMethodArgs": [],
+            "promise": 5,
+        }
+        with pytest.raises(ValueError):
+            handler._handle_published_event(rpc)
+
+        execute_cmds = tree.collect_execute()
+        promise_cmds = [
+            cmd for cmd in execute_cmds
+            if any("}p" in str(item) for item in cmd)
+        ]
+        script = promise_cmds[0][-1]
+        assert "$0.$server" in script
+        assert "this.$server" not in script
 
     def test_promise_minus_one_is_fire_and_forget(self):
         tree, handler, comp = self._setup_component()
