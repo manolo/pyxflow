@@ -63,6 +63,18 @@ class TestThemeView(VerticalLayout):
 
         btn_aura_dark.add_click_listener(_set_aura_dark)
 
+        # --- Reset to Lumo light (for cleanup after Aura tests) ---
+        btn_lumo = Button("Lumo light")
+        btn_lumo.set_id("btn-lumo")
+
+        def _set_lumo(e):
+            ui = self.get_ui()
+            if ui:
+                ui.set_theme("lumo", "light")
+                theme_status.set_text("light")
+
+        btn_lumo.add_click_listener(_set_lumo)
+
         # --- CSS class for style test ---
         styled_btn = Button("Custom styled")
         styled_btn.set_id("styled-btn")
@@ -72,5 +84,5 @@ class TestThemeView(VerticalLayout):
             theme_status,
             btn_dark, btn_light,
             btn_aura, btn_aura_dark,
-            styled_btn,
+            btn_lumo, styled_btn,
         )

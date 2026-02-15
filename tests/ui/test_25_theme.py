@@ -43,10 +43,11 @@ class TestThemeSwitching:
     def test_custom_styled_button(self, view_page: Page):
         expect(view_page.locator("#styled-btn")).to_be_visible()
 
-    # Reset to Lumo light for subsequent tests
-    @pytest.mark.spec("V25.03")
-    def test_reset_theme(self, view_page: Page):
-        view_page.locator("#btn-light").click()
+    # Reset to Lumo light for subsequent tests (btn-lumo calls set_theme("lumo", "light"),
+    # not just set_theme_variant — needed after Aura tests to switch back to Lumo)
+    @pytest.mark.spec("V25.06")
+    def test_reset_to_lumo(self, view_page: Page):
+        view_page.locator("#btn-lumo").click()
         expect(view_page.locator("#theme-status")).to_have_text("light")
 
 
