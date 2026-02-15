@@ -490,6 +490,10 @@ def guess_content_type(path: Path) -> str:
         ".json": "application/json",
         ".svg": "image/svg+xml",
         ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".gif": "image/gif",
+        ".webp": "image/webp",
         ".ico": "image/x-icon",
     }
     return types.get(suffix, "application/octet-stream")
@@ -625,6 +629,7 @@ def create_app() -> web.Application:
     app.router.add_get("/lumo/{path:.*}", handle_theme)
     app.router.add_get("/aura/{path:.*}", handle_theme)
     app.router.add_get("/styles/{path:.*}", handle_styles)
+    app.router.add_get("/static/{path:.*}", handle_app_static)
     # Catch-all for other routes (e.g., /about) - serve index.html
     app.router.add_get("/{path:.*}", handle_route)
     app.router.add_post("/{path:.*}", handle_route_post)
@@ -662,6 +667,26 @@ async def handle_styles(request: web.Request) -> web.Response:
         return web.Response(text="Forbidden", status=403)
     if resolved.is_file() and resolved.suffix == ".css":
         return web.FileResponse(resolved, headers={"Content-Type": "text/css", "Cache-Control": "no-cache"})  # type: ignore[return-value]
+    return web.Response(text="Not found", status=404)
+
+
+async def handle_app_static(request: web.Request) -> web.Response:
+    """Handle static file requests for /static/*.
+
+    Serves files from the app package's static/ directory
+    (e.g. demo/static/ when running ``python -m demo``).
+    """
+    if _app_directory is None:
+        return web.Response(text="Not found", status=404)
+    path = request.match_info.get("path", "")
+    file_path = _app_directory / "static" / path
+    static_dir = (_app_directory / "static").resolve()
+    resolved = file_path.resolve()
+    if not str(resolved).startswith(str(static_dir)):
+        return web.Response(text="Forbidden", status=403)
+    if resolved.is_file():
+        content_type = guess_content_type(resolved)
+        return web.FileResponse(resolved, headers={"Content-Type": content_type, "Cache-Control": "no-cache"})  # type: ignore[return-value]
     return web.Response(text="Not found", status=404)
 
 
