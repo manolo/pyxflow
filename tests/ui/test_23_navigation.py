@@ -94,6 +94,26 @@ class TestSideNav:
         expect(view_page).to_have_url(re.compile(r".*/test/navigation"), timeout=5000)
 
 
+class TestPageHeader:
+    @pytest.mark.spec("V23.16")
+    def test_page_header_shows_current_view(self, view_page: Page):
+        """get_page_header updates #page-header with current view title."""
+        header = view_page.locator("#page-header")
+        expect(header).to_contain_text("Navigation", timeout=3000)
+
+    @pytest.mark.spec("V23.17")
+    def test_page_header_changes_on_navigation(self, view_page: Page):
+        """Navigating to another view updates #page-header."""
+        view_page.locator("vaadin-side-nav-item[path='/test/binder']").click()
+        expect(view_page).to_have_url(re.compile(r".*/test/binder"), timeout=5000)
+        header = view_page.locator("#page-header")
+        expect(header).to_contain_text("Binder", timeout=3000)
+        # Navigate back
+        view_page.locator("vaadin-side-nav-item[path='/test/navigation']").click()
+        expect(view_page).to_have_url(re.compile(r".*/test/navigation"), timeout=5000)
+        expect(header).to_contain_text("Navigation", timeout=3000)
+
+
 class TestNavigation:
     @pytest.mark.spec("V23.14")
     def test_nav_via_sidenav(self, view_page: Page):

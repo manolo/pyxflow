@@ -37,7 +37,7 @@
 | 20 | `/test/component-api` | 18 | Base Component API (visibility, enabled, classes, styles, size, tooltip, aria, theme) |
 | 21 | `/test/field-mixins` | 13 | HasReadOnly, HasValidation, HasRequired |
 | 22 | `/test/binder` | 20 | Binder, validators, converters, dirty tracking, field types |
-| 23 | `/test/navigation` | 10 | @Route, params, AppLayout, SideNav, RouterLink, page title |
+| 23 | `/test/navigation` | 13 | @Route, params, AppLayout, SideNav, RouterLink, page title, get_page_header |
 | 24 | `/test/push` | 8 | WebSocket push, UI.access() |
 | 25 | `/test/theme` | 10 | Theme switching, @StyleSheet, @ColorScheme, persistence across navigation |
 | 26 | `/test/client-callable` | 3 | @ClientCallable |
@@ -2496,6 +2496,21 @@ Feature: Navigation — Routes, AppLayout, SideNav
     Given DrawerToggle in navbar
     When click toggle
     Then drawer opens/closes
+
+  Scenario: V23.15 — set_primary_section(DRAWER) property [skip:unit]
+    Given AppLayout with set_primary_section(Section.DRAWER)
+    Then vaadin-app-layout has primarySection="drawer"
+
+  # --- Page header ---
+  Scenario: V23.16 — get_page_header updates on navigation
+    Given TestMainLayout with #page-header span using get_page_header()
+    When navigate to /test/navigation (page_title="Test: Navigation")
+    Then #page-header text contains "Navigation"
+
+  Scenario: V23.17 — get_page_header changes on second navigation
+    Given already on /test/navigation
+    When navigate to /test/binder via SideNav
+    Then #page-header text changes to contain "Binder"
 
   # --- SideNav ---
   Scenario: V23.11 — SideNav renders items
