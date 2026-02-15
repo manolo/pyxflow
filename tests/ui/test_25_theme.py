@@ -6,11 +6,15 @@ import pytest
 from playwright.sync_api import Page, expect
 
 
+_module_initial = {}
+
+
 @pytest.fixture(scope="module")
 def view_page(shared_page, base_url):
     """Reuse shared page — navigate via SideNav or goto fallback."""
     from conftest import navigate_to
     navigate_to(shared_page, base_url, "test/theme", "vaadin-button")
+    _module_initial["theme"] = shared_page.locator("#theme-status").text_content()
     yield shared_page
 
 
@@ -72,12 +76,16 @@ class TestThemePersistsAcrossNavigation:
         expect(view_page.locator("#theme-status")).to_have_text("aura-light")
 
     @pytest.mark.spec("V25.12")
-    def test_reset_restores_captured_initial(self, view_page: Page):
-        """Reset restores the theme captured at view attach (aura-light after nav back)."""
-        # After navigating back with aura-light, _attach captured it as _initial_theme.
-        # So reset restores to aura-light, proving the capture works correctly.
-        view_page.locator("#btn-reset").click()
-        expect(view_page.locator("#theme-status")).to_have_text("aura-light")
+    def test_restore_initial_theme(self, view_page: Page):
+        """Restore theme to what it was before this test module started."""
+        target = _module_initial["theme"]
+        theme, variant = target.split("-")
+        # Restore theme family
+        view_page.locator("#btn-lumo" if theme == "lumo" else "#btn-aura").click()
+        # Restore variant
+        if variant == "dark":
+            view_page.locator("#btn-dark").click()
+        expect(view_page.locator("#theme-status")).to_have_text(target)
 
 
 class TestNavigation:
