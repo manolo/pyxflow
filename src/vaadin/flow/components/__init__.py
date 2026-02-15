@@ -68,6 +68,8 @@ from vaadin.flow.components.constants import (
     Autocomplete, ValueChangeMode, AutoExpandMode,
     # Position
     PopoverPosition,
+    # AppLayout
+    AppLayoutSection,
     # Theme variants
     AvatarGroupVariant, AvatarVariant, ButtonVariant, CardVariant,
     CheckboxGroupVariant, CheckboxVariant, ComboBoxVariant, CustomFieldVariant,
@@ -204,6 +206,8 @@ __all__ = [
     "ValueChangeMode",
     # Enums — position
     "PopoverPosition",
+    # Enums — AppLayout
+    "AppLayoutSection",
     # Enums — theme variants
     "AvatarGroupVariant",
     "AvatarVariant",

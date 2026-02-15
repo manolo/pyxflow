@@ -3,6 +3,7 @@
 import pytest
 
 from vaadin.flow.components.app_layout import AppLayout
+from vaadin.flow.components.constants import AppLayoutSection
 from vaadin.flow.components.button import Button
 from vaadin.flow.components.drawer_toggle import DrawerToggle
 from vaadin.flow.components.icon import Icon
@@ -150,6 +151,58 @@ class TestAppLayout:
         changes = tree.collect_changes()
         prop_changes = [c for c in changes if c.get("key") == "primarySection"]
         assert any(c["value"] == "drawer" for c in prop_changes)
+
+    def test_section_enum_values(self):
+        assert AppLayout.Section.NAVBAR.value == "navbar"
+        assert AppLayout.Section.DRAWER.value == "drawer"
+        # Enum is accessible both from class and from constants
+        assert AppLayout.Section is AppLayoutSection
+        assert AppLayoutSection.NAVBAR == "navbar"
+        assert AppLayoutSection.DRAWER == "drawer"
+
+    def test_section_enum_from_string(self):
+        assert AppLayoutSection("navbar") == AppLayoutSection.NAVBAR
+        assert AppLayoutSection("drawer") == AppLayoutSection.DRAWER
+
+    def test_set_primary_section_with_enum(self, tree):
+        layout = AppLayout()
+        layout._attach(tree)
+        tree.collect_changes()
+
+        layout.set_primary_section(AppLayout.Section.DRAWER)
+        changes = tree.collect_changes()
+        prop_changes = [c for c in changes if c.get("key") == "primarySection"]
+        assert any(c["value"] == "drawer" for c in prop_changes)
+
+    def test_get_primary_section_returns_enum(self):
+        layout = AppLayout()
+        assert layout.get_primary_section() == AppLayoutSection.NAVBAR
+        layout.set_primary_section("drawer")
+        assert layout.get_primary_section() == AppLayoutSection.DRAWER
+
+    def test_primary_section_before_attach(self, tree):
+        """Setting primary section before attach should flush in _attach()."""
+        layout = AppLayout()
+        layout.set_primary_section(AppLayout.Section.DRAWER)
+        layout._attach(tree)
+
+        prop = layout.element.node.get(Feature.ELEMENT_PROPERTY_MAP, "primarySection")
+        assert prop == "drawer"
+
+    def test_drawer_opened_false_before_attach(self, tree):
+        """Setting drawer closed before attach should flush in _attach()."""
+        layout = AppLayout()
+        layout.set_drawer_opened(False)
+        layout._attach(tree)
+
+        prop = layout.element.node.get(Feature.ELEMENT_PROPERTY_MAP, "drawerOpened")
+        assert prop is False
+
+    def test_is_drawer_opened(self):
+        layout = AppLayout()
+        assert layout.is_drawer_opened() is True
+        layout.set_drawer_opened(False)
+        assert layout.is_drawer_opened() is False
 
     def test_show_router_layout_content(self, tree, ui):
         layout = AppLayout()

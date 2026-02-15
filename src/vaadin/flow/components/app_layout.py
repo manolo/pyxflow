@@ -2,6 +2,7 @@
 
 from typing import TYPE_CHECKING
 
+from vaadin.flow.components.constants import AppLayoutSection
 from vaadin.flow.core.component import Component
 
 if TYPE_CHECKING:
@@ -25,17 +26,21 @@ class AppLayout(Component):
     _tag = "vaadin-app-layout"
     _is_router_layout = True
 
+    Section = AppLayoutSection
+
     def __init__(self):
         super().__init__()
         self._navbar_components: list[Component] = []
         self._drawer_components: list[Component] = []
         self._content: Component | None = None
-        self._primary_section = "navbar"
+        self._primary_section: AppLayoutSection = AppLayoutSection.NAVBAR
         self._drawer_opened = True
 
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
-        self.element.set_property("drawerOpened", True)
+        self.element.set_property("drawerOpened", self._drawer_opened)
+        if self._primary_section != AppLayoutSection.NAVBAR:
+            self.element.set_property("primarySection", self._primary_section.value)
         for comp in self._navbar_components:
             self._attach_slotted(comp, "navbar", tree)
         for comp in self._drawer_components:
@@ -93,14 +98,16 @@ class AppLayout(Component):
         """Check if the drawer is open."""
         return self._drawer_opened
 
-    def set_primary_section(self, section: str):
-        """Set which section is primary ('navbar' or 'drawer')."""
+    def set_primary_section(self, section: "AppLayoutSection | str"):
+        """Set which section is primary (Section.NAVBAR or Section.DRAWER)."""
+        if isinstance(section, str):
+            section = AppLayoutSection(section)
         self._primary_section = section
         if self._element:
-            self.element.set_property("primarySection", section)
+            self.element.set_property("primarySection", section.value)
 
-    def get_primary_section(self) -> str:
-        """Get which section is primary ('navbar' or 'drawer')."""
+    def get_primary_section(self) -> AppLayoutSection:
+        """Get which section is primary."""
         return self._primary_section
 
     # --- RouterLayout interface ---

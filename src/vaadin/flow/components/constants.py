@@ -602,3 +602,17 @@ class VirtualListVariant(str, Enum):
     AURA_OVERFLOW_INDICATORS = "overflow-indicators"
     AURA_OVERFLOW_INDICATOR_TOP = "overflow-indicator-top"
     AURA_OVERFLOW_INDICATOR_BOTTOM = "overflow-indicator-bottom"
+
+
+# ---------------------------------------------------------------------------
+#  AppLayout enums
+# ---------------------------------------------------------------------------
+
+class AppLayoutSection(str, Enum):
+    """Sections that can be used as primary in AppLayout.
+
+    NAVBAR — navbar takes full width, drawer below (default).
+    DRAWER — drawer takes full height, navbar beside it.
+    """
+    NAVBAR = "navbar"
+    DRAWER = "drawer"
