@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1676f3"/>
+      <stop offset="100%" style="stop-color:#00d2ff"/>
+    </linearGradient>
+    <linearGradient id="grad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d2ff"/>
+      <stop offset="100%" style="stop-color:#1676f3"/>
+    </linearGradient>
+  </defs>
+  <!-- Python-inspired double curve / flow motif -->
+  <circle cx="60" cy="60" r="56" fill="none" stroke="url(#grad)" stroke-width="2.5" opacity="0.3"/>
+  <!-- Upper flow wave (python head) -->
+  <path d="M38 32 C38 22, 52 18, 60 18 C68 18, 82 22, 82 32 L82 52 C82 58, 76 62, 68 62 L52 62 C44 62, 38 66, 38 72"
+        fill="none" stroke="url(#grad)" stroke-width="6" stroke-linecap="round"/>
+  <!-- Lower flow wave (python tail) -->
+  <path d="M82 88 C82 98, 68 102, 60 102 C52 102, 38 98, 38 88 L38 68 C38 62, 44 58, 52 58 L68 58 C76 58, 82 54, 82 48"
+        fill="none" stroke="url(#grad2)" stroke-width="6" stroke-linecap="round"/>
+  <!-- Python eyes -->
+  <circle cx="50" cy="34" r="4" fill="#00d2ff"/>
+  <circle cx="70" cy="86" r="4" fill="#1676f3"/>
+</svg>

@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PyFlow — Build Web Apps in Pure Python</title>
+<style>
+/* ===== Reset & Base ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+a { color: #00d2ff; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #1676f3; }
+img { max-width: 100%; height: auto; display: block; }
+
+/* ===== Utility ===== */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+.section { padding: 100px 0; }
+.fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== Nav ===== */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(26, 26, 46, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 14px 0;
+}
+nav .container {
+  display: flex; align-items: center; justify-content: space-between;
+}
+nav .brand {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1.5rem; font-weight: 700; color: #fff;
+}
+nav .brand img { width: 60px; }
+nav .brand .by-vaadin {
+  font-size: 0.6rem;
+  font-weight: 400;
+  color: #667;
+  margin-left: -4px;
+  align-self: flex-end;
+  margin-bottom: 2px;
+}
+nav .links { display: flex; gap: 28px; }
+nav .links a { color: #aaa; font-size: 0.9rem; font-weight: 500; }
+nav .links a:hover { color: #fff; }
+
+/* ===== Hero ===== */
+.hero {
+  min-height: 100vh;
+  display: flex; align-items: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  position: relative;
+  padding-top: 80px;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 70% 30%, rgba(22, 118, 243, 0.12) 0%, transparent 60%),
+              radial-gradient(circle at 30% 70%, rgba(0, 210, 255, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+.hero .container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  position: relative;
+}
+.hero-text h1 {
+  font-size: 3.2rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.hero-text h1 .accent {
+  background: linear-gradient(135deg, #1676f3, #00d2ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-text .subtitle {
+  font-size: 1.25rem;
+  color: #8899aa;
+  margin-bottom: 36px;
+}
+.hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.25s;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #1676f3, #00b4d8);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(22, 118, 243, 0.35);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(22, 118, 243, 0.5);
+  color: #fff;
+}
+.btn-outline {
+  background: transparent;
+  color: #ccc;
+  border: 1.5px solid rgba(255,255,255,0.15);
+}
+.btn-outline:hover {
+  border-color: #00d2ff;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ===== Hero Code Block (typing animation) ===== */
+.hero-code {
+  background: #0d1117;
+  border-radius: 12px;
+  padding: 28px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  position: relative;
+  overflow: hidden;
+}
+.hero-code::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 38px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.hero-code .dots {
+  position: absolute; top: 12px; left: 16px;
+  display: flex; gap: 7px;
+}
+.hero-code .dots span {
+  width: 11px; height: 11px; border-radius: 50%;
+}
+.hero-code .dots span:nth-child(1) { background: #ff5f57; }
+.hero-code .dots span:nth-child(2) { background: #febc2e; }
+.hero-code .dots span:nth-child(3) { background: #28c840; }
+.hero-code .filename {
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  font-size: 0.75rem; color: #555; font-family: monospace;
+}
+.hero-code pre {
+  margin-top: 22px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: #e6edf3;
+  overflow-x: auto;
+}
+.hero-code .cursor {
+  display: inline-block;
+  width: 2px; height: 1.1em;
+  background: #00d2ff;
+  vertical-align: text-bottom;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Syntax colors */
+.kw { color: #ff7b72; }
+.fn { color: #d2a8ff; }
+.str { color: #a5d6ff; }
+.cls { color: #7ee787; }
+.dec { color: #ffa657; }
+.cmt { color: #6e7681; font-style: italic; }
+.op { color: #79c0ff; }
+
+/* ===== Why PyFlow ===== */
+.why {
+  background: linear-gradient(180deg, #16213e 0%, #1a1a2e 100%);
+}
+.section-title {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12px;
+}
+.section-subtitle {
+  text-align: center;
+  color: #778;
+  font-size: 1.1rem;
+  margin-bottom: 60px;
+}
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 28px;
+}
+.feature-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: 32px 28px;
+  transition: transform 0.3s, border-color 0.3s;
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(22, 118, 243, 0.3);
+}
+.feature-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 18px;
+  background: linear-gradient(135deg, rgba(22,118,243,0.15), rgba(0,210,255,0.1));
+  color: #00d2ff;
+}
+.feature-card h3 {
+  font-size: 1.15rem;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.feature-card p {
+  font-size: 0.92rem;
+  color: #889;
+  line-height: 1.6;
+}
+
+/* ===== Code Showcase ===== */
+.showcase { background: #1a1a2e; }
+.showcase-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+  margin-bottom: 80px;
+}
+.showcase-item:last-child { margin-bottom: 0; }
+.showcase-item.reverse { direction: rtl; }
+.showcase-item.reverse > * { direction: ltr; }
+.showcase-code {
+  background: #0d1117;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.showcase-code .code-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.showcase-code .code-header .dot {
+  width: 10px; height: 10px; border-radius: 50%;
+}
+.showcase-code .code-header .dot:nth-child(1) { background: #ff5f57; }
+.showcase-code .code-header .dot:nth-child(2) { background: #febc2e; }
+.showcase-code .code-header .dot:nth-child(3) { background: #28c840; }
+.showcase-code .code-header span.file {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: #555;
+  font-family: monospace;
+}
+.showcase-code pre {
+  font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: #e6edf3;
+  overflow-x: auto;
+}
+.showcase-screenshot {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 16px 50px rgba(0,0,0,0.4);
+}
+.showcase-screenshot img {
+  width: 100%;
+  display: block;
+}
+.showcase-label {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+.showcase-desc {
+  font-size: 0.95rem;
+  color: #889;
+  margin-bottom: 20px;
+}
+
+/* ===== Component Gallery ===== */
+.gallery {
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+}
+.gallery-image {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  margin-top: 40px;
+}
+.gallery-image img { width: 100%; display: block; }
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+}
+.gallery-card {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  transition: transform 0.3s;
+}
+.gallery-card:hover { transform: translateY(-4px); }
+.gallery-card img { width: 100%; display: block; }
+
+/* ===== Quick Start ===== */
+.quickstart { background: #1a1a2e; }
+.terminal {
+  max-width: 700px;
+  margin: 40px auto 0;
+  background: #0d1117;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  overflow: hidden;
+  box-shadow: 0 16px 50px rgba(0,0,0,0.4);
+}
+.terminal-header {
+  background: rgba(255,255,255,0.03);
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 7px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.terminal-header span {
+  width: 11px; height: 11px; border-radius: 50%;
+}
+.terminal-header span:nth-child(1) { background: #ff5f57; }
+.terminal-header span:nth-child(2) { background: #febc2e; }
+.terminal-header span:nth-child(3) { background: #28c840; }
+.terminal-body {
+  padding: 24px;
+  font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+  font-size: 0.88rem;
+  line-height: 1.8;
+  color: #e6edf3;
+}
+.terminal-body .prompt { color: #7ee787; }
+.terminal-body .comment { color: #6e7681; }
+.file-tree {
+  max-width: 700px;
+  margin: 32px auto 0;
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  padding: 28px 32px;
+  border: 1px solid rgba(255,255,255,0.06);
+  font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: #aaa;
+}
+.file-tree .dir { color: #79c0ff; }
+.file-tree .file { color: #e6edf3; }
+.file-tree .note { color: #6e7681; }
+
+/* ===== Footer ===== */
+footer {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 40px 0;
+  text-align: center;
+  color: #556;
+  font-size: 0.9rem;
+}
+footer a { color: #00d2ff; }
+footer .footer-links {
+  display: flex; justify-content: center; gap: 32px; margin-bottom: 16px;
+}
+
+/* ===== Architecture ===== */
+.architecture {
+  background: linear-gradient(180deg, #1a1a2e 0%, #0f1a2e 50%, #1a1a2e 100%);
+}
+.arch-illustration {
+  max-width: 700px;
+  margin: 0 auto 50px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.arch-illustration img { width: 100%; display: block; }
+.arch-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 60px;
+  flex-wrap: wrap;
+}
+.arch-box {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 28px 32px;
+  min-width: 260px;
+  max-width: 320px;
+  flex: 1;
+}
+.arch-box h3 {
+  font-size: 1.1rem;
+  color: #fff;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.arch-box h3 .arch-icon {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, rgba(22,118,243,0.2), rgba(0,210,255,0.15));
+  color: #00d2ff;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.arch-box ul {
+  list-style: none;
+  font-size: 0.88rem;
+  line-height: 2;
+}
+.arch-box ul li::before {
+  margin-right: 8px;
+  font-weight: 700;
+}
+.arch-box.server ul li::before { content: "✓"; color: #7ee787; }
+.arch-box.browser ul li { color: #889; }
+.arch-box.browser ul li::before { content: "🛡️"; color: #556; font-size: 1em; }
+.arch-box.browser ul li.yes { color: #e0e0e0; }
+.arch-box.browser ul li.yes::before { content: "✓"; color: #7ee787; }
+
+.arch-wire {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 24px;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.arch-wire .wire-line {
+  width: 100px; height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #1676f3, #00d2ff, #1676f3);
+  background-size: 200% 100%;
+  animation: wirePulse 2s ease-in-out infinite;
+  position: relative;
+}
+.arch-wire .wire-line::after {
+  content: '';
+  position: absolute; inset: -3px 0;
+  background: linear-gradient(90deg, transparent, rgba(0,210,255,0.3), transparent);
+  background-size: 200% 100%;
+  animation: wirePulse 2s ease-in-out infinite;
+  border-radius: 4px;
+  filter: blur(4px);
+}
+@keyframes wirePulse {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.arch-wire .wire-label {
+  font-size: 0.7rem;
+  color: #00d2ff;
+  font-family: monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.arch-wire .wire-sub {
+  font-size: 0.65rem;
+  color: #556;
+}
+
+.arch-benefits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+.arch-benefit {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 24px;
+  transition: transform 0.3s, border-color 0.3s;
+}
+.arch-benefit:hover {
+  transform: translateY(-3px);
+  border-color: rgba(0,210,255,0.2);
+}
+.arch-benefit .benefit-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px;
+  background: linear-gradient(135deg, rgba(22,118,243,0.15), rgba(0,210,255,0.1));
+  color: #00d2ff;
+}
+.arch-benefit h4 {
+  color: #fff;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+.arch-benefit p {
+  font-size: 0.85rem;
+  color: #889;
+  line-height: 1.6;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .hero .container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+  .hero-text h1 { font-size: 2.2rem; }
+  .hero-buttons { justify-content: center; }
+  .showcase-item { grid-template-columns: 1fr; }
+  .showcase-item.reverse { direction: ltr; }
+  .section-title { font-size: 1.8rem; }
+  nav .links { display: none; }
+  .features { grid-template-columns: 1fr; }
+  .arch-diagram { flex-direction: column; gap: 20px; }
+  .arch-wire { flex-direction: row; padding: 0; }
+  .arch-wire .wire-line { width: 3px; height: 40px; }
+  .arch-box { max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Nav ===== -->
+<nav>
+  <div class="container">
+    <a href="#" class="brand">
+      <img src="logo2.png" alt="PyFlow">
+      PyFlow
+      <span class="by-vaadin">by Vaadin</span>
+    </a>
+    <div class="links">
+      <a href="#why">Features</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#showcase">Examples</a>
+      <a href="#gallery">Components</a>
+      <a href="#quickstart">Quick Start</a>
+      <a href="https://github.com/nicegui/pyflow" target="_blank">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== Hero ===== -->
+<section class="hero" id="hero">
+  <div class="container">
+    <div class="hero-text">
+      <h1>Build Web Apps<br>in <span class="accent">Pure Python</span></h1>
+      <p class="subtitle">No JavaScript. No HTML. Just Python.<br>Enterprise-grade Vaadin components, powered by Python.</p>
+      <div class="hero-buttons">
+        <a href="#quickstart" class="btn btn-primary">Get Started</a>
+        <a href="https://github.com/manolo/vaadin-pyflow" target="_blank" class="btn btn-outline">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+    </div>
+    <div class="hero-code">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <span class="filename">hello.py</span>
+      <pre id="typed-code"></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Why PyFlow ===== -->
+<section class="section why" id="why">
+  <div class="container">
+    <h2 class="section-title fade-in">Why PyFlow?</h2>
+    <p class="section-subtitle fade-in">Everything you need to build production web apps, without leaving Python.</p>
+    <div class="features">
+      <div class="feature-card fade-in">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <h3>Pure Python</h3>
+        <p>Write your entire UI in Python. No JavaScript, no HTML templates, no CSS. Just clean, idiomatic Python code.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </div>
+        <h3>49+ Vaadin Components</h3>
+        <p>Enterprise-grade UI components: Grid, Forms, Charts, Login, MenuBar, TreeGrid, and many more. Battle-tested at scale.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3>Real-time Push</h3>
+        <p>Built-in WebSocket support for live updates. Stream data to the browser in real time with server push.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 12A11 11 0 1 1 12 1"/><path d="M23 3v9h-9"/></svg>
+        </div>
+        <h3>Hot Reload</h3>
+        <p>Instant feedback with <code>--dev</code> mode. Edit your Python code and see changes reflected immediately in the browser.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Architecture ===== -->
+<section class="section architecture" id="architecture">
+  <div class="container">
+    <h2 class="section-title fade-in">How It Works</h2>
+    <p class="section-subtitle fade-in">Your code runs on the server. The browser is just a <em>Thin-Client</em>.<br>No server APIs to expose, no JS business code to ship.</p>
+
+    <div class="arch-illustration fade-in">
+      <img src="screenshots/architecture.png" alt="Server-side architecture: Python server connected to thin-client browsers via WebSocket" loading="lazy">
+    </div>
+
+    <div class="arch-diagram fade-in">
+      <div class="arch-box server">
+        <h3>
+          <span class="arch-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1" fill="currentColor"/><circle cx="6" cy="18" r="1" fill="currentColor"/></svg></span>
+          Python Server
+        </h3>
+        <ul>
+          <li>Business logic</li>
+          <li>Data access &amp; validation</li>
+          <li>UI state management</li>
+          <li>Session &amp; security</li>
+          <li>Your Python code</li>
+        </ul>
+      </div>
+
+      <div class="arch-wire">
+        <span class="wire-label">WebSocket</span>
+        <div class="wire-line"></div>
+        <span class="wire-sub">UI diffs only</span>
+      </div>
+
+      <div class="arch-box browser">
+        <h3>
+          <span class="arch-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+          Browser (Thin Client)
+        </h3>
+        <ul>
+          <li class="yes">Vaadin web components</li>
+          <li class="yes">DOM rendering</li>
+          <li>No business logic</li>
+          <li>No data access</li>
+          <li>No API endpoints</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="arch-benefits">
+      <div class="arch-benefit fade-in">
+        <div class="benefit-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        </div>
+        <h4>Zero Attack Surface</h4>
+        <p>No REST APIs, no GraphQL, no endpoints to exploit. The binary WebSocket protocol is opaque to pentesters. XSS and injection are structurally impossible.</p>
+      </div>
+      <div class="arch-benefit fade-in">
+        <div class="benefit-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h4>Server-side State</h4>
+        <p>All logic, validation, and data stay on the server. Nothing sensitive reaches the browser. Impossible to tamper with from DevTools.</p>
+      </div>
+      <div class="arch-benefit fade-in">
+        <div class="benefit-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h4>Minimal Bandwidth</h4>
+        <p>Only UI diffs travel the wire. No full-page reloads, no heavy JS bundles to download. Instant interactions over WebSocket.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Code Showcase ===== -->
+<section class="section showcase" id="showcase">
+  <div class="container">
+    <h2 class="section-title fade-in">See It in Action</h2>
+    <p class="section-subtitle fade-in">Real examples, real screenshots. From hello world to full CRUD apps.</p>
+
+    <!-- Example 1: Hello World -->
+    <div class="showcase-item fade-in">
+      <div>
+        <p class="showcase-label">Hello World</p>
+        <p class="showcase-desc">A complete web app in Python. Text field, button, and a notification toast.</p>
+        <div class="showcase-code">
+          <div class="code-header">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <span class="file">views/hello.py</span>
+          </div>
+          <pre><span class="kw">from</span> vaadin.flow <span class="kw">import</span> Route, Menu
+<span class="kw">from</span> vaadin.flow.components <span class="kw">import</span> *
+
+<span class="dec">@Route</span>(<span class="str">"hello"</span>)
+<span class="dec">@Menu</span>(<span class="str">"Hello"</span>, icon=<span class="str">"vaadin:hand"</span>)
+<span class="kw">class</span> <span class="cls">HelloView</span>(HorizontalLayout):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        name = TextField(<span class="str">"Your name"</span>)
+        button = Button(<span class="str">"Say hello"</span>, <span class="kw">lambda</span> e:
+            Notification.show(f<span class="str">"Hello {name.value}"</span>))
+        self.add(name, button)</pre>
+        </div>
+      </div>
+      <div class="showcase-screenshot">
+        <img src="screenshots/screenshot-hello.png" alt="Hello World demo" loading="lazy">
+      </div>
+    </div>
+
+    <!-- Example 2: Data Grid -->
+    <div class="showcase-item reverse fade-in">
+      <div>
+        <p class="showcase-label">Data Grid with Lazy Loading</p>
+        <p class="showcase-desc">Sortable columns, lazy data provider, selection events. Fetches only visible rows.</p>
+        <div class="showcase-code">
+          <div class="code-header">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <span class="file">views/grid.py</span>
+          </div>
+          <pre><span class="dec">@Route</span>(<span class="str">"grid"</span>)
+<span class="dec">@Menu</span>(<span class="str">"Grid"</span>, icon=<span class="str">"vaadin:table"</span>)
+<span class="kw">class</span> <span class="cls">GridView</span>(VerticalLayout):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self.grid = Grid()
+        self.grid.add_column(<span class="str">"name"</span>, header=<span class="str">"Name"</span>)
+        self.grid.add_column(<span class="str">"email"</span>, header=<span class="str">"Email"</span>)
+        self.grid.add_column(<span class="str">"role"</span>).set_sortable(True)
+        self.grid.add_column(<span class="str">"city"</span>).set_sortable(True)
+
+        <span class="cmt"># Lazy: only fetches visible rows</span>
+        self.grid.set_data_provider(self.fetch)
+        self.add(self.grid)
+
+    <span class="kw">def</span> <span class="fn">fetch</span>(self, offset, limit, sorts):
+        <span class="kw">return</span> people[offset:offset+limit], len(people)</pre>
+        </div>
+      </div>
+      <div class="showcase-screenshot">
+        <img src="screenshots/screenshot-grid.png" alt="Data Grid demo" loading="lazy">
+      </div>
+    </div>
+
+    <!-- Example 3: Master-Detail -->
+    <div class="showcase-item fade-in">
+      <div>
+        <p class="showcase-label">Master-Detail CRUD</p>
+        <p class="showcase-desc">SplitLayout with Grid + Form. Binder handles validation and save/cancel.</p>
+        <div class="showcase-code">
+          <div class="code-header">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <span class="file">views/master_detail.py</span>
+          </div>
+          <pre><span class="kw">from</span> vaadin.flow.components <span class="kw">import</span> *
+<span class="kw">from</span> vaadin.flow.data <span class="kw">import</span> Binder
+
+<span class="dec">@Route</span>(<span class="str">"master-detail"</span>)
+<span class="dec">@Menu</span>(<span class="str">"Master-Detail"</span>, icon=<span class="str">"vaadin:split-h"</span>)
+<span class="kw">class</span> <span class="cls">MasterDetailView</span>(Div):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        split = SplitLayout()
+        self.grid = Grid()
+        self.grid.set_columns(<span class="str">"firstName"</span>, <span class="str">"lastName"</span>,
+            <span class="str">"email"</span>, <span class="str">"phone"</span>)
+        self.grid.set_items(people)
+        split.add_to_primary(self.grid)
+
+        form = FormLayout()
+        self.first = TextField(<span class="str">"First Name"</span>)
+        self.last = TextField(<span class="str">"Last Name"</span>)
+        form.add(self.first, self.last)
+
+        self.binder = Binder(Person)
+        self.binder.bind_instance_fields(self)
+        split.add_to_secondary(form)
+        self.add(split)</pre>
+        </div>
+      </div>
+      <div class="showcase-screenshot">
+        <img src="screenshots/screenshot-master-detail.png" alt="Master-Detail demo" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Component Gallery ===== -->
+<section class="section gallery" id="gallery">
+  <div class="container">
+    <h2 class="section-title fade-in">Component Gallery</h2>
+    <p class="section-subtitle fade-in">49+ enterprise-grade Vaadin components, all accessible from Python.</p>
+    <div class="gallery-image fade-in">
+      <img src="screenshots/screenshot-components.png" alt="Component Gallery showing LoginForm, ListBox, ProgressBar, Avatar, Tabs, MenuBar and more" loading="lazy">
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-card fade-in">
+        <img src="screenshots/screenshot-file-explorer.png" alt="TreeGrid File Explorer" loading="lazy">
+      </div>
+      <div class="gallery-card fade-in">
+        <img src="screenshots/screenshot-stopwatch.png" alt="Stopwatch with Server Push" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Quick Start ===== -->
+<section class="section quickstart" id="quickstart">
+  <div class="container">
+    <h2 class="section-title fade-in">Quick Start</h2>
+    <p class="section-subtitle fade-in">Up and running in under a minute.</p>
+    <div class="terminal fade-in">
+      <div class="terminal-header">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="terminal-body">
+        <span class="comment"># Install PyFlow</span><br>
+        <span class="prompt">$</span> pip install vaadin-pyflow<br>
+        <br>
+        <span class="comment"># Create your app</span><br>
+        <span class="prompt">$</span> mkdir myapp && cd myapp<br>
+        <span class="prompt">$</span> mkdir views<br>
+        <br>
+        <span class="comment"># Run with hot reload</span><br>
+        <span class="prompt">$</span> python -m vaadin --dev<br>
+      </div>
+    </div>
+    <div class="file-tree fade-in">
+      <span class="dir">myapp/</span><br>
+      &nbsp;&nbsp;<span class="dir">views/</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">__init__.py</span> <span class="note">&larr; from vaadin import *</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">hello.py</span> <span class="note">&larr; your first view</span><br>
+      &nbsp;&nbsp;<span class="file">__main__.py</span> <span class="note">&larr; from vaadin import run; run()</span><br>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-links">
+      <a href="https://github.com/manolo/vaadin-pyflow" target="_blank">GitHub</a>
+      <a href="https://github.com/manolo/vaadin-pyflow/issues" target="_blank">Issues</a>
+    </div>
+    <p>PyFlow by <a href="https://vaadin.com" target="_blank">Vaadin }></a> — Open source under the Apache 2.0 License.</p>
+  </div>
+</footer>
+
+<script>
+// ===== Typing animation =====
+const codeLines = [
+  '<span class="kw">from</span> vaadin.flow <span class="kw">import</span> Route, Menu',
+  '<span class="kw">from</span> vaadin.flow.components <span class="kw">import</span> *',
+  '',
+  '<span class="dec">@Route</span>(<span class="str">"hello"</span>)',
+  '<span class="dec">@Menu</span>(<span class="str">"Hello"</span>, icon=<span class="str">"vaadin:hand"</span>)',
+  '<span class="kw">class</span> <span class="cls">HelloView</span>(HorizontalLayout):',
+  '    <span class="kw">def</span> <span class="fn">__init__</span>(self):',
+  '        name = TextField(<span class="str">"Your name"</span>)',
+  '        button = Button(<span class="str">"Say hello"</span>, <span class="kw">lambda</span> e:',
+  '            Notification.show(f<span class="str">"Hello {name.value}"</span>))',
+  '        self.add(name, button)',
+];
+
+const typedEl = document.getElementById('typed-code');
+let lineIdx = 0, charIdx = 0;
+
+// Extract plain text length from HTML string
+function plainLength(html) {
+  const tmp = document.createElement('span');
+  tmp.innerHTML = html;
+  return tmp.textContent.length;
+}
+
+// Reveal characters one by one while preserving HTML tags
+function revealChars(html, count) {
+  let result = '', plain = 0, i = 0;
+  while (i < html.length && plain < count) {
+    if (html[i] === '<') {
+      const end = html.indexOf('>', i);
+      result += html.substring(i, end + 1);
+      i = end + 1;
+    } else {
+      result += html[i];
+      plain++;
+      i++;
+    }
+  }
+  // Close any open tags
+  const opens = (result.match(/<span[^>]*>/g) || []);
+  const closes = (result.match(/<\/span>/g) || []);
+  for (let j = 0; j < opens.length - closes.length; j++) result += '</span>';
+  return result;
+}
+
+function typeNext() {
+  if (lineIdx >= codeLines.length) {
+    // Done typing, show cursor at end
+    typedEl.innerHTML = codeLines.join('\n') + '<span class="cursor"></span>';
+    return;
+  }
+  const line = codeLines[lineIdx];
+  const pLen = plainLength(line);
+
+  if (charIdx <= pLen) {
+    let display = [];
+    for (let l = 0; l < lineIdx; l++) display.push(codeLines[l]);
+    display.push(revealChars(line, charIdx) + '<span class="cursor"></span>');
+    typedEl.innerHTML = display.join('\n');
+    charIdx++;
+    setTimeout(typeNext, 35 + Math.random() * 25);
+  } else {
+    lineIdx++;
+    charIdx = 0;
+    setTimeout(typeNext, 120);
+  }
+}
+
+// Start typing after short delay
+setTimeout(typeNext, 800);
+
+// ===== Scroll fade-in =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
