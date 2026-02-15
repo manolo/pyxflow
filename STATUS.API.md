@@ -72,6 +72,7 @@ All components inherit from `Component` which provides:
 |---------|--------|
 | `add_to_navbar` / `add_to_drawer` / `set_content` / `get_content` | [x] |
 | `set_drawer_opened` / `is_drawer_opened` / `set_primary_section` / `get_primary_section` | [x] |
+| `Section` enum (`NAVBAR`, `DRAWER`) — in `constants.py` as `AppLayoutSection` | [x] |
 | `show_router_layout_content` / `remove_router_layout_content` | [x] |
 | `add_to_navbar(touch_optimized, ...)` | [ ] |
 | `is_overlay` | [ ] |
@@ -837,6 +838,17 @@ All components inherit from `Component` which provides:
 | **90-99%** | FormLayout, SplitLayout, FlexLayout, ConfirmDialog, Avatar, LoginForm, Popover, Details, CustomField, Card, Icon, Tabs, Tab, TabSheet, Dialog, Grid, Button, TextField, TextArea, EmailField, PasswordField, NumberField, DatePicker, TimePicker, DateTimePicker, ComboBox, MultiSelectComboBox, CheckboxGroup, MultiSelectListBox, Upload, MenuBar, ContextMenu, SideNav, SideNavItem, Binder, VerticalLayout, HorizontalLayout, Select | 37 |
 | **70-89%** | Checkbox, RadioButtonGroup, ListBox, VirtualList, AppLayout, LoginOverlay | 6 |
 | **50-69%** | RouterLink | 1 |
+
+### Menu & Navigation Utilities (`menu.py` / `router.py`)
+
+| Feature | Status |
+|---------|--------|
+| `@Menu(title, order, icon, exclude)` decorator | [x] |
+| `@PageTitle("...")` decorator | [x] |
+| `@Route(page_title="...")` param | [x] |
+| `get_menu_entries()` — sorted, filtered menu entries | [x] |
+| `get_page_header(view)` — resolve title (dynamic > @PageTitle > class name) | [x] |
+| `AfterNavigationObserver` / `after_navigation(event)` listener | [ ] |
 
 ### Remaining Priority Gaps
 

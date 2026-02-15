@@ -92,6 +92,26 @@ def get_menu_entries() -> list[MenuEntry]:
     return entries
 
 
+def get_page_header(view: "Component") -> str | None:
+    """Get the page header/title for the given view.
+
+    Resolution order (matches Java's MenuConfiguration.getPageHeader):
+    1. view.get_page_title() — dynamic title (HasDynamicTitle pattern)
+    2. @PageTitle annotation value (cls._page_title)
+    3. Auto-derived from class name (e.g. "MyDashboardView" → "My Dashboard")
+
+    Args:
+        view: The current view component instance.
+
+    Returns:
+        The resolved title string, or None if view is None.
+    """
+    if view is None:
+        return None
+    from vaadin.flow.router import _resolve_title
+    return _resolve_title(type(view), view)
+
+
 def _derive_title(cls) -> str:
     """Derive a title from the class name."""
     import re

@@ -1,13 +1,6 @@
 from vaadin.flow import AppShell, ColorScheme, Push, StyleSheet
-from vaadin.flow.components import (
-    AppLayout,
-    DrawerToggle,
-    H1,
-    SideNav,
-    SideNavItem,
-    Icon,
-)
-from vaadin.flow.menu import get_menu_entries
+from vaadin.flow.components import *
+from vaadin.flow.menu import get_menu_entries, get_page_header
 
 
 @AppShell
@@ -17,13 +10,21 @@ from vaadin.flow.menu import get_menu_entries
 class MainLayout(AppLayout):
     def __init__(self):
         # Navbar
-        self.add_to_navbar(DrawerToggle(), H1("PyFlow"))
+        self._page_header = H1("PyFlow")
+        self.add_to_navbar(DrawerToggle(), self._page_header)
 
         # Drawer with SideNav — populated from @Menu-annotated routes
         nav = SideNav()
+        name = H1("PyFlow")
+        name.get_style().set("padding", "10px")
         for entry in get_menu_entries():
             icon = Icon(entry.icon) if entry.icon else None
             nav.add_item(SideNavItem(entry.title, entry.path, icon))
-        self.add_to_drawer(nav)
+        self.add_to_drawer(name, nav)
 
-        self.set_primary_section("drawer")
+        self.set_primary_section(AppLayoutSection.DRAWER)
+
+    def show_router_layout_content(self, content):
+        super().show_router_layout_content(content)
+        title = get_page_header(content) or "PyFlow"
+        self._page_header.set_text(title)

@@ -1,8 +1,8 @@
 """Tests for @Menu decorator and MenuConfiguration."""
 
 import pytest
-from vaadin.flow.menu import Menu, MenuEntry, get_menu_entries
-from vaadin.flow.router import Route, _routes, clear_routes
+from vaadin.flow.menu import Menu, MenuEntry, get_menu_entries, get_page_header
+from vaadin.flow.router import Route, PageTitle, _routes, clear_routes
 from vaadin.flow.core.component import Component
 
 
@@ -196,3 +196,71 @@ class TestGetMenuEntries:
 
         entries = get_menu_entries()
         assert entries[0].path == "/"
+
+
+class TestGetPageHeader:
+    def test_none_view(self):
+        assert get_page_header(None) is None
+
+    def test_page_title_annotation(self):
+        @Route("about")
+        @PageTitle("About Us")
+        class AboutView(Component):
+            pass
+
+        view = AboutView()
+        assert get_page_header(view) == "About Us"
+
+    def test_route_page_title_param(self):
+        @Route("info", page_title="Info Page")
+        class InfoView(Component):
+            pass
+
+        view = InfoView()
+        assert get_page_header(view) == "Info Page"
+
+    def test_dynamic_title(self):
+        @Route("dynamic")
+        class DynamicView(Component):
+            def get_page_title(self):
+                return "Dynamic Title"
+
+        view = DynamicView()
+        assert get_page_header(view) == "Dynamic Title"
+
+    def test_dynamic_title_takes_priority(self):
+        @Route("prio")
+        @PageTitle("Static Title")
+        class PrioView(Component):
+            def get_page_title(self):
+                return "Dynamic Wins"
+
+        view = PrioView()
+        assert get_page_header(view) == "Dynamic Wins"
+
+    def test_fallback_to_class_name(self):
+        @Route("dashboard")
+        class MyDashboardView(Component):
+            pass
+
+        view = MyDashboardView()
+        assert get_page_header(view) == "My Dashboard"
+
+    def test_fallback_class_name_no_view_suffix(self):
+        @Route("settings")
+        class Settings(Component):
+            pass
+
+        view = Settings()
+        assert get_page_header(view) == "Settings"
+
+    def test_menu_title_not_used(self):
+        """get_page_header uses @PageTitle / class name, not @Menu title."""
+        @Route("foo")
+        @Menu(title="Menu Title")
+        @PageTitle("Page Title")
+        class FooView(Component):
+            pass
+
+        view = FooView()
+        assert get_page_header(view) == "Page Title"
