@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PyFlow — Build Web Apps in Pure Python</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/black.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/monokai.css">
+  <style>
+    /* ─── Base theme ─── */
+    .reveal {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #e6edf3;
+      font-size: 32px;
+    }
+    .reveal h1, .reveal h2 { color: #fff; text-transform: none; }
+    .reveal h3 { color: #00d2ff; text-transform: none; }
+    .reveal code { color: #a5d6ff; }
+    .reveal a { color: #00d2ff; }
+
+    /* ─── Gradient text ─── */
+    .gradient-text {
+      background: linear-gradient(135deg, #fff, #1676f3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── Cards ─── */
+    .card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 1.2em;
+      border: 1px solid rgba(255,255,255,0.1);
+      text-align: left;
+      backdrop-filter: blur(4px);
+    }
+    .card h3 { margin-top: 0; font-size: 0.85em; }
+    .card p { font-size: 0.6em; color: #8899aa; margin: 0; }
+
+    /* ─── DX cards grid ─── */
+    .dx-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1em;
+      margin-top: 0.8em;
+    }
+    .dx-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 1em 1.2em;
+      text-align: left;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .dx-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(22,118,243,0.4);
+    }
+    .dx-card .dx-icon { font-size: 1.4em; margin-bottom: 0.3em; display: block; }
+    .dx-card strong { color: #00d2ff; font-size: 0.75em; display: block; margin-bottom: 0.2em; }
+    .dx-card span { font-size: 0.55em; color: #8899aa; }
+
+    /* ─── Code blocks ─── */
+    .reveal pre {
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      border-radius: 8px;
+      margin: 0.3em 0;
+    }
+    .reveal pre code {
+      font-size: 0.65em;
+      line-height: 1.5;
+      font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+      padding: 1em;
+    }
+
+    /* ─── Quotes ─── */
+    .reveal blockquote {
+      background: rgba(255,255,255,0.03);
+      border-left: 4px solid #1676f3;
+      padding: 0.6em 1.2em;
+      font-style: italic;
+      color: #8899aa;
+      width: 90%;
+      text-align: left;
+      font-size: 0.85em;
+      backdrop-filter: blur(2px);
+    }
+
+    /* ─── Layouts ─── */
+    .two-columns { display: flex; gap: 2em; align-items: center; }
+    .two-columns > div { flex: 1; }
+    .three-cards { display: flex; gap: 1.2em; }
+    .three-cards > .card { flex: 1; }
+
+    /* ─── Images ─── */
+    .reveal img { border: none; box-shadow: 0 4px 30px rgba(0,0,0,0.4); border-radius: 8px; }
+    .reveal img.logo { box-shadow: none; border-radius: 0; }
+
+    /* ─── Caption ─── */
+    .caption { font-style: italic; color: #8899aa; font-size: 0.65em; margin-top: 0.3em; }
+
+    /* ─── Left-aligned ─── */
+    .left-aligned { text-align: left; }
+    .left-aligned h2 { text-align: left; }
+
+    /* ─── Lists ─── */
+    .reveal ul { list-style: none; padding-left: 0; }
+    .reveal ul li { padding: 0.25em 0; font-size: 0.85em; }
+    .reveal ul li::before { content: "\25B8  "; color: #1676f3; }
+
+    /* ─── Terminal ─── */
+    .terminal pre { background: #0d1117; border-radius: 8px; padding: 1em; }
+
+    /* ─── Links ─── */
+    .links { font-size: 0.6em; color: #8899aa; margin-top: 1em; }
+    .links a { color: #00d2ff; }
+
+    /* ─── Cycle diagram ─── */
+    .cycle-step {
+      display: inline-block;
+      background: rgba(22,118,243,0.15);
+      border: 1px solid rgba(22,118,243,0.3);
+      border-radius: 8px;
+      padding: 0.4em 0.8em;
+      margin: 0.2em;
+      font-size: 0.6em;
+      color: #e6edf3;
+    }
+    .cycle-arrow { display: inline-block; color: #1676f3; font-size: 0.8em; margin: 0 0.1em; }
+
+    /* ─── Glow ─── */
+    .glow { text-shadow: 0 0 20px rgba(0,210,255,0.4), 0 0 40px rgba(0,210,255,0.2); }
+
+    /* ─── Stats row ─── */
+    .stats-row { display: flex; gap: 1.5em; justify-content: center; margin: 0.8em 0; }
+    .stat-box { text-align: center; }
+    .stat-box .num { font-size: 1.8em; font-weight: bold; color: #00d2ff; line-height: 1; }
+    .stat-box .label { font-size: 0.5em; color: #8899aa; margin-top: 0.2em; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- SLIDE 1: Title -->
+      <!-- ═══════════════════════════════════════════ -->
+      <section data-background-image="images/bg-python.jpg"
+               data-background-opacity="0.12"
+               data-background-size="cover">
+        <img src="images/logo.png" alt="PyFlow logo" class="logo" style="max-width: 160px; margin-bottom: 0.3em;">
+        <h1><span class="gradient-text" style="font-size: 1.8em;">PyFlow</span></h1>
+        <p><em>Build Web Apps in Pure Python</em></p>
+        <p style="font-size: 0.7em; color: #8899aa;"><code>No JavaScript. No HTML. Just Python.</code></p>
+        <aside class="notes">Introduce yourself, mention this is a new way to build web apps with Python. Tease the story: this started with a question — what is the essence of a web framework?</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- SLIDE 2: The Essence — BSSN -->
+      <!-- ═══════════════════════════════════════════ -->
+      <section class="left-aligned"
+               data-background-image="images/bg-zen.jpg"
+               data-background-opacity="0.10"
+               data-background-size="cover">
+        <h2>"Look for the <span class="gradient-text">essence</span> of the problem"</h2>
+        <blockquote>"A complex system that works is invariably found to have evolved from a simple system that worked." — John Gall</blockquote>
+        <ul>
+          <li class="fragment">I saw Dan North's talk at Jfokus: <em>Best Simple System for Now</em></li>
+          <li class="fragment">His idea: don't ask <em>what is there</em> — ask <strong>what should be there</strong></li>
+          <li class="fragment">So I looked at Vaadin Flow's 25 years of Java code...</li>
+          <li class="fragment">...and asked: <strong>what is the essence?</strong></li>
+        </ul>
+        <aside class="notes">Credit Dan North. BSSN = find the essence, strip everything else. Vaadin Flow has 25 years of accumulated complexity. But the core idea is brilliantly simple: server renders UI, browser is a thin client. That's the essence I wanted to port.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- SLIDE 3: Why Python? Why Now? (interactive chart) -->
+      <!-- ═══════════════════════════════════════════ -->
+      <section>
+        <h2>Why Python? Why Now?</h2>
+        <div class="stats-row" style="margin-top: 0.5em;">
+          <div class="stat-box">
+            <div class="num glow">21.81%</div>
+            <div class="label">Python #1 — TIOBE Feb 2026</div>
+          </div>
+          <div class="stat-box">
+            <div class="num" style="color: #8899aa;">11.05%</div>
+            <div class="label">C #2 — 10+ points behind</div>
+          </div>
+          <div class="stat-box">
+            <div class="num" style="color: #8899aa;">8.12%</div>
+            <div class="label">Java #3 — 13+ points behind</div>
+          </div>
+        </div>
+        <div id="tiobe-chart" style="width:100%; height:320px; margin-top: 0.3em; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); padding: 0.5em;"></div>
+        <p class="caption">"The most popular language in the world has no full-stack web framework"</p>
+        <aside class="notes">Python is the #1 language by a huge margin. Django/Flask/FastAPI are great for APIs, but they all need JavaScript for the frontend. There's no server-side UI framework like Vaadin for Python. That's the gap. TIOBE source: tiobe.com/tiobe-index/</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- SLIDE 4: The Architecture — Thin Client -->
+      <!-- ═══════════════════════════════════════════ -->
+      <section>
+        <h2>The Architecture</h2>
+        <img src="images/architecture.png" alt="Server-Browser architecture diagram" style="max-width: 75%;">
+        <p class="caption"><em>The browser is a thin client. All logic runs on the server.</em></p>
+        <aside class="notes">This is the essence of Vaadin, unchanged for 25 years. Server maintains a state tree of UI nodes. Changes are sent as diffs (UIDL protocol). The browser just renders — no business logic, no data access, no API endpoints exposed. The same protocol that powers Java Vaadin Flow now runs in Python.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- SLIDE 5: Why Thin Client Matters -->
+      <!-- ═══════════════════════════════════════════ -->
+      <section data-background-image="images/bg-security.jpg"
+               data-background-opacity="0.10"
+               data-background-size="cover">
+        <h2>Secure by <span class="gradient-text">Architecture</span></h2>
+        <div class="three-cards">
+          <div class="card fragment">
+            <h3>Zero Attack Surface</h3>
+            <p>No REST APIs to exploit. No GraphQL endpoints. The WebSocket protocol is opaque and binary.</p>
+          </div>
+          <div class="card fragment">
+            <h3>One Team, One Language</h3>
+            <p>Full-stack Python. No JS specialists, no API contracts, no serialization layer.</p>
+          </div>
+          <div class="card fragment">
+            <h3>Server-side State</h3>
+            <p>All validation, all business logic, all data access — stays on the server. Nothing sensitive in the browser.</p>
+          </div>
+        </div>
+        <aside class="notes">Three pillars from the Vaadin philosophy. Security: there is literally nothing to attack on the client. Team: one language means one team, faster iteration. State: no state sync bugs, no stale caches, no optimistic updates gone wrong.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- SLIDE 6: Hello World -->
+      <!-- ═══════════════════════════════════════════ -->
+      <section data-background-image="images/screenshot-hello.gif"
+               data-background-opacity="0.08"
+               data-background-size="contain"
+               data-background-position="right center">
+        <h2>Hello World</h2>
+        <div class="two-columns">
+          <div>
+            <pre class="typewriter-code" data-speed="25"><code data-trim data-noescape class="language-python">
+@Route("hello")
+class HelloView(VerticalLayout):
+    def __init__(self):
+        name = TextField("Your name")
+        button = Button("Say hello", lambda e: 
+            Notification.show(f"Hello {name.value}"))
+        self.add(name, button)
+            </code></pre>
+          </div>
+          <div>
+            <img src="images/screenshot-hello.gif" alt="Hello World screenshot" class="fragment fade-in" style="max-width: 480px;">
+          </div>
+        </div>
+        <p class="caption">7 lines. A complete interactive web view.</p>
+        <aside class="notes">Walk through the code. No HTML, no JS, no template files. The class IS the view. @Route maps a URL. Components are Python objects. Events are lambdas. This is what "the essence" looks like.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- SLIDE 7: Component Showcase -->
+      <!-- ═══════════════════════════════════════════ -->
+      <section data-background-image="images/screenshot-components.gif"
+               data-background-opacity="0.15"
+               data-background-size="cover">
+        <h2><span class="gradient-text glow">49</span> Enterprise Components</h2>
+        <img src="images/screenshot-components.gif" alt="Component gallery screenshot" style="max-width: 80%;">
+        <p class="caption">Form fields, grids, dialogs, menus, trees, charts — all from Python</p>
+        <aside class="notes">These are the exact same Vaadin web components used by thousands of Java enterprises. Production-ready, accessible, WCAG compliant, themeable. We didn't rebuild them — we reuse the existing frontend. Only the server side is Python.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- SLIDE 8: Data Grid — Lazy Loading -->
+      <!-- ═══════════════════════════════════════════ -->
+      <section data-background-image="images/screenshot-grid.gif"
+               data-background-opacity="0.06"
+               data-background-size="contain"
+               data-background-position="right center">
+        <h2>Data Grid</h2>
+        <div class="two-columns">
+          <div>
+            <pre class="typewriter-code" data-speed="20"><code data-trim data-noescape class="language-python">
+self.db = PersonService()
+
+grid = Grid()
+
+grid.add_column("name", header="Name").set_sortable(True)
+grid.add_column("email", header="Email")..set_sortable(True)
+/...
+
+grid.set_data_provider(self.fetch_page)
+
+def fetch_page(self, offset, limit, sort_orders):
+    return self.db.query(offset, limit), db.count())
+            </code></pre>
+          </div>
+          <div>
+            <img src="images/screenshot-grid.gif" alt="Grid with lazy loading" class="fragment fade-in" style="max-width: 480px;">
+          </div>
+        </div>
+        <p class="caption">Lazy loading, server-side sorting, single callback.</p>
+        <aside class="notes">Grid is the most complex component. Thousands of rows loaded on demand. Sorting, column reordering, selection — all handled by one callback. No pagination widgets, no state management libraries, no infinite scroll JavaScript.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- SLIDE 9: Master-Detail — Binder & Validation -->
+      <!-- ═══════════════════════════════════════════ -->
+      <section data-background-image="images/screenshot-master-detail.gif"
+               data-background-opacity="0.06"
+               data-background-size="contain"
+               data-background-position="left center">
+        <h2>Master-Detail</h2>
+        <div class="two-columns">
+          <div>
+            <img src="images/screenshot-master-detail.gif" alt="Master-Detail CRUD view" class="fragment fade-in" style="max-width: 480px;">
+          </div>
+          <div>
+            <pre class="typewriter-code" data-speed="30"><code data-trim data-noescape class="language-python">
+binder = Binder(Person)
+binder.bind_instance_fields(self)
+
+def on_save(self, event):
+    binder.write_bean(self.person)
+    service.save(self.person)
+            </code></pre>
+          </div>
+        </div>
+        <p class="caption">Grid + Form + Binder + Validation — the enterprise CRUD pattern.</p>
+        <aside class="notes">The most common enterprise pattern. Binder does two-way data binding with validation. bind_instance_fields auto-wires form fields by name. Same API as Java Vaadin, same patterns.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- SLIDE 10: Real-time Push — WebSocket -->
+      <!-- ═══════════════════════════════════════════ -->
+      <section data-background-image="images/screenshot-stopwatch.gif"
+               data-background-opacity="0.06"
+               data-background-size="contain"
+               data-background-position="right center">
+        <h2>Real-time Push</h2>
+        <div class="two-columns">
+          <div>
+            <pre class="typewriter-code" data-speed="25"><code data-trim data-noescape class="language-python">
+@AppShell
+@Push
+class App: pass
+
+async def _tick(self):
+    while self._running:
+        await asyncio.sleep(1)
+        self._elapsed += 1
+        ui.access(self._update_display)
+            </code></pre>
+          </div>
+          <div>
+            <img src="images/screenshot-stopwatch.gif" alt="Stopwatch with WebSocket push" class="fragment fade-in" style="max-width: 480px;">
+          </div>
+        </div>
+        <p class="caption">Server pushes UI updates via WebSocket. No polling.</p>
+        <aside class="notes">@Push enables WebSocket. ui.access() safely modifies UI from background tasks. Standard asyncio — no special framework, no Socket.IO, no custom protocols.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- SLIDE 11: @ClientCallable -->
+      <!-- ═══════════════════════════════════════════ -->
+      <section data-background-image="images/screenshot-file-explorer.gif"
+               data-background-opacity="0.06"
+               data-background-size="contain"
+               data-background-position="left center">
+        <h2>@ClientCallable</h2>
+        <div class="two-columns">
+          <div>
+            <img src="images/screenshot-file-explorer.gif" alt="TreeGrid file explorer" class="fragment fade-in" style="max-width: 480px;">
+          </div>
+          <div>
+            <pre class="typewriter-code" data-speed="30"><code data-trim data-noescape class="language-python">
+@ClientCallable
+def open(self, key):
+    item = self.tree_grid.get_item(key)
+    subprocess.Popen(
+        ["open", item["path"]])
+            </code></pre>
+          </div>
+        </div>
+        <p class="caption">Browser calls server methods directly. No REST API needed.</p>
+        <aside class="notes">TreeGrid with double-click handler. The browser fires $server.open(key) — calls the Python method directly over WebSocket. Return values come back as resolved Promises. No REST endpoint to define, no serialization to worry about.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- SLIDE 12: Spec-Driven Development -->
+      <!-- ═══════════════════════════════════════════ -->
+      <section class="left-aligned"
+               data-background-image="images/bg-ai-coding.jpg"
+               data-background-opacity="0.15"
+               data-background-size="cover">
+        <h2>Porting 25 Years of Java in <span class="gradient-text">6 Weeks</span></h2>
+        <blockquote>"Write specs first, let AI generate code. Separate thinking from doing." — Arun Gupta</blockquote>
+        <ul>
+          <li class="fragment">Reverse-engineered Java Flow: StateTree, UIDL protocol, Feature IDs</li>
+          <li class="fragment">Wrote language-agnostic specs &rarr; AI agents generated Python from specs</li>
+          <li class="fragment">28 pitfalls documented — each one saves days of debugging</li>
+        </ul>
+        <div class="fragment stats-row" style="margin-top: 1em;">
+          <div class="stat-box">
+            <div class="num glow">~16K</div>
+            <div class="label">lines of code</div>
+          </div>
+          <div class="stat-box">
+            <div class="num glow">2,300+</div>
+            <div class="label">unit tests</div>
+          </div>
+          <div class="stat-box">
+            <div class="num glow">400+</div>
+            <div class="label">UI tests</div>
+          </div>
+        </div>
+        <aside class="notes">Credit Arun Gupta's SDD talk. I followed his approach: define WHAT (specs), let AI handle HOW (implementation). Wrote specs by reverse-engineering Java Flow. 28 critical pitfalls documented — each one would have cost days of debugging.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- SLIDE 13: The Spec-Driven Loop -->
+      <!-- ═══════════════════════════════════════════ -->
+      <section data-background-image="images/bg-cycle.jpg"
+               data-background-opacity="0.12"
+               data-background-size="cover">
+        <h2>The <span class="gradient-text">Spec-Driven</span> Loop</h2>
+        <div style="margin: 1.5em 0;">
+          <span class="cycle-step">1. Read Java source</span>
+          <span class="cycle-arrow">&rarr;</span>
+          <span class="cycle-step">2. Write spec</span>
+          <span class="cycle-arrow">&rarr;</span>
+          <span class="cycle-step">3. AI generates Python</span>
+          <br>
+          <span class="cycle-step" style="margin-top: 0.5em;">6. Back to step 1</span>
+          <span class="cycle-arrow">&larr;</span>
+          <span class="cycle-step">5. Discover pitfall</span>
+          <span class="cycle-arrow">&larr;</span>
+          <span class="cycle-step">4. Tests validate</span>
+        </div>
+        <p style="font-size: 0.85em; margin-top: 1em;"><strong class="glow" style="color: #00d2ff;">28 pitfalls documented.</strong> Each one saves days of debugging.</p>
+        <p class="caption" style="margin-top: 0.6em;">The specs are reusable — the same specs could port Flow to Rust, Go, or any language.</p>
+        <aside class="notes">This is the practical loop. Example pitfall: "Constants dedup — resending the same hash breaks FlowClient silently." Without the spec, you'd spend days debugging a blank page. With the spec, it's a one-line check.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- SLIDE 14: Developer Experience (cards) -->
+      <!-- ═══════════════════════════════════════════ -->
+      <section data-background-image="images/bg-developer.jpg"
+               data-background-opacity="0.10"
+               data-background-size="cover">
+        <h2>Developer <span class="gradient-text">Experience</span></h2>
+        <div class="dx-grid">
+          <div class="dx-card fragment">
+            <span class="dx-icon">&#x1F40D;</span>
+            <strong>Pure Python</strong>
+            <span>Classes, decorators, lambdas. No DSL to learn.</span>
+          </div>
+          <div class="dx-card fragment">
+            <span class="dx-icon">&#x2328;&#xFE0F;</span>
+            <strong>Type Hints</strong>
+            <span>Full IDE autocomplete and error checking</span>
+          </div>
+          <div class="dx-card fragment">
+            <span class="dx-icon">&#x1F4E6;</span>
+            <strong>pip install</strong>
+            <span><code style="font-size: 0.9em;">pip install vaadin-pyflow</code></span>
+          </div>
+          <div class="dx-card fragment">
+            <span class="dx-icon">&#x26A1;</span>
+            <strong>asyncio Native</strong>
+            <span>Background tasks, WebSocket push, standard Python</span>
+          </div>
+          <div class="dx-card fragment">
+            <span class="dx-icon">&#x1F9F1;</span>
+            <strong>49 Components</strong>
+            <span>Forms, grids, dialogs, trees, charts, menus...</span>
+          </div>
+          <div class="dx-card fragment">
+            <span class="dx-icon">&#x1F3A8;</span>
+            <strong>Two Themes</strong>
+            <span>Lumo &amp; Aura, light &amp; dark, one decorator</span>
+          </div>
+        </div>
+        <aside class="notes">Emphasize familiarity. If you know Python, you know PyFlow. No new template language, no JSX, no build toolchain. The "best simple system for now" — just Python.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- SLIDE 15: Getting Started / Closing -->
+      <!-- ═══════════════════════════════════════════ -->
+      <section data-background-image="images/bg-rocket.jpg"
+               data-background-opacity="0.12"
+               data-background-size="cover">
+        <h2>Get Started in <span class="gradient-text">30 Seconds</span></h2>
+        <div class="terminal">
+          <pre class="typewriter-code" data-speed="40"><code data-trim class="language-bash">
+pip install vaadin-pyflow
+vaadin init myapp
+cd myapp && vaadin --dev
+          </code></pre>
+        </div>
+        <div class="fragment" style="margin-top: 1.5em;">
+          <h1><span class="gradient-text" style="font-size: 1.5em;">Thank You</span></h1>
+          <blockquote style="margin-top: 0.6em;">"Look for the essence of the problem — not what is there, but what should be there." — Dan North</blockquote>
+        </div>
+        <div class="fragment links">
+          <p>GitHub &middot; Documentation &middot; PyPI</p>
+          <img src="images/logo.png" alt="PyFlow logo" class="logo" style="max-width: 70px; margin-top: 0.3em;">
+        </div>
+        <aside class="notes">Quick demo if time allows — open terminal, run the commands live, show the app. Otherwise, point to the repo and docs. End with Dan North's quote — it's the thread that ties the whole talk together.</aside>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ─── Scripts ─── -->
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/notes/notes.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      transition: 'slide',
+      plugins: [RevealHighlight, RevealNotes],
+      slideNumber: true
+    });
+  </script>
+
+  <!-- Reusable libs (load after Reveal init) -->
+  <script src="lib/typewriter.js"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="lib/tiobe-data.js"></script>
+  <script src="lib/tiobe-chart.js"></script>
+</body>
+</html>
