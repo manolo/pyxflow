@@ -4,7 +4,7 @@ import subprocess
 import sys
 
 from vaadin.flow import Menu, Route
-from vaadin.flow.components import Button, Div, Icon, Span, TreeGrid, VerticalLayout
+from vaadin.flow.components import *
 from vaadin.flow.core.component import ClientCallable
 from demo.views.main_layout import MainLayout
 

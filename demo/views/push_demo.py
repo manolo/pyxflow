@@ -1,11 +1,8 @@
 import asyncio
 
 from vaadin.flow import Menu, Route
-from vaadin.flow.components import (
-    Button, Div, HorizontalLayout, Icon, Span, VerticalLayout,
-)
+from vaadin.flow.components import *
 from demo.views.main_layout import MainLayout
-
 
 @Route("push-demo", page_title="Stopwatch", layout=MainLayout)
 @Menu(title="Stopwatch", order=10, icon="vaadin:timer")
@@ -68,7 +65,7 @@ class PushDemoView(VerticalLayout):
         # --- Layout ---
         self.add_class_name("sw-view")
         self.set_padding(False)
-        self.add(hint, circle, btn_row)
+        self.add(circle, btn_row)
 
     def _update_display(self):
         h = self._elapsed // 3600

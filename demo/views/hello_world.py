@@ -1,14 +1,5 @@
 from vaadin.flow import Menu, Route
-from vaadin.flow.components import (
-    Button,
-    Div,
-    HorizontalLayout,
-    Icon,
-    Notification,
-    Span,
-    TextField,
-    VerticalLayout,
-)
+from vaadin.flow.components import *
 from vaadin.flow.components.horizontal_layout import Alignment
 from demo.views.main_layout import MainLayout
 

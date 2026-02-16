@@ -1,22 +1,7 @@
 from demo.services.sample_person_service import SamplePerson, sample_person_service
 from demo.views.main_layout import MainLayout
 from vaadin.flow import Menu, Route
-from vaadin.flow.components import (
-    Button,
-    Checkbox,
-    ComboBox,
-    DatePicker,
-    Div,
-    FormLayout,
-    Grid,
-    HorizontalLayout,
-    Icon,
-    Notification,
-    NotificationVariant,
-    Span,
-    TextField,
-    TextRenderer,
-)
+from vaadin.flow.components import *
 from vaadin.flow.components.split_layout import SplitLayout
 from vaadin.flow.data import Binder, ValidationError
 
@@ -59,8 +44,11 @@ class MasterDetailView(Div):
         self._all_people = [p.to_dict() for p in sample_person_service.find_all()]
         self.grid.set_items(self._all_people)
 
-        # Populate role ComboBox from data
-        roles = sorted({p.role for p in sample_person_service.find_all() if p.role})
+        # Populate ComboBoxes from data
+        all_people = sample_person_service.find_all()
+        occupations = sorted({p.occupation for p in all_people if p.occupation})
+        self.occupation.set_items(*occupations)
+        roles = sorted({p.role for p in all_people if p.role})
         self.role.set_items(*roles)
 
         # When a row is selected or deselected, populate form
@@ -117,10 +105,10 @@ class MasterDetailView(Div):
         form_layout = FormLayout()
         self.first_name = TextField("First Name")
         self.last_name = TextField("Last Name")
-        self.email = TextField("Email")
+        self.email = EmailField("Email")
         self.phone = TextField("Phone")
         self.date_of_birth = DatePicker("Date Of Birth")
-        self.occupation = TextField("Occupation")
+        self.occupation = ComboBox("Occupation")
         self.role = ComboBox("Role")
         self.important = Checkbox("Important")
         form_layout.add(

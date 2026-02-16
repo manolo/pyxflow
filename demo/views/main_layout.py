@@ -18,7 +18,7 @@ class MainLayout(AppLayout):
         logo = Image("/images/logo2.png", "PyFlow")
         logo.get_style().set("height", "60px")
         name = HorizontalLayout()
-        name.add(logo, H2("PyFlow"))
+        name.add(H2("PyFlow"))
         name.set_align_items(FlexAlignment.CENTER)
         name.get_style().set("padding", "10px")
         for entry in get_menu_entries():

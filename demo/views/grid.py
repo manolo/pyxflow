@@ -5,14 +5,7 @@ from vaadin.flow import Menu, Route
 log = logging.getLogger("vaadin.flow")
 from demo.services import people_service
 from demo.views.main_layout import MainLayout
-from vaadin.flow.components import (
-    Div,
-    Grid,
-    Icon,
-    SortDirection,
-    Span,
-    VerticalLayout,
-)
+from vaadin.flow.components import *
 
 
 # Pre-load for lazy data provider
