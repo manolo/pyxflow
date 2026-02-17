@@ -4,7 +4,9 @@
 
 Single-page marketing landing site for Vaadin PyFlow. Pure HTML+CSS+JS, zero dependencies, no build tools.
 
-Read `SPECS.md` for full design specs (colors, sections, typography, animations).
+**Content source of truth**: `INDEX.md` — section-by-section content for regenerating `index.html`.
+**Design specs**: `SPECS.md` — colors, typography, animations, responsive rules.
+**Asset sources**: `README.md` — screenshot origins, logo prompts, regeneration guide.
 
 ## File Structure
 

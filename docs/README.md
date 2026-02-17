@@ -1,10 +1,9 @@
-# PyFlow Landing Website — Guía de regeneración
+# PyFlow Landing Website — Asset Sources & Regeneration Guide
 
-## Qué es
+**Content source of truth**: `INDEX.md` — section-by-section content for regenerating `index.html`.
+**Design specs**: `SPECS.md` — colors, typography, animations, responsive rules.
 
-Landing page single-page para **Vaadin PyFlow** — un framework Python para construir UIs web con componentes Vaadin. Página de marketing diseñada para que los desarrolladores se enamoren del framework a primera vista.
-
-**Una sola página HTML** sin dependencias externas (sin CDN, sin fonts, sin librerías JS, sin build tools).
+Single-page marketing landing for Vaadin PyFlow. Zero external dependencies (no CDN, no fonts, no JS libs, no build tools).
 
 ## Cómo se generó
 

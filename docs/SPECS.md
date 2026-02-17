@@ -1,80 +1,10 @@
-# PyFlow Landing Website — Specs
+# PyFlow Landing Website — Design Specs
+
+**Content source of truth**: See `INDEX.md` — section-by-section content for regenerating `index.html`.
 
 ## Purpose
 
-Single-page marketing/documentation landing site for Vaadin PyFlow — a Python framework for building web UIs with Vaadin components. The goal is to make developers fall in love with PyFlow at first sight.
-
-## Architecture
-
-```
-web/
-├── index.html              # Single self-contained page (HTML + CSS + JS)
-├── logo.svg                # PyFlow logo (Python snake + flow motif, blue/cyan gradient)
-├── screenshots/            # App screenshots from the demo (Lumo Dark theme)
-│   ├── screenshot-hello.png
-│   ├── screenshot-grid.png
-│   ├── screenshot-master-detail.png
-│   ├── screenshot-components.png
-│   ├── screenshot-file-explorer.png
-│   ├── screenshot-stopwatch.png
-│   └── architecture.png
-├── SPECS.md                # This file
-└── CLAUDE.md               # Instructions for Claude Code
-```
-
-**Zero external dependencies.** No fonts, no libraries, no CDN, no build tools. Everything is embedded in `index.html`.
-
-## Sections (in order)
-
-### 1. Nav (fixed top)
-- Logo + "PyFlow" brand
-- Links: Features, Architecture, Examples, Components, Quick Start, GitHub
-- Frosted glass effect: `backdrop-filter: blur(12px)`
-- On mobile (<768px): nav links hidden, only brand visible
-
-### 2. Hero (full viewport)
-- Left: headline "Build Web Apps in **Pure Python**" + subtitle + CTA buttons (Get Started, View on GitHub)
-- Right: code block with **typing animation** of a hello world view
-- Typing animation: character-by-character reveal preserving HTML syntax spans, blinking cursor
-- Background: 3-stop gradient `#1a1a2e → #16213e → #0f3460` with subtle radial glows
-
-### 3. Why PyFlow (feature cards)
-- 4 cards in a responsive grid: Pure Python, 49+ Components, Real-time Push, Hot Reload
-- Each card: SVG icon (inline, no deps) + title + description
-- Hover effect: lift + blue border glow
-
-### 4. Architecture — "How It Works"
-- AI-generated illustration (`screenshots/architecture.png`) showing server-browser concept
-- Animated diagram: **Python Server** box ↔ WebSocket wire ↔ **Browser (Thin Client)** box
-  - Server lists: Business logic, Data access & validation, UI state management, Session & security, Your Python code
-  - Browser lists: Vaadin web components, DOM rendering, then negatives with 🛡️ icon (No business logic, No data access, No API endpoints)
-  - Animated cyan wire with pulsing gradient between them, labeled "WebSocket" / "UI diffs only"
-- Subtitle: "Your code runs on the server. The browser is just a *Thin-Client*. No server APIs to expose, no JS business code to ship."
-- 3 benefit cards below:
-  1. **Zero Attack Surface** — No REST APIs, no GraphQL, binary WebSocket opaque to pentesters
-  2. **Server-side State** — All logic/validation/data on server, nothing sensitive in browser
-  3. **Minimal Bandwidth** — Only UI diffs, no full-page reloads, no heavy JS bundles
-- CSS animation: `wirePulse` keyframes on the connection line
-
-### 5. Code Showcase (side-by-side)
-- 3 examples, alternating layout (code-left/screenshot-right, then reversed):
-  1. **Hello World** — `views/hello.py` → `screenshot-hello.png`
-  2. **Data Grid** — `views/grid.py` → `screenshot-grid.png` (reversed layout)
-  3. **Master-Detail CRUD** — `views/master_detail.py` → `screenshot-master-detail.png`
-- Code blocks: macOS-style window chrome (red/yellow/green dots, filename)
-- Syntax highlighting via CSS classes (no external lib)
-
-### 6. Component Gallery
-- Hero image: `screenshot-components.png` (LoginForm, ListBox, ProgressBar, Avatar, Tabs, MenuBar, etc.)
-- 2-column grid below: File Explorer + Stopwatch screenshots
-
-### 7. Quick Start
-- Terminal-style block with install commands: `pip install vaadin-pyflow`, create app, run with `--dev`
-- File tree showing minimal app structure (3 files)
-
-### 8. Footer
-- Links: GitHub, Issues, Vaadin
-- "Apache 2.0 License" text
+Single-page marketing landing site for Vaadin PyFlow. Dark theme, zero external dependencies, single HTML file.
 
 ## Design Language
 
