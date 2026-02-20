@@ -5,8 +5,8 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~17,800 (core src/), ~53,400 (total with demo + tests)
-**Test structure:** `tests/unit/` (2380 unit tests, default `pytest`) + `tests/ui/` (423 Playwright, run explicitly)
-**Tests:** 2380 unit + 423 UI (Playwright)
+**Test structure:** `tests/unit/` (2381 unit tests, default `pytest`) + `tests/ui/` (423 Playwright, run explicitly)
+**Tests:** 2381 unit + 423 UI (Playwright)
 **Last updated:** 2026-02-20
 
 ---
@@ -64,7 +64,7 @@
 - [x] RadioButtonGroup - Radio button selection
 - [x] CheckboxGroup - Multiple checkbox selection
 - [x] FormLayout - Responsive steps, colspan, FormItem (label slot), FormRow, auto-responsive, CSS custom properties
-- [x] Grid - Columns (path, header, width, flexGrow, autoWidth, resizable, sortable, textAlign), in-memory data push, single/multi selection, sorting, lazy loading/DataProvider, column reordering, LitRenderer, ComponentRenderer, header rows (column groups), column footers, item click listeners, scroll_to_item, remove_column, set_rows_draggable, set_drop_mode, set_empty_state_text, set_details_visible_on_click
+- [x] Grid - Columns (path, header, width, flexGrow, autoWidth, resizable, sortable, textAlign), in-memory data push, single/multi selection, sorting, lazy loading/DataProvider, column reordering, LitRenderer, ComponentRenderer, header rows (column groups), column footers, item click listeners, scroll_to_item, remove_column, set_rows_draggable, set_drop_mode, set_empty_state_text, set_details_visible_on_click, programmatic selection push to client
 - [x] ConfirmDialog - Confirm/cancel/reject actions, header/message/button text, theme, cancelable/rejectable
 - [x] ComboBox - Filtered dropdown, data push protocol, item label generator, custom value support, class name generator, prefix component, overlay width
 - [x] DatePicker - Date selection with calendar overlay, min/max, connector init, i18n, week numbers, initial position, open/close, opened-change listener
