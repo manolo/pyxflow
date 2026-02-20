@@ -57,6 +57,20 @@ class TestWriteBean:
         )
 
 
+class TestRequiredIndicator:
+    @pytest.mark.spec("V22.24")
+    def test_as_required_shows_indicator(self, view_page: Page):
+        """as_required() should set required indicator visible on the field."""
+        expect(view_page.locator("#name")).to_have_js_property("required", True)
+
+    @pytest.mark.spec("V22.25")
+    def test_non_required_no_indicator(self, view_page: Page):
+        """Fields without as_required() should not show required indicator."""
+        # 'required' is undefined (not false) when never set
+        val = view_page.locator("#email").evaluate("el => el.required")
+        assert not val
+
+
 class TestValidation:
     @pytest.mark.spec("V22.04")
     def test_required_blocks_save(self, view_page: Page):

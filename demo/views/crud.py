@@ -15,7 +15,7 @@ from vaadin.flow.data import Binder, ValidationError
 
 
 @Route("crud/:id?/:action?", page_title="CRUD", layout=MainLayout)
-@Menu(title="CRUD", order=4, icon="vaadin:list")
+@Menu(title="CRUD", order=5, icon="vaadin:list")
 class CrudView(Div):
     def __init__(self):
         self.add_class_name("crud-view")
@@ -85,9 +85,25 @@ class CrudView(Div):
         # When a row is selected or deselected, populate form
         self.grid.add_selection_listener(self._on_select)
 
-        # Configure Binder
+        # Configure Binder with validations
         self.binder = Binder(SamplePerson)
-        self.binder.bind_instance_fields(self)
+        self.binder.for_field(self.first_name).as_required("First name is required").bind(
+            lambda p: p.first_name, lambda p, v: setattr(p, "first_name", v))
+        self.binder.for_field(self.last_name).as_required("Last name is required").bind(
+            lambda p: p.last_name, lambda p, v: setattr(p, "last_name", v))
+        self.binder.for_field(self.email).as_required("Email is required").with_validator(
+            lambda v: not v or "@" in v, "Must be a valid email address").bind(
+            lambda p: p.email, lambda p, v: setattr(p, "email", v))
+        self.binder.for_field(self.phone).bind(
+            lambda p: p.phone, lambda p, v: setattr(p, "phone", v))
+        self.binder.for_field(self.date_of_birth).bind(
+            lambda p: p.date_of_birth, lambda p, v: setattr(p, "date_of_birth", v))
+        self.binder.for_field(self.occupation).bind(
+            lambda p: p.occupation, lambda p, v: setattr(p, "occupation", v))
+        self.binder.for_field(self.role).bind(
+            lambda p: p.role, lambda p, v: setattr(p, "role", v))
+        self.binder.for_field(self.important).bind(
+            lambda p: p.important, lambda p, v: setattr(p, "important", v))
 
         # Button listeners
         self.cancel.add_click_listener(self._on_cancel)

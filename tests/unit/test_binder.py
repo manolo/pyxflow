@@ -264,6 +264,25 @@ class TestBinding:
             binder.write_bean(person)
         assert "Name required" in str(exc_info.value)
 
+    def test_as_required_sets_required_indicator(self):
+        """as_required() should call set_required_indicator_visible(True)."""
+        field = make_field()
+        binder = Binder()
+        assert not field.is_required_indicator_visible()
+        binder.for_field(field).as_required("Required").bind(
+            lambda p: p.name, lambda p, v: setattr(p, 'name', v)
+        )
+        assert field.is_required_indicator_visible()
+
+    def test_without_as_required_no_indicator(self):
+        """Without as_required(), required indicator stays false."""
+        field = make_field()
+        binder = Binder()
+        binder.for_field(field).bind(
+            lambda p: p.name, lambda p, v: setattr(p, 'name', v)
+        )
+        assert not field.is_required_indicator_visible()
+
     def test_with_validator_predicate(self):
         field = make_field()
         person = Person()

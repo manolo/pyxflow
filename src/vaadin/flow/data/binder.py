@@ -147,6 +147,8 @@ class BindingBuilder:
         """Mark this binding as required."""
         from vaadin.flow.data.validator import required
         self._required_validator = required(message)
+        if hasattr(self._field, "set_required_indicator_visible"):
+            self._field.set_required_indicator_visible(True)
         return self
 
     def with_validator(self, validator_or_predicate, message: str | None = None) -> BindingBuilder:

@@ -36,7 +36,7 @@
 | 19 | `/test/html-elements` | 21 | H1-H6, Paragraph, Span, Div, Anchor, IFrame, Hr, Pre, Image, NativeLabel |
 | 20 | `/test/component-api` | 18 | Base Component API (visibility, enabled, classes, styles, size, tooltip, aria, theme) |
 | 21 | `/test/field-mixins` | 13 | HasReadOnly, HasValidation, HasRequired |
-| 22 | `/test/binder` | 20 | Binder, validators, converters, dirty tracking, field types |
+| 22 | `/test/binder` | 22 | Binder, validators, converters, dirty tracking, field types, required indicator |
 | 23 | `/test/navigation` | 13 | @Route, params, AppLayout, SideNav, RouterLink, page title, get_page_header |
 | 24 | `/test/push` | 8 | WebSocket push, UI.access() |
 | 25 | `/test/theme` | 10 | Theme switching, @StyleSheet, @ColorScheme, persistence across navigation |
@@ -2440,6 +2440,13 @@ Feature: Binder — Data Binding & Validation
   Scenario: V22.23 — Nav to next view
     When click link "Next: Navigation"
     Then URL contains "/test/navigation"
+
+  # --- Required indicator ---
+  Scenario: V22.24 — as_required shows required indicator
+    Then #name has JS property "required" = true
+
+  Scenario: V22.25 — Non-required field has no indicator
+    Then #email does NOT have "required" = true
 ```
 
 ---
