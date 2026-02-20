@@ -11,12 +11,11 @@ from demo.services.sample_person_service import SamplePerson, sample_person_serv
 from demo.views.main_layout import MainLayout
 from vaadin.flow import BeforeEnterEvent, Menu, Route
 from vaadin.flow.components import *
-from vaadin.flow.components.split_layout import SplitLayout
 from vaadin.flow.data import Binder, ValidationError
 
 
 @Route("crud/:id?/:action?", page_title="CRUD", layout=MainLayout)
-@Menu(title="CRUD", order=4, icon="vaadin:split-h")
+@Menu(title="CRUD", order=4, icon="vaadin:list")
 class CrudView(Div):
     def __init__(self):
         self.add_class_name("master-detail-view")
@@ -32,13 +31,17 @@ class CrudView(Div):
         self.sample_person: SamplePerson | None = None
 
         # Create UI
-        split_layout = SplitLayout()
-        split_layout.set_size_full()
+        self._layout = MasterDetailLayout()
+        self._layout.set_size_full()
+        self._layout.set_detail_size("400px")
 
-        self._create_grid_layout(split_layout)
-        self._create_editor_layout(split_layout)
+        self._create_grid_layout()
+        self._create_editor_layout()
 
-        self.add(split_layout)
+        self._layout.add_backdrop_click_listener(self._on_cancel)
+        self._layout.add_detail_escape_press_listener(self._on_cancel)
+
+        self.add(self._layout)
 
         # ConfirmDialog for delete
         self._delete_dialog = ConfirmDialog(
@@ -49,6 +52,15 @@ class CrudView(Div):
         self._delete_dialog.add_confirm_listener(self._on_delete_confirm)
         self._delete_dialog.add_cancel_listener(self._on_delete_cancel)
         self.add(self._delete_dialog)
+
+        # ConfirmDialog for discard
+        self._discard_dialog = ConfirmDialog(
+            "Discard changes", "You have unsaved changes. Are you sure you want to discard them?", "Discard"
+        )
+        self._discard_dialog.set_cancelable(True)
+        self._discard_dialog.set_confirm_button_theme("error primary")
+        self._discard_dialog.add_confirm_listener(self._on_discard_confirm)
+        self.add(self._discard_dialog)
 
         # Configure Grid
         self.grid.set_columns("firstName", "lastName", "email", "phone", "dateOfBirth", "occupation", "role")
@@ -87,7 +99,8 @@ class CrudView(Div):
         action = event.get("action", None)
 
         if person_id is None:
-            # /crud -- clear form
+            # /crud -- clear form and deselect grid
+            self.grid.select(None)
             self._clear_form()
             return
 
@@ -97,6 +110,8 @@ class CrudView(Div):
             self.sample_person = SamplePerson()
             self.binder.read_bean(self.sample_person)
             self.delete.set_visible(False)
+            self._layout.set_detail(self._editor_div)
+            self._fab.set_visible(False)
             return
 
         # /crud/:id or /crud/:id/delete
@@ -153,11 +168,19 @@ class CrudView(Div):
     # -- Cancel / Save -------------------------------------------------
 
     def _on_cancel(self, event):
+        if self.binder.is_dirty():
+            self._discard_dialog.open()
+            return
+        self._do_cancel()
+
+    def _on_discard_confirm(self, event):
+        self._do_cancel()
+
+    def _do_cancel(self):
         self._clear_form()
-        self._refresh_grid()
         ui = self.get_ui()
         if ui:
-            ui.push_url("/crud")
+            ui.navigate("crud")
 
     def _on_save(self, event):
         try:
@@ -165,12 +188,12 @@ class CrudView(Div):
                 self.sample_person = SamplePerson()
             self.binder.write_bean(self.sample_person)
             sample_person_service.save(self.sample_person)
-            self._clear_form()
-            self._refresh_grid()
             Notification.show("Data updated")
+            self._refresh_grid()
+            self._clear_form()
             ui = self.get_ui()
             if ui:
-                ui.push_url("/crud")
+                ui.navigate("crud")
         except ValidationError:
             Notification.show("Failed to update the data. Check again that all values are valid")
 
@@ -191,8 +214,8 @@ class CrudView(Div):
         if self.sample_person and self.sample_person.id:
             sample_person_service.delete(self.sample_person.id)
             Notification.show("Person deleted")
-        self._clear_form()
         self._refresh_grid()
+        self._clear_form()
         ui = self.get_ui()
         if ui:
             ui.navigate("crud")
@@ -206,13 +229,13 @@ class CrudView(Div):
 
     # -- Layout helpers ------------------------------------------------
 
-    def _create_editor_layout(self, split_layout: SplitLayout):
-        editor_layout_div = Div()
-        editor_layout_div.add_class_name("editor-layout")
+    def _create_editor_layout(self):
+        self._editor_div = Div()
+        self._editor_div.add_class_name("editor-layout")
 
         editor_div = Div()
         editor_div.add_class_name("editor")
-        editor_layout_div.add(editor_div)
+        self._editor_div.add(editor_div)
 
         form_layout = FormLayout()
         self.first_name = TextField("First Name")
@@ -229,9 +252,7 @@ class CrudView(Div):
         )
 
         editor_div.add(form_layout)
-        self._create_button_layout(editor_layout_div)
-
-        split_layout.add_to_secondary(editor_layout_div)
+        self._create_button_layout(self._editor_div)
 
     def _create_button_layout(self, editor_layout_div: Div):
         button_layout = HorizontalLayout()
@@ -246,14 +267,21 @@ class CrudView(Div):
         button_layout.add(self.save, self.delete, self.cancel)
         editor_layout_div.add(button_layout)
 
-    def _create_grid_layout(self, split_layout: SplitLayout):
+    def _create_grid_layout(self):
         wrapper = Div()
         wrapper.add_class_name("grid-wrapper")
         wrapper.set_size_full()
+
+        self._fab = Button(Icon("vaadin:plus"))
+        self._fab.add_theme_name("primary")
+        self._fab.add_class_name("fab")
+        self._fab.add_click_listener(lambda e: self.get_ui().navigate("crud/new"))
+        wrapper.add(self._fab)
+
         self.grid = Grid()
         self.grid.set_size_full()
         wrapper.add(self.grid)
-        split_layout.add_to_primary(wrapper)
+        self._layout.set_master(wrapper)
 
     def _refresh_grid(self):
         self.grid.select(None)
@@ -262,8 +290,13 @@ class CrudView(Div):
 
     def _clear_form(self):
         self._populate_form(None)
+        self._layout.set_detail(None)
+        self._fab.set_visible(True)
 
     def _populate_form(self, value: SamplePerson | None):
         self.sample_person = value
         self.binder.read_bean(value)
         self.delete.set_visible(value is not None and value.id != 0)
+        if value is not None:
+            self._layout.set_detail(self._editor_div)
+            self._fab.set_visible(False)

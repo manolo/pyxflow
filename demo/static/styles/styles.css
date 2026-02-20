@@ -32,15 +32,36 @@
   flex-direction: column;
 }
 
-.master-detail-view vaadin-split-layout {
+.master-detail-view vaadin-master-detail-layout {
   flex: 1;
   min-height: 0;
+}
+
+.master-detail-view .fab {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 1;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  box-shadow: 0 3px 5px -1px rgba(0,0,0,.2), 0 6px 10px rgba(0,0,0,.14), 0 1px 18px rgba(0,0,0,.12);
+  animation: fab-in 0.3s ease 0.25s both;
+}
+
+@keyframes fab-in {
+  from { opacity: 0; transform: translateX(80px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.master-detail-view .grid-wrapper {
+  position: relative;
 }
 
 .master-detail-view .editor-layout {
   display: flex;
   flex-direction: column;
-  width: 400px;
+  height: 100%;
 }
 
 .master-detail-view .editor {
