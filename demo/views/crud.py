@@ -18,7 +18,7 @@ from vaadin.flow.data import Binder, ValidationError
 @Menu(title="CRUD", order=4, icon="vaadin:list")
 class CrudView(Div):
     def __init__(self):
-        self.add_class_name("master-detail-view")
+        self.add_class_name("crud-view")
         self.set_size_full()
 
         hint = Div()

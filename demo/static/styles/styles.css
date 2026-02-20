@@ -27,17 +27,53 @@
   margin: 0;
 }
 
+/* ── Master-Detail view (SplitLayout) ── */
 .master-detail-view {
   display: flex;
   flex-direction: column;
 }
 
-.master-detail-view vaadin-master-detail-layout {
+.master-detail-view vaadin-split-layout {
   flex: 1;
   min-height: 0;
 }
 
-.master-detail-view .fab {
+.master-detail-view .editor-layout {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+}
+
+.master-detail-view .editor {
+  flex-grow: 1;
+  padding: var(--vaadin-padding-l);
+  overflow-y: auto;
+}
+
+.master-detail-view .editor vaadin-checkbox {
+  padding-top: var(--vaadin-padding-m);
+}
+
+.master-detail-view .button-layout {
+  width: 100%;
+  flex-wrap: wrap;
+  background-color: var(--vaadin-background-container);
+  padding: var(--vaadin-padding-s) var(--vaadin-padding-l);
+  gap: var(--vaadin-gap-m);
+}
+
+/* ── CRUD view (MasterDetailLayout) ── */
+.crud-view {
+  display: flex;
+  flex-direction: column;
+}
+
+.crud-view vaadin-master-detail-layout {
+  flex: 1;
+  min-height: 0;
+}
+
+.crud-view .fab {
   position: absolute;
   bottom: 1.5rem;
   right: 1.5rem;
@@ -54,27 +90,27 @@
   to   { opacity: 1; transform: translateX(0); }
 }
 
-.master-detail-view .grid-wrapper {
+.crud-view .grid-wrapper {
   position: relative;
 }
 
-.master-detail-view .editor-layout {
+.crud-view .editor-layout {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
-.master-detail-view .editor {
+.crud-view .editor {
   flex-grow: 1;
   padding: var(--vaadin-padding-l);
   overflow-y: auto;
 }
 
-.master-detail-view .editor vaadin-checkbox {
+.crud-view .editor vaadin-checkbox {
   padding-top: var(--vaadin-padding-m);
 }
 
-.master-detail-view .button-layout {
+.crud-view .button-layout {
   width: 100%;
   flex-wrap: wrap;
   background-color: var(--vaadin-background-container);
