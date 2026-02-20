@@ -69,6 +69,9 @@ class ConfirmDialog(Component):
         if not self._close_on_esc:
             self.element.set_property("closeOnEsc", False)
 
+        if self._opened:
+            self.element.set_property("opened", True)
+
         # Register event listeners with explicit hash (empty config)
         self.element.add_event_listener("confirm", self._on_confirm, _CLOSED_HASH)
         self.element.add_event_listener("cancel", self._on_cancel, _CLOSED_HASH)

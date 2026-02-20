@@ -258,3 +258,19 @@ class TestConfirmDialog:
         assert node.get(Feature.ELEMENT_PROPERTY_MAP, "confirmText") == "OK"
         assert node.get(Feature.ELEMENT_PROPERTY_MAP, "cancelButtonVisible") is True
         assert node.get(Feature.ELEMENT_PROPERTY_MAP, "rejectButtonVisible") is True
+
+    def test_open_before_attach_flushed(self):
+        """open() called before attach must flush opened=True during _attach.
+
+        Pitfall 31: before_enter() runs before _attach(), so open() called
+        there sets _opened=True but _element is None. _attach() must flush it.
+        """
+        cd = ConfirmDialog(header="Delete", text="Sure?")
+        cd.open()  # before attach -- _element is None
+        assert cd.is_opened() is True
+
+        tree = StateTree()
+        cd._attach(tree)
+
+        node = cd.element.node
+        assert node.get(Feature.ELEMENT_PROPERTY_MAP, "opened") is True
