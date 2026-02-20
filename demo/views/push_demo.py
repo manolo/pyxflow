@@ -65,7 +65,7 @@ class PushDemoView(VerticalLayout):
         # --- Layout ---
         self.add_class_name("sw-view")
         self.set_padding(False)
-        self.add(circle, btn_row)
+        self.add(hint, circle, btn_row)
 
     def _update_display(self):
         h = self._elapsed // 3600

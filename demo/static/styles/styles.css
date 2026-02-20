@@ -11,6 +11,7 @@
   color: var(--lumo-secondary-text-color);
   font-size: var(--lumo-font-size-s);
   line-height: 1.5;
+  align-self: stretch;
 }
 
 .demo-hint vaadin-icon {
@@ -24,6 +25,16 @@
 .components-view > .demo-hint {
   grid-column: 1 / -1;
   margin: 0;
+}
+
+.master-detail-view {
+  display: flex;
+  flex-direction: column;
+}
+
+.master-detail-view vaadin-split-layout {
+  flex: 1;
+  min-height: 0;
 }
 
 .master-detail-view .editor-layout {
