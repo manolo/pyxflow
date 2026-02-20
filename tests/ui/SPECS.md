@@ -45,8 +45,10 @@
 | 28 | `/test/virtual-list` | 5 | VirtualList |
 | 29 | `/test/login` | 8 | LoginForm, LoginOverlay |
 | 30 | `/test/server-errors` | 8 | Error notification, meta.appError, JSON serialization, session resilience |
+| 31 | `/test/route-params` | 5 | Wildcard, mid-optional, QueryParameters, BeforeEnterEvent |
+| 32 | `/test/mdl-nav` | 12 | MasterDetailLayout (URL-driven detail, push_url, navigate, animation) |
 
-**Total: 388 tests across 30 views (388 pass, 0 skip)**
+**Total: 405 tests across 32 views (405 pass, 0 skip)**
 
 ---
 
@@ -2973,6 +2975,86 @@ Feature: Server Error Handling & Session Resilience
   # --- Final ---
   Scenario: V30.13 — All tests complete
     Then Span#all-done text is "All UI test views visited"
+```
+
+---
+
+## View 32: `/test/mdl-nav`
+
+```gherkin
+Feature: MasterDetailLayout with URL-driven navigation
+
+  Background:
+    Given MasterDetailLayout#mdl with master (3 item buttons + "New" button)
+    And detail panel with label + Cancel button
+    And Span#mdl-status tracking state ("closed", "open:1", "open:new", etc.)
+    Routes: /test/mdl-nav, /test/mdl-nav/new, /test/mdl-nav/:id
+
+  # --- Basic ---
+  Scenario: V32.01 -- View renders with detail hidden
+    Given navigate to /test/mdl-nav
+    Then master visible, Span#mdl-status is "closed"
+
+  Scenario: V32.02 -- New button visible
+    Then Button#mdl-new "New" is visible
+
+  # --- Item selection (push_url pattern) ---
+  Scenario: V32.03 -- Click item opens detail
+    When click "#mdl-sel-1"
+    Then Span#mdl-status is "open:1", detail label is "Detail: 1"
+    And URL contains "/test/mdl-nav/1"
+
+  Scenario: V32.04 -- Cancel after selection closes detail (bug fix)
+    Given detail open via item click (push_url)
+    When click "#mdl-cancel"
+    Then Span#mdl-status is "closed", URL is "/test/mdl-nav"
+    Note: Fixed push_url vs navigate mismatch -- _hide_detail() called before navigate()
+
+  Scenario: V32.05 -- Switch between items
+    When click "#mdl-sel-2" then "#mdl-sel-3"
+    Then detail updates to "Detail: 3"
+    When cancel, detail closed
+
+  # --- New button navigation (navigate pattern) ---
+  Scenario: V32.06 -- New button opens detail via navigate (bug fix)
+    When click "#mdl-new"
+    Then Span#mdl-status is "open:new", URL is "/test/mdl-nav/new"
+    Note: Fixed _attach() re-queuing _update_details() after _has_initialized=True
+
+  Scenario: V32.07 -- Cancel after New button closes detail
+    Given detail open via New button
+    When click "#mdl-cancel"
+    Then Span#mdl-status is "closed", URL is "/test/mdl-nav"
+
+  # --- Direct URL navigation ---
+  Scenario: V32.08 -- Direct URL /test/mdl-nav/2
+    When goto /test/mdl-nav/2
+    Then Span#mdl-status is "open:2", detail label is "Detail: 2"
+
+  Scenario: V32.09 -- Direct URL /test/mdl-nav/new
+    When goto /test/mdl-nav/new
+    Then Span#mdl-status is "open:new"
+
+  Scenario: V32.10 -- Direct URL /test/mdl-nav hides detail
+    When goto /test/mdl-nav
+    Then Span#mdl-status is "closed"
+
+  # --- Animation (skipTransition) ---
+  Scenario: V32.11 -- New button _setDetail uses skipTransition=false
+    Given fresh page at /test/mdl-nav
+    When click "#mdl-new"
+    Then detail opens (visible), _setDetail called without skipping transition
+
+  Scenario: V32.12 -- Item1 -> Cancel -> New -> Cancel close animation (bug fix)
+    Given fresh page at /test/mdl-nav
+    When click "#mdl-sel-1", then "#mdl-cancel", then "#mdl-new", then "#mdl-cancel"
+    Then final Cancel closes with _setDetail(null, skipTransition=false) on same MDL element
+    Note: Fixed by reusing view instances for same-route-pattern navigations (_reenter_view)
+
+  Scenario: V32.13 -- Item click _setDetail uses skipTransition=false
+    Given fresh page at /test/mdl-nav, instrument _setDetail
+    When click "#mdl-sel-1"
+    Then _setDetail(element, skipTransition=false) captured
 ```
 
 ---
