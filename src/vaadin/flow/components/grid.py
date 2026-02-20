@@ -628,6 +628,8 @@ class Grid(Component):
         # _key_to_item not yet built (before _push_data) -- store for data push
         if self._selection_mode != SelectionMode.MULTI:
             self._selected_item = item
+            for listener in self._selection_listeners:
+                listener({"item": item})
 
     def _push_selection_to_client(self, key: str | None):
         """Push selection state to the client via $connector.doSelection."""

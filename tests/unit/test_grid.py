@@ -231,6 +231,31 @@ class TestGrid:
         assert len(selected) == 2
         assert selected[1]["item"] is None
 
+    def test_select_item_before_attach_fires_listener(self):
+        """select_item() before _push_data must fire selection listeners."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        items = [{"name": "Alice"}, {"name": "Bob"}]
+        grid.set_items(items)
+
+        selected = []
+        grid.add_selection_listener(lambda e: selected.append(e))
+
+        # select_item before attach -- _key_to_item is empty
+        grid.select_item(items[0])
+        assert len(selected) == 1
+        assert selected[0]["item"]["name"] == "Alice"
+
+    def test_select_item_before_attach_stores_item(self):
+        """select_item() before attach stores item for later push."""
+        grid = Grid()
+        grid.add_column("name", header="Name")
+        items = [{"name": "Alice"}]
+        grid.set_items(items)
+
+        grid.select_item(items[0])
+        assert grid._selected_item is items[0]
+
     def test_missing_property(self, tree):
         """Columns handle missing item properties gracefully."""
         grid = Grid()
