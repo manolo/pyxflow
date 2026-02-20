@@ -623,7 +623,20 @@ class Grid(Component):
         for key, it in self._key_to_item.items():
             if it is item or it == item:
                 self.select(key)
+                self._push_selection_to_client(key)
                 return
+        # _key_to_item not yet built (before _push_data) -- store for data push
+        if self._selection_mode != SelectionMode.MULTI:
+            self._selected_item = item
+
+    def _push_selection_to_client(self, key: str | None):
+        """Push selection state to the client via $connector.doSelection."""
+        if not self._element:
+            return
+        tree = self.element._tree
+        ref = {"@v-node": self.element.node_id}
+        items = [{"key": key}] if key is not None else [None]
+        tree.queue_execute([ref, items, "$0.$connector.doSelection($1)"])
 
     # --- Lazy Loading ---
 
@@ -913,10 +926,11 @@ class Grid(Component):
         # Apply sorting
         sorted_items = self._sorted_items()
 
-        # Remap selected keys if in multi-select mode
-        # Must happen before clearing _key_to_item
+        # Collect selected item ids (by Python identity) before clearing _key_to_item
         if self._selection_mode == SelectionMode.MULTI and self._selected_keys:
             selected_item_ids = {id(self._key_to_item[k]) for k in self._selected_keys if k in self._key_to_item}
+        elif self._selected_item is not None:
+            selected_item_ids = {id(self._selected_item)}
         else:
             selected_item_ids = set()
 
@@ -1111,6 +1125,7 @@ class Grid(Component):
         """Select an item by key, or deselect if None."""
         if key is None:
             self.deselect(None)
+            self._push_selection_to_client(None)
             return
         item = self._key_to_item.get(key)
         if self._selection_mode == SelectionMode.MULTI:
