@@ -293,7 +293,7 @@ class TestDiscoverViews:
         entries = get_menu_entries()
         assert len(entries) == 8
         titles = [e.title for e in entries]
-        assert titles == ["About", "Hello", "Components", "Grid", "CRUD", "Master-Detail", "Stopwatch", "File Explorer"]
+        assert titles == ["About", "Hello", "Components", "Grid", "Master-Detail", "CRUD", "Stopwatch", "File Explorer"]
         # Verify sorted by (order, path)
         orders = [e.order for e in entries]
         assert orders == sorted(orders)
