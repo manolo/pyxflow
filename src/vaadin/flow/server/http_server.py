@@ -435,6 +435,16 @@ async def _push_sender(ws: web.WebSocketResponse, ui_state: dict):
 
 _BUNDLE_CACHE = "public, max-age=31536000, immutable"
 
+# File extensions treated as static files in the catch-all route handler.
+# Paths whose last segment ends with one of these get a static file lookup
+# (and 404 if not found) instead of being served index.html for SPA routing.
+_STATIC_EXTENSIONS = frozenset({
+    ".js", ".mjs", ".css", ".html", ".json", ".map",
+    ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".webp", ".avif",
+    ".woff", ".woff2", ".ttf", ".eot", ".otf",
+    ".txt", ".xml", ".webmanifest", ".pdf",
+})
+
 
 async def handle_static(request: web.Request) -> web.Response:
     """Handle static file requests for /VAADIN/*."""
@@ -664,7 +674,18 @@ async def handle_route(request: web.Request) -> web.Response:
     path = request.match_info.get("path", "")
 
     # Path has a file extension → serve from static/ or 404
-    if path and "." in path.rsplit("/", 1)[-1]:
+    # Only treat as static file if the last segment ends with a known extension
+    # (not just any dot, since route params like "25.1.0-alpha9" contain dots)
+    # BUT skip static lookup if the path matches a registered route (e.g. wildcard
+    # routes like "files/:path*" can match paths ending in .txt/.json).
+    last_segment = path.rsplit("/", 1)[-1] if path else ""
+    dot_pos = last_segment.rfind(".")
+    ext = last_segment[dot_pos:].lower() if dot_pos > 0 else ""
+    if ext in _STATIC_EXTENSIONS:
+        from vaadin.flow.router import match_route
+        if match_route(path):
+            html = get_index_html()
+            return web.Response(text=html, content_type="text/html")
         if _app_directory is not None:
             file_path = _app_directory / "static" / path
             static_dir = (_app_directory / "static").resolve()

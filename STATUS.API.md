@@ -848,6 +848,12 @@ All components inherit from `Component` which provides:
 | `@Route(page_title="...")` param | [x] |
 | `get_menu_entries()` — sorted, filtered menu entries | [x] |
 | `get_page_header(view)` — resolve title (dynamic > @PageTitle > class name) | [x] |
+| `QueryParameters` — immutable multidict for URL query params | [x] |
+| `RouteParameters` — typed path param access (get, get_integer, get_wildcard) | [x] |
+| `Location` — path + query params | [x] |
+| `BeforeEnterEvent` — full navigation context, dict-compatible | [x] |
+| Wildcard route params (`:path*`) | [x] |
+| Mid-position optional params (`:id?` anywhere) | [x] |
 | `AfterNavigationObserver` / `after_navigation(event)` listener | [ ] |
 
 ### Remaining Priority Gaps

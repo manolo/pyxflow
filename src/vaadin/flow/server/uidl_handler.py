@@ -561,6 +561,7 @@ class UidlHandler:
         3. No layout → direct view in container (backward-compatible)
         """
         route = event_data.get("route", "")
+        query_string = event_data.get("query", "")
 
         # Normalize route - strip leading/trailing slashes
         route = route.strip("/")
@@ -624,7 +625,7 @@ class UidlHandler:
                         self._layout.remove_router_layout_content(self._view)
                         self._view = None
 
-                    view = self._create_view(view_class, params, ui)
+                    view = self._create_view(view_class, params, ui, query_string)
                     self._layout.show_router_layout_content(view)
                 else:
                     # Different/new layout → remove old root, create layout + view
@@ -641,7 +642,7 @@ class UidlHandler:
                     layout._ui = ui
                     layout._attach(self._tree)
 
-                    view = self._create_view(view_class, params, ui)
+                    view = self._create_view(view_class, params, ui, query_string)
                     layout.show_router_layout_content(view)  # type: ignore[attr-defined]
 
                     self._container_node.add_child(layout.element.node)
@@ -658,7 +659,7 @@ class UidlHandler:
                     self._container_node.remove_child(self._view.element.node)
                     self._view = None
 
-                view = self._create_view(view_class, params, ui)
+                view = self._create_view(view_class, params, ui, query_string)
                 self._container_node.add_child(view.element.node)
 
             self._view = view
@@ -685,8 +686,12 @@ class UidlHandler:
         # Build execute commands
         self._setup_execute_commands(page_title, is_first_navigation)
 
-    def _create_view(self, view_class: type, params: dict, ui: Any) -> Any:
+    def _create_view(self, view_class: type, params: dict, ui: Any,
+                      query_string: str = "") -> Any:
         """Create and attach a view instance."""
+        from vaadin.flow.router import (
+            BeforeEnterEvent, Location, QueryParameters, RouteParameters,
+        )
         view = view_class()
         view._ui = ui
 
@@ -694,7 +699,17 @@ class UidlHandler:
             view.set_parameter(params)
 
         if hasattr(view, 'before_enter'):
-            view.before_enter(params)
+            route_params = RouteParameters(params)
+            query_params = QueryParameters.from_string(query_string)
+            path = getattr(view_class, '_route_path', '')
+            location = Location(path, query_params)
+            event = BeforeEnterEvent(
+                location=location,
+                route_parameters=route_params,
+                navigation_target=view_class,
+                ui=ui,
+            )
+            view.before_enter(event)
 
         view._attach(self._tree)
         return view

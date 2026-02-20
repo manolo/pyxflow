@@ -1,14 +1,235 @@
 """Router - URL routing with @Route decorator."""
 
 import re
+from itertools import product
 from typing import Type, TYPE_CHECKING
+from urllib.parse import parse_qs
 
 if TYPE_CHECKING:
     from vaadin.flow.core.component import Component
 
 
-# Route entry: (view_class, explicit_page_title, param_names, compiled_regex, layout_class)
-_RouteEntry = tuple[Type["Component"], str | None, list[str], re.Pattern | None, Type["Component"] | None]
+# ---------------------------------------------------------------------------
+# Data classes for navigation context
+# ---------------------------------------------------------------------------
+
+class QueryParameters:
+    """Immutable multidict for URL query parameters (?key=val&key=val2)."""
+
+    __slots__ = ("_params",)
+
+    def __init__(self, params: dict[str, list[str]] | None = None):
+        self._params: dict[str, list[str]] = dict(params) if params else {}
+
+    @staticmethod
+    def from_string(query_string: str) -> "QueryParameters":
+        """Parse a raw query string (without leading '?')."""
+        if not query_string:
+            return QueryParameters()
+        return QueryParameters(parse_qs(query_string, keep_blank_values=True))
+
+    @staticmethod
+    def empty() -> "QueryParameters":
+        return QueryParameters()
+
+    def get_parameters(self, key: str) -> list[str]:
+        """Return all values for *key*, or empty list."""
+        return list(self._params.get(key, []))
+
+    def get_single_parameter(self, key: str) -> str | None:
+        """Return the first value for *key*, or None."""
+        vals = self._params.get(key)
+        return vals[0] if vals else None
+
+    def get_parameter_names(self) -> set[str]:
+        return set(self._params.keys())
+
+    def __bool__(self) -> bool:
+        return bool(self._params)
+
+    def __repr__(self) -> str:
+        return f"QueryParameters({self._params!r})"
+
+    def __eq__(self, other):
+        if isinstance(other, QueryParameters):
+            return self._params == other._params
+        return NotImplemented
+
+
+class RouteParameters:
+    """Immutable wrapper around path parameters with typed access."""
+
+    __slots__ = ("_params",)
+
+    def __init__(self, params: dict[str, str] | None = None):
+        self._params: dict[str, str] = dict(params) if params else {}
+
+    def get(self, name: str) -> str | None:
+        """Return value of path parameter *name*, or None."""
+        return self._params.get(name)
+
+    def get_integer(self, name: str) -> int | None:
+        """Return int value of *name*, or None if missing / not an int."""
+        val = self._params.get(name)
+        if val is None:
+            return None
+        try:
+            return int(val)
+        except (ValueError, TypeError):
+            return None
+
+    def get_wildcard(self, name: str) -> list[str]:
+        """Split a wildcard param value by '/' and return segments."""
+        val = self._params.get(name)
+        if not val:
+            return []
+        return [s for s in val.split("/") if s]
+
+    def get_parameter_names(self) -> set[str]:
+        return set(self._params.keys())
+
+    # --- dict-like read access (for backward compat) ---
+    def __getitem__(self, key: str) -> str:
+        return self._params[key]
+
+    def __contains__(self, key: str) -> bool:
+        return key in self._params
+
+    def keys(self):
+        return self._params.keys()
+
+    def values(self):
+        return self._params.values()
+
+    def items(self):
+        return self._params.items()
+
+    def __bool__(self) -> bool:
+        return bool(self._params)
+
+    def __repr__(self) -> str:
+        return f"RouteParameters({self._params!r})"
+
+    def __eq__(self, other):
+        if isinstance(other, RouteParameters):
+            return self._params == other._params
+        return NotImplemented
+
+
+class Location:
+    """Represents a navigation location (path + query parameters)."""
+
+    __slots__ = ("_path", "_query_parameters")
+
+    def __init__(self, path: str, query_parameters: QueryParameters | None = None):
+        self._path = path.strip("/")
+        self._query_parameters = query_parameters or QueryParameters.empty()
+
+    @property
+    def path(self) -> str:
+        return self._path
+
+    @property
+    def segments(self) -> list[str]:
+        if not self._path:
+            return []
+        return self._path.split("/")
+
+    @property
+    def query_parameters(self) -> QueryParameters:
+        return self._query_parameters
+
+    @property
+    def first_segment(self) -> str:
+        segs = self.segments
+        return segs[0] if segs else ""
+
+    def __repr__(self) -> str:
+        return f"Location({self._path!r}, {self._query_parameters!r})"
+
+    def __eq__(self, other):
+        if isinstance(other, Location):
+            return self._path == other._path and self._query_parameters == other._query_parameters
+        return NotImplemented
+
+
+class BeforeEnterEvent:
+    """Full navigation context passed to view.before_enter().
+
+    Dict-compatible so existing ``before_enter(params)`` code that does
+    ``params["id"]`` or ``params.get("q")`` keeps working unchanged.
+    """
+
+    __slots__ = ("_location", "_route_parameters", "_navigation_target", "_ui", "_trigger")
+
+    def __init__(
+        self,
+        location: Location,
+        route_parameters: RouteParameters,
+        navigation_target: type | None = None,
+        ui: object | None = None,
+        trigger: str = "router",
+    ):
+        self._location = location
+        self._route_parameters = route_parameters
+        self._navigation_target = navigation_target
+        self._ui = ui
+        self._trigger = trigger
+
+    @property
+    def location(self) -> Location:
+        return self._location
+
+    @property
+    def route_parameters(self) -> RouteParameters:
+        return self._route_parameters
+
+    @property
+    def navigation_target(self) -> type | None:
+        return self._navigation_target
+
+    @property
+    def ui(self) -> object | None:
+        return self._ui
+
+    @property
+    def trigger(self) -> str:
+        return self._trigger
+
+    # --- dict-like API delegating to route_parameters (backward compat) ---
+    def get(self, key: str, default=None):
+        val = self._route_parameters.get(key)
+        return val if val is not None else default
+
+    def __getitem__(self, key: str) -> str:
+        return self._route_parameters[key]
+
+    def __contains__(self, key: str) -> bool:
+        return key in self._route_parameters
+
+    def keys(self):
+        return self._route_parameters.keys()
+
+    def values(self):
+        return self._route_parameters.values()
+
+    def items(self):
+        return self._route_parameters.items()
+
+    def __bool__(self) -> bool:
+        return True  # event is always truthy
+
+    def __repr__(self) -> str:
+        return f"BeforeEnterEvent(location={self._location!r}, route_parameters={self._route_parameters!r})"
+
+
+# ---------------------------------------------------------------------------
+# Route registry
+# ---------------------------------------------------------------------------
+
+# Route entry: (view_class, explicit_page_title, param_names, compiled_regexes, layout_class)
+# compiled_regexes is None for static routes, or a list of regex patterns to try in order
+_RouteEntry = tuple[Type["Component"], str | None, list[str], list[re.Pattern] | None, Type["Component"] | None]
 
 # Global route registry: normalized_path -> route entry
 _routes: dict[str, _RouteEntry] = {}
@@ -224,49 +445,97 @@ def PageTitle(title: str):
     return decorator
 
 
-def _compile_route(path: str) -> tuple[list[str], re.Pattern | None]:
-    """Compile a route path into param names and regex pattern.
+def _compile_route(path: str) -> tuple[list[str], list[re.Pattern] | None]:
+    """Compile a route path into param names and regex patterns.
 
-    Returns (param_names, regex) where regex is None for static routes.
-    Supports :param (required) and :param? (optional) syntax.
+    Returns (param_names, regexes) where regexes is None for static routes,
+    or a list of compiled patterns to try in order.
+
+    Supported syntax:
+        :param   -- required segment
+        :param?  -- optional segment (can appear mid-path or trailing)
+        :param*  -- wildcard (0+ remaining segments, must be last)
     """
     if ':' not in path:
         return [], None
 
-    param_names = []
+    param_names: list[str] = []
     parts = path.split('/')
-    regex_parts = []
 
+    # Classify each part
+    segments: list[tuple[str, str]] = []  # (kind, name_or_literal)
     for part in parts:
-        if part.startswith(':'):
-            if part.endswith('?'):
-                name = part[1:-1]
-                param_names.append(name)
-                regex_parts.append('(?:([^/]+))?')
-            else:
-                name = part[1:]
-                param_names.append(name)
-                regex_parts.append('([^/]+)')
+        if part.startswith(':') and part.endswith('*'):
+            name = part[1:-1]
+            param_names.append(name)
+            segments.append(('wildcard', name))
+        elif part.startswith(':') and part.endswith('?'):
+            name = part[1:-1]
+            param_names.append(name)
+            segments.append(('optional', name))
+        elif part.startswith(':'):
+            name = part[1:]
+            param_names.append(name)
+            segments.append(('required', name))
         else:
-            regex_parts.append(re.escape(part))
+            segments.append(('literal', part))
 
-    pattern = '^' + '/'.join(regex_parts) + '$'
-    # Also match without trailing optional segments
-    # e.g., "search/:q?" should match both "search/foo" and "search"
-    if any(p.endswith('?') for p in parts if p.startswith(':')):
-        # Build alternative pattern without trailing optional segments
-        alt_parts = []
-        for part in parts:
-            if part.startswith(':') and part.endswith('?'):
-                break
-            elif part.startswith(':'):
-                alt_parts.append('([^/]+)')
-            else:
-                alt_parts.append(re.escape(part))
-        alt_pattern = '^' + '/'.join(alt_parts) + '$'
-        pattern = f'(?:{pattern}|{alt_pattern})'
+    # Validate: wildcard must be last
+    for i, (kind, _) in enumerate(segments):
+        if kind == 'wildcard' and i != len(segments) - 1:
+            raise ValueError(f"Wildcard parameter must be the last segment in route: {path}")
 
-    return param_names, re.compile(pattern)
+    optional_indices = [i for i, (kind, _) in enumerate(segments) if kind == 'optional']
+
+    if len(optional_indices) > 4:
+        raise ValueError(f"Max 4 optional parameters supported, got {len(optional_indices)} in: {path}")
+
+    if not optional_indices:
+        # No optionals -- single pattern
+        return param_names, [re.compile(_build_pattern(segments))]
+
+    # Generate alternative patterns for each combination of present/absent optionals.
+    # Each alternative is compiled separately (Python re doesn't allow
+    # duplicate named groups across alternatives in a single pattern).
+    regexes: list[re.Pattern] = []
+    for combo in product([True, False], repeat=len(optional_indices)):
+        # combo[j] = True means optional_indices[j] is present
+        opt_set = {optional_indices[j] for j, present in enumerate(combo) if not present}
+        filtered = [seg for i, seg in enumerate(segments) if i not in opt_set]
+        regexes.append(re.compile(_build_pattern(filtered)))
+
+    return param_names, regexes
+
+
+def _build_pattern(segments: list[tuple[str, str]]) -> str:
+    """Build a single regex pattern string from classified segments."""
+    parts: list[str] = []
+    for kind, name in segments:
+        if kind == 'literal':
+            parts.append(re.escape(name))
+        elif kind in ('required', 'optional'):
+            parts.append(f'(?P<{name}>[^/]+)')
+        elif kind == 'wildcard':
+            # Match 0 or more remaining path segments
+            parts.append(f'(?:/(?P<{name}>.*))?')
+
+    # Wildcard segment already includes its leading slash, so join
+    # only the non-wildcard parts with '/'
+    result_parts: list[str] = []
+    for i, (kind, _) in enumerate(segments):
+        if kind == 'wildcard':
+            # Don't put '/' before the wildcard group -- it's built in
+            result_parts.append(parts[i])
+        else:
+            result_parts.append(parts[i])
+
+    pattern = '/'.join(p for i, p in enumerate(result_parts) if segments[i][0] != 'wildcard')
+    # Append wildcard part (if any) at the end
+    for i, (kind, _) in enumerate(segments):
+        if kind == 'wildcard':
+            pattern += result_parts[i]
+
+    return f'^{pattern}$'
 
 
 def match_route(path: str) -> tuple[Type["Component"], str | None, dict[str, str], Type["Component"] | None] | None:
@@ -285,18 +554,15 @@ def match_route(path: str) -> tuple[Type["Component"], str | None, dict[str, str
             resolved_title = _resolve_title(cls)
             return cls, resolved_title, {}, layout_cls
 
-    # Parameterized routes
-    for route_path, (cls, title, param_names, regex, layout_cls) in _routes.items():
-        if regex is not None:
-            m = regex.match(normalized_path)
-            if m:
-                groups = m.groups()
-                params = {}
-                for i, name in enumerate(param_names):
-                    if i < len(groups) and groups[i] is not None:
-                        params[name] = groups[i]
-                resolved_title = _resolve_title(cls)
-                return cls, resolved_title, params, layout_cls
+    # Parameterized routes (uses named groups)
+    for route_path, (cls, title, param_names, regexes, layout_cls) in _routes.items():
+        if regexes is not None:
+            for regex in regexes:
+                m = regex.match(normalized_path)
+                if m:
+                    params = {k: v for k, v in m.groupdict().items() if v is not None}
+                    resolved_title = _resolve_title(cls)
+                    return cls, resolved_title, params, layout_cls
 
     return None
 

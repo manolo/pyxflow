@@ -4,10 +4,10 @@
 
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
-**Lines of code:** ~17,400 (core src/), ~52,300 (total with demo + tests)
-**Test structure:** `tests/unit/` (2331 unit tests, default `pytest`) + `tests/ui/` (415 Playwright, run explicitly)
-**Tests:** 2331 unit + 415 UI (Playwright)
-**Last updated:** 2026-02-15
+**Lines of code:** ~17,800 (core src/), ~53,400 (total with demo + tests)
+**Test structure:** `tests/unit/` (2380 unit tests, default `pytest`) + `tests/ui/` (423 Playwright, run explicitly)
+**Tests:** 2380 unit + 423 UI (Playwright)
+**Last updated:** 2026-02-20
 
 ---
 
@@ -187,8 +187,13 @@
 - [x] Multiple views - HelloWorldView, AboutView
 - [x] Page title - Explicit or auto-generated from class name
 - [x] Route parameters (`/users/:id`) - Required and optional (`:param?`) syntax
+- [x] Wildcard route parameters (`:path*`) - Match 0+ remaining segments, `RouteParameters.get_wildcard()`
+- [x] Mid-position optional params (`user/:id?/contact`) - Optional segments anywhere in path
+- [x] Query parameters - `QueryParameters` class, parsed from URL via `BeforeEnterEvent.location.query_parameters`
+- [x] `BeforeEnterEvent` - Full navigation context (location, route params, query params), dict-compatible for backward compat
+- [x] Navigation data classes - `QueryParameters`, `RouteParameters`, `Location`, `BeforeEnterEvent`
 - [x] Re-navigation - Navigate between views without page reload
-- [x] Navigation guards - `before_leave()`, `before_enter(params)`, `after_navigation()`
+- [x] Navigation guards - `before_leave()`, `before_enter(event)`, `after_navigation()`
 - [x] RouterLink component - `<a>` tag with `router-link` attribute for client-side navigation
 - [x] `@PageTitle` decorator - Alternative to `page_title` param, supports `get_page_title()` for dynamic titles
 - [x] `@Route(layout=...)` - RouterLayout support, layout chain in navigation, layout reuse on same-layout routes
@@ -243,7 +248,7 @@
 | Category | Coverage | Details |
 |----------|----------|---------|
 | **Unit tests** | 2314 passing | Good coverage of all 49 components + core + data layer. Located in `tests/unit/` |
-| **UI tests** | 413 passed | All 29 test views (in `tests/views/`) with shared SideNav layout and single browser session. UI tests in `tests/ui/`. Spec coverage: 81% actionable (408/501). |
+| **UI tests** | 423 passed | All 31 test views (in `tests/views/`) with shared SideNav layout and single browser session. UI tests in `tests/ui/`. |
 
 ---
 

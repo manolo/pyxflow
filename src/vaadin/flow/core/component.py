@@ -733,6 +733,41 @@ class UI:
             )
             self._tree.queue_execute([theme_attr, value, js])
 
+    def navigate(self, path: str) -> None:
+        """Navigate to a new route (SPA-style, no page reload).
+
+        Triggers a full client-side navigation through React Router,
+        which sends a ``ui-navigate`` event back to the server.
+        The target view will be created (or re-created) normally.
+
+        Args:
+            path: The target route path (e.g., ``"about"``, ``"user/123"``).
+        """
+        js = (
+            "return (function(){"
+            "window.dispatchEvent(new CustomEvent('vaadin-navigate',"
+            "{detail:{url:$0,state:null,replace:false,callback:true}}));"
+            "})()"
+        )
+        self._tree.queue_execute([path, js])
+
+    def push_url(self, path: str) -> None:
+        """Update the browser URL without triggering navigation.
+
+        Use this to keep the URL in sync with the current view state
+        (e.g., for bookmarkable URLs / permalinks) without re-creating
+        the view.
+
+        Args:
+            path: The new URL path (e.g., ``"25.1.0-beta1"``).
+        """
+        js = (
+            "return (function(){"
+            "window.history.replaceState(window.history.state,'',$0);"
+            "})()"
+        )
+        self._tree.queue_execute([path, js])
+
     def set_theme_variant(self, variant: str) -> None:
         """Switch only the color variant (light/dark) without changing the theme.
 
