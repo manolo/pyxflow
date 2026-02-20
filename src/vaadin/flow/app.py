@@ -61,7 +61,6 @@ class FlowApp:
         inherited by each child via pass_fds.  When a child is killed for
         reload, the socket stays open — no EADDRINUSE race.
         """
-        import signal
         import socket
         import subprocess
         import watchfiles
@@ -111,12 +110,8 @@ class FlowApp:
 
         def stop_child(proc):
             if proc.poll() is None:
-                proc.send_signal(signal.SIGINT)
-                try:
-                    proc.wait(timeout=5)
-                except subprocess.TimeoutExpired:
-                    proc.kill()
-                    proc.wait(timeout=1)
+                proc.kill()
+                proc.wait(timeout=2)
 
         # Track mtimes to ignore metadata-only events (macOS FSEvents
         # fires for extended attribute changes like "last opened date")

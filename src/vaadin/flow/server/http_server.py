@@ -550,10 +550,18 @@ def get_index_html() -> str:
                 theme_attr = color_scheme.replace(' ', '-')
                 html = html.replace('<html', f'<html theme="{theme_attr}" style="color-scheme: {color_scheme};"', 1)
             # In dev mode, inject a meta tag identifying the views module
+            # and an SSE-based auto-reload script
             if _dev_mode and _views_module:
                 html = html.replace(
                     '<base href="/">',
                     f'<base href="/">\n  <meta name="pyflow-views" content="{_views_module}">'
+                )
+                html = html.replace(
+                    '</body>',
+                    '<script>(function(){var first=true;'
+                    'var es=new EventSource("/_dev/reload");'
+                    'es.onopen=function(){if(!first)location.reload();first=false;}'
+                    '})()</script>\n</body>'
                 )
             return html
 
@@ -624,6 +632,29 @@ async def _close_push_connections(app: web.Application):
                 await ws.close()
 
 
+async def handle_dev_reload(request: web.Request) -> web.StreamResponse:
+    """SSE endpoint for dev-mode auto-reload.
+
+    Keeps the connection open. When the dev-mode parent process kills and
+    restarts the server child (on file change), this connection drops.
+    The client-side EventSource auto-reconnects to the new server, detects
+    the reconnection, and calls location.reload().
+    """
+    resp = web.StreamResponse()
+    resp.content_type = "text/event-stream"
+    resp.headers["Cache-Control"] = "no-cache"
+    resp.headers["X-Accel-Buffering"] = "no"
+    await resp.prepare(request)
+    # Keep alive until client disconnects or server shuts down
+    try:
+        while True:
+            await asyncio.sleep(30)
+            await resp.write(b": heartbeat\n\n")
+    except (asyncio.CancelledError, ConnectionResetError, ConnectionError):
+        pass
+    return resp
+
+
 def create_app() -> web.Application:
     """Create the aiohttp application."""
     app = web.Application()
@@ -638,6 +669,8 @@ def create_app() -> web.Application:
     app.router.add_get("/VAADIN/{path:.*}", handle_static)
     app.router.add_get("/lumo/{path:.*}", handle_theme)
     app.router.add_get("/aura/{path:.*}", handle_theme)
+    if _dev_mode:
+        app.router.add_get("/_dev/reload", handle_dev_reload)
     # Catch-all for other routes (e.g., /about) - serve index.html
     app.router.add_get("/{path:.*}", handle_route)
     app.router.add_post("/{path:.*}", handle_route_post)
