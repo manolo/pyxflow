@@ -1,6 +1,7 @@
 """StateTree - manages the server-side component tree."""
 
 import asyncio
+import json
 from typing import Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -68,7 +69,22 @@ class StateTree:
         """Queue a JS execute command for the next UIDL response.
 
         Components use this to register execute commands (e.g., grid connector init).
+
+        Scripts are wrapped in a try/catch with a nested Function constructor so
+        that JavaScript syntax errors (e.g. from unsanitized content in f-strings)
+        are caught and reported clearly instead of crashing FlowClient silently.
         """
+        if command and isinstance(command[-1], str):
+            script = command[-1]
+            param_count = len(command) - 1  # $0=element, $1..$N=extra args
+            param_names = ", ".join(f'"${i}"' for i in range(param_count))
+            params = ", ".join(f"${i}" for i in range(param_count))
+            escaped = json.dumps(script)
+            command[-1] = (
+                f"try{{return(new Function({param_names},{escaped}))({params})}}"
+                f"catch(_e){{console.error('[PyFlow] execute_js error:',_e.message,"
+                f"'\\nScript:',{escaped}.substring(0,500))}}"
+            )
         self._pending_execute.append(command)
 
     def collect_execute(self) -> list:

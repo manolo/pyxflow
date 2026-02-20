@@ -250,7 +250,7 @@ class TestComponentExecuteJs:
 
         assert len(cmds) == 1
         cmd = cmds[0]
-        assert cmd[-1] == "this.focus()"  # Script is last
+        assert "this.focus()" in cmd[-1]  # Script is wrapped in try/catch
         assert cmd[0] == {"@v-node": button.element.node_id}  # Element ref is first
 
     def test_execute_js_with_args_when_attached(self, tree):
@@ -264,7 +264,7 @@ class TestComponentExecuteJs:
 
         assert len(cmds) == 1
         cmd = cmds[0]
-        assert cmd[-1] == "this.style.color = $0"  # Script is last
+        assert "this.style.color = $0" in cmd[-1]  # Script is wrapped in try/catch
         assert cmd[0] == {"@v-node": button.element.node_id}
         assert cmd[1] == "red"  # First arg
 
@@ -278,7 +278,7 @@ class TestComponentExecuteJs:
         button._attach(tree)
         cmds = tree.collect_execute()
 
-        focus_cmds = [c for c in cmds if c[-1] == "this.focus()"]
+        focus_cmds = [c for c in cmds if "this.focus()" in c[-1]]
         assert len(focus_cmds) == 1
 
     def test_execute_js_buffered_multiple(self, tree):
@@ -290,7 +290,7 @@ class TestComponentExecuteJs:
         button._attach(tree)
         cmds = tree.collect_execute()
 
-        log_cmds = [c for c in cmds if c[-1] == "console.log($0)"]
+        log_cmds = [c for c in cmds if "console.log($0)" in c[-1]]
         assert len(log_cmds) == 2
         assert log_cmds[0][1] == "first"
         assert log_cmds[1][1] == "second"

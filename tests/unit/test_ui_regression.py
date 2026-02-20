@@ -394,7 +394,7 @@ class TestElementExecuteJsFormat:
         # Must appear in execute queue
         cmds = tree.collect_execute()
         assert len(cmds) == 1
-        assert cmds[0][-1] == "$0.focus()"
+        assert "$0.focus()" in cmds[0][-1]  # Script is wrapped in try/catch
         assert cmds[0][0] == {"@v-node": btn.element.node_id}
 
     def test_execute_js_not_in_changes(self, tree):
@@ -428,7 +428,7 @@ class TestElementExecuteJsFormat:
         cmd = cmds[0]
         assert cmd[0] == {"@v-node": btn.element.node_id}
         assert cmd[1] == {"@v-node": span.element.node_id}
-        assert cmd[2] == "$0.appendChild($1)"
+        assert "$0.appendChild($1)" in cmd[2]  # Script is wrapped in try/catch
 
 
 # ── Bug 12: DatePicker/TimePicker/MultiSelectComboBox clear button ──────────
