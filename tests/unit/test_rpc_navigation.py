@@ -314,10 +314,9 @@ class TestSameRouteNavigationSkipped:
         }
         response2 = session["handler"].handle_uidl(payload2)
 
-        # Must have exactly one execute command: serverConnected
+        # Must include serverConnected (among title + other commands)
         execute = response2.get("execute", [])
-        assert len(execute) == 1
-        assert "serverConnected" in execute[0][-1]
+        assert any("serverConnected" in cmd[-1] for cmd in execute)
 
 
 class TestNavigationViewComponents:

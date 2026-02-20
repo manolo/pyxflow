@@ -157,14 +157,14 @@ def _auto_detect_app() -> str | None:
 
 def _usage() -> None:
     print("Usage: vaadin [app_module] [--dev] [--debug] [--port PORT] [--host HOST]")
-    print("       vaadin [app_module] --bundle [--keep] [--vaadin-version VERSION]")
+    print("       vaadin [app_module] bundle [--keep] [--vaadin-version VERSION]")
     print()
     print("  app_module  Python module with views (auto-detected if omitted)")
     print("  --dev       Auto-reload on source changes")
     print("  --debug     Verbose UIDL protocol logging")
     print("  --port N    Server port (default: 8080)")
     print("  --host H    Server host (default: localhost)")
-    print("  --bundle    Generate frontend bundle from component registry")
+    print("  bundle      Generate frontend bundle from component registry")
     print("  --keep      Keep build/bundle-project/ after extraction")
     sys.exit(0)
 
@@ -175,6 +175,8 @@ def main():
         _usage()
 
     # Parse all arguments: find module name (first non-flag) and flags.
+    # "bundle" is a subcommand alias for "--bundle"
+    _SUBCOMMANDS = {"bundle": "--bundle"}
     # Flags that consume the next token as their value:
     _VALUE_FLAGS = {"--vaadin-version", "--port", "--host"}
     args = sys.argv[1:]
@@ -188,6 +190,8 @@ def main():
         elif arg in _VALUE_FLAGS:
             rest.append(arg)
             skip_next = True
+        elif arg in _SUBCOMMANDS:
+            rest.append(_SUBCOMMANDS[arg])
         elif views is None and not arg.startswith("-"):
             views = arg
         else:

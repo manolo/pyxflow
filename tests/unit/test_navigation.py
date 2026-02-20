@@ -123,8 +123,13 @@ class TestViewReuse:
         assert handler._view is view
         assert view.counter == 2  # reused, before_enter called again
 
-    def test_same_route_string_skips_entirely(self):
-        """Navigating to exact same route string is a no-op (existing behavior)."""
+    def test_same_route_string_reruns_before_enter(self):
+        """Navigating to same route re-runs before_enter (matches Java Flow).
+
+        This is needed because push_url() can change the browser URL without
+        server navigation.  When the user presses back, the route looks the
+        same but before_enter must run so the view can react.
+        """
         @Route("static")
         class StaticView(VerticalLayout):
             def __init__(self):
@@ -137,9 +142,62 @@ class TestViewReuse:
         self._navigate(handler, csrf, "static", sync_id=0, client_id=0)
         assert handler._view.enter_count == 1
 
-        # Same route string -- skipped at line 579 (route == _current_route)
+        # Same route string -- before_enter runs again (view is reused)
         self._navigate(handler, csrf, "static", sync_id=1, client_id=1)
-        assert handler._view.enter_count == 1  # NOT called again
+        assert handler._view.enter_count == 2
+
+
+class TestPushUrl:
+    """Test UI.push_url() generates correct vaadin-navigate command."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        clear_routes()
+        yield
+        clear_routes()
+
+    def _make_tree_and_ui(self):
+        from vaadin.flow.core.state_tree import StateTree
+        from vaadin.flow.core.component import UI
+        tree = StateTree()
+        ui = UI(tree)
+        return tree, ui
+
+    def test_push_url_uses_vaadin_navigate_callback_false(self):
+        """push_url emits vaadin-navigate with replace:false, callback:false."""
+        tree, ui = self._make_tree_and_ui()
+        ui.push_url("/crud/42")
+        cmds = tree.collect_execute()
+        assert len(cmds) == 1
+        script = cmds[0][-1]
+        assert "vaadin-navigate" in script
+        assert "callback:false" in script
+        assert "replace:false" in script
+
+    def test_push_url_strips_leading_slash(self):
+        """push_url strips leading / so URL is relative to <base href='/'>."""
+        tree, ui = self._make_tree_and_ui()
+        ui.push_url("/test/mdl-nav/1")
+        cmds = tree.collect_execute()
+        # First arg is the path — must NOT have leading /
+        assert cmds[0][0] == "test/mdl-nav/1"
+
+    def test_push_url_without_leading_slash(self):
+        """push_url works with paths that have no leading /."""
+        tree, ui = self._make_tree_and_ui()
+        ui.push_url("crud/42")
+        cmds = tree.collect_execute()
+        assert cmds[0][0] == "crud/42"
+
+    def test_navigate_uses_callback_true(self):
+        """navigate() emits vaadin-navigate with callback:true (server round-trip)."""
+        tree, ui = self._make_tree_and_ui()
+        ui.navigate("about")
+        cmds = tree.collect_execute()
+        assert len(cmds) == 1
+        script = cmds[0][-1]
+        assert "vaadin-navigate" in script
+        assert "callback:true" in script
 
 
 class TestNavigationRequest:

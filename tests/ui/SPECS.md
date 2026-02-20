@@ -46,9 +46,9 @@
 | 29 | `/test/login` | 8 | LoginForm, LoginOverlay |
 | 30 | `/test/server-errors` | 8 | Error notification, meta.appError, JSON serialization, session resilience |
 | 31 | `/test/route-params` | 5 | Wildcard, mid-optional, QueryParameters, BeforeEnterEvent |
-| 32 | `/test/mdl-nav` | 12 | MasterDetailLayout (URL-driven detail, push_url, navigate, animation) |
+| 32 | `/test/mdl-nav` | 16 | MasterDetailLayout (URL-driven detail, push_url, navigate, animation, back/forward) |
 
-**Total: 405 tests across 32 views (405 pass, 0 skip)**
+**Total: 441 tests across 32 views (441 pass, 0 skip)**
 
 ---
 
@@ -3062,6 +3062,24 @@ Feature: MasterDetailLayout with URL-driven navigation
     Given fresh page at /test/mdl-nav, instrument _setDetail
     When click "#mdl-sel-1"
     Then _setDetail(element, skipTransition=false) captured
+
+  # --- Browser back/forward (push_url history) ---
+  Scenario: V32.14 -- Browser back after item click (bug fix)
+    Given fresh context, goto /test/mdl-nav
+    When click "#mdl-sel-1", detail opens, URL is "/test/mdl-nav/1"
+    When browser back
+    Then Span#mdl-status is "closed", URL is "/test/mdl-nav"
+    Note: Fixed push_url to use vaadin-navigate (not raw pushState) so React Router manages idx
+
+  Scenario: V32.15 -- Browser forward after back
+    Given fresh context, goto /test/mdl-nav
+    When click "#mdl-sel-2", then browser back, then browser forward
+    Then Span#mdl-status is "open:2", URL is "/test/mdl-nav/2"
+
+  Scenario: V32.16 -- Multiple items back and forward through history
+    Given fresh context, goto /test/mdl-nav
+    When click "#mdl-sel-1", then "#mdl-sel-2" (two push_url entries)
+    When back -> "open:1", back -> "closed", forward -> "open:1", forward -> "open:2"
 ```
 
 ---

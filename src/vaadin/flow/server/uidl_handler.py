@@ -572,16 +572,12 @@ class UidlHandler:
         if not route and initial_route:
             route = initial_route
 
-        # Same route as current → skip view recreation but still send
-        # serverConnected so FlowClient's navigation state machine completes.
-        # Without serverConnected, React Router stays in "navigating" state
-        # and all subsequent SPA navigations are silently blocked.
-        if self._view is not None and route == self._current_route:
-            self._pending_execute.append(
-                [False, {"@v-node": self._container_node.id},
-                 "return (async function() { this.serverConnected($0)}).apply($1)"]
-            )
-            return
+        # Note: we do NOT skip same-route navigations.  Even if route ==
+        # _current_route, the browser URL may have changed via push_url()
+        # (pushState without server navigation).  When the user presses
+        # back, the route looks the same to us but before_enter() must
+        # still run so the view can react (e.g. close a detail panel).
+        # Java Flow also calls beforeEnter on every navigation.
 
         # Use router to find view class and params
         from vaadin.flow.router import match_route, _resolve_title

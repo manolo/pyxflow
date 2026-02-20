@@ -235,3 +235,94 @@ class TestAnimation:
         assert len(open_calls) >= 1, f"Expected _setDetail(element) call, got: {calls}"
         assert open_calls[-1]["skipTransition"] is False, \
             f"Expected skipTransition=false, got: {open_calls[-1]}"
+
+
+class TestBrowserBackForward:
+    """Browser back/forward buttons must work with push_url history entries.
+
+    push_url uses vaadin-navigate with callback:false so React Router manages
+    the history state (incrementing idx).  Back/forward trigger popstate which
+    React Router intercepts and dispatches ui-navigate to the server.
+    """
+
+    @pytest.mark.spec("V32.14")
+    def test_back_after_item_click(self, browser, base_url):
+        """Click item -> browser back -> detail closes, URL returns to list."""
+        ctx = browser.new_context(viewport={"width": 1280, "height": 720})
+        page = ctx.new_page()
+        try:
+            page.goto(f"{base_url}/test/mdl-nav")
+            expect(page.locator("#mdl-status")).to_have_text("closed", timeout=5000)
+
+            # Click Item 1 -> detail opens, URL changes
+            page.locator("#mdl-sel-1").click()
+            expect(page.locator("#mdl-status")).to_have_text("open:1")
+            expect(page).to_have_url(re.compile(r".*/test/mdl-nav/1"))
+
+            # Browser back -> detail should close
+            page.go_back()
+            expect(page.locator("#mdl-status")).to_have_text("closed", timeout=5000)
+            expect(page).to_have_url(re.compile(r".*/test/mdl-nav$"))
+        finally:
+            ctx.close()
+
+    @pytest.mark.spec("V32.15")
+    def test_forward_after_back(self, browser, base_url):
+        """Click item -> back -> forward -> detail reopens."""
+        ctx = browser.new_context(viewport={"width": 1280, "height": 720})
+        page = ctx.new_page()
+        try:
+            page.goto(f"{base_url}/test/mdl-nav")
+            expect(page.locator("#mdl-status")).to_have_text("closed", timeout=5000)
+
+            # Click Item 2 -> detail opens
+            page.locator("#mdl-sel-2").click()
+            expect(page.locator("#mdl-status")).to_have_text("open:2")
+            expect(page).to_have_url(re.compile(r".*/test/mdl-nav/2"))
+
+            # Back -> detail closes
+            page.go_back()
+            expect(page.locator("#mdl-status")).to_have_text("closed", timeout=5000)
+
+            # Forward -> detail reopens with same item
+            page.go_forward()
+            expect(page.locator("#mdl-status")).to_have_text("open:2", timeout=5000)
+            expect(page).to_have_url(re.compile(r".*/test/mdl-nav/2"))
+        finally:
+            ctx.close()
+
+    @pytest.mark.spec("V32.16")
+    def test_multiple_items_back_forward(self, browser, base_url):
+        """Click multiple items -> back through history -> forward through."""
+        ctx = browser.new_context(viewport={"width": 1280, "height": 720})
+        page = ctx.new_page()
+        try:
+            page.goto(f"{base_url}/test/mdl-nav")
+            expect(page.locator("#mdl-status")).to_have_text("closed", timeout=5000)
+
+            # Click Item 1 then Item 2 (each push_url adds history entry)
+            page.locator("#mdl-sel-1").click()
+            expect(page.locator("#mdl-status")).to_have_text("open:1")
+
+            page.locator("#mdl-sel-2").click()
+            expect(page.locator("#mdl-status")).to_have_text("open:2")
+
+            # Back -> Item 1
+            page.go_back()
+            expect(page.locator("#mdl-status")).to_have_text("open:1", timeout=5000)
+            expect(page).to_have_url(re.compile(r".*/test/mdl-nav/1"))
+
+            # Back again -> list (no detail)
+            page.go_back()
+            expect(page.locator("#mdl-status")).to_have_text("closed", timeout=5000)
+            expect(page).to_have_url(re.compile(r".*/test/mdl-nav$"))
+
+            # Forward -> Item 1
+            page.go_forward()
+            expect(page.locator("#mdl-status")).to_have_text("open:1", timeout=5000)
+
+            # Forward -> Item 2
+            page.go_forward()
+            expect(page.locator("#mdl-status")).to_have_text("open:2", timeout=5000)
+        finally:
+            ctx.close()

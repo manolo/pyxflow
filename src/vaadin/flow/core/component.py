@@ -754,16 +754,24 @@ class UI:
     def push_url(self, path: str) -> None:
         """Update the browser URL without triggering navigation.
 
-        Use this to keep the URL in sync with the current view state
-        (e.g., for bookmarkable URLs / permalinks) without re-creating
-        the view.
+        Adds a new entry to the browser history stack so the back button
+        returns to the previous URL.  Uses ``vaadin-navigate`` with
+        ``callback:false`` so React Router manages the history state
+        (incrementing its internal ``idx``), but no server round-trip
+        is triggered.
+
+        The path must be relative (no leading ``/``).  A leading slash
+        is stripped automatically to match ``navigate()`` semantics --
+        ``vaadin-navigate`` URLs are relative to ``<base href="/">``.
 
         Args:
-            path: The new URL path (e.g., ``"25.1.0-beta1"``).
+            path: The route path (e.g., ``"crud/42"``, ``"/crud/42"``).
         """
+        path = path.lstrip("/")
         js = (
             "return (function(){"
-            "window.history.replaceState(window.history.state,'',$0);"
+            "window.dispatchEvent(new CustomEvent('vaadin-navigate',"
+            "{detail:{url:$0,state:null,replace:false,callback:false}}));"
             "})()"
         )
         self._tree.queue_execute([path, js])
