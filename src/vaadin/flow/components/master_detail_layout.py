@@ -35,6 +35,7 @@ class MasterDetailLayout(Component):
         self._detail: Component | None = None
         self._has_initialized = False
         self._pending_detail_cmd: list | None = None
+        self._virtual_children: set = set()  # track components added as virtual children
 
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
@@ -45,8 +46,15 @@ class MasterDetailLayout(Component):
             self._attach_master(self._master, tree)
         if self._detail:
             self._add_virtual_child(self._detail, tree)
+            self._virtual_children.add(id(self._detail))
         self._update_details()
         self._has_initialized = True
+
+        # If detail was pre-set (e.g., in before_enter which runs before _attach),
+        # re-queue _setDetail now that _has_initialized=True so animation is enabled.
+        # The dedup in _update_details() cancels the previous skipTransition=true command.
+        if self._detail:
+            self._update_details()
 
         # Flush pending event listeners
         for listener in getattr(self, "_pending_backdrop_listeners", []):
@@ -85,9 +93,9 @@ class MasterDetailLayout(Component):
             "addNodes": [component.element.node_id],
         })
 
-    def _remove_virtual_child(self):
-        """Remove the current detail from virtual children (Feature 24)."""
-        if self._detail and self._detail._element:
+    def _remove_virtual_child_component(self, component: Component):
+        """Remove a specific component from virtual children (Feature 24)."""
+        if component._element:
             self._element._tree.add_change({
                 "node": self.element.node_id,
                 "type": "splice",
@@ -143,15 +151,23 @@ class MasterDetailLayout(Component):
 
         The detail is added as a virtual child (Feature 24) so that
         ``_setDetail()`` can manage DOM placement with animation.
+        Virtual children are kept alive (never removed from Feature 24)
+        -- only ``_setDetail(null)`` hides them visually.
         """
-        # Remove previous detail from virtual children
-        if self._detail and self._element and self._detail._element:
-            self._remove_virtual_child()
-
+        old = self._detail
+        if component is old and self._has_initialized:
+            return  # No change
         self._detail = component
 
-        if self._element and component:
+        # Add new component as virtual child (only once per component)
+        if self._element and component and id(component) not in self._virtual_children:
             self._add_virtual_child(component, self._element._tree)
+            self._virtual_children.add(id(component))
+
+        # Remove old component from virtual children only if replacing with a different non-None one
+        if old and component and old is not component and self._element and old._element and id(old) in self._virtual_children:
+            self._remove_virtual_child_component(old)
+            self._virtual_children.discard(id(old))
 
         if self._element:
             self._update_details()

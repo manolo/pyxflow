@@ -115,8 +115,12 @@ class TestMasterDetailLayout:
         # Should have a _setDetail call
         assert any("_setDetail" in str(cmd) for cmd in execute)
 
-    def test_initial_attach_skips_transition(self, tree):
-        """First _setDetail call uses skipTransition=True."""
+    def test_initial_attach_with_pre_set_detail_animates(self, tree):
+        """When detail is set before attach (e.g. in before_enter), animation is enabled.
+
+        The _attach() method re-queues _update_details() after _has_initialized=True,
+        so the dedup replaces the initial skipTransition=true with skipTransition=false.
+        """
         layout = MasterDetailLayout()
         detail = Span("Detail")
         layout.set_detail(detail)
@@ -125,8 +129,18 @@ class TestMasterDetailLayout:
         # Find the _setDetail command
         set_detail_cmd = [cmd for cmd in execute if "_setDetail" in str(cmd)]
         assert len(set_detail_cmd) == 1
-        # skipTransition is the third positional arg (True)
-        assert set_detail_cmd[0][2] is True
+        # skipTransition is False (animate) because detail was pre-set
+        assert set_detail_cmd[0][2] is False
+
+    def test_initial_attach_without_detail_skips_transition(self, tree):
+        """When no detail is pre-set, initial _setDetail(null) uses skipTransition=True."""
+        layout = MasterDetailLayout()
+        layout._attach(tree)
+        execute = tree.collect_execute()
+        set_detail_cmd = [cmd for cmd in execute if "_setDetail" in str(cmd)]
+        assert len(set_detail_cmd) == 1
+        # skipTransition is True (no animation) for null detail on first attach
+        assert set_detail_cmd[0][1] is True
 
     def test_subsequent_set_detail_animates(self, tree):
         """After initial attach, _setDetail uses skipTransition=False."""

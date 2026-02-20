@@ -2,6 +2,145 @@
 
 import pytest
 
+from vaadin.flow.components import VerticalLayout, Span
+from vaadin.flow.router import Route, clear_routes, BeforeEnterEvent
+
+
+class TestViewReuse:
+    """Test that same-route-pattern navigations reuse the view instance."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        clear_routes()
+        yield
+        clear_routes()
+
+    def _make_handler(self):
+        from vaadin.flow.server.uidl_handler import UidlHandler
+        from vaadin.flow.core.state_tree import StateTree
+
+        tree = StateTree()
+        handler = UidlHandler(tree)
+        init = handler.handle_init({})
+        csrf = init["appConfig"]["uidl"]["Vaadin-Security-Key"]
+        return handler, tree, csrf
+
+    def _navigate(self, handler, csrf, route, sync_id=0, client_id=0):
+        payload = {
+            "csrfToken": csrf,
+            "rpc": [{
+                "type": "event",
+                "node": 1,
+                "event": "ui-navigate",
+                "data": {"route": route, "query": "", "appShellTitle": "",
+                         "historyState": {"idx": 0}, "trigger": ""}
+            }],
+            "syncId": sync_id,
+            "clientId": client_id,
+        }
+        return handler.handle_uidl(payload)
+
+    def test_same_route_pattern_reuses_view(self):
+        """Navigating within same route pattern reuses view instance."""
+        @Route("test/:id?")
+        class MyView(VerticalLayout):
+            def __init__(self):
+                self.entered = []
+
+            def before_enter(self, event: BeforeEnterEvent):
+                self.entered.append(event.get("id", None))
+
+        handler, tree, csrf = self._make_handler()
+
+        # First navigation to /test/1
+        self._navigate(handler, csrf, "test/1", sync_id=0, client_id=0)
+        view1 = handler._view
+        assert view1 is not None
+        assert view1.entered == ["1"]
+
+        # Navigate to /test/2 -- same route pattern, should reuse
+        self._navigate(handler, csrf, "test/2", sync_id=1, client_id=1)
+        view2 = handler._view
+        assert view2 is view1, "Should reuse same view instance"
+        assert view1.entered == ["1", "2"]
+
+    def test_same_route_pattern_different_params_calls_before_enter(self):
+        """Reused view gets before_enter called with new params."""
+        @Route("item/:id?")
+        class ItemView(VerticalLayout):
+            def __init__(self):
+                self.last_id = None
+
+            def before_enter(self, event: BeforeEnterEvent):
+                self.last_id = event.get("id", None)
+
+        handler, tree, csrf = self._make_handler()
+        self._navigate(handler, csrf, "item/1", sync_id=0, client_id=0)
+        assert handler._view.last_id == "1"
+
+        self._navigate(handler, csrf, "item", sync_id=1, client_id=1)
+        assert handler._view.last_id is None
+
+    def test_different_view_class_creates_new_instance(self):
+        """Navigating to a different view class creates a new instance."""
+        @Route("view-a")
+        class ViewA(VerticalLayout):
+            pass
+
+        @Route("view-b")
+        class ViewB(VerticalLayout):
+            pass
+
+        handler, tree, csrf = self._make_handler()
+        self._navigate(handler, csrf, "view-a", sync_id=0, client_id=0)
+        view_a = handler._view
+        assert isinstance(view_a, ViewA)
+
+        self._navigate(handler, csrf, "view-b", sync_id=1, client_id=1)
+        view_b = handler._view
+        assert isinstance(view_b, ViewB)
+        assert view_b is not view_a
+
+    def test_reuse_preserves_component_state(self):
+        """Reused view preserves component state (e.g., added children)."""
+        @Route("detail/:id?")
+        class DetailView(VerticalLayout):
+            def __init__(self):
+                self.counter = 0
+                self.label = Span("init")
+                self.add(self.label)
+
+            def before_enter(self, event: BeforeEnterEvent):
+                self.counter += 1
+                self.label.set_text(f"visit {self.counter}")
+
+        handler, tree, csrf = self._make_handler()
+        self._navigate(handler, csrf, "detail/1", sync_id=0, client_id=0)
+        view = handler._view
+        assert view.counter == 1
+
+        self._navigate(handler, csrf, "detail/2", sync_id=1, client_id=1)
+        assert handler._view is view
+        assert view.counter == 2  # reused, before_enter called again
+
+    def test_same_route_string_skips_entirely(self):
+        """Navigating to exact same route string is a no-op (existing behavior)."""
+        @Route("static")
+        class StaticView(VerticalLayout):
+            def __init__(self):
+                self.enter_count = 0
+
+            def before_enter(self, event):
+                self.enter_count += 1
+
+        handler, tree, csrf = self._make_handler()
+        self._navigate(handler, csrf, "static", sync_id=0, client_id=0)
+        assert handler._view.enter_count == 1
+
+        # Same route string -- skipped at line 579 (route == _current_route)
+        self._navigate(handler, csrf, "static", sync_id=1, client_id=1)
+        assert handler._view.enter_count == 1  # NOT called again
+
 
 class TestNavigationRequest:
     """Test navigation event handling."""

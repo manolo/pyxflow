@@ -617,7 +617,14 @@ class UidlHandler:
         try:
             ui = self._ui
 
-            if layout_class is not None:
+            # Same view class → reuse instance, just re-invoke before_enter
+            # (Java Flow reuses views for same-route-pattern navigations)
+            if (self._view is not None
+                    and type(self._view) is view_class):
+                self._reenter_view(self._view, view_class, params,
+                                   ui, query_string)
+                view = self._view
+            elif layout_class is not None:
                 # --- Layout mode ---
                 if self._layout_class is layout_class and self._layout is not None:
                     # Same layout class → reuse layout, just swap content
@@ -685,6 +692,33 @@ class UidlHandler:
 
         # Build execute commands
         self._setup_execute_commands(page_title, is_first_navigation)
+
+    def _reenter_view(self, view: Any, view_class: type, params: dict,
+                       ui: Any, query_string: str = "") -> None:
+        """Re-invoke lifecycle on an existing view (same route pattern, different params).
+
+        Like Java Flow, reuses the view instance so that the DOM is NOT
+        replaced -- enabling animations (e.g., MasterDetailLayout close)
+        to complete without interruption.
+        """
+        from vaadin.flow.router import (
+            BeforeEnterEvent, Location, QueryParameters, RouteParameters,
+        )
+        if params and hasattr(view, 'set_parameter'):
+            view.set_parameter(params)
+
+        if hasattr(view, 'before_enter'):
+            route_params = RouteParameters(params)
+            query_params = QueryParameters.from_string(query_string)
+            path = getattr(view_class, '_route_path', '')
+            location = Location(path, query_params)
+            event = BeforeEnterEvent(
+                location=location,
+                route_parameters=route_params,
+                navigation_target=view_class,
+                ui=ui,
+            )
+            view.before_enter(event)
 
     def _create_view(self, view_class: type, params: dict, ui: Any,
                       query_string: str = "") -> Any:
