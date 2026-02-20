@@ -4,9 +4,9 @@
 
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
-**Lines of code:** ~17,800 (core src/), ~53,400 (total with demo + tests)
-**Test structure:** `tests/unit/` (2381 unit tests, default `pytest`) + `tests/ui/` (423 Playwright, run explicitly)
-**Tests:** 2381 unit + 423 UI (Playwright)
+**Lines of code:** ~17,800 (core src/), ~54,100 (total with demo + tests)
+**Test structure:** `tests/unit/` (2387 unit tests, default `pytest`) + `tests/ui/` (436 Playwright, run explicitly)
+**Tests:** 2387 unit + 436 UI (Playwright)
 **Last updated:** 2026-02-20
 
 ---
@@ -197,6 +197,7 @@
 - [x] RouterLink component - `<a>` tag with `router-link` attribute for client-side navigation
 - [x] `@PageTitle` decorator - Alternative to `page_title` param, supports `get_page_title()` for dynamic titles
 - [x] `@Route(layout=...)` - RouterLayout support, layout chain in navigation, layout reuse on same-layout routes
+- [x] View reuse on same-route-pattern - Navigating within same `@Route` pattern reuses view instance (calls `before_enter` with new params, preserves DOM for animations)
 - [x] `@Menu(title, order, icon)` - Decorator for automatic menu generation
 - [x] `get_menu_entries()` - Collects @Menu routes, filters required params, sorts by order/path
 - [x] `@AppShell` - Global app configuration class (single place for @Push, @StyleSheet)
