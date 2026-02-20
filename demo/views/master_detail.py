@@ -7,7 +7,7 @@ from vaadin.flow.data import Binder, ValidationError
 
 
 @Route("master-detail", page_title="Master-Detail", layout=MainLayout)
-@Menu(title="Master-Detail", order=4, icon="vaadin:split-h")
+@Menu(title="Master-Detail", order=5, icon="vaadin:split-h")
 class MasterDetailView(Div):
     def __init__(self):
         self.add_class_name("master-detail-view")
