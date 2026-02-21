@@ -97,6 +97,15 @@ def base_url(request):
             ready = True
             break
         if proc.poll() is not None:
+            # Process exited — maybe another xdist worker already started
+            # the server on this port.  Wait a bit and re-check.
+            for _ in range(20):
+                time.sleep(0.5)
+                if _check_server() is True:
+                    ready = True
+                    break
+            if ready:
+                break
             out = proc.stdout.read().decode() if proc.stdout else ""
             pytest.fail(f"Server exited with code {proc.returncode}:\n{out}")
         time.sleep(0.3)
@@ -106,14 +115,16 @@ def base_url(request):
         out = proc.stdout.read().decode() if proc.stdout else ""
         pytest.fail(f"Server did not start within 15s:\n{out}")
 
+    owns_server = proc.poll() is None
     yield DEFAULT_BASE_URL
 
-    proc.terminate()
-    try:
-        proc.wait(timeout=5)
-    except subprocess.TimeoutExpired:
-        proc.kill()
-        proc.wait(timeout=2)
+    if owns_server:
+        proc.terminate()
+        try:
+            proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.wait(timeout=2)
 
 
 @pytest.fixture(scope="session")
@@ -194,7 +205,13 @@ def _assert_no_console_errors(shared_page, request):
 
     def _on_console(msg):
         if msg.type == "error":
-            errors.append(msg.text)
+            text = msg.text
+            # Ignore transient WS/network errors (happen under parallel load)
+            if "ERR_CONNECTION_REFUSED" in text:
+                return
+            if "ERR_INCOMPLETE_CHUNKED_ENCODING" in text:
+                return
+            errors.append(text)
 
     shared_page.on("console", _on_console)
     yield

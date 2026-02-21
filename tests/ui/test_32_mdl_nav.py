@@ -280,14 +280,15 @@ class TestBrowserBackForward:
             expect(page.locator("#mdl-status")).to_have_text("open:2")
             expect(page).to_have_url(re.compile(r".*/test/mdl-nav/2"))
 
-            # Back -> detail closes
+            # Back -> detail closes (wait for URL + status before forward)
             page.go_back()
+            expect(page).to_have_url(re.compile(r".*/test/mdl-nav$"), timeout=5000)
             expect(page.locator("#mdl-status")).to_have_text("closed", timeout=5000)
 
             # Forward -> detail reopens with same item
             page.go_forward()
+            expect(page).to_have_url(re.compile(r".*/test/mdl-nav/2"), timeout=5000)
             expect(page.locator("#mdl-status")).to_have_text("open:2", timeout=5000)
-            expect(page).to_have_url(re.compile(r".*/test/mdl-nav/2"))
         finally:
             ctx.close()
 
@@ -296,33 +297,39 @@ class TestBrowserBackForward:
         """Click multiple items -> back through history -> forward through."""
         ctx = browser.new_context(viewport={"width": 1280, "height": 720})
         page = ctx.new_page()
+        status = page.locator("#mdl-status")
         try:
             page.goto(f"{base_url}/test/mdl-nav")
-            expect(page.locator("#mdl-status")).to_have_text("closed", timeout=5000)
+            expect(status).to_have_text("closed", timeout=5000)
 
-            # Click Item 1 then Item 2 (each push_url adds history entry)
+            # Click Item 1, wait for full round-trip
             page.locator("#mdl-sel-1").click()
-            expect(page.locator("#mdl-status")).to_have_text("open:1")
+            expect(status).to_have_text("open:1", timeout=5000)
+            expect(page).to_have_url(re.compile(r".*/test/mdl-nav/1"))
 
+            # Click Item 2, wait for full round-trip
             page.locator("#mdl-sel-2").click()
-            expect(page.locator("#mdl-status")).to_have_text("open:2")
+            expect(status).to_have_text("open:2", timeout=5000)
+            expect(page).to_have_url(re.compile(r".*/test/mdl-nav/2"))
 
             # Back -> Item 1
             page.go_back()
-            expect(page.locator("#mdl-status")).to_have_text("open:1", timeout=5000)
-            expect(page).to_have_url(re.compile(r".*/test/mdl-nav/1"))
+            expect(page).to_have_url(re.compile(r".*/test/mdl-nav/1"), timeout=5000)
+            expect(status).to_have_text("open:1", timeout=5000)
 
             # Back again -> list (no detail)
             page.go_back()
-            expect(page.locator("#mdl-status")).to_have_text("closed", timeout=5000)
-            expect(page).to_have_url(re.compile(r".*/test/mdl-nav$"))
+            expect(page).to_have_url(re.compile(r".*/test/mdl-nav$"), timeout=5000)
+            expect(status).to_have_text("closed", timeout=5000)
 
-            # Forward -> Item 1
+            # Forward -> Item 1 (wait for status update before next forward)
             page.go_forward()
-            expect(page.locator("#mdl-status")).to_have_text("open:1", timeout=5000)
+            expect(page).to_have_url(re.compile(r".*/test/mdl-nav/1"), timeout=5000)
+            expect(status).to_have_text("open:1", timeout=5000)
 
             # Forward -> Item 2
             page.go_forward()
-            expect(page.locator("#mdl-status")).to_have_text("open:2", timeout=5000)
+            expect(page).to_have_url(re.compile(r".*/test/mdl-nav/2"), timeout=5000)
+            expect(status).to_have_text("open:2", timeout=5000)
         finally:
             ctx.close()
