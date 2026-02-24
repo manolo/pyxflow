@@ -5,9 +5,9 @@
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~17,900 (core src/), ~54,400 (total with demo + tests)
-**Test structure:** `tests/unit/` (2395 unit tests, default `pytest`) + `tests/ui/` (441 Playwright, run explicitly)
-**Tests:** 2395 unit + 441 UI (Playwright)
-**Last updated:** 2026-02-20
+**Test structure:** `tests/unit/` (2400 unit tests, default `pytest`) + `tests/ui/` (444 Playwright, run explicitly)
+**Tests:** 2400 unit + 444 UI (Playwright)
+**Last updated:** 2026-02-24
 
 ---
 

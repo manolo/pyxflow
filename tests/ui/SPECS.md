@@ -20,7 +20,7 @@
 | 3 | `/test/number-inputs` | 14 | NumberField, IntegerField |
 | 4 | `/test/checkbox-radio` | 21 | Checkbox, CheckboxGroup, RadioButtonGroup |
 | 5 | `/test/select-listbox` | 17 | Select, ListBox, MultiSelectListBox |
-| 6 | `/test/combo-box` | 18 | ComboBox, MultiSelectComboBox |
+| 6 | `/test/combo-box` | 21 | ComboBox, MultiSelectComboBox |
 | 7 | `/test/date-time` | 20 | DatePicker, TimePicker, DateTimePicker |
 | 8 | `/test/grid-basic` | 20 | Grid (columns, data, renderers) |
 | 9 | `/test/grid-features` | 17 | Grid (selection, sorting, click, columns ops, details) |
@@ -48,7 +48,7 @@
 | 31 | `/test/route-params` | 5 | Wildcard, mid-optional, QueryParameters, BeforeEnterEvent |
 | 32 | `/test/mdl-nav` | 16 | MasterDetailLayout (URL-driven detail, push_url, navigate, animation, back/forward) |
 
-**Total: 441 tests across 32 views (441 pass, 0 skip)**
+**Total: 444 tests across 32 views (444 pass, 0 skip)**
 
 ---
 
@@ -674,19 +674,21 @@ Feature: ComboBox & MultiSelectComboBox
     Given MultiSelectComboBox("Tags") with set_items("A","B","C"), id="mscb1"
     Then "#mscb1" label is "Tags"
 
-  Scenario: V06.12 — MultiSelectComboBox select multiple [skip:flaky]
-    When open and select "A", then open again and select "C"
-    Then Span#mscb1-val contains "A" and "C"
-    And chips "A" and "C" visible in input
+  Scenario: V06.12 — MultiSelectComboBox client select fires listener (bug fix)
+    Given MultiSelectComboBox#mscb1 with value_change_listener -> Span#mscb1-val
+    When open dropdown and select "A"
+    Then Span#mscb1-val text is "A"
+    Note: Fixed _sync_property to fire change listeners (value arrives via mSync, not event)
 
   Scenario: V06.13 — MultiSelectComboBox set_value programmatic
-    Given MultiSelectComboBox with set_value({"B","C"})
-    Then "B" and "C" chips visible
+    Given MultiSelectComboBox with set_value({"X","Z"})
+    Then 2 chips visible (selectedItems.length == 2)
 
-  Scenario: V06.14 — MultiSelectComboBox deselect via chip remove
-    Given "A","B" selected
-    When remove chip "A"
-    Then only "B" remains
+  Scenario: V06.14 — MultiSelectComboBox server set_value fires listener (bug fix)
+    Given MultiSelectComboBox#mscb1 with value_change_listener -> Span#mscb1-val
+    When click Button#btn-mscb-set (calls set_value({"A","C"}))
+    Then Span#mscb1-val text is "A,C"
+    Note: set_value fires from_client=False when value changes
 
   Scenario: V06.15 — MultiSelectComboBox deselect_all
     Given items selected, Button calling mscb.deselect_all()
@@ -732,9 +734,13 @@ Feature: ComboBox & MultiSelectComboBox
     When deselect "A", then re-select "A"
     Then value contains "A" and "B"
 
+  Scenario: V06.26 — MultiSelectComboBox client select shows chips
+    Given after V06.12, items selected in #mscb1
+    Then selectedItems.length >= 1 (chips visible in combo)
+
   # --- Nav ---
-  Scenario: V06.24 — Nav to next view
-    When click link "Next: Date & Time"
+  Scenario: V06.25 — Nav to next view
+    When click SideNav link "/test/date-time"
     Then URL contains "/test/date-time"
 ```
 

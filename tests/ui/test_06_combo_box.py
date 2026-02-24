@@ -98,6 +98,35 @@ class TestMultiSelectComboBox:
         expect(mscb).to_have_js_property("selectedItems", [])
 
 
+class TestMultiSelectComboBoxValueChange:
+    """Value change listener fires from both client selection and server set_value."""
+
+    @pytest.mark.spec("V06.12")
+    def test_client_select_fires_listener(self, view_page: Page):
+        """Selecting an item in the dropdown fires value change listener."""
+        view_page.keyboard.press("Escape")
+        mscb = view_page.locator("#mscb1")
+        mscb.locator("input").click()
+        view_page.keyboard.type("A")
+        view_page.locator("vaadin-multi-select-combo-box-item").first.click()
+        expect(view_page.locator("#mscb1-val")).to_have_text("A", timeout=5000)
+        view_page.keyboard.press("Escape")
+
+    @pytest.mark.spec("V06.14")
+    def test_server_set_value_fires_listener(self, view_page: Page):
+        """Clicking Set A,C button calls set_value which fires listener."""
+        view_page.keyboard.press("Escape")
+        view_page.locator("#btn-mscb-set").click()
+        expect(view_page.locator("#mscb1-val")).to_have_text("A,C", timeout=5000)
+
+    @pytest.mark.spec("V06.26")
+    def test_client_select_updates_chips(self, view_page: Page):
+        """After client selection, chips appear in the combo box."""
+        mscb = view_page.locator("#mscb1")
+        count = view_page.evaluate("document.querySelector('#mscb1').selectedItems.length")
+        assert count >= 1
+
+
 class TestComboBoxPrefix:
     @pytest.mark.spec("V06.21")
     def test_prefix_icon_rendered(self, view_page: Page):

@@ -188,6 +188,55 @@ class TestMultiSelectComboBox:
         cb._sync_property("selectedItems", [{"key": "0"}])
         assert len(events) == 1
 
+    def test_sync_property_empty_clears_value(self, tree):
+        """Syncing empty selectedItems clears value and fires listener."""
+        cb = MultiSelectComboBox()
+        cb.set_items("A", "B", "C")
+        cb._attach(tree)
+        cb._sync_property("selectedItems", [{"key": "0"}, {"key": "1"}])
+
+        events = []
+        cb.add_value_change_listener(lambda e: events.append(e))
+        cb._sync_property("selectedItems", [])
+        assert cb.get_value() == set()
+        assert len(events) == 1
+        assert events[0]["value"] == set()
+
+    def test_handle_selection_changed_is_noop(self, tree):
+        """_handle_selection_changed is a no-op (value arrives via mSync)."""
+        cb = MultiSelectComboBox()
+        cb.set_items("A", "B", "C")
+        cb._attach(tree)
+
+        events = []
+        cb.add_value_change_listener(lambda e: events.append(e))
+        cb._handle_selection_changed({"value": [{"key": "0"}]})
+        assert len(events) == 0
+        assert cb.get_value() == set()
+
+    def test_set_value_fires_listener_from_server(self):
+        """set_value fires listener with from_client=False."""
+        cb = MultiSelectComboBox()
+        cb.set_items("A", "B", "C")
+
+        events = []
+        cb.add_value_change_listener(lambda e: events.append(e))
+        cb.set_value({"A", "C"})
+        assert len(events) == 1
+        assert events[0]["from_client"] is False
+        assert events[0]["value"] == {"A", "C"}
+
+    def test_set_value_same_no_fire(self):
+        """set_value with same value does not fire listener."""
+        cb = MultiSelectComboBox()
+        cb.set_items("A", "B")
+        cb.set_value({"A"})
+
+        events = []
+        cb.add_value_change_listener(lambda e: events.append(e))
+        cb.set_value({"A"})
+        assert len(events) == 0
+
     def test_set_placeholder(self):
         cb = MultiSelectComboBox()
         cb.set_placeholder("Select...")

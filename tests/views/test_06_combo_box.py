@@ -83,6 +83,11 @@ class TestComboBoxView(VerticalLayout):
         mscb_pre.set_items("X", "Y", "Z")
         mscb_pre.set_value({"X", "Z"})
 
+        # --- MultiSelectComboBox set_value via button (fires listener) ---
+        btn_set = Button("Set A,C")
+        btn_set.set_id("btn-mscb-set")
+        btn_set.add_click_listener(lambda e: mscb1.set_value({"A", "C"}))
+
         # --- MultiSelectComboBox deselect_all ---
         mscb_des = MultiSelectComboBox("Deselectable")
         mscb_des.set_id("mscb-des")
@@ -154,7 +159,7 @@ class TestComboBoxView(VerticalLayout):
             cb_prefix,
             cb_ow,
             cb_round, cb_round_val,
-            mscb1, mscb1_val,
+            mscb1, mscb1_val, btn_set,
             mscb_pre,
             mscb_des, btn_des,
             mscb_clr,
