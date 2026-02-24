@@ -52,4 +52,29 @@ class TestTreeGridView(VerticalLayout):
         btn_collapse.set_id("btn-collapse")
         btn_collapse.add_click_listener(lambda e: tg.collapse(ROOT1))
 
-        self.add(tg, sel_val, btn_expand, btn_collapse)
+        # --- TreeGrid with dynamic children provider (new objects each call) ---
+        dyn_roots = [
+            {"name": "DirA", "type": "dir"},
+            {"name": "FileB", "type": "file"},
+        ]
+
+        def dynamic_provider(item):
+            if item["name"] == "DirA":
+                return [
+                    {"name": "SubA1", "type": "dir"},
+                    {"name": "FileA2", "type": "file"},
+                ]
+            if item["name"] == "SubA1":
+                return [{"name": "Deep1", "type": "file"}]
+            return []
+
+        tg2 = TreeGrid()
+        tg2.set_id("tg2")
+        tg2.add_hierarchy_column(lambda item: item["name"], header="Name")
+        tg2.set_items(dyn_roots, dynamic_provider)
+
+        btn_expand_a = Button("Expand DirA")
+        btn_expand_a.set_id("btn-expand-a")
+        btn_expand_a.add_click_listener(lambda e: tg2.expand(dyn_roots[0]))
+
+        self.add(tg, sel_val, btn_expand, btn_collapse, tg2, btn_expand_a)

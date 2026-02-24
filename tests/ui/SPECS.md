@@ -48,7 +48,7 @@
 | 31 | `/test/route-params` | 5 | Wildcard, mid-optional, QueryParameters, BeforeEnterEvent |
 | 32 | `/test/mdl-nav` | 16 | MasterDetailLayout (URL-driven detail, push_url, navigate, animation, back/forward) |
 
-**Total: 445 tests across 32 views (445 pass, 0 skip)**
+**Total: 446 tests across 32 views (446 pass, 0 skip)**
 
 ---
 
@@ -1244,10 +1244,10 @@ Feature: TreeGrid
     When click "Child1A"
     Then Span#tg1-sel text is "Child1A"
 
-  Scenario: V10.09 — TreeGrid sorting
-    Given sortable column
-    When click header to sort
-    Then root items sorted, children maintain hierarchy
+  Scenario: V10.09 — TreeGrid second-level expand with dynamic provider
+    Given TreeGrid#tg2 with dynamic children_provider (new objects per call)
+    When expand DirA, then click SubA1 toggle
+    Then "Deep1" appears at level 2
 
   # --- Nav ---
   Scenario: V10.10 — Nav to next view

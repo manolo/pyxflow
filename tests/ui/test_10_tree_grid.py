@@ -73,6 +73,26 @@ class TestTreeGrid:
         expect(view_page.locator("#tg1-sel")).to_have_text("Child1A", timeout=5000)
 
 
+class TestTreeGridDynamicProvider:
+    """Test TreeGrid with dynamic children_provider (creates new objects each call)."""
+
+    @pytest.mark.spec("V10.09")
+    def test_second_level_expand_dynamic_provider(self, view_page: Page):
+        """Expanding a second-level folder works with dynamic children provider."""
+        grid2 = view_page.locator("#tg2")
+        # Expand DirA via button
+        view_page.locator("#btn-expand-a").click()
+        expect(grid2).to_contain_text("SubA1", timeout=5000)
+        expect(grid2).to_contain_text("FileA2")
+        # Now click SubA1 toggle to expand second level
+        toggles = grid2.locator("vaadin-grid-tree-toggle")
+        for i in range(toggles.count()):
+            if "SubA1" in toggles.nth(i).text_content():
+                toggles.nth(i).click()
+                break
+        expect(grid2).to_contain_text("Deep1", timeout=5000)
+
+
 class TestNavigation:
     @pytest.mark.spec("V10.10")
     def test_nav_via_sidenav(self, view_page: Page):
