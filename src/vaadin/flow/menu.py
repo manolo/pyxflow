@@ -81,8 +81,17 @@ def get_menu_entries() -> list[MenuEntry]:
         order = getattr(cls, '_menu_order', 0)
         icon = getattr(cls, '_menu_icon', None)
 
+        # Strip optional/varargs parameters from the path (Java: getRouteUrl)
+        menu_path = "/" + path if path else "/"
+        menu_path = "/".join(
+            seg for seg in menu_path.split("/")
+            if not (seg.startswith(":") and (seg.endswith("?") or seg.endswith("*")))
+        )
+        if not menu_path:
+            menu_path = "/"
+
         entries.append(MenuEntry(
-            path="/" + path if path else "/",
+            path=menu_path,
             title=title,
             order=order,
             icon=icon,
