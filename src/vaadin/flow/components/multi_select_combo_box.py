@@ -247,22 +247,8 @@ class MultiSelectComboBox(HasReadOnly, HasValidation, HasRequired, Component, Ge
         self._change_listeners.append(listener)
 
     def _handle_selection_changed(self, event_data: dict):
-        """Handle selected-items-changed from client."""
-        # The client sends selected items as JSON array
-        selected_items = event_data.get("value", [])
-        self._value = set()
-        if isinstance(selected_items, list):
-            for si in selected_items:
-                if isinstance(si, dict):
-                    key = si.get("key", "")
-                    try:
-                        idx = int(key)
-                        if 0 <= idx < len(self._items):
-                            self._value.add(self._items[idx])
-                    except (ValueError, IndexError):
-                        pass
-        for listener in self._change_listeners:
-            listener({"value": self._value})
+        """No-op: value arrives via mSync (_sync_property), not event data."""
+        pass
 
     # --- Client-callable methods (publishedEventHandler RPC) ---
 
@@ -337,6 +323,7 @@ class MultiSelectComboBox(HasReadOnly, HasValidation, HasRequired, Component, Ge
 
     def _sync_property(self, name: str, value):
         if name == "selectedItems":
+            old_value = self._value.copy()
             self._value = set()
             if isinstance(value, list):
                 for si in value:
@@ -348,3 +335,6 @@ class MultiSelectComboBox(HasReadOnly, HasValidation, HasRequired, Component, Ge
                                 self._value.add(self._items[idx])
                         except (ValueError, IndexError):
                             pass
+            if self._value != old_value:
+                for listener in self._change_listeners:
+                    listener({"value": self._value, "from_client": True})

@@ -402,10 +402,18 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         select.set_placeholder("Choose an option")
         selection_form.add(select)
 
-        multi_combo = MultiSelectComboBox("MultiSelectComboBox")
+        multi_combo = MultiSelectComboBox("Skills")
         multi_combo.set_items("Java", "Python", "JavaScript", "TypeScript", "Rust", "Go")
         multi_combo.set_placeholder("Select skills")
-        selection_form.add(multi_combo)
+        multi_combo_status = Span("")
+        multi_combo.add_value_change_listener(
+            lambda e: multi_combo_status.set_text(f"Selected: {', '.join(e['value'])}")
+        )
+        set_py_btn = Button("Set Python+Rust")
+        set_py_btn.add_click_listener(lambda e: multi_combo.set_value({"Python", "Rust"}))
+        clear_btn = Button("Clear")
+        clear_btn.add_click_listener(lambda e: multi_combo.set_value(set()))
+        selection_form.add(multi_combo, HorizontalLayout(set_py_btn, clear_btn), multi_combo_status)
 
         radio_group = RadioButtonGroup("RadioButtonGroup")
         radio_group.set_items("Choice 1", "Choice 2", "Choice 3")

@@ -163,16 +163,30 @@ class TestMultiSelectComboBox:
         cb.deselect("B")
         assert cb.get_value() == {"A", "C"}
 
-    def test_value_change_listener(self, tree):
+    def test_value_change_listener_from_client(self, tree):
+        """Value change fires via mSync (_sync_property), not event handler."""
         cb = MultiSelectComboBox()
         cb.set_items("A", "B", "C")
         cb._attach(tree)
 
         events = []
         cb.add_value_change_listener(lambda e: events.append(e))
-        cb._handle_selection_changed({"value": [{"key": "0"}, {"key": "2"}]})
+        cb._sync_property("selectedItems", [{"key": "0"}, {"key": "2"}])
         assert len(events) == 1
         assert events[0]["value"] == {"A", "C"}
+        assert events[0]["from_client"] is True
+
+    def test_value_change_listener_no_duplicate(self, tree):
+        """Same value synced twice does not fire listener again."""
+        cb = MultiSelectComboBox()
+        cb.set_items("A", "B", "C")
+        cb._attach(tree)
+
+        events = []
+        cb.add_value_change_listener(lambda e: events.append(e))
+        cb._sync_property("selectedItems", [{"key": "0"}])
+        cb._sync_property("selectedItems", [{"key": "0"}])
+        assert len(events) == 1
 
     def test_set_placeholder(self):
         cb = MultiSelectComboBox()
