@@ -99,16 +99,55 @@ class TestDialog:
         assert dialog.get_header_title() == "Test Title"
 
     def test_set_width_height(self, tree):
-        """set_width and set_height work correctly."""
+        """set_width and set_height use element properties (not CSS vars)."""
         dialog = Dialog()
         dialog._attach(tree)
 
         dialog.set_width("400px")
         dialog.set_height("300px")
 
-        # Width and height are set via CSS variables on style
-        # Just verify they don't raise errors
-        assert True
+        props = dialog.element.node._features[1]
+        assert props["width"] == "400px"
+        assert props["height"] == "300px"
+        assert dialog.get_width() == "400px"
+        assert dialog.get_height() == "300px"
+
+    def test_set_width_height_before_attach(self, tree):
+        """Width/height set before attach are applied on attach."""
+        dialog = Dialog()
+        dialog.set_width("500px")
+        dialog.set_height("400px")
+        dialog._attach(tree)
+
+        props = dialog.element.node._features[1]
+        assert props["width"] == "500px"
+        assert props["height"] == "400px"
+
+    def test_set_min_max_dimensions(self, tree):
+        """Min/max width/height use execute_js on overlay."""
+        dialog = Dialog()
+        dialog._attach(tree)
+
+        dialog.set_min_width("200px")
+        dialog.set_max_width("800px")
+        dialog.set_min_height("100px")
+        dialog.set_max_height("600px")
+
+        # Values are stored for re-application
+        assert dialog._min_width == "200px"
+        assert dialog._max_width == "800px"
+        assert dialog._min_height == "100px"
+        assert dialog._max_height == "600px"
+
+    def test_set_min_max_before_attach(self, tree):
+        """Min/max dimensions set before attach are applied on attach."""
+        dialog = Dialog()
+        dialog.set_min_width("200px")
+        dialog.set_max_width("800px")
+        dialog._attach(tree)
+
+        assert dialog._min_width == "200px"
+        assert dialog._max_width == "800px"
 
     def test_add_children_before_attach(self, tree):
         """Children can be added before attach."""

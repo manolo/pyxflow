@@ -72,18 +72,38 @@ class TestDialog:
 
     @pytest.mark.spec("V11.09")
     def test_set_width_height(self, view_page: Page):
-        """Dialog with set_width/set_height has correct dimensions."""
+        """Dialog with set_width/set_height uses element properties."""
         _close_dialog(view_page, "dlg-resize")
         view_page.locator("#btn-size").click()
         dlg = view_page.locator("#dlg-size")
         expect(dlg).to_have_attribute("opened", "", timeout=3000)
-        expect(dlg).to_contain_text("Sized")
+        # Width/height are element properties (not CSS custom properties)
+        expect(dlg).to_have_js_property("width", "600px")
+        expect(dlg).to_have_js_property("height", "400px")
+        view_page.keyboard.press("Escape")
+        expect(dlg).not_to_have_attribute("opened", "")
+
+    @pytest.mark.spec("V11.10")
+    def test_set_min_max_dimensions(self, view_page: Page):
+        """Dialog min/max width/height applied on overlay via JS."""
+        _close_dialog(view_page, "dlg-size")
+        view_page.locator("#btn-minmax").click()
+        dlg = view_page.locator("#dlg-minmax")
+        expect(dlg).to_have_attribute("opened", "", timeout=3000)
+        expect(dlg).to_contain_text("MinMax")
+        # Min/max are set as inline styles on the overlay's inner overlay
+        overlay = dlg.locator("vaadin-dialog-overlay")
+        style = overlay.evaluate("el => el.$.overlay.style.cssText")
+        assert "min-width: 300px" in style
+        assert "max-width: 800px" in style
+        assert "min-height: 200px" in style
+        assert "max-height: 600px" in style
         view_page.keyboard.press("Escape")
         expect(dlg).not_to_have_attribute("opened", "")
 
     @pytest.mark.spec("V11.11")
     def test_close_listener(self, view_page: Page):
-        _close_dialog(view_page, "dlg-size")
+        _close_dialog(view_page, "dlg-minmax")
         view_page.locator("#btn-cls").click()
         dlg = view_page.locator("#dlg-cls")
         expect(dlg).to_have_attribute("opened", "", timeout=3000)

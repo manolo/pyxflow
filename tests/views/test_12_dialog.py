@@ -70,6 +70,18 @@ class TestDialogView(VerticalLayout):
         btn_size.set_id("btn-size")
         btn_size.add_click_listener(lambda e: dlg_size.open())
 
+        # --- Dialog min/max width/height ---
+        dlg_minmax = Dialog()
+        dlg_minmax.set_id("dlg-minmax")
+        dlg_minmax.set_min_width("300px")
+        dlg_minmax.set_max_width("800px")
+        dlg_minmax.set_min_height("200px")
+        dlg_minmax.set_max_height("600px")
+        dlg_minmax.add(Span("MinMax"))
+        btn_minmax = Button("Open minmax")
+        btn_minmax.set_id("btn-minmax")
+        btn_minmax.add_click_listener(lambda e: dlg_minmax.open())
+
         # --- Dialog close listener ---
         dlg_cls_val = Span("")
         dlg_cls_val.set_id("dlg-closed")
@@ -164,5 +176,6 @@ class TestDialogView(VerticalLayout):
             btn_cd, cd1, cd_result,
             btn_cd_cancel, cd_cancel, cd_cancel_result,
             btn_cd_reject, cd_reject, cd_reject_result,
+            btn_minmax, dlg_minmax,
             btn_cd_reopen, cd_reopen, cd_reopen_count,
         )

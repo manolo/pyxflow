@@ -48,7 +48,7 @@
 | 31 | `/test/route-params` | 5 | Wildcard, mid-optional, QueryParameters, BeforeEnterEvent |
 | 32 | `/test/mdl-nav` | 16 | MasterDetailLayout (URL-driven detail, push_url, navigate, animation, back/forward) |
 
-**Total: 444 tests across 32 views (444 pass, 0 skip)**
+**Total: 445 tests across 32 views (445 pass, 0 skip)**
 
 ---
 
@@ -1308,12 +1308,12 @@ Feature: Dialog & ConfirmDialog
   Scenario: V11.09 — Dialog set_width/set_height
     Given Dialog with set_width("600px"), set_height("400px")
     When open
-    Then dialog dimensions are ~600x400
+    Then JS properties width="600px", height="400px"
 
-  Scenario: V11.10 — Dialog add/remove content
-    Given Dialog with Button("Add") calling dlg.add(Span("new"))
-    When open, click "Add"
-    Then "new" span appears in dialog
+  Scenario: V11.10 — Dialog set_min/max_width/height
+    Given Dialog with set_min_width("300px"), set_max_width("800px"), set_min_height("200px"), set_max_height("600px")
+    When open
+    Then overlay inner style has min-width/max-width/min-height/max-height
 
   Scenario: V11.11 — Dialog close listener
     Given Dialog with add_close_listener → Span#dlg-closed

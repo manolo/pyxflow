@@ -441,12 +441,12 @@ All components inherit from `Component` which provides:
 | `set_modal` / `is_modal` / `set_draggable` / `is_draggable` | [x] |
 | `set_resizable` / `is_resizable` | [x] |
 | `set_header_title` / `get_header_title` | [x] |
-| `set_width` / `set_height` | [x] |
+| `set_width` / `get_width` / `set_height` / `get_height` | [x] |
 | `set_close_on_esc` / `is_close_on_esc` / `set_close_on_outside_click` / `is_close_on_outside_click` | [x] |
 | `add_open_listener` / `add_close_listener` | [x] |
 | `get_header` / `get_footer` (section components for buttons) | [x] |
 | `remove` / `remove_all` | [x] |
-| `set_min_width` / `set_max_width` / `set_min_height` / `set_max_height` (inherited) | [x] |
+| `set_min_width` / `set_max_width` / `set_min_height` / `set_max_height` (overlay JS) | [x] |
 | `set_top` / `set_left` (positioning) | [x] |
 | `add_resize_listener` / `add_dragged_listener` | [x] |
 | `add_theme_variants` / `remove_theme_variants` (DialogVariant) | [x] |

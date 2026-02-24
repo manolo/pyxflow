@@ -71,6 +71,10 @@ class Dialog(Component):
         self._header_title = ""
         self._width = None
         self._height = None
+        self._min_width = None
+        self._max_width = None
+        self._min_height = None
+        self._max_height = None
         self._close_on_esc = True
         self._close_on_outside_click = True
         self._children: list[Component] = []
@@ -93,9 +97,19 @@ class Dialog(Component):
         if not self._close_on_outside_click:
             self.element.set_property("closeOnOutsideClick", False)
         if self._width:
-            self.element.get_style().set("--vaadin-dialog-overlay-width", self._width)
+            self.element.set_property("width", self._width)
         if self._height:
-            self.element.get_style().set("--vaadin-dialog-overlay-height", self._height)
+            self.element.set_property("height", self._height)
+
+        # Re-apply min/max dimensions on overlay (must be after attach)
+        if self._min_width:
+            self._set_overlay_dimension("min-width", self._min_width)
+        if self._max_width:
+            self._set_overlay_dimension("max-width", self._max_width)
+        if self._min_height:
+            self._set_overlay_dimension("min-height", self._min_height)
+        if self._max_height:
+            self._set_overlay_dimension("max-height", self._max_height)
 
         # Attach children as regular children of the dialog element
         # (not virtual children - the renderer handles placing them in the overlay)
@@ -237,14 +251,48 @@ class Dialog(Component):
     def set_width(self, width: str | None):
         """Set the dialog width (e.g., '400px', '50%')."""
         self._width = width
-        if self._element and width:
-            self.element.get_style().set("--vaadin-dialog-overlay-width", width)
+        if self._element:
+            self.element.set_property("width", width or "")
+
+    def get_width(self) -> str | None:
+        """Get the dialog width."""
+        return self._width
 
     def set_height(self, height: str | None):
         """Set the dialog height (e.g., '300px', '50%')."""
         self._height = height
-        if self._element and height:
-            self.element.get_style().set("--vaadin-dialog-overlay-height", height)
+        if self._element:
+            self.element.set_property("height", height or "")
+
+    def get_height(self) -> str | None:
+        """Get the dialog height."""
+        return self._height
+
+    def set_min_width(self, min_width: str | None):
+        """Set the minimum width of the dialog overlay."""
+        self._min_width = min_width
+        self._set_overlay_dimension("min-width", min_width)
+
+    def set_max_width(self, max_width: str | None):
+        """Set the maximum width of the dialog overlay."""
+        self._max_width = max_width
+        self._set_overlay_dimension("max-width", max_width)
+
+    def set_min_height(self, min_height: str | None):
+        """Set the minimum height of the dialog overlay."""
+        self._min_height = min_height
+        self._set_overlay_dimension("min-height", min_height)
+
+    def set_max_height(self, max_height: str | None):
+        """Set the maximum height of the dialog overlay."""
+        self._max_height = max_height
+        self._set_overlay_dimension("max-height", max_height)
+
+    def _set_overlay_dimension(self, dimension: str, value: str | None):
+        """Set a CSS dimension on the overlay element via JS."""
+        self.execute_js(
+            "$0.$.overlay.$.overlay.style[$1]=$2", dimension, value or ""
+        )
 
     def set_close_on_esc(self, close_on_esc: bool):
         """Set whether the dialog closes on Escape key."""
