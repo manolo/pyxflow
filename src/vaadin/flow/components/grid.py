@@ -1251,6 +1251,7 @@ class TreeGrid(Grid):
         self._children_provider: Callable | None = None
         self._expanded_item_ids: set[int] = set()  # id(original_item)
         self._key_to_original: dict[str, object] = {}  # key -> original item
+        self._children_cache: dict[int, list] = {}  # id(parent) -> children list
 
     def add_hierarchy_column(self, value_provider: Callable, header: str = "Name") -> Column:
         """Add the hierarchy column with expand/collapse toggles.
@@ -1300,6 +1301,7 @@ class TreeGrid(Grid):
         self._children_provider = children_provider
         self._expanded_item_ids.clear()
         self._key_to_original.clear()
+        self._children_cache.clear()
         self._items = self._flatten_tree()
         self._key_to_item.clear()
         if self._element:
@@ -1361,7 +1363,14 @@ class TreeGrid(Grid):
 
         def visit(items, level):
             for item in items:
-                children = self._children_provider(item) if self._children_provider else []
+                item_id = id(item)
+                if item_id in self._children_cache:
+                    children = self._children_cache[item_id]
+                elif self._children_provider:
+                    children = self._children_provider(item)
+                    self._children_cache[item_id] = children
+                else:
+                    children = []
                 has_children = len(children) > 0
                 is_expanded = has_children and id(item) in self._expanded_item_ids
 

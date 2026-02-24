@@ -161,6 +161,58 @@ class TestTreeGridFlatten:
         assert len(tg._items) == 2
 
 
+class TestTreeGridDynamicChildrenProvider:
+    """Test that expansion works when children_provider creates new objects each call."""
+
+    def test_expand_second_level_with_dynamic_provider(self):
+        """Bug: second-level expand failed because children were recreated as new dicts."""
+        root = [{"name": "A", "type": "dir"}, {"name": "B", "type": "file"}]
+
+        def dynamic_provider(item):
+            # Creates NEW dict objects each call (like _scan_dir does)
+            if item["name"] == "A":
+                return [{"name": "A1", "type": "dir"}, {"name": "A2", "type": "file"}]
+            if item["name"] == "A1":
+                return [{"name": "A1a", "type": "file"}]
+            return []
+
+        tg = TreeGrid()
+        tg.add_hierarchy_column(lambda item: item["name"])
+        tg.set_items(root, children_provider=dynamic_provider)
+
+        # Expand A (root level)
+        tg.expand(root[0])
+        assert len(tg._items) == 4  # A, A1, A2, B
+        assert tg._items[1]["name"] == "A1"
+
+        # Now expand A1 (second level) — must use the cached child object
+        a1_item = tg._key_to_original["1"]  # key "1" = A1
+        tg.expand(a1_item)
+        assert len(tg._items) == 5  # A, A1, A1a, A2, B
+        assert tg._items[2]["name"] == "A1a"
+        assert tg._items[2]["_level"] == 2
+
+    def test_children_cache_cleared_on_set_items(self):
+        root = [{"name": "X", "type": "dir"}]
+        call_count = [0]
+
+        def counting_provider(item):
+            call_count[0] += 1
+            return [{"name": "child", "type": "file"}] if item["name"] == "X" else []
+
+        tg = TreeGrid()
+        tg.add_hierarchy_column(lambda item: item["name"])
+        tg.set_items(root, children_provider=counting_provider)
+        tg.expand(root[0])
+        first_count = call_count[0]
+
+        # set_items clears cache, so provider is called again
+        call_count[0] = 0
+        tg.set_items(root, children_provider=counting_provider)
+        tg.expand(root[0])
+        assert call_count[0] >= 1  # provider was called again (cache cleared)
+
+
 class TestTreeGridUpdateExpandedState:
 
     def test_expand_via_server_call(self):
