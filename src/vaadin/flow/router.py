@@ -554,15 +554,26 @@ def match_route(path: str) -> tuple[Type["Component"], str | None, dict[str, str
             resolved_title = _resolve_title(cls)
             return cls, resolved_title, {}, layout_cls
 
-    # Parameterized routes (uses named groups)
-    for route_path, (cls, title, param_names, regexes, layout_cls) in _routes.items():
-        if regexes is not None:
-            for regex in regexes:
-                m = regex.match(normalized_path)
-                if m:
-                    params = {k: v for k, v in m.groupdict().items() if v is not None}
-                    resolved_title = _resolve_title(cls)
-                    return cls, resolved_title, params, layout_cls
+    # Parameterized routes — sorted by specificity (most literal segments first)
+    def _route_specificity(item):
+        route_path = item[0]
+        segments = route_path.split("/") if route_path else []
+        literals = sum(1 for s in segments if not s.startswith(":"))
+        optionals = sum(1 for s in segments if s.endswith("?") or s.endswith("*"))
+        return (-literals, optionals, -len(segments))
+
+    parameterized = [
+        (rp, entry) for rp, entry in _routes.items() if entry[3] is not None
+    ]
+    parameterized.sort(key=_route_specificity)
+
+    for route_path, (cls, title, param_names, regexes, layout_cls) in parameterized:
+        for regex in regexes:
+            m = regex.match(normalized_path)
+            if m:
+                params = {k: v for k, v in m.groupdict().items() if v is not None}
+                resolved_title = _resolve_title(cls)
+                return cls, resolved_title, params, layout_cls
 
     return None
 

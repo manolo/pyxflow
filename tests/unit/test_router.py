@@ -229,6 +229,77 @@ class TestMatchRoute:
         assert result[0] == TestView
 
 
+class TestMatchRouteSpecificity:
+    """Test that parameterized routes are matched by specificity, not registration order."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        clear_routes()
+        yield
+        clear_routes()
+
+    def test_literal_segment_beats_all_params(self):
+        """Route with literal segment wins over all-optional route."""
+        @Route(":version?/:starter?")
+        class CatchAllView(VerticalLayout):
+            pass
+
+        @Route("run-local/:run_id?")
+        class RunLocalView(VerticalLayout):
+            pass
+
+        result = match_route("run-local")
+        assert result is not None
+        cls, _title, params, _layout = result
+        assert cls == RunLocalView
+        assert params == {}
+
+    def test_more_literals_wins(self):
+        """Route with more literal segments has higher priority."""
+        @Route(":a/:b")
+        class GenericView(VerticalLayout):
+            pass
+
+        @Route("api/:id")
+        class ApiView(VerticalLayout):
+            pass
+
+        result = match_route("api/123")
+        assert result is not None
+        assert result[0] == ApiView
+        assert result[2] == {"id": "123"}
+
+    def test_fewer_optionals_wins(self):
+        """Route with fewer optional params wins at same literal count."""
+        @Route("docs/:page?/:section?")
+        class DocsOptView(VerticalLayout):
+            pass
+
+        @Route("docs/:page")
+        class DocsReqView(VerticalLayout):
+            pass
+
+        result = match_route("docs/intro")
+        assert result is not None
+        assert result[0] == DocsReqView
+        assert result[2] == {"page": "intro"}
+
+    def test_static_still_beats_parameterized(self):
+        """Static route always wins over parameterized."""
+        @Route(":slug?")
+        class SlugView(VerticalLayout):
+            pass
+
+        @Route("about")
+        class AboutView(VerticalLayout):
+            pass
+
+        result = match_route("about")
+        assert result is not None
+        assert result[0] == AboutView
+        assert result[2] == {}
+
+
 class TestPageTitleDecorator:
     """Test @PageTitle decorator."""
 
