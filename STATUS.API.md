@@ -1,7 +1,7 @@
 # PyFlow API Inventory — Python vs Java Vaadin 25
 
 **Generated: 2026-02-25**
-**Python components: 49 | Tests: 2415 unit + 446 UI | LOC: ~18,000 (core)**
+**Python components: 49 | Tests: 2415 unit + 446 UI | LOC: ~18,100 (core)**
 
 Legend: `[x]` = implemented, `[ ]` = missing
 
