@@ -14,7 +14,7 @@ class AboutView(Div):
         hero = Div()
         hero.add_class_name("about-hero")
 
-        logo = Image("images/logo2.png", "PyFlow")
+        logo = Image("images/logo.png", "PyFlow")
         logo.add_class_name("about-logo")
 
         title = H1("Build Web Apps in Pure Python")
