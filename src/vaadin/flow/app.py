@@ -349,6 +349,9 @@ def _ensure_importable(views: str) -> None:
         pkg_mod.__path__ = [cwd]
         pkg_mod.__package__ = package
         sys.modules[package] = pkg_mod
+        # Also add cwd to sys.path so sibling packages (e.g. lib/) are importable.
+        if cwd not in sys.path:
+            sys.path.insert(0, cwd)
     else:
         if cwd not in sys.path:
             sys.path.insert(0, cwd)

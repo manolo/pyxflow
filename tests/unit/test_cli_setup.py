@@ -455,6 +455,42 @@ class TestCliParsing:
         # Cleanup
         del sys.modules["my_app"]
 
+    def test_cwd_views_sibling_packages_importable(self, tmp_path, monkeypatch):
+        """When views/ is in cwd, sibling packages (e.g. lib/) must be importable."""
+        from vaadin.flow.app import main
+
+        project = tmp_path / "my-app"
+        project.mkdir()
+        (project / "views").mkdir()
+        (project / "__init__.py").touch()
+        (project / "views" / "__init__.py").touch()
+        (project / "views" / "hello.py").write_text(
+            "from vaadin.flow import Route\n"
+            "from vaadin.flow.components import Div\n"
+            "@Route('hello')\n"
+            "class HelloView(Div): pass\n"
+        )
+        # Create a sibling package (like lib/)
+        (project / "lib").mkdir()
+        (project / "lib" / "__init__.py").write_text("MAGIC = 42\n")
+
+        monkeypatch.chdir(project)
+        monkeypatch.setattr(sys, "argv", ["vaadin", "."])
+
+        def mock_serve(views, host, port, debug, *, dev=False, socket_fd=None):
+            pass
+
+        monkeypatch.setattr("vaadin.flow.app._serve", mock_serve)
+        main()
+
+        # cwd must be in sys.path so sibling packages are importable
+        assert str(project) in sys.path
+
+        # Cleanup
+        del sys.modules["my_app"]
+        if "lib" in sys.modules:
+            del sys.modules["lib"]
+
 
 # ---------------------------------------------------------------------------
 # Favicon link in index.html
