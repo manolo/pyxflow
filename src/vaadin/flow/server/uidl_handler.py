@@ -389,6 +389,7 @@ class UidlHandler:
 
             # Node 3: flow-container
             self._container_node = self._tree.create_node()  # This will be node 3
+            self._tree._container_node_id = 3
             changes.append({"node": 3, "type": "attach"})
             changes.append({"node": 3, "type": "put", "key": "payload", "feat": 0, "value": {"type": "@id", "payload": self._app_id}})
             changes.append({"node": 3, "type": "put", "key": "tag", "feat": 0, "value": f"flow-container-root-{app_num}"})
@@ -399,6 +400,7 @@ class UidlHandler:
 
             # Node 2: flow-container
             self._container_node = self._tree.create_node()  # This will be node 2
+            self._tree._container_node_id = 2
             changes.append({"node": 2, "type": "attach"})
             changes.append({"node": 2, "type": "put", "key": "payload", "feat": 0, "value": {"type": "@id", "payload": self._app_id}})
             changes.append({"node": 2, "type": "put", "key": "tag", "feat": 0, "value": f"flow-container-root-{app_num}"})

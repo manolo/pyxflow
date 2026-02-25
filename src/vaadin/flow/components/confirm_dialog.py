@@ -40,6 +40,7 @@ class ConfirmDialog(Component):
         self._reject_listeners: list[Callable] = []
         self._close_on_esc = True
         self._opened_change_listeners: list[Callable] = []
+        self._auto_added = False
 
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
@@ -78,8 +79,22 @@ class ConfirmDialog(Component):
         self.element.add_event_listener("reject", self._on_reject, _CLOSED_HASH)
 
     def open(self):
-        """Open the confirm dialog."""
+        """Open the confirm dialog.
+
+        If the dialog was not added manually to a parent component, it will be
+        automatically added to the UI when opened, and automatically removed
+        when closed.
+        """
         self._opened = True
+        if not self._element:
+            from vaadin.flow.components.notification import _get_current_tree
+            tree = _get_current_tree()
+            if tree:
+                self._attach(tree)
+                container = tree.get_node(tree._container_node_id)
+                if container:
+                    container.add_child(self.element.node)
+                self._auto_added = True
         if self._element:
             self.element.set_property("opened", True)
         for listener in self._opened_change_listeners:
@@ -90,8 +105,17 @@ class ConfirmDialog(Component):
         self._opened = False
         if self._element:
             self.element.set_property("opened", False)
+        self._auto_remove()
         for listener in self._opened_change_listeners:
             listener({"opened": False})
+
+    def _auto_remove(self):
+        """Remove from UI if this dialog was auto-added."""
+        if self._auto_added and self._element:
+            self._auto_added = False
+            parent = self.element.node._parent
+            if parent:
+                parent.remove_child(self.element.node)
 
     def is_opened(self) -> bool:
         """Check if the dialog is open."""
@@ -217,6 +241,7 @@ class ConfirmDialog(Component):
             self.element.set_property("opened", False)
         for listener in self._confirm_listeners:
             listener(event_data)
+        self._auto_remove()
 
     def _on_cancel(self, event_data: dict):
         """Handle cancel event from client."""
@@ -225,6 +250,7 @@ class ConfirmDialog(Component):
             self.element.set_property("opened", False)
         for listener in self._cancel_listeners:
             listener(event_data)
+        self._auto_remove()
 
     def _on_reject(self, event_data: dict):
         """Handle reject event from client."""
@@ -233,6 +259,7 @@ class ConfirmDialog(Component):
             self.element.set_property("opened", False)
         for listener in self._reject_listeners:
             listener(event_data)
+        self._auto_remove()
 
     def add_theme_variants(self, *variants: DialogVariant):
         """Add theme variants to the confirm dialog."""

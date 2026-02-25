@@ -4,10 +4,10 @@
 
 **Vaadin version:** 25.0.4
 **Components:** 49 implemented (all Vaadin 25 UI components)
-**Lines of code:** ~18,000 (core src/), ~54,800 (total with demo + tests)
-**Test structure:** `tests/unit/` (2409 unit tests, default `pytest`) + `tests/ui/` (446 Playwright, run explicitly)
-**Tests:** 2409 unit + 446 UI (Playwright)
-**Last updated:** 2026-02-24
+**Lines of code:** ~18,000 (core src/), ~55,200 (total with demo + tests)
+**Test structure:** `tests/unit/` (2412 unit tests, default `pytest`) + `tests/ui/` (446 Playwright, run explicitly)
+**Tests:** 2412 unit + 446 UI (Playwright)
+**Last updated:** 2026-02-25
 
 ---
 
@@ -26,6 +26,7 @@
 - [x] **FlowComponentHost** - Virtual children renderer for Dialog/Overlay components
 - [x] **publishedEventHandler** - Client-callable methods via Feature 19 (`CLIENT_DELEGATE_HANDLERS`)
 - [x] **Server-client state sync** - `_pending_server_change` flag absorbs echoes from server-initiated property changes
+- [x] **Overlay auto-add** - Dialog, ConfirmDialog auto-attach to UI container on `open()`, auto-remove on close (Java's `OverlayAutoAddController`)
 - [x] **Client-side validation** - Field components use native web component validation (pattern, allowedCharPattern, required); `manualValidation` removed
 - [x] **Grid connector protocol** - `gridConnector.initLazy`, `$connector.set/updateSize/confirm`, `setHeaderRenderer`, `setFooterRenderer`
 - [x] **Grid header rows** - `prepend_header_row()`, `HeaderRow.join()` creates `<vaadin-grid-column-group>` for spanning headers
@@ -248,8 +249,8 @@
 
 | Category | Coverage | Details |
 |----------|----------|---------|
-| **Unit tests** | 2314 passing | Good coverage of all 49 components + core + data layer. Located in `tests/unit/` |
-| **UI tests** | 423 passed | All 31 test views (in `tests/views/`) with shared SideNav layout and single browser session. UI tests in `tests/ui/`. |
+| **Unit tests** | 2412 passing | Good coverage of all 49 components + core + data layer. Located in `tests/unit/` |
+| **UI tests** | 446 passed | All 32 test views (in `tests/views/`) with shared SideNav layout and single browser session. UI tests in `tests/ui/`. |
 
 ---
 

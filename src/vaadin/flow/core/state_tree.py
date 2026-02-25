@@ -21,6 +21,7 @@ class StateTree:
         self._components: dict[int, "Component"] = {}  # node_id -> Component
         self._pending_execute: list = []  # Execute commands queued by components
         self._app_id: str = ""  # Set by UidlHandler during init
+        self._container_node_id: int = 0  # Set by UidlHandler during init
         self._return_channels: dict[tuple[int, int], Callable] = {}
         self._next_channel_id: int = 0
         self._push_event: asyncio.Event = asyncio.Event()

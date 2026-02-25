@@ -82,6 +82,7 @@ class Dialog(Component):
         self._footer_section = _DialogSection(self, "footer")
         self._open_listeners: list[Callable] = []
         self._close_listeners: list[Callable] = []
+        self._auto_added = False
 
     def _attach(self, tree: "StateTree"):
         super()._attach(tree)
@@ -174,8 +175,23 @@ class Dialog(Component):
             self._update_virtual_child_node_ids()
 
     def open(self):
-        """Open the dialog."""
+        """Open the dialog.
+
+        If the dialog was not added manually to a parent component, it will be
+        automatically added to the UI when opened, and automatically removed
+        from the UI when closed.
+        """
         self._opened = True
+        if not self._element:
+            # Auto-attach to UI container (same as Java's OverlayAutoAddController)
+            from vaadin.flow.components.notification import _get_current_tree
+            tree = _get_current_tree()
+            if tree:
+                self._attach(tree)
+                container = tree.get_node(tree._container_node_id)
+                if container:
+                    container.add_child(self.element.node)
+                self._auto_added = True
         if self._element:
             self._pending_server_change = True
             self.element.set_property("opened", True)
@@ -183,11 +199,16 @@ class Dialog(Component):
             listener({})
 
     def close(self):
-        """Close the dialog."""
+        """Close the dialog.
+
+        If the dialog was auto-added to the UI when opened, it will be
+        automatically removed from the UI when closed.
+        """
         self._opened = False
         if self._element:
             self._pending_server_change = True
             self.element.set_property("opened", False)
+        self._auto_remove()
 
     def is_opened(self) -> bool:
         """Check if the dialog is open."""
@@ -322,6 +343,14 @@ class Dialog(Component):
         """Add a listener for when the dialog closes."""
         self._close_listeners.append(listener)
 
+    def _auto_remove(self):
+        """Remove from UI if this dialog was auto-added."""
+        if self._auto_added and self._element:
+            self._auto_added = False
+            parent = self.element.node._parent
+            if parent:
+                parent.remove_child(self.element.node)
+
     def _handle_opened_changed(self, event_data: dict):
         """Handle opened-changed event from client.
 
@@ -344,6 +373,7 @@ class Dialog(Component):
         if was_opened:
             for listener in self._close_listeners:
                 listener(event_data)
+            self._auto_remove()
 
     def handle_client_close(self):
         """Called when the client reports the dialog was closed.

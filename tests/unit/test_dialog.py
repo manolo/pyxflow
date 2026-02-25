@@ -250,6 +250,76 @@ class TestDialog:
         assert title_change is not None
 
 
+class TestDialogAutoAdd:
+    """Test Dialog auto-add to UI behavior."""
+
+    @pytest.fixture
+    def tree(self):
+        return StateTree()
+
+    def test_open_auto_attaches_to_container(self, tree):
+        """open() auto-attaches dialog to container node when not manually added."""
+        from vaadin.flow.components.notification import _set_current_tree
+        # Create body (node 1) and container (node 2)
+        tree.create_node()  # node 1 = body
+        tree.create_node()  # node 2 = container
+        tree._container_node_id = 2
+
+        dialog = Dialog()
+        dialog.add(Span("Hello"))
+        assert dialog._element is None
+
+        _set_current_tree(tree)
+        try:
+            dialog.open()
+        finally:
+            _set_current_tree(None)
+
+        assert dialog._element is not None
+        assert dialog._auto_added is True
+        assert dialog.is_opened() is True
+        # Should be child of container node
+        container = tree.get_node(2)
+        assert dialog.element.node in container._children
+
+    def test_close_auto_removes_from_container(self, tree):
+        """close() removes auto-added dialog from container."""
+        from vaadin.flow.components.notification import _set_current_tree
+        tree.create_node()  # node 1 = body
+        tree.create_node()  # node 2 = container
+        tree._container_node_id = 2
+
+        dialog = Dialog()
+        _set_current_tree(tree)
+        try:
+            dialog.open()
+        finally:
+            _set_current_tree(None)
+
+        assert dialog._auto_added is True
+        container = tree.get_node(2)
+        assert dialog.element.node in container._children
+
+        dialog.close()
+        assert dialog._auto_added is False
+        assert dialog.element.node not in container._children
+
+    def test_manually_added_dialog_not_auto_removed(self, tree):
+        """Manually added dialogs are not auto-removed on close."""
+        dialog = Dialog()
+        dialog._attach(tree)
+        # Simulate being added to a parent
+        body = tree.create_node()
+        body.add_child(dialog.element.node)
+
+        dialog.open()
+        assert dialog._auto_added is False
+
+        dialog.close()
+        # Should still be a child (not auto-removed)
+        assert dialog.element.node in body._children
+
+
 class TestDialogResizeListener:
     """Tests for Dialog.add_resize_listener."""
 
