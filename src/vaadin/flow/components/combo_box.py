@@ -219,19 +219,27 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
 
     def set_value(self, value: Optional[T]):
         old_value = self._value
-        self._value = value
         if self._element:
             if value is not None:
                 key = self._find_key_for_item(value)
                 if key is not None:
+                    self._value = value
                     self.element.set_property("selectedItem", {"key": key, "label": self._get_item_label(value)})
                     self.element.set_property("value", key)
+                else:
+                    # Value not in items -- clear (same as Java when value not in DataProvider)
+                    self._value = None
+                    self.element.set_property("selectedItem", None)
+                    self.element.set_property("value", "")
             else:
+                self._value = None
                 self.element.set_property("selectedItem", None)
                 self.element.set_property("value", "")
-        if value != old_value:
+        else:
+            self._value = value
+        if self._value != old_value:
             for listener in self._change_listeners:
-                listener({"value": value, "from_client": False})
+                listener({"value": self._value, "from_client": False})
 
     def set_label(self, label: str):
         self._label = label
