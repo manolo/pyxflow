@@ -6,7 +6,7 @@
     "python.analysis.packageIndexDepths": [
         { "name": "", "depth": 5, "includeAllSymbols": true }
     ],
-    "python.analysis.completeFunctionParens": true,
+    "python.analysis.completeFunctionParens": false,
     "python.analysis.diagnosticSeverityOverrides": {
         "reportWildcardImportFromLibrary": "none",
         "reportWildcardImportFromModule": "none"
