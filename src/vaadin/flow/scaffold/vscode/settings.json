@@ -7,6 +7,10 @@
         { "name": "", "depth": 5, "includeAllSymbols": true }
     ],
     "python.analysis.completeFunctionParens": true,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportWildcardImportFromLibrary": "none",
+        "reportWildcardImportFromModule": "none"
+    },
     "python.analysis.extraPaths": ["."],
     "python.defaultInterpreterPath": ".venv/bin/python",
     "editor.snippetSuggestions": "top",

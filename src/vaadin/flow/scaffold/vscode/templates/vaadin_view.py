@@ -1,9 +1,5 @@
-from vaadin.flow import Route
-from vaadin.flow.components import (
-    Div,
-    H3,
-    VerticalLayout,
-)
+from vaadin.flow import *
+from vaadin.flow.components import *
 
 
 @Route("{{route}}")
