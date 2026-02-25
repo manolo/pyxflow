@@ -1,0 +1,22 @@
+{
+    "Vaadin View": {
+        "scope": "python",
+        "prefix": "vview",
+        "description": "Create a new Vaadin Flow Python view",
+        "body": [
+            "from vaadin.flow import *",
+            "from vaadin.flow.components import *",
+            "",
+            "@Route(\"${1:path}\")",
+            "class ${3:MyView}(${2:Div}):",
+            "    def __init__(self):",
+            "        self.set_size_full()",
+            "",
+            "        layout = VerticalLayout()",
+            "        layout.set_size_full()",
+            "        $0",
+            "        self.add(layout)",
+            ""
+        ]
+    }
+}
