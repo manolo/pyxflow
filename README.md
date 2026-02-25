@@ -37,20 +37,20 @@ pip install git+https://github.com/manolo/vaadin-pyflow.git
 
 ## Quick start
 
-### New project (empty directory)
+### New project
 
 ```bash
-mkdir my-project && cd my-project
+mkdir my-app && cd my-app
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install git+https://github.com/manolo/vaadin-pyflow.git
 vaadin --setup
 ```
 
-This creates everything you need:
+This creates views, static files, and VSCode config in the current directory:
 
 ```
-my_project/
+my-app/
   __init__.py
   __main__.py
   views/
@@ -62,30 +62,54 @@ my_project/
     styles/
       styles.css
     images/
-.vscode/              # VSCode settings, snippets, extensions
+  .vscode/            # VSCode settings, snippets, extensions
 ```
 
 Run it:
 
 ```bash
-python -m my_project
+cd .. && python -m my_app
 # http://localhost:8080
+```
+
+Or use the CLI from inside the directory:
+
+```bash
+vaadin
 ```
 
 ### Existing project
 
-If you already have a project with a virtual environment and other code:
+If you already have a project with other code and want to add Vaadin as a subpackage:
 
 ```bash
 cd my-project
-source .venv/bin/activate   # activate your existing venv
+source .venv/bin/activate
 pip install git+https://github.com/manolo/vaadin-pyflow.git
 vaadin --setup myapp
 ```
 
-This scaffolds a `myapp/` package inside your project without touching existing files. VSCode configuration is included automatically.
+This creates a `myapp/` package inside your project without touching existing files:
 
-If you only need the VSCode config (without scaffolding a project), use `vaadin --vscode`.
+```
+my-project/
+  .venv/
+  lib/
+  myapp/              # created by --setup
+    __init__.py
+    __main__.py
+    views/
+    static/
+  .vscode/            # also created
+```
+
+Run it:
+
+```bash
+python -m myapp
+```
+
+VSCode configuration is included automatically. If you only need the VSCode config, use `vaadin --vscode`.
 
 ### Running
 

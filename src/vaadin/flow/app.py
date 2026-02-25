@@ -184,11 +184,14 @@ def _setup_project(app_name: str | None = None) -> None:
     import shutil
     from pathlib import Path
 
-    if app_name is None:
-        app_name = Path.cwd().name.replace("-", "_")
-
     root = Path.cwd()
-    pkg = root / app_name
+    if app_name is not None:
+        # Explicit name: create as subdirectory
+        pkg = root / app_name
+    else:
+        # No name: scaffold in cwd, derive name from directory
+        app_name = root.name.replace("-", "_")
+        pkg = root
     scaffold = _scaffold_dir() / "project"
 
     # --- Package directories ---
@@ -240,7 +243,10 @@ def _setup_project(app_name: str | None = None) -> None:
             print("  Warning: favicon.ico not found in package scaffold")
 
     print(f"\n  Project '{app_name}' scaffolded!")
-    print(f"  Run:  python -m {app_name}")
+    if pkg == root:
+        print(f"  Run:  cd .. && python -m {app_name}")
+    else:
+        print(f"  Run:  python -m {app_name}")
 
 
 def _setup_vscode() -> None:
