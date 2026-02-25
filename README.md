@@ -32,61 +32,90 @@ class HelloView(VerticalLayout):
 ## Installation
 
 ```bash
-pip install vaadin-pyflow
+pip install git+https://github.com/manolo/vaadin-pyflow.git@main
 ```
 
 ## Quick start
 
-Create a project:
+### New project (empty directory)
+
+```bash
+mkdir my-project && cd my-project
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install git+https://github.com/manolo/vaadin-pyflow.git@main
+vaadin --setup
+```
+
+This creates everything you need:
 
 ```
-myapp/
+my_project/
   __init__.py
   __main__.py
   views/
     __init__.py
-    hello.py
-```
-
-`myapp/views/hello.py`:
-
-```python
-from vaadin.flow import Route
-from vaadin.flow.components import Button, Notification, TextField, VerticalLayout
-
-@Route("")
-class HelloView(VerticalLayout):
-    def __init__(self):
-        self.name = TextField("Your name")
-        self.add(
-            self.name,
-            Button("Say hello", on_click=self._greet),
-        )
-
-    def _greet(self, event):
-        Notification.show(f"Hello {self.name.value}")
-```
-
-`myapp/__main__.py`:
-
-```python
-from vaadin.flow import FlowApp
-
-FlowApp(port=8080).run()
+    main_layout.py    # AppLayout with SideNav
+    hello_world.py    # Sample view with TextField + Button
+  static/
+    favicon.ico
+    styles/
+      styles.css
+    images/
+.vscode/              # VSCode settings, snippets, extensions
 ```
 
 Run it:
 
 ```bash
-python -m myapp
+python -m my_project
 # http://localhost:8080
 ```
 
-Or use the CLI (auto-detects any directory with `views/`):
+### Existing project
+
+If you already have a project with a virtual environment and other code:
 
 ```bash
-vaadin --port 8080
+cd my-project
+source .venv/bin/activate   # activate your existing venv
+pip install git+https://github.com/manolo/vaadin-pyflow.git@main
+vaadin --setup myapp
 ```
+
+This scaffolds a `myapp/` package inside your project without touching existing files. VSCode configuration is included automatically.
+
+If you only need the VSCode config (without scaffolding a project), use `vaadin --vscode`.
+
+### Running
+
+```bash
+# Auto-detect (finds the directory with views/)
+vaadin
+
+# Explicit module
+vaadin myapp
+
+# Dev mode with hot-reload
+vaadin --dev
+
+# Custom port
+vaadin --port 3000
+```
+
+### Project structure
+
+The `--setup` command generates this structure. Only `views/` is required -- everything else is optional:
+
+| File | Purpose |
+|------|---------|
+| `__main__.py` | Entry point (`python -m myapp`) |
+| `views/main_layout.py` | `@AppShell` with `AppLayout`, drawer, navigation |
+| `views/hello_world.py` | Sample view with `@Route` and `@Menu` |
+| `views/*.py` | Add more views here -- one class per file |
+| `static/styles/*.css` | CSS loaded via `@StyleSheet` in the layout |
+| `static/images/` | Images served at `/images/...` |
+| `static/favicon.ico` | Browser favicon |
 
 ## Components
 
@@ -234,6 +263,8 @@ Requires `@Push` on the `@AppShell` class.
 vaadin [app_module] [options]
 
   app_module               Python module with views/ (auto-detected if omitted)
+  --setup [app_name]       Scaffold a new project (views, static, __main__.py, .vscode/)
+  --vscode                 Generate .vscode/ config and install recommended extensions
   --dev                    Auto-reload on source changes
   --debug                  Verbose UIDL protocol logging
   --port PORT              Server port (default: 8080)
@@ -245,84 +276,7 @@ vaadin [app_module] [options]
 
 ## Development
 
-### Setup
-
-```bash
-git clone https://github.com/vaadin/vaadin-pyflow.git
-cd vaadin-pyflow
-python -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev]"
-```
-
-### Run the demo
-
-```bash
-python -m demo                # http://localhost:8088
-python -m demo --dev          # hot-reload on file changes
-python -m demo --debug        # verbose protocol logging
-```
-
-### Tests
-
-```bash
-# Unit tests (default)
-pytest
-
-# All tests — unit + UI (auto-starts server if needed)
-pytest --all
-
-# Specific test file
-pytest tests/unit/test_rpc_events.py -v
-```
-
-UI integration tests require Playwright:
-
-```bash
-pip install playwright pytest-playwright
-playwright install chromium
-
-# Run UI tests only (auto-starts the server if needed)
-pytest tests/ui/
-
-# With visible browser
-pytest tests/ui/ --headed
-```
-
-UI tests are in `tests/ui/` and excluded from the default `pytest` run. Use `pytest --all` to run everything in one go. They use a shared browser session with SPA navigation across 29 test views in `tests/views/`, each backed by a `TestMainLayout` with a menu sidebar. The test server auto-starts via `python -m tests`.
-
-### Project structure
-
-```
-src/vaadin/flow/
-├── core/           # StateTree, StateNode, Element, Component
-├── components/     # 49 Vaadin components
-├── data/           # Binder, DataProvider, validators, converters
-└── server/         # HTTP server (aiohttp), UIDL protocol handler
-
-demo/
-├── views/          # Demo views (7 routes)
-└── __main__.py     # python -m demo
-
-tests/
-├── views/          # 29 test views with TestMainLayout (independent app)
-├── unit/           # Unit tests (default pytest target)
-├── ui/             # Playwright integration tests (run explicitly)
-└── __main__.py     # python -m tests (test server on :8088)
-```
-
-### Architecture
-
-```
-Browser                          Server (Python)
-┌──────────────────┐             ┌──────────────────────┐
-│ Vaadin Web       │   HTTP/WS   │ StateTree            │
-│ Components       │◄───────────►│ Components (Python)  │
-│ FlowClient.js    │   (UIDL)    │ UIDL Handler         │
-└──────────────────┘             └──────────────────────┘
-```
-
-The browser runs the standard Vaadin frontend (web components + FlowClient.js). The Python server maintains a state tree and communicates changes via the UIDL protocol over HTTP, with optional WebSocket for push.
+See [README-DEV.md](README-DEV.md) for setup, running the demo, tests, project structure, and architecture.
 
 ## License
 
