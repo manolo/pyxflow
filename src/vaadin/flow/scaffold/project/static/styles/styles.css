@@ -1,1 +1,8 @@
 /* App styles */
+
+/* Global Theme: aura or lumo */
+/* @import url('/aura/aura.css'); */
+@import url('/lumo/lumo.css');
+
+/* Set custom styles below */
+/* TIP: set classes to views/components in code */

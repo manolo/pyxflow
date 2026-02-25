@@ -325,6 +325,28 @@ class TestDevModeMetaTag:
         assert '<meta name="pyflow-views" content="demo.views">' in html
 
 
+class TestFaviconFallbackHttp(AioHTTPTestCase):
+    """Test that /favicon.ico is served from scaffold when no app static."""
+
+    async def get_application(self):
+        from vaadin.flow.server.http_server import create_app
+        return create_app()
+
+    async def test_favicon_returns_200(self):
+        """GET /favicon.ico should return 200 even without app static dir."""
+        resp = await self.client.request("GET", "/favicon.ico")
+        assert resp.status == 200
+        assert resp.content_type == "image/x-icon"
+        data = await resp.read()
+        # Valid ICO magic bytes
+        assert data[:4] == b"\x00\x00\x01\x00"
+        assert len(data) > 1000
+
+    async def test_favicon_returns_ico_content_type(self):
+        resp = await self.client.request("GET", "/favicon.ico")
+        assert resp.content_type == "image/x-icon"
+
+
 class TestUidlErrorHandling(AioHTTPTestCase):
     """Test that UIDL errors return meta.appError instead of HTTP 500."""
 

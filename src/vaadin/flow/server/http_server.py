@@ -524,7 +524,7 @@ def get_index_html() -> str:
             # document.baseURI to intercept link clicks for SPA navigation)
             html = html.replace(
                 '<meta charset="UTF-8" />',
-                '<meta charset="UTF-8" />\n  <base href="/">'
+                '<meta charset="UTF-8" />\n  <base href="/">\n  <link rel="icon" href="/favicon.ico">'
             )
             # Prevent document-level scrolling — AppLayout handles its own
             # internal scroll.  Without this the browser can scroll the
@@ -724,7 +724,17 @@ async def handle_route(request: web.Request) -> web.Response:
             if str(resolved).startswith(str(static_dir)) and resolved.is_file():
                 content_type = guess_content_type(resolved)
                 return web.FileResponse(resolved, headers={"Content-Type": content_type, "Cache-Control": "no-cache"})  # type: ignore[return-value]
-        # No static file -- check if a route matches (wildcard routes)
+        # No static file -- fallback favicon from package scaffold
+        if path == "favicon.ico":
+            import importlib.resources
+            try:
+                favicon = importlib.resources.files("vaadin.flow") / "scaffold" / "favicon.ico"
+                with importlib.resources.as_file(favicon) as f:
+                    if f.is_file():
+                        return web.FileResponse(f, headers={"Content-Type": "image/x-icon", "Cache-Control": "no-cache"})  # type: ignore[return-value]
+            except (FileNotFoundError, TypeError):
+                pass
+        # Check if a route matches (wildcard routes)
         from vaadin.flow.router import match_route
         if match_route(path):
             html = get_index_html()

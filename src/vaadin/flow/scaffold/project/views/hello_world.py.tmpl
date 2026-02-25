@@ -1,9 +1,10 @@
-from vaadin.flow import Menu, Route
+from vaadin.flow import *
 from vaadin.flow.components import *
 from {{app_name}}.views.main_layout import MainLayout
 
 
 @Route("hello", page_title="Hello World", layout=MainLayout)
+@RouteAlias("")
 @Menu(title="Hello", order=1, icon="vaadin:hand")
 class HelloWorldView(VerticalLayout):
     def __init__(self):
