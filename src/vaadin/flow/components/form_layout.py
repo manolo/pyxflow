@@ -349,90 +349,73 @@ class FormLayout(Component):
 
     # --- Auto-responsive properties ---
 
+    def _set_form_property(self, name: str, value):
+        """Set a property, buffering in _pending_properties if not yet attached."""
+        if self._element:
+            self.element.set_property(name, value)
+        else:
+            if not hasattr(self, "_pending_properties"):
+                self._pending_properties = {}
+            self._pending_properties[name] = value
+
+    def _get_form_property(self, name: str, default=None):
+        """Get a property from element or pending buffer."""
+        if self._element:
+            return self.element.get_property(name, default)
+        return getattr(self, "_pending_properties", {}).get(name, default)
+
     def set_auto_responsive(self, auto_responsive: bool):
         """Enable or disable auto-responsive mode."""
-        if self._element:
-            self.element.set_property("autoResponsive", auto_responsive)
+        self._set_form_property("autoResponsive", auto_responsive)
 
     def is_auto_responsive(self) -> bool:
-        """Get whether auto-responsive mode is enabled."""
-        if self._element:
-            return self.element.get_property("autoResponsive", False)
-        return False
+        return self._get_form_property("autoResponsive", False)
 
     def set_auto_rows(self, auto_rows: bool):
         """Enable or disable auto-rows mode."""
-        if self._element:
-            self.element.set_property("autoRows", auto_rows)
+        self._set_form_property("autoRows", auto_rows)
 
     def is_auto_rows(self) -> bool:
-        """Get whether auto-rows mode is enabled."""
-        if self._element:
-            return self.element.get_property("autoRows", False)
-        return False
+        return self._get_form_property("autoRows", False)
 
     def set_column_width(self, width: str):
         """Set the column width for auto-responsive mode."""
-        if self._element:
-            self.element.set_property("columnWidth", width)
+        self._set_form_property("columnWidth", width)
 
     def get_column_width(self) -> str | None:
-        """Get the column width."""
-        if self._element:
-            return self.element.get_property("columnWidth")
-        return None
+        return self._get_form_property("columnWidth")
 
     def set_max_columns(self, max_columns: int):
         """Set the maximum number of columns."""
-        if self._element:
-            self.element.set_property("maxColumns", max_columns)
+        self._set_form_property("maxColumns", max_columns)
 
     def get_max_columns(self) -> int | None:
-        """Get the maximum number of columns."""
-        if self._element:
-            return self.element.get_property("maxColumns")
-        return None
+        return self._get_form_property("maxColumns")
 
     def set_min_columns(self, min_columns: int):
         """Set the minimum number of columns."""
-        if self._element:
-            self.element.set_property("minColumns", min_columns)
+        self._set_form_property("minColumns", min_columns)
 
     def get_min_columns(self) -> int | None:
-        """Get the minimum number of columns."""
-        if self._element:
-            return self.element.get_property("minColumns")
-        return None
+        return self._get_form_property("minColumns")
 
     def set_expand_columns(self, expand: bool):
         """Set whether columns should expand to fill available space."""
-        if self._element:
-            self.element.set_property("expandColumns", expand)
+        self._set_form_property("expandColumns", expand)
 
     def is_expand_columns(self) -> bool:
-        """Get whether columns expand."""
-        if self._element:
-            return self.element.get_property("expandColumns", False)
-        return False
+        return self._get_form_property("expandColumns", False)
 
     def set_expand_fields(self, expand: bool):
         """Set whether fields should expand within their column."""
-        if self._element:
-            self.element.set_property("expandFields", expand)
+        self._set_form_property("expandFields", expand)
 
     def is_expand_fields(self) -> bool:
-        """Get whether fields expand."""
-        if self._element:
-            return self.element.get_property("expandFields", False)
-        return False
+        return self._get_form_property("expandFields", False)
 
     def set_labels_aside(self, aside: bool):
         """Set whether labels are positioned beside fields."""
-        if self._element:
-            self.element.set_property("labelsAside", aside)
+        self._set_form_property("labelsAside", aside)
 
     def is_labels_aside(self) -> bool:
-        """Get whether labels are positioned aside."""
-        if self._element:
-            return self.element.get_property("labelsAside")
-        return False
+        return self._get_form_property("labelsAside", False)
