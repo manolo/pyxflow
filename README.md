@@ -32,7 +32,7 @@ class HelloView(VerticalLayout):
 ## Installation
 
 ```bash
-pip install git+https://github.com/manolo/vaadin-pyflow.git@main
+pip install git+https://github.com/manolo/vaadin-pyflow.git
 ```
 
 ## Quick start
@@ -43,7 +43,7 @@ pip install git+https://github.com/manolo/vaadin-pyflow.git@main
 mkdir my-project && cd my-project
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install git+https://github.com/manolo/vaadin-pyflow.git@main
+pip install git+https://github.com/manolo/vaadin-pyflow.git
 vaadin --setup
 ```
 
@@ -79,7 +79,7 @@ If you already have a project with a virtual environment and other code:
 ```bash
 cd my-project
 source .venv/bin/activate   # activate your existing venv
-pip install git+https://github.com/manolo/vaadin-pyflow.git@main
+pip install git+https://github.com/manolo/vaadin-pyflow.git
 vaadin --setup myapp
 ```
 
