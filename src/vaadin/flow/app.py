@@ -216,7 +216,11 @@ def _setup_project(app_name: str | None = None) -> None:
         if dest.exists():
             return
         text = (scaffold / src_name).read_text()
-        _write(dest, text.replace("{{app_name}}", app_name))
+        if pkg == root:
+            # cwd mode: "from views.main_layout" not "from pepe.views.main_layout"
+            text = text.replace("{{app_name}}.", "")
+        text = text.replace("{{app_name}}", app_name)
+        _write(dest, text)
 
     # --- __init__.py ---
     for init in (pkg / "__init__.py", views_dir / "__init__.py"):
@@ -413,6 +417,11 @@ def main():
     if views is None or views == ".":
         views = _auto_detect_app()
         if views is None:
+            print("  No views/ directory found in the current directory.")
+            print()
+            print("  To scaffold a new project:  vaadin --setup")
+            print("  Or create views/ manually:  mkdir -p views && touch views/__init__.py")
+            print()
             _usage()
 
     if "." not in views:

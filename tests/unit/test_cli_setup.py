@@ -60,16 +60,17 @@ class TestSetupProjectInCwd:
         assert (project / "__init__.py").exists()
         assert (project / "__main__.py").exists()
 
-    def test_derives_app_name_from_cwd(self, tmp_path, monkeypatch):
+    def test_cwd_mode_uses_relative_import(self, tmp_path, monkeypatch):
         project = tmp_path / "cool-app"
         project.mkdir()
         monkeypatch.chdir(project)
 
         _setup_project(app_name=None)
 
-        # hello_world.py should import from cool_app (hyphens -> underscores)
+        # cwd mode: import from views directly, not cool_app.views
         hello = (project / "views" / "hello_world.py").read_text()
-        assert "from cool_app.views.main_layout import MainLayout" in hello
+        assert "from views.main_layout import MainLayout" in hello
+        assert "cool_app.views" not in hello
 
     def test_main_py_uses_cwd_name(self, tmp_path, monkeypatch):
         project = tmp_path / "my-demo"
