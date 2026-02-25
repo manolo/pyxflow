@@ -7,8 +7,4 @@ class {{classname}}(Div):
     def __init__(self):
         self.set_size_full()
 
-        layout = VerticalLayout()
-        layout.set_size_full()
-        layout.add(H3("{{route}}"))
-
-        self.add(layout)
+        self.add(H3("hello"))
