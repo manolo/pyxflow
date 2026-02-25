@@ -260,7 +260,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.dialog.set_header_title("Sample Dialog")
         self.dialog.add(Span("This is a dialog with some content."))
         self.dialog.add(Span("You can close it by clicking outside."))
-        self.add(self.dialog)
 
         # --- Component Features ---
         section = self.add_section("Component Features", "col-span-2")
@@ -610,7 +609,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.crud_confirm.set_confirm_button_theme("error primary")
         self.crud_confirm.set_cancelable(True)
         self.crud_confirm.add_confirm_listener(self._crud_do_delete)
-        self.add(self.crud_confirm)
 
         # ConfirmDialog for cancel with unsaved changes (overlay)
         self.crud_cancel_confirm = ConfirmDialog()
@@ -620,7 +618,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         self.crud_cancel_confirm.set_confirm_button_theme("error primary")
         self.crud_cancel_confirm.set_cancelable(True)
         self.crud_cancel_confirm.add_confirm_listener(lambda e: self._crud_clear_form())
-        self.add(self.crud_cancel_confirm)
 
         # --- Grid ---
         section = self.add_section("Grid", "col-span-2")
@@ -817,9 +814,73 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         section.add(virtual_list)
         section.add(self.vl_label)
 
+        # --- FormLayout (auto-responsive, add children) ---
+        section = self.add_section("FormLayout", "col-span-3")
+
+        fl_first = TextField("First name")
+        fl_last = TextField("Last name")
+        fl_email = EmailField("Email")
+        fl_phone = TextField("Phone")
+        fl_call = Checkbox("Call me")
+        fl_pwd = PasswordField("Password")
+        fl_confirm = PasswordField("Confirm password")
+        fl_phone_row = HorizontalLayout(fl_phone, fl_call)
+        fl_phone_row.set_align_items(Alignment.BASELINE)
+
+        form1 = FormLayout()
+        form1.set_auto_responsive(True)
+        form1.set_expand_columns(True)
+        form1.set_expand_fields(True)
+
+        form1.add_form_row(fl_first, fl_last)
+        form1.add_form_row(fl_email, fl_phone_row)
+        form1.add_form_row(fl_pwd, fl_confirm)
+
+        section.add(form1)
+
+        # --- FormLayout (auto-responsive, FormItem labels aside) ---
+        section = self.add_section("FormLayout (labels aside)", "col-span-3")
+
+        fi_first = TextField()
+        fi_last = TextField()
+        fi_email = EmailField()
+        fi_phone = TextField()
+        fi_call = Checkbox("Call me")
+        fi_pwd = PasswordField()
+        fi_confirm = PasswordField()
+        fi_phone_row = HorizontalLayout(fi_phone, fi_call)
+        fi_phone_row.set_align_items(Alignment.BASELINE)
+
+        form2 = FormLayout()
+        form2.set_auto_responsive(True)
+        form2.set_expand_columns(True)
+        form2.set_expand_fields(True)
+        form2.set_labels_aside(True)
+
+        row1 = form2.add_form_row()
+        row1.add_form_item(fi_first, "First name")
+        row1.add_form_item(fi_last, "Last name")
+
+        row2 = form2.add_form_row()
+        email_item = row2.add_form_item(fi_email, "Email")
+        form2.set_colspan(email_item, 2)
+
+        row3 = form2.add_form_row()
+        phone_item = row3.add_form_item(fi_phone_row, "Phone")
+        form2.set_colspan(phone_item, 2)
+        fi_call.set_width("20%")
+        fi_phone.set_width("80%")
+
+        form2.add_form_item(fi_pwd, "Password")
+        form2.add_form_item(fi_confirm, "Repeat")
+
+        section.add(form2)
+
     def _attach(self, tree):
         super()._attach(tree)
         ui = self.get_ui()
+        if ui is None:
+            return
         t, v = ui.get_theme(), ui.get_theme_variant()
         self.theme_label.set_text(f"Current: {t}-{v}")
         self._theme_list_box.set_value(f"{t.capitalize()} {v.capitalize()}")
