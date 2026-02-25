@@ -259,6 +259,60 @@ class TestConfirmDialog:
         assert node.get(Feature.ELEMENT_PROPERTY_MAP, "cancelButtonVisible") is True
         assert node.get(Feature.ELEMENT_PROPERTY_MAP, "rejectButtonVisible") is True
 
+    def test_reopen_after_close(self):
+        """Auto-added ConfirmDialog can be reopened after close."""
+        from vaadin.flow.components.notification import _set_current_tree
+        tree = StateTree()
+        tree.create_node()  # node 1 = body
+        tree.create_node()  # node 2 = container
+        tree._container_node_id = 2
+
+        cd = ConfirmDialog(header="Delete", text="Sure?", confirm_text="OK")
+        _set_current_tree(tree)
+        try:
+            cd.open()
+            assert cd.is_opened() is True
+            container = tree.get_node(2)
+            assert cd.element.node in container._children
+
+            cd.close()
+            assert cd.is_opened() is False
+
+            # Reopen -- must work
+            cd.open()
+            assert cd.is_opened() is True
+            assert cd.element.node in container._children
+            props = cd.element.node._features.get(1, {})
+            assert props.get("opened") is True
+        finally:
+            _set_current_tree(None)
+
+    def test_reopen_after_confirm(self):
+        """Auto-added ConfirmDialog can be reopened after confirm event."""
+        from vaadin.flow.components.notification import _set_current_tree
+        tree = StateTree()
+        tree.create_node()  # node 1 = body
+        tree.create_node()  # node 2 = container
+        tree._container_node_id = 2
+
+        cd = ConfirmDialog(header="Delete", text="Sure?", confirm_text="OK")
+        container = tree.get_node(2)
+        _set_current_tree(tree)
+        try:
+            cd.open()
+            # Simulate confirm from client
+            cd._on_confirm({})
+            assert cd.is_opened() is False
+
+            # Reopen -- must work
+            cd.open()
+            assert cd.is_opened() is True
+            assert cd.element.node in container._children
+            props = cd.element.node._features.get(1, {})
+            assert props.get("opened") is True
+        finally:
+            _set_current_tree(None)
+
     def test_open_before_attach_flushed(self):
         """open() called before attach must flush opened=True during _attach.
 

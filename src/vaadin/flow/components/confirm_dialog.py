@@ -105,17 +105,8 @@ class ConfirmDialog(Component):
         self._opened = False
         if self._element:
             self.element.set_property("opened", False)
-        self._auto_remove()
         for listener in self._opened_change_listeners:
             listener({"opened": False})
-
-    def _auto_remove(self):
-        """Remove from UI if this dialog was auto-added."""
-        if self._auto_added and self._element:
-            self._auto_added = False
-            parent = self.element.node._parent
-            if parent:
-                parent.remove_child(self.element.node)
 
     def is_opened(self) -> bool:
         """Check if the dialog is open."""
@@ -241,7 +232,6 @@ class ConfirmDialog(Component):
             self.element.set_property("opened", False)
         for listener in self._confirm_listeners:
             listener(event_data)
-        self._auto_remove()
 
     def _on_cancel(self, event_data: dict):
         """Handle cancel event from client."""
@@ -250,7 +240,6 @@ class ConfirmDialog(Component):
             self.element.set_property("opened", False)
         for listener in self._cancel_listeners:
             listener(event_data)
-        self._auto_remove()
 
     def _on_reject(self, event_data: dict):
         """Handle reject event from client."""
@@ -259,7 +248,6 @@ class ConfirmDialog(Component):
             self.element.set_property("opened", False)
         for listener in self._reject_listeners:
             listener(event_data)
-        self._auto_remove()
 
     def add_theme_variants(self, *variants: DialogVariant):
         """Add theme variants to the confirm dialog."""

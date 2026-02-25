@@ -208,7 +208,6 @@ class Dialog(Component):
         if self._element:
             self._pending_server_change = True
             self.element.set_property("opened", False)
-        self._auto_remove()
 
     def is_opened(self) -> bool:
         """Check if the dialog is open."""
@@ -343,14 +342,6 @@ class Dialog(Component):
         """Add a listener for when the dialog closes."""
         self._close_listeners.append(listener)
 
-    def _auto_remove(self):
-        """Remove from UI if this dialog was auto-added."""
-        if self._auto_added and self._element:
-            self._auto_added = False
-            parent = self.element.node._parent
-            if parent:
-                parent.remove_child(self.element.node)
-
     def _handle_opened_changed(self, event_data: dict):
         """Handle opened-changed event from client.
 
@@ -373,7 +364,6 @@ class Dialog(Component):
         if was_opened:
             for listener in self._close_listeners:
                 listener(event_data)
-            self._auto_remove()
 
     def handle_client_close(self):
         """Called when the client reports the dialog was closed.

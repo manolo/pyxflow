@@ -282,8 +282,8 @@ class TestDialogAutoAdd:
         container = tree.get_node(2)
         assert dialog.element.node in container._children
 
-    def test_close_auto_removes_from_container(self, tree):
-        """close() removes auto-added dialog from container."""
+    def test_close_keeps_node_in_container(self, tree):
+        """close() keeps auto-added dialog in container (node stays, overlay hidden)."""
         from vaadin.flow.components.notification import _set_current_tree
         tree.create_node()  # node 1 = body
         tree.create_node()  # node 2 = container
@@ -301,8 +301,37 @@ class TestDialogAutoAdd:
         assert dialog.element.node in container._children
 
         dialog.close()
-        assert dialog._auto_added is False
-        assert dialog.element.node not in container._children
+        # Node stays in container -- overlay is hidden by opened=false
+        assert dialog.element.node in container._children
+
+    def test_reopen_after_close(self, tree):
+        """Auto-added dialog can be reopened after being closed."""
+        from vaadin.flow.components.notification import _set_current_tree
+        tree.create_node()  # node 1 = body
+        tree.create_node()  # node 2 = container
+        tree._container_node_id = 2
+
+        dialog = Dialog()
+        dialog.add(Span("Hello"))
+        _set_current_tree(tree)
+        try:
+            dialog.open()
+            assert dialog.is_opened() is True
+            container = tree.get_node(2)
+            assert dialog.element.node in container._children
+
+            dialog.close()
+            assert dialog.is_opened() is False
+
+            # Reopen -- must work
+            dialog.open()
+            assert dialog.is_opened() is True
+            assert dialog.element.node in container._children
+            # Property must be True on the element
+            props = dialog.element.node._features.get(1, {})
+            assert props.get("opened") is True
+        finally:
+            _set_current_tree(None)
 
     def test_manually_added_dialog_not_auto_removed(self, tree):
         """Manually added dialogs are not auto-removed on close."""
