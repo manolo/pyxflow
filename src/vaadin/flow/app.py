@@ -327,6 +327,29 @@ def _setup_vscode() -> None:
     print("\n  VSCode configuration ready!")
 
 
+def _ensure_importable(views: str) -> None:
+    """Make sure the views module is importable from the current directory."""
+    cwd = os.getcwd()
+    package = views.rsplit(".", 1)[0]
+    package_dir = os.path.join(cwd, package.replace(".", os.sep))
+    if os.path.isdir(package_dir):
+        # Package is a subdirectory of cwd (e.g. myapp/views/)
+        if cwd not in sys.path:
+            sys.path.insert(0, cwd)
+    elif os.path.isdir(os.path.join(cwd, "views")):
+        # Package is cwd itself (views/ at root, from --setup without name).
+        # Directory may have hyphens (app-1) while module uses underscores (app_1).
+        # Inject cwd as a synthetic package so `import app_1.views` works.
+        import types
+        pkg_mod = types.ModuleType(package)
+        pkg_mod.__path__ = [cwd]
+        pkg_mod.__package__ = package
+        sys.modules[package] = pkg_mod
+    else:
+        if cwd not in sys.path:
+            sys.path.insert(0, cwd)
+
+
 def main():
     """CLI entry point: ``vaadin [app_module] [--dev] [--debug]``."""
     if len(sys.argv) >= 2 and sys.argv[1] in ("-h", "--help"):
@@ -395,26 +418,7 @@ def main():
     if "." not in views:
         views = f"{views}.views"
 
-    # Ensure the package is importable
-    cwd = os.getcwd()
-    package = views.rsplit(".", 1)[0]
-    package_dir = os.path.join(cwd, package.replace(".", os.sep))
-    if os.path.isdir(package_dir):
-        # Package is a subdirectory of cwd (e.g. myapp/views/)
-        if cwd not in sys.path:
-            sys.path.insert(0, cwd)
-    elif os.path.isdir(os.path.join(cwd, "views")):
-        # Package is cwd itself (views/ at root, from --setup without name).
-        # Directory may have hyphens (app-1) while module uses underscores (app_1).
-        # Inject cwd as a synthetic package so `import app_1.views` works.
-        import types
-        pkg_mod = types.ModuleType(package)
-        pkg_mod.__path__ = [cwd]
-        pkg_mod.__package__ = package
-        sys.modules[package] = pkg_mod
-    else:
-        if cwd not in sys.path:
-            sys.path.insert(0, cwd)
+    _ensure_importable(views)
 
     port = 8080
     host = "localhost"
@@ -443,11 +447,9 @@ def main():
 
 def _dev_serve():
     """Entry point for dev-mode child process (reads config from env)."""
-    cwd = os.getcwd()
-    if cwd not in sys.path:
-        sys.path.insert(0, cwd)
     try:
         cfg = json.loads(os.environ["_PYFLOW_APP"])
+        _ensure_importable(cfg["views"])
         _serve(cfg["views"], cfg["host"], cfg["port"], cfg["debug"],
                dev=True, socket_fd=cfg.get("socket_fd"))
     except KeyboardInterrupt:
