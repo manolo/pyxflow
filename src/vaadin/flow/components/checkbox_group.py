@@ -75,6 +75,9 @@ class CheckboxGroup(HasReadOnly, HasValidation, HasRequired, Component, Generic[
 
     def set_items(self, *items: T):
         """Set the items for the checkbox group."""
+        # Support both set_items("a", "b") and set_items(["a", "b"])
+        if len(items) == 1 and isinstance(items[0], (list, tuple)):
+            items = items[0]
         self._items = list(items)
         if self._element and self._element._tree:
             self._create_checkboxes(self._element._tree)

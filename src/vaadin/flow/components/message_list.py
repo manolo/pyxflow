@@ -90,6 +90,9 @@ class MessageList(Component):
 
     def set_items(self, *items: MessageListItem):
         """Set the message items."""
+        # Support both set_items(item1, item2) and set_items([item1, item2])
+        if len(items) == 1 and isinstance(items[0], (list, tuple)):
+            items = items[0]
         self._items = list(items)
         for item in self._items:
             item._message_list = self

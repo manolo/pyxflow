@@ -172,6 +172,9 @@ class MultiSelectComboBox(HasReadOnly, HasValidation, HasRequired, Component, Ge
         self.element.set_property("selectedItems", selected)
 
     def set_items(self, *items: T):
+        # Support both set_items("a", "b") and set_items(["a", "b"])
+        if len(items) == 1 and isinstance(items[0], (list, tuple)):
+            items = items[0]
         self._clear_provider()
         self._items = list(items)
         if self._element:

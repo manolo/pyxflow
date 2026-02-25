@@ -124,6 +124,9 @@ class Select(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
 
     def set_items(self, *items: T):
         """Set the items for the select."""
+        # Support both set_items("a", "b") and set_items(["a", "b"])
+        if len(items) == 1 and isinstance(items[0], (list, tuple)):
+            items = items[0]
         self._items = list(items)
         if self._element and self._element._tree:
             tree = self._element._tree
