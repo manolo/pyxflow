@@ -706,19 +706,17 @@ async def handle_route(request: web.Request) -> web.Response:
 
     path = request.match_info.get("path", "")
 
-    # Path has a file extension → serve from static/ or 404
+    # Path has a file extension → serve from static/ first, then check routes.
     # Only treat as static file if the last segment ends with a known extension
-    # (not just any dot, since route params like "25.1.0-alpha9" contain dots)
-    # BUT skip static lookup if the path matches a registered route (e.g. wildcard
-    # routes like "files/:path*" can match paths ending in .txt/.json).
+    # (not just any dot, since route params like "25.1.0-alpha9" contain dots).
+    # Static files take priority over wildcard routes -- if a real file exists
+    # in static/, serve it. Only fall through to SPA routing if no file found
+    # AND a registered route matches (e.g. wildcard "files/:path*" for .txt).
     last_segment = path.rsplit("/", 1)[-1] if path else ""
     dot_pos = last_segment.rfind(".")
     ext = last_segment[dot_pos:].lower() if dot_pos > 0 else ""
     if ext in _STATIC_EXTENSIONS:
-        from vaadin.flow.router import match_route
-        if match_route(path):
-            html = get_index_html()
-            return web.Response(text=html, content_type="text/html")
+        # Try static file first
         if _app_directory is not None:
             file_path = _app_directory / "static" / path
             static_dir = (_app_directory / "static").resolve()
@@ -726,6 +724,11 @@ async def handle_route(request: web.Request) -> web.Response:
             if str(resolved).startswith(str(static_dir)) and resolved.is_file():
                 content_type = guess_content_type(resolved)
                 return web.FileResponse(resolved, headers={"Content-Type": content_type, "Cache-Control": "no-cache"})  # type: ignore[return-value]
+        # No static file -- check if a route matches (wildcard routes)
+        from vaadin.flow.router import match_route
+        if match_route(path):
+            html = get_index_html()
+            return web.Response(text=html, content_type="text/html")
         return web.Response(status=404)
 
     # No extension → serve index.html for client-side routing
