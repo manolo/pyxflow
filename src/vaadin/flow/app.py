@@ -147,11 +147,15 @@ class FlowApp:
 
 
 def _auto_detect_app() -> str | None:
-    """Try to find an app module in cwd by looking for <pkg>/views/."""
+    """Try to find an app module in cwd by looking for <pkg>/views/ or ./views/."""
     from pathlib import Path
+    # Check subdirectories first (e.g. myapp/views/)
     for entry in sorted(Path.cwd().iterdir()):
         if entry.is_dir() and (entry / "views").is_dir():
             return entry.name
+    # Check cwd itself (e.g. views/ at root, from --setup without name)
+    if (Path.cwd() / "views").is_dir():
+        return Path.cwd().name.replace("-", "_")
     return None
 
 
@@ -383,7 +387,7 @@ def main():
         generate_and_build(app_dir=app_dir, keep=keep, vaadin_version=vaadin_version)
         sys.exit(0)
 
-    if views is None:
+    if views is None or views == ".":
         views = _auto_detect_app()
         if views is None:
             _usage()
@@ -391,9 +395,26 @@ def main():
     if "." not in views:
         views = f"{views}.views"
 
+    # Ensure the package is importable
     cwd = os.getcwd()
-    if cwd not in sys.path:
-        sys.path.insert(0, cwd)
+    package = views.rsplit(".", 1)[0]
+    package_dir = os.path.join(cwd, package.replace(".", os.sep))
+    if os.path.isdir(package_dir):
+        # Package is a subdirectory of cwd (e.g. myapp/views/)
+        if cwd not in sys.path:
+            sys.path.insert(0, cwd)
+    elif os.path.isdir(os.path.join(cwd, "views")):
+        # Package is cwd itself (views/ at root, from --setup without name).
+        # Directory may have hyphens (app-1) while module uses underscores (app_1).
+        # Inject cwd as a synthetic package so `import app_1.views` works.
+        import types
+        pkg_mod = types.ModuleType(package)
+        pkg_mod.__path__ = [cwd]
+        pkg_mod.__package__ = package
+        sys.modules[package] = pkg_mod
+    else:
+        if cwd not in sys.path:
+            sys.path.insert(0, cwd)
 
     port = 8080
     host = "localhost"
@@ -447,10 +468,10 @@ def _serve(views: str, host: str, port: int, debug: bool, *, dev: bool = False, 
     # Resolve app package directory (e.g. "demo.views" → demo/)
     package = views.rsplit(".", 1)[0]
     pkg_mod = importlib.import_module(package)
-    if pkg_mod.__file__:
+    if getattr(pkg_mod, "__file__", None):
         set_app_directory(Path(pkg_mod.__file__).parent)
     elif hasattr(pkg_mod, "__path__"):
-        # Namespace package (no __init__.py) — use __path__
+        # Namespace or synthetic package — use __path__
         set_app_directory(Path(list(pkg_mod.__path__)[0]))
 
     if socket_fd is not None:
