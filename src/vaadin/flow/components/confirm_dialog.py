@@ -95,6 +95,12 @@ class ConfirmDialog(Component):
                 if container:
                     container.add_child(self.element.node)
                 self._auto_added = True
+        elif self._auto_added and self.element.node._parent is None:
+            # Was auto-removed on close, re-add to container
+            tree = self.element.node._tree
+            container = tree.get_node(tree._container_node_id)
+            if container:
+                container.add_child(self.element.node)
         if self._element:
             self.element.set_property("opened", True)
         for listener in self._opened_change_listeners:
@@ -105,6 +111,7 @@ class ConfirmDialog(Component):
         self._opened = False
         if self._element:
             self.element.set_property("opened", False)
+            self._auto_remove()
         for listener in self._opened_change_listeners:
             listener({"opened": False})
 
@@ -225,11 +232,17 @@ class ConfirmDialog(Component):
         """Add a listener for opened state changes."""
         self._opened_change_listeners.append(listener)
 
+    def _auto_remove(self):
+        """Remove auto-added dialog from container (matching Java's OverlayAutoAddController)."""
+        if self._auto_added and self._element and self.element.node._parent is not None:
+            self.element.node._parent.remove_child(self.element.node)
+
     def _on_confirm(self, event_data: dict):
         """Handle confirm event from client."""
         self._opened = False
         if self._element:
             self.element.set_property("opened", False)
+            self._auto_remove()
         for listener in self._confirm_listeners:
             listener(event_data)
 
@@ -238,6 +251,7 @@ class ConfirmDialog(Component):
         self._opened = False
         if self._element:
             self.element.set_property("opened", False)
+            self._auto_remove()
         for listener in self._cancel_listeners:
             listener(event_data)
 
@@ -246,6 +260,7 @@ class ConfirmDialog(Component):
         self._opened = False
         if self._element:
             self.element.set_property("opened", False)
+            self._auto_remove()
         for listener in self._reject_listeners:
             listener(event_data)
 

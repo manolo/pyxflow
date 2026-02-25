@@ -277,8 +277,10 @@ class TestConfirmDialog:
 
             cd.close()
             assert cd.is_opened() is False
+            # Auto-removed from container
+            assert cd.element.node not in container._children
 
-            # Reopen -- must work
+            # Reopen -- re-adds to container
             cd.open()
             assert cd.is_opened() is True
             assert cd.element.node in container._children
@@ -303,8 +305,10 @@ class TestConfirmDialog:
             # Simulate confirm from client
             cd._on_confirm({})
             assert cd.is_opened() is False
+            # Auto-removed from container
+            assert cd.element.node not in container._children
 
-            # Reopen -- must work
+            # Reopen -- re-adds to container
             cd.open()
             assert cd.is_opened() is True
             assert cd.element.node in container._children

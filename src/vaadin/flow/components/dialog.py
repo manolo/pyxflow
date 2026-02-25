@@ -192,6 +192,12 @@ class Dialog(Component):
                 if container:
                     container.add_child(self.element.node)
                 self._auto_added = True
+        elif self._auto_added and self.element.node._parent is None:
+            # Was auto-removed on close, re-add to container
+            tree = self.element.node._tree
+            container = tree.get_node(tree._container_node_id)
+            if container:
+                container.add_child(self.element.node)
         if self._element:
             self._pending_server_change = True
             self.element.set_property("opened", True)
@@ -208,6 +214,7 @@ class Dialog(Component):
         if self._element:
             self._pending_server_change = True
             self.element.set_property("opened", False)
+            self._auto_remove()
 
     def is_opened(self) -> bool:
         """Check if the dialog is open."""
@@ -361,9 +368,15 @@ class Dialog(Component):
         if was_opened and self._element:
             self._pending_server_change = True
             self.element.set_property("opened", False)
+            self._auto_remove()
         if was_opened:
             for listener in self._close_listeners:
                 listener(event_data)
+
+    def _auto_remove(self):
+        """Remove auto-added dialog from container (matching Java's OverlayAutoAddController)."""
+        if self._auto_added and self._element and self.element.node._parent is not None:
+            self.element.node._parent.remove_child(self.element.node)
 
     def handle_client_close(self):
         """Called when the client reports the dialog was closed.
