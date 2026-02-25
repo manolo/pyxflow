@@ -1,9 +1,10 @@
-from vaadin.flow import AppShell, StyleSheet
+from vaadin.flow import *
 from vaadin.flow.components import *
 from vaadin.flow.menu import get_menu_entries
 
 
 @AppShell
+@Push
 @StyleSheet("styles/styles.css")
 class MainLayout(AppLayout):
     def __init__(self):

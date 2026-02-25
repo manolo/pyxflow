@@ -122,7 +122,7 @@ class FlowApp:
             for changes in watchfiles.watch(
                 ".",
                 watch_filter=watchfiles.PythonFilter(),
-                debounce=1600,
+                debounce=800,
             ):
                 actually_changed = []
                 for _, p in changes:
