@@ -51,14 +51,14 @@ Single-page marketing landing site for Vaadin PyFlow. Dark theme, zero external 
 
 Screenshots are captured from the PyFlow demo app running at `localhost:8089` with Lumo Dark theme. To refresh them:
 
-1. Start the demo: `cd ../.. && python -m vaadin --dev` (from the pyflow demo project)
+1. Start the demo: `cd vaadin-pyflow && source .venv/bin/activate && python -m demo` → :8088
 2. Use Playwright MCP to navigate and take screenshots
-3. Save to `web/screenshots/`
+3. Save to `docs/screenshots/`
 
 ## Verification
 
 ```bash
-cd web && python -m http.server 8000
+cd docs && python -m http.server 8000
 # Open http://localhost:8000
 ```
 

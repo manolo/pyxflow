@@ -560,7 +560,7 @@ footer .footer-links {
     <a href="#" class="brand">
       <img src="logo.png" alt="PyFlow">
       PyFlow
-      <span class="by-vaadin">by Vaadin</span>
+      <!-- <span class="by-vaadin">by Vaadin</span> -->
     </a>
     <div class="links">
       <a href="#why">Features</a>
@@ -659,7 +659,7 @@ footer .footer-links {
       </div>
 
       <div class="arch-wire">
-        <span class="wire-label">WebSocket</span>
+        <span class="wire-label">UIDL/WebSocket</span>
         <div class="wire-line"></div>
         <span class="wire-sub">UI diffs only</span>
       </div>
@@ -685,14 +685,14 @@ footer .footer-links {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
         </div>
         <h4>Zero Attack Surface</h4>
-        <p>No REST APIs, no GraphQL, no endpoints to exploit. The binary WebSocket protocol is opaque to pentesters. XSS and injection are structurally impossible.</p>
+        <p>No REST APIs, no GraphQL, no endpoints to exploit. The UIDL protocol is opaque to pentesters. XSS and injection are by design impossible.</p>
       </div>
       <div class="arch-benefit fade-in">
         <div class="benefit-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <h4>Server-side State</h4>
-        <p>All logic, validation, and data stay on the server. Nothing sensitive reaches the browser. Impossible to tamper with from DevTools.</p>
+        <p>All logic, validation, and data stay on the server. Nothing sensitive reaches the browser. Dificult to tamper from DevTools.</p>
       </div>
       <div class="arch-benefit fade-in">
         <div class="benefit-icon">
@@ -844,22 +844,25 @@ footer .footer-links {
       </div>
       <div class="terminal-body">
         <span class="comment"># Install PyFlow</span><br>
-        <span class="prompt">$</span> pip install vaadin-pyflow<br>
+        <span class="prompt">$</span> pip install git+https://github.com/manolo/vaadin-pyflow.git<br>
         <br>
         <span class="comment"># Create your app</span><br>
         <span class="prompt">$</span> mkdir myapp && cd myapp<br>
         <span class="prompt">$</span> mkdir views<br>
         <br>
+        <span class="comment"># Optionally create some demo views</span><br>
+        <span class="prompt">$</span> vaadin --setup<br>
+        <br>
         <span class="comment"># Run with hot reload</span><br>
-        <span class="prompt">$</span> python -m vaadin --dev<br>
+        <span class="prompt">$</span> vaadin --dev<br>
       </div>
     </div>
     <div class="file-tree fade-in">
       <span class="dir">myapp/</span><br>
-      &nbsp;&nbsp;<span class="dir">views/</span><br>
-      &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">__init__.py</span> <span class="note">&larr; from vaadin import *</span><br>
-      &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">hello.py</span> <span class="note">&larr; your first view</span><br>
-      &nbsp;&nbsp;<span class="file">__main__.py</span> <span class="note">&larr; from vaadin import run; run()</span><br>
+      &nbsp;&nbsp;<span class="dir">views/</span> <span class="note">&larr; your views</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">hello.py</span><br>
+      &nbsp;&nbsp;<span class="dir">static/</span> <span class="note">&larr; optional</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">styles/</span><span class="file">styles.css</span> <span class="note">&larr; custom styles</span><br>
     </div>
   </div>
 </section>
@@ -871,7 +874,8 @@ footer .footer-links {
       <a href="https://github.com/vaadin/vaadin-pyflow" target="_blank">GitHub</a>
       <a href="https://github.com/vaadin/vaadin-pyflow/issues" target="_blank">Issues</a>
     </div>
-    <p>PyFlow by <a href="https://vaadin.com" target="_blank">Vaadin }></a> — Open source under the Apache 2.0 License.</p>
+    <!-- <p>PyFlow by <a href="https://vaadin.com" target="_blank">Vaadin }></a> -- Open source under the Apache 2.0 License.</p> -->
+    <p>PyFlow - Open source under the Apache 2.0 License.</p>
   </div>
 </footer>
 

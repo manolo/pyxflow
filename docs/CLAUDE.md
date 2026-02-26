@@ -11,9 +11,9 @@ Single-page marketing landing site for Vaadin PyFlow. Pure HTML+CSS+JS, zero dep
 ## File Structure
 
 ```
-web/
+docs/
 ├── index.html          # THE site — all HTML, CSS, and JS in one file
-├── logo.svg            # SVG logo (Python snake + flow, blue/cyan gradient)
+├── logo.png            # Logo (Python snake + flow, blue/cyan gradient)
 ├── screenshots/        # App screenshots (Lumo Dark theme)
 │   ├── screenshot-hello.png
 │   ├── screenshot-grid.png
@@ -46,7 +46,7 @@ The showcase section has 3 examples with hand-written syntax-highlighted HTML. E
 Screenshots come from the PyFlow demo app. To refresh:
 1. Start the demo app (ask user which port)
 2. Use Playwright MCP: `browser_navigate` → `browser_take_screenshot`
-3. Save PNGs to `web/screenshots/`
+3. Save PNGs to `docs/screenshots/`
 
 ### Adding a new showcase example
 1. Add a new `<div class="showcase-item fade-in">` (or `showcase-item reverse fade-in` for alternating layout) inside the `#showcase` section
@@ -66,7 +66,7 @@ Add inside `.features` grid in the `#why` section:
 ## How to Verify
 
 ```bash
-cd web && python -m http.server 8000
+cd docs && python -m http.server 8000
 # Open http://localhost:8000
 ```
 
@@ -80,7 +80,7 @@ Or use Playwright MCP:
 
 - Repository: `https://github.com/manolo/vaadin-pyflow`
 - Issues: `https://github.com/manolo/vaadin-pyflow/issues`
-- Nav GitHub link currently points to `https://github.com/nicegui/pyflow` (placeholder — update when repo is public)
+- Nav GitHub link: `https://github.com/vaadin/vaadin-pyflow`
 
 ## PyFlow API Patterns (for code snippets)
 

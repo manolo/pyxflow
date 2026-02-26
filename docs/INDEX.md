@@ -126,7 +126,7 @@ class HelloView(HorizontalLayout):
 5. Your Python code
 
 **Wire** (animated gradient pulse):
-- Label: `WebSocket`
+- Label: `UIDL/WebSocket`
 - Sub-label: `UI diffs only`
 
 **Browser (Thin Client) box** (shield icons for negatives, green checks for positives):
@@ -140,8 +140,8 @@ class HelloView(HorizontalLayout):
 
 | # | Icon | Title | Description |
 |---|------|-------|-------------|
-| 1 | Lock | Zero Attack Surface | No REST APIs, no GraphQL, no endpoints to exploit. The binary WebSocket protocol is opaque to pentesters. XSS and injection are structurally impossible. |
-| 2 | Shield | Server-side State | All logic, validation, and data stay on the server. Nothing sensitive reaches the browser. Impossible to tamper with from DevTools. |
+| 1 | Lock | Zero Attack Surface | No REST APIs, no GraphQL, no endpoints to exploit. The UIDL protocol is opaque to pentesters. XSS and injection are by design impossible. |
+| 2 | Shield | Server-side State | All logic, validation, and data stay on the server. Nothing sensitive reaches the browser. Dificult to tamper from DevTools. |
 | 3 | Lightning bolt | Minimal Bandwidth | Only UI diffs travel the wire. No full-page reloads, no heavy JS bundles to download. Instant interactions over WebSocket. |
 
 ---
@@ -276,24 +276,27 @@ class MasterDetailView(Div):
 
 ```bash
 # Install PyFlow
-$ pip install vaadin-pyflow
+$ pip install git+https://github.com/manolo/vaadin-pyflow.git
 
 # Create your app
 $ mkdir myapp && cd myapp
 $ mkdir views
 
+# Optionally create some demo views
+$ vaadin --setup
+
 # Run with hot reload
-$ python -m vaadin --dev
+$ vaadin --dev
 ```
 
 **File tree:**
 
 ```
 myapp/
-  views/
-    __init__.py    <- from vaadin import *
-    hello.py       <- your first view
-  __main__.py      <- from vaadin import run; run()
+  views/            <- your views
+    hello.py
+  static/           <- optional
+    styles/styles.css  <- custom styles
 ```
 
 ---
