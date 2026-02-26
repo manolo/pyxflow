@@ -51,10 +51,7 @@ This creates views, static files, and VSCode config in the current directory:
 
 ```
 my-app/
-  __init__.py
-  __main__.py
   views/
-    __init__.py
     main_layout.py    # AppLayout with SideNav
     hello_world.py    # Sample view with TextField + Button
   static/
@@ -68,14 +65,8 @@ my-app/
 Run it:
 
 ```bash
-cd .. && python -m my_app
-# http://localhost:8080
-```
-
-Or use the CLI from inside the directory:
-
-```bash
 vaadin
+# http://localhost:8080
 ```
 
 ### Existing project
@@ -86,27 +77,15 @@ If you already have a project with other code and want to add Vaadin as a subpac
 cd my-project
 source .venv/bin/activate
 pip install git+https://github.com/manolo/vaadin-pyflow.git
-vaadin --setup myapp
+vaadin --setup
 ```
 
-This creates a `myapp/` package inside your project without touching existing files:
-
-```
-my-project/
-  .venv/
-  lib/
-  myapp/              # created by --setup
-    __init__.py
-    __main__.py
-    views/
-    static/
-  .vscode/            # also created
-```
+This creates  `views/`,  `static/` folders and the example view.
 
 Run it:
 
 ```bash
-python -m myapp
+vaadin
 ```
 
 VSCode configuration is included automatically. If you only need the VSCode config, use `vaadin --vscode`.
@@ -114,17 +93,27 @@ VSCode configuration is included automatically. If you only need the VSCode conf
 ### Running
 
 ```bash
-# Auto-detect (finds the directory with views/)
-vaadin
+vaadin [app_module] [options]
 
-# Explicit module
-vaadin myapp
+  app_module               Python module with views/ (auto-detected if omitted)
+  --setup [app_name]       Scaffold a new project (views, static, .vscode/)
+  --vscode                 Generate .vscode/ config and install recommended extensions
+  --dev                    Auto-reload on source changes
+  --debug                  Verbose UIDL protocol logging
+  --port PORT              Server port (default: 8080)
+  --host HOST              Server host (default: localhost)
+  --bundle                 Generate frontend bundle
+  --bundle --keep          Keep build artifacts after generation
+  --bundle --vaadin-version VERSION   Pin a Vaadin version
+```
 
-# Dev mode with hot-reload
-vaadin --dev
+Examples:
 
-# Custom port
-vaadin --port 3000
+```bash
+vaadin                  # auto-detect views/ and run
+vaadin myapp            # explicit module
+vaadin --dev            # hot-reload on source changes
+vaadin --port 3000      # custom port
 ```
 
 ### Project structure
@@ -280,23 +269,6 @@ class LiveView(VerticalLayout):
 ```
 
 Requires `@Push` on the `@AppShell` class.
-
-## CLI
-
-```
-vaadin [app_module] [options]
-
-  app_module               Python module with views/ (auto-detected if omitted)
-  --setup [app_name]       Scaffold a new project (views, static, __main__.py, .vscode/)
-  --vscode                 Generate .vscode/ config and install recommended extensions
-  --dev                    Auto-reload on source changes
-  --debug                  Verbose UIDL protocol logging
-  --port PORT              Server port (default: 8080)
-  --host HOST              Server host (default: localhost)
-  --bundle                 Generate frontend bundle
-  --bundle --keep          Keep build artifacts after generation
-  --bundle --vaadin-version VERSION   Pin a Vaadin version
-```
 
 ## Development
 
