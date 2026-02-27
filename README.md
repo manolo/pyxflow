@@ -2,9 +2,11 @@
 
 # PyFlow
 
-**Build full-stack web apps in pure Python with Vaadin components.**
+**Build full-stack web apps in pure Python. No JavaScript. No HTML templates.**
 
-No JavaScript. No HTML templates. Your code runs on the server -- the browser is just a thin client.
+Write your code and business logic in Python. It runs on the server. The browser is just a thin client rendering standard web components: you never touch the frontend.
+
+Under the hood, PyFlow uses the same server-driven architecture as [Vaadin Flow](https://vaadin.com/flow) but entirely written in Python, and ships with 49 [Vaadin web components](https://vaadin.com/components): enterprise-grade, accessible, and battle-tested over years.
 
 <img src="docs/screenshots/architecture-diagram.png" alt="Architecture" >
 
