@@ -61,6 +61,7 @@ vaadin-pyflow/
 │   └── app.py          # FlowApp entry point
 ├── demo/               # Demo app + __main__.py entry point
 │   ├── views/          # Demo views (7 routes)
+│   ├── static/         # Static assets (images, CSS) served at /images/*, /styles/*
 │   └── services/       # PeopleService (data access layer)
 ├── tests/
 │   ├── views/          # 29 test views with TestMainLayout (independent app, python -m tests)
