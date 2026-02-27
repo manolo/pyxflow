@@ -1,0 +1,1353 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PyFlow — 3 Talks. 3 Ideas. 1 Project.</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/black.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/monokai.css">
+  <style>
+    /* ─── Base theme ─── */
+    .reveal {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #e6edf3;
+      font-size: 32px;
+    }
+    .reveal h1, .reveal h2 { color: #fff; text-transform: none; }
+    .reveal h3 { color: #00d2ff; text-transform: none; }
+    .reveal code { color: #a5d6ff; }
+    .reveal a { color: #00d2ff; }
+
+    /* ─── Gradient text ─── */
+    .gradient-text {
+      background: linear-gradient(135deg, #fff, #1676f3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── Cards ─── */
+    .card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 1.2em;
+      border: 1px solid rgba(255,255,255,0.1);
+      text-align: left;
+      backdrop-filter: blur(4px);
+    }
+    .card h3 { margin-top: 0; font-size: 0.85em; }
+    .card p { font-size: 0.6em; color: #8899aa; margin: 0; }
+
+    /* ─── DX cards grid ─── */
+    .dx-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1em;
+      margin-top: 0.8em;
+      max-width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .dx-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 1em 1.2em;
+      text-align: left;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .dx-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(22,118,243,0.4);
+    }
+    .dx-card .dx-icon { font-size: 1.4em; margin-bottom: 0.3em; display: block; }
+    .dx-card strong { color: #00d2ff; font-size: 0.75em; display: block; margin-bottom: 0.2em; }
+    .dx-card span { font-size: 0.55em; color: #8899aa; display: block; }
+    .next-desc { color: #8899aa; font-weight: 300; }
+    .reveal .slide-number { background: transparent; color: #8899aa; font-size: 24px; }
+
+    /* ─── Code blocks ─── */
+    .reveal pre {
+      width: 100%;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+      border-radius: 8px;
+      margin: 0.3em 0;
+      padding: 0;
+    }
+    .reveal pre code {
+      font-size: 0.65em;
+      line-height: 1.5;
+      font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+      padding: 1em;
+    }
+
+    /* ─── Quotes ─── */
+    .reveal blockquote {
+      background: rgba(255,255,255,0.03);
+      border-left: 4px solid #1676f3;
+      padding: 0.6em 1.2em;
+      font-style: italic;
+      color: #8899aa;
+      width: 90%;
+      text-align: left;
+      font-size: 0.85em;
+      backdrop-filter: blur(2px);
+    }
+
+    /* ─── Layouts ─── */
+    .two-columns { display: flex; gap: 2em; align-items: center; }
+    .two-columns > div { flex: 1; }
+    .three-cards { display: flex; gap: 1.2em; }
+    .three-cards > .card { flex: 1; }
+
+    /* ─── Images ─── */
+    .reveal img { border: none; box-shadow: 0 4px 30px rgba(0,0,0,0.4); border-radius: 8px; }
+    .reveal img.logo { box-shadow: none; border-radius: 0; }
+
+    /* ─── Caption ─── */
+    .caption { font-style: italic; color: #8899aa; font-size: 0.65em; margin-top: 0.3em; }
+
+    /* ─── Left-aligned ─── */
+    .left-aligned { text-align: left; }
+    .left-aligned h2 { text-align: left; }
+
+    /* ─── Lists ─── */
+    .reveal ul { list-style: none; padding-left: 0; }
+    .reveal ul li { padding: 0.25em 0; font-size: 0.85em; }
+    .reveal ul li::before { content: "\25B8  "; color: #1676f3; }
+
+    /* ─── Terminal ─── */
+    .terminal pre { background: transparent; border-radius: 8px; padding: 0; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 2px 12px rgba(0,0,0,0.3); overflow: hidden; }
+    .terminal pre code { border-radius: 8px; }
+
+    /* ─── Links ─── */
+    .links { font-size: 0.6em; color: #8899aa; margin-top: 1em; }
+    .links a { color: #00d2ff; }
+
+    /* ─── Cycle diagram ─── */
+    .cycle-step {
+      display: inline-block;
+      background: rgba(22,118,243,0.15);
+      border: 1px solid rgba(22,118,243,0.3);
+      border-radius: 8px;
+      padding: 0.4em 0.8em;
+      margin: 0.2em;
+      font-size: 0.6em;
+      color: #e6edf3;
+    }
+    .cycle-arrow { display: inline-block; color: #1676f3; font-size: 0.8em; margin: 0 0.1em; }
+
+    /* ─── Glow ─── */
+    .glow { text-shadow: 0 0 20px rgba(0,210,255,0.4), 0 0 40px rgba(0,210,255,0.2); }
+
+    /* ─── Stats row ─── */
+    .stats-row { display: flex; gap: 1.5em; justify-content: center; margin: 0.8em 0; }
+    .stat-box { text-align: center; }
+    .stat-box .num { font-size: 1.8em; font-weight: bold; color: #00d2ff; line-height: 1; }
+    .stat-box .label { font-size: 0.5em; color: #8899aa; margin-top: 0.2em; }
+
+    /* ═══ NEW CSS for v-learn ═══ */
+
+    /* ─── Slide 5: subtitle fragment controlled by JS, not Reveal ─── */
+    #slide-thin-client h2 .fragment.visible,
+    #tiobe-quote.visible {
+      opacity: inherit;
+    }
+    #slide-thin-client img[data-id="arch-img"].shrink-away {
+      max-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    /* ─── Section divider ─── */
+    .section-divider {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .section-divider .section-number {
+      position: absolute;
+      font-size: 12em;
+      font-weight: 900;
+      opacity: 0.12;
+      color: #00d2ff;
+      z-index: 0;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .section-divider h2,
+    .section-divider blockquote {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── Spec list (2x3 grid) ─── */
+    .spec-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8em;
+      margin-top: 0.8em;
+    }
+    .spec-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 0.8em 1em;
+      text-align: left;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .spec-item:hover {
+      transform: translateY(-2px);
+      border-color: rgba(22,118,243,0.4);
+    }
+    .spec-item code {
+      font-size: 0.7em;
+      display: block;
+      margin-bottom: 0.3em;
+      color: #00d2ff;
+    }
+    .spec-item .spec-desc {
+      font-size: 0.5em;
+      color: #8899aa;
+    }
+
+    /* ─── Architecture comparison ─── */
+    .arch-compare {
+      display: flex;
+      gap: 2em;
+      align-items: flex-start;
+      margin-top: 0.5em;
+    }
+    .arch-compare > div {
+      flex: 1;
+    }
+    .arch-column h3 {
+      text-align: center;
+      margin-bottom: 0.5em;
+    }
+    .arch-layer {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 0.4em 0.8em;
+      margin: 0.3em 0;
+      font-size: 0.55em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .arch-layer .loc {
+      color: #00d2ff;
+      font-weight: bold;
+      font-size: 0.9em;
+      white-space: nowrap;
+      margin-left: 0.5em;
+    }
+    .arch-layer.highlight {
+      border-color: rgba(22,118,243,0.4);
+      background: rgba(22,118,243,0.1);
+    }
+    .arch-vs {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5em;
+      color: #1676f3;
+      padding-top: 2em;
+    }
+
+    /* ─── Coverage bar ─── */
+    .coverage-bar {
+      background: rgba(255,150,40,0.25);
+      border-radius: 8px;
+      height: 28px;
+      width: 80%;
+      margin: 0.5em auto;
+      overflow: hidden;
+      position: relative;
+    }
+    .coverage-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1676f3, #00d2ff);
+      border-radius: 8px 0 0 8px;
+      width: 0%;
+      transition: width 2s ease-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .coverage-fill .coverage-title {
+      font-size: 0.5em;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      text-shadow: 0 0 8px rgba(0,0,0,0.5);
+    }
+    .coverage-fill.animate {
+      width: 92%;
+    }
+    #test-coverage-fill.animate {
+      width: 89%;
+    }
+    .coverage-remaining {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.45em;
+      color: rgba(255,170,70,0.9);
+      font-weight: 600;
+    }
+    .coverage-label {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.5em;
+      color: #e6edf3;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.5s 2s;
+    }
+    .coverage-fill.animate ~ .coverage-label {
+      opacity: 1;
+    }
+
+    /* Fragments stripped of .fragment class for print — hide them */
+    .fragment-hidden {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      height: 0 !important;
+      overflow: hidden !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    /* Print-pdf: show animated/deferred elements statically */
+    @media print {
+      .coverage-fill { width: 92%; }
+      #test-coverage-fill { width: 89%; }
+      .coverage-label { opacity: 1; }
+      #thankyou-logo { opacity: 1 !important; transform: none !important; }
+      #thankyou-links { opacity: 1 !important; }
+    }
+
+    /* ─── Closing sentences ─── */
+    .closing-sentence {
+      text-align: left;
+      padding: 0.5em 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .closing-sentence:last-child {
+      border-bottom: none;
+    }
+    .closing-sentence .quote-text {
+      font-style: italic;
+      font-size: 0.8em;
+      color: #e6edf3;
+    }
+    .closing-sentence .quote-source {
+      font-size: 0.55em;
+      color: #8899aa;
+      margin-top: 0.15em;
+    }
+
+    /* ─── Talk progress bar (bottom, above reveal progress) ─── */
+    .talk-progress {
+      position: fixed;
+      bottom: 3px; left: 0; right: 0; z-index: 40;
+      height: 32px;
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+    }
+    .tp-seg {
+      position: absolute;
+      bottom: 0;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 8px;
+      border-left: solid 1px #1e90ff7a;
+      visibility: hidden;
+      transition: all 0.5s;
+    }
+    /* Position each segment — left+width of N must equal left of N+1 */
+    .tp-seg[data-part="1"] { left: 10%;  width: 23%; }
+    .tp-seg[data-part="2"] { left: 33%; width: 27%; }
+    .tp-seg[data-part="3"] { left: 60%; width: 24%; }
+    .tp-seg[data-part="4"] { left: 83%; width: 13%; }
+    .tp-seg .tp-num {
+      font-family: 'SF Pro Text', -apple-system, system-ui, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.12);
+      transition: color 0.5s, text-shadow 0.5s;
+    }
+    .tp-seg .tp-label {
+      font-family: 'SF Pro Text', -apple-system, system-ui, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.1);
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      transition: color 0.5s;
+    }
+    /* ── Lit (visited / past) ── */
+    .tp-seg.lit {
+      visibility: visible;
+    }
+    .tp-seg.lit .tp-num {
+      color: rgba(0,210,255,0.35);
+      text-shadow: none;
+    }
+    .tp-seg.lit .tp-label { color: rgba(0,210,255,0.3); }
+    /* ── Current (active section) ── */
+    .tp-seg.lit.current .tp-num {
+      color: #00d2ff;
+      text-shadow: 0 0 10px rgba(0,210,255,0.4);
+    }
+    .tp-seg.lit.current .tp-label { color: rgba(0,210,255,0.7); }
+
+    /* ─── Rotated background ─── */
+    .slide-background.bg-rotated .slide-background-content {
+      transform: rotate(-4deg) scale(1.15);
+    }
+
+    /* ─── Speaker card ─── */
+    .speaker-card h3 {
+      margin-bottom: 0.2em;
+    }
+    .speaker-card .talk-title {
+      font-size: 0.55em;
+      color: #00d2ff;
+      font-style: italic;
+      margin-bottom: 0.3em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ Talk progress bar ═══ -->
+  <div class="talk-progress" id="talk-progress">
+    <div class="tp-seg" data-part="1"><span class="tp-num">1</span><span class="tp-label">Find the Essence</span></div>
+    <div class="tp-seg" data-part="2"><span class="tp-num">2</span><span class="tp-label">Full-Stack apps</span></div>
+    <div class="tp-seg" data-part="3"><span class="tp-num">3</span><span class="tp-label">Spec-Driven devel</span></div>
+    <div class="tp-seg" data-part="4"><span class="tp-num">4</span><span class="tp-label">Python Flow</span></div>
+  </div>
+
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- ACT 0: OPENING                                            -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+
+      <!-- SLIDE 1: Title -->
+      <section class="bg-rotated"
+               data-background-image="images/background-code.png"
+               data-background-opacity="0.10"
+               data-background-size="cover">
+        <h1><span class="gradient-text" style="font-size: 1.8em;">PyFlow</span></h1>
+        <p style="font-size: 1.9em;"><em>Build Web Apps in Pure Python</em></p>
+        <p style="font-size: 0.75em; color: #8899aa; margin-top: 0.6em;"><code>3 talks. 3 ideas. 1 project.</code></p>
+        <aside class="notes">Hello everyone. This is Manolo from the Releases Team.<br>Let's talk today about: how to build webapps in pure Python.<br>This speech is about how 3 talks at Jfokus 3 weeks ago gave me 3 ideas.<br>And those 3 ideas became one CF project with the name PyFlow.</aside>
+      </section>
+
+      <!-- SLIDE 2: Three Talks -->
+      <section data-background-image="images/background-jfokus.png"
+               data-background-opacity="0.06"
+               data-background-size="50%">
+        <h2>Three Talks at <span class="gradient-text">Jfokus 2026</span></h2>
+        <div class="three-cards" style="margin-top: 0.8em;">
+          <div class="card speaker-card fragment">
+            <h3>Dan North</h3>
+            <p class="talk-title">"Best Simple System for Now"</p>
+            <p>Focus on the essential. Strip everything else.</p>
+          </div>
+          <div class="card speaker-card fragment">
+            <h3>Marcus Hellberg</h3>
+            <p class="talk-title">"Full-Stack Web Apps, 100% Java"</p>
+            <p>Full-stack teams ship quality software faster.</p>
+          </div>
+          <div class="card speaker-card fragment">
+            <h3>Arun Gupta</h3>
+            <p class="talk-title">"How to Succeed at Vibe Coding"</p>
+            <p>Run slow to run fast. Specs before code.</p>
+          </div>
+        </div>
+        <aside class="notes">These are the 3 speakers who inspired PyFlow.<br><b>&rarr;</b> Dan North says: find the essence. Strip the rest.<br><b>&rarr;</b> Marcus Hellberg says: one language, full-stack. No JavaScript needed.<br><b>&rarr;</b> Arun Gupta says: write specs first, then let the AI to code.<br><br>So, Three ideas.<br>Let me show you what happens when you combine them.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- ACT 1: FOCUS ON THE ESSENTIAL — Dan North                 -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+
+      <!-- SLIDE 3: Part 1 Divider -->
+      <section class="section-divider"
+               data-background-image="images/bg-zen.jpg"
+               data-background-opacity="0.06"
+               data-background-size="cover">
+        <span class="section-number">1</span>
+        <h2>Focus on the <span class="gradient-text">Essential</span></h2>
+        <blockquote style="margin-top: 0.8em;">Look for the essence of the problem &mdash; not what is there, but what should be there.<br><span style="font-size: 0.8em; color: #666;">&mdash; Dan North</span></blockquote>
+        <blockquote class="fragment" style="margin-top: 0.6em;">A complex system that works is invariably found to have evolved from a simple system that worked.<br><span style="font-size: 0.8em; color: #666;">&mdash; John Gall</span></blockquote>
+        <aside class="notes">Part one.<br>Dan North talk was about: The Best Simple System for Now.<br>And, His tip was to focus on the essence of the problem<br><br><b>&rarr;</b> He also mentioned Gall's Law that tells:<br>A complex system that works... came from a simple system that worked first.</aside>
+      </section>
+
+      <!-- SLIDE 4: Gall's Law -->
+      <section class="left-aligned"
+               data-background-image="images/bg-zen.jpg"
+               data-background-opacity="0.10"
+               data-background-size="cover">
+        <h2>Vaadin Flow <span class="gradient-text">&amp;</span> Flow-Components</h2>
+        <div class="three-cards" style="margin-top: 0.8em;">
+          <div class="card fragment">
+            <h3 style="font-size: 1.8em;" class="gradient-text">+6,500</h3>
+            <p>Classes</p>
+          </div>
+          <div class="card fragment">
+            <h3 style="font-size: 1.8em;" class="gradient-text">+550,000</h3>
+            <p>Lines of Code</p>
+          </div>
+          <div class="card fragment">
+            <h3 style="font-size: 1.8em;" class="gradient-text">20+</h3>
+            <p>Years of Evolution</p>
+          </div>
+        </div>
+        <p class="fragment" style="margin-top: 1.2em; font-size: 1.1em;"><em>Inside all that complexity... <strong>what is the essence?</strong></em></p>
+        <aside class="notes">This is Vaadin Flow.<br><b>&rarr;</b> It has over 6000 Java classes.<br><b>&rarr;</b> More than half million lines of code.<br><b>&rarr;</b> And Twenty years of evolution.<br>It works nice. It is used by thousands of companies.<br><b>&rarr;</b> But the question is: what is the simple system inside?<br>What is the minimum that makes it work?</aside>
+      </section>
+
+      <!-- SLIDE 5: The Thin Client + Secure by Architecture -->
+      <section data-background-image="images/architecture.png"
+               data-background-opacity="0"
+               data-background-size="contain"
+               id="slide-thin-client">
+        <h2 style="position: relative; z-index: 2;">The <span class="gradient-text">Thin Client</span>
+          <span class="fragment" data-fragment-index="0" style="display: block; font-size: 0.55em; margin-top: 0.3em; font-weight: normal; opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease;">Secure by <strong style="color: #00d2ff;">Architecture</strong></span>
+        </h2>
+        <img src="images/architecture.png" alt="Server-Browser architecture diagram"
+             style="max-width: 70%; position: relative; z-index: 1; transition: transform 0.8s ease, opacity 0.6s ease 0.4s;" data-id="arch-img">
+        <div class="three-cards fragment-replace-target" style="margin-top: 0.6em;">
+          <div class="card fragment" data-fragment-index="1">
+            <h3>Zero Attack Surface</h3>
+            <p>No REST APIs to exploit. No GraphQL endpoints. The protocol is opaque.</p>
+          </div>
+          <div class="card fragment" data-fragment-index="2">
+            <h3>Minimal Bandwidth</h3>
+            <p>Only UI diffs travel the wire.<br>No full-page reloads.<br>No heavy HTML/JS fragments to download.</p>
+          </div>
+          <div class="card fragment" data-fragment-index="3">
+            <h3>Server-side State</h3>
+            <p>All validation, all business logic, all data access stay on the server.<br>Nothing sensitive in the browser.</p>
+          </div>
+        </div>
+        <aside class="notes">Vaadin uses a thin client.<br>The browser just renders the UI.<br>The server has everything. State, business logic, components.<br><b>&rarr;</b> This gives you 3 things for free.<br><b>&rarr;</b> First: zero attack surface. No REST APIs to hack.<br><b>&rarr;</b> Second: minimal bandwidth. Only UI diffs travel the wire.<br><b>&rarr;</b> Third: server-side state. Nothing sensitive in the browser.</aside>
+      </section>
+
+      <!-- SLIDE 6: The Platform -->
+      <section>
+        <h2>The <span class="gradient-text">Platform</span></h2>
+        <iframe src="specs/platform-explorer.html#initial"
+                style="width: 100%; height: 520px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: #0d1117;"
+                loading="lazy"></iframe>
+        <aside class="notes">This is the Platform Explorer.<br>We can see that there are more than 40 modules or subsystems in the platform<br>client server ... modernization<br><br>But what is the essential part? what minimum stuff makes flow work.<br><br><b>[CLICK Essentials in the iframe]</b><br>There are only about 10 modules that realy compose the core protocol.<br>Everything else... is something that we can skip for now.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- ACT 2: FULL-STACK WITH PYTHON ONLY — Marcus Hellberg      -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+
+      <!-- SLIDE 7: Part 2 Divider -->
+      <section class="section-divider"
+               data-background-image="images/bg-developer.jpg"
+               data-background-opacity="0.12"
+               data-background-size="cover">
+        <span class="section-number">2</span>
+        <h2>Full-Stack <span class="gradient-text">Apps</span></h2>
+        <blockquote style="margin-top: 0.8em;">What if frontend development didn't need to be so difficult?<br><span style="font-size: 0.8em; color: #666;">&mdash; Marcus Hellberg</span></blockquote>
+        <blockquote class="fragment" style="margin-top: 0.6em;">Full-stack teams ship quality software faster.<br><span style="font-size: 0.8em; color: #666;">&mdash; Marcus Hellberg</span></blockquote>
+        <aside class="notes">Part two.<br>Marcus spoke that Java developers can build full-stack apps without JavaScript.<br>No handoffs. No API contracts.<br><b>&rarr;</b> Full-stack teams ship faster.<br>So I asked myself: can we do the same with Python?</aside>
+      </section>
+
+      <!-- SLIDE 8: The Language of Today -->
+      <section data-background-image="images/screenshot-tiobe.png"
+               data-background-opacity="0.08"
+               data-background-size="contain"
+               id="slide-tiobe">
+        <h2>The Language of <span class="gradient-text">Today</span></h2>
+        <div class="fragment fade-up" data-fragment-index="0" id="tiobe-iframe-wrapper"
+             style="max-height: 540px; overflow: hidden;">
+          <iframe src="specs/tiobe-2026.html"
+                  style="width: 100%; height: 520px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: #0d1117;"
+                  loading="lazy"></iframe>
+        </div>
+        <blockquote class="fragment" data-fragment-index="1" id="tiobe-quote" style="margin-top: 6em; opacity: 0; transition: opacity 0.6s ease;">21% of developers still need to write JS<br>No server-driven UI</blockquote>
+        <aside class="notes"><b>&rarr;</b> Python is the number one language today.<br>Here we have the TIOBE report about programing languages popularity<br><br><b>[Show the TIOBE]</b><br><br><b>&rarr;</b> But although they have Django, Flask, FastAPI etc<br>They all need JavaScript or HTML skills for the frontend.<br><br>There is no server-side UI framework for Python; that is the gap.</aside>
+      </section>
+
+      <!-- SLIDE 9: MVP -->
+      <section>
+        <h2>Minimum Viable <span class="gradient-text">Product</span></h2>
+        <iframe src="specs/platform-explorer.html#essentials"
+                style="width: 100%; height: 520px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: #0d1117;"
+                loading="lazy"></iframe>
+        <aside class="notes">We said that for the essential implementation of flow we need only these parts<br>The essential protocol. And a set of basic components.<br><br><b>[CLICK MVP in the iframe]</b><br>And this is the MVP.<br>The browser part and the server part.<br>But the browser part is static, we can take it from the platform jar artifacts<br><br><b>[CLICK Python in the iframe]</b><br>And these are the Python files that could replace them.</aside>
+      </section>
+
+      <!-- SLIDE 10: Architecture Comparison -->
+      <section data-visibility="hidden" data-background-image="images/bg-developer.jpg"
+               data-background-opacity="0.08"
+               data-background-size="cover">
+        <h2>Java <span style="color: #1676f3;">&rarr;</span> Python</h2>
+        <div class="arch-compare">
+          <div class="arch-column">
+            <h3 style="color: #f89820;">Java</h3>
+            <div class="arch-layer"><span>Servlet Container (Tomcat/Jetty)</span> <span class="loc">331 cls</span></div>
+            <div class="arch-layer"><span>Request Handlers + RPC</span> <span class="loc">65 cls</span></div>
+            <div class="arch-layer"><span>StateTree + Features</span> <span class="loc">103 cls</span></div>
+            <div class="arch-layer"><span>Element / DOM API</span> <span class="loc">37 cls</span></div>
+            <div class="arch-layer"><span>Component + Mixins</span> <span class="loc">141 cls</span></div>
+            <div class="arch-layer"><span>49 Components</span> <span class="loc">977 cls</span></div>
+            <div class="arch-layer"><span>Data Binding</span> <span class="loc">155 cls</span></div>
+            <div class="arch-layer"><span>Router</span> <span class="loc">93 cls</span></div>
+            <div class="arch-layer highlight" style="margin-top: 0.8em; justify-content: center;"><span><strong>3,081 classes &middot; 451K LOC</strong></span></div>
+          </div>
+          <div class="arch-vs">
+            <span>&rarr;</span>
+          </div>
+          <div class="arch-column">
+            <h3 style="color: #306998;">Python</h3>
+            <div class="arch-layer"><span>aiohttp + http_server.py</span> <span class="loc">753 L</span></div>
+            <div class="arch-layer"><span>uidl_handler.py</span> <span class="loc">1,039 L</span></div>
+            <div class="arch-layer"><span>state_tree + state_node</span> <span class="loc">231 L</span></div>
+            <div class="arch-layer"><span>element.py</span> <span class="loc">130 L</span></div>
+            <div class="arch-layer"><span>component.py + mixins</span> <span class="loc">750 L</span></div>
+            <div class="arch-layer"><span>49 Components (57 files)</span> <span class="loc">12,447 L</span></div>
+            <div class="arch-layer"><span>Data Binding (5 files)</span> <span class="loc">836 L</span></div>
+            <div class="arch-layer"><span>router.py</span> <span class="loc">397 L</span></div>
+            <div class="arch-layer highlight" style="margin-top: 0.8em; justify-content: center;"><span><strong>77 files &middot; ~17K LOC</strong></span></div>
+          </div>
+        </div>
+        <p class="caption" style="margin-top: 0.5em;">Ratio: <strong>26:1</strong> in lines of code &middot; <strong>40:1</strong> in files</p>
+        <aside class="notes">Side-by-side comparison. Every Java layer maps to a Python equivalent, but dramatically smaller. The ratio is 26:1 in lines of code. Not because Python is magical — because we found the essence and skipped the rest.</aside>
+      </section>
+
+      <!-- SLIDE 11: Hello World -->
+      <section data-background-image="images/screenshot-hello.gif"
+               data-background-opacity="0.08"
+               data-background-size="contain"
+               data-background-position="right center">
+        <h2>Hello World</h2>
+        <div class="two-columns">
+          <div>
+            <pre class="typewriter-code" data-speed="25"><code data-trim data-noescape class="language-python">
+@Route("hello")
+class HelloView(VerticalLayout):
+    def __init__(self):
+        name = TextField("Your name")
+        button = Button("Say hello", lambda e:
+            Notification.show(f"Hello {name.value}"))
+        self.add(name, button)
+            </code></pre>
+          </div>
+          <div>
+            <img src="images/screenshot-hello.gif" alt="Hello World screenshot" class="fragment fade-in" style="max-width: 480px;">
+          </div>
+        </div>
+        <p class="caption">7 lines. A complete interactive web view.</p>
+        <aside class="notes">So the output would be a library in python that is able to produce a complete webview with only 6 lines of code.<br><br><b>&rarr;</b> No HTML. No JavaScript. No template files.<br>The class IS the view.<br>Route maps an URL.<br>Components are Python objects.<br>Events are lambdas.<br><br>In sum: This is full-stack Python Web Application.</aside>
+      </section>
+
+      <!-- SLIDE 12: 49 Components -->
+      <section data-visibility="hidden" data-background-image="images/screenshot-components.gif"
+               data-background-opacity="0.15"
+               data-background-size="cover">
+        <h2><span class="gradient-text glow" style="font-size: 2.5em;">49</span></h2>
+        <h2>Enterprise Components</h2>
+        <img src="images/screenshot-components.gif" alt="Component gallery screenshot" style="max-width: 75%;">
+        <p class="caption">Form fields, grids, dialogs, menus, trees, charts &mdash; all from Python</p>
+        <aside class="notes">These are the exact same Vaadin web components used by thousands of Java enterprises. Production-ready, accessible, WCAG compliant, themeable. We didn't rebuild them — we reuse the existing frontend bundle. Only the server side is Python.</aside>
+      </section>
+
+      <!-- SLIDE 13: Data Grid -->
+      <section data-visibility="hidden" data-background-image="images/screenshot-grid.gif"
+               data-background-opacity="0.06"
+               data-background-size="contain"
+               data-background-position="right center">
+        <h2>Data Grid</h2>
+        <div class="two-columns">
+          <div>
+            <pre class="typewriter-code" data-speed="20"><code data-trim data-noescape class="language-python">
+grid = Grid()
+
+grid.add_column("name", header="Name")
+    .set_sortable(True)
+grid.add_column("email", header="Email")
+    .set_sortable(True)
+
+grid.set_data_provider(self.fetch_page)
+
+def fetch_page(self, offset, limit, sorts):
+    return db.query(offset, limit), db.count()
+            </code></pre>
+          </div>
+          <div>
+            <img src="images/screenshot-grid.gif" alt="Grid with lazy loading" class="fragment fade-in" style="max-width: 480px;">
+          </div>
+        </div>
+        <p class="caption">Lazy loading, server-side sorting, single callback.</p>
+        <aside class="notes">Grid is the most complex component. Thousands of rows loaded on demand. Sorting, column reordering, selection — all handled by one callback. No pagination widgets, no state management libraries, no infinite scroll JavaScript.</aside>
+      </section>
+
+      <!-- SLIDE 14: Real-time Push -->
+      <section data-background-image="images/screenshot-stopwatch.gif"
+               data-background-opacity="0.06"
+               data-background-size="contain"
+               data-background-position="right center">
+        <h2>Real-time Push</h2>
+        <div class="two-columns">
+          <div>
+            <pre class="typewriter-code" data-speed="25"><code data-trim data-noescape class="language-python">
+@AppShell
+@Push
+class App: pass
+
+async def _tick(self):
+    while self._running:
+        await asyncio.sleep(1)
+        self._elapsed += 1
+        ui.access(self._update_display)
+            </code></pre>
+          </div>
+          <div>
+            <img src="images/screenshot-stopwatch.gif" alt="Stopwatch with WebSocket push" class="fragment fade-in" style="max-width: 480px;">
+          </div>
+        </div>
+        <p class="caption">Server pushes UI updates via WebSocket. No polling.</p>
+        <aside class="notes">But we can also implement enterprise features like Push for real-time updates.<br>Just by adding the Push annotation.<br>And, Then use ui.access to update the browser from a background task.<br><br><b>&rarr;</b> We use here the standard python asyncIO. NO special libraries.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- ACT 3: SPEC-DRIVEN DEVELOPMENT — Arun Gupta               -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+
+      <!-- SLIDE 15: Part 3 Divider -->
+      <section class="section-divider"
+               data-background-image="images/bg-sdd.jpg"
+               data-background-opacity="0.06"
+               data-background-size="cover">
+        <span class="section-number">3</span>
+        <h2>Spec-Driven <span class="gradient-text">Development</span></h2>
+        <blockquote style="margin-top: 0.8em;">Vibe coding generates code based upon your vibe... Spec-driven development generates code based upon your specs.<br><span style="font-size: 0.8em; color: #666;">&mdash; Arun Gupta</span></blockquote>
+        <blockquote class="fragment" style="margin-top: 0.6em;">Teams that prioritize documentation have 30% higher delivery performance.<br><span style="font-size: 0.8em; color: #666;">&mdash; State of DevOps Report 2025</span></blockquote>
+        <aside class="notes">Part three.<br>Arun Gupta makes a clear distinction.<br>Vibe coding generates code from your vibe.<br>Spec-driven development generates code from your specs.<br><b>&rarr;</b> And a research confirms that:<br>Teams that write documentation... deliver 30% faster.<br><br>This is why we should document the specs of our systems.<br>My takeaway from this speech was: The specs are the product.</aside>
+      </section>
+
+      <!-- SLIDE 16: Spec-Driven Loop -->
+      <section data-background-image="images/bg-cycle.jpg"
+               data-background-opacity="0.12"
+               data-background-size="cover">
+        <h2>The <span class="gradient-text">Spec-Driven</span> Loop</h2>
+        <iframe src="specs/sdd-loop.html"
+                style="width: 100%; height: 520px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: #0d1117;"
+                loading="lazy"></iframe>
+        <aside class="notes">This is the spec-driven loop.<br><b>[CLICK Next in the iframe to walk through the 5 steps]</b><br>It has 5 phases<br>Then, write specs.<br>Then, generate code.<br>Then, test.<br>Then, observe.<br>Then, repeat.<br><b>[Keep clicking -- it cycles to show PyFlow-specific steps]</b></aside>
+      </section>
+
+      <!-- SLIDE 17: The Specs -->
+      <section data-visibility="hidden" data-background-image="images/bg-ai-coding.jpg"
+               data-background-opacity="0.50"
+               data-background-size="cover">
+        <h2>The <span class="gradient-text">Specs</span></h2>
+        <h3 style="font-size: 0.6em; color: #8899aa; font-weight: 400; margin-top: -0.3em;">Language-agnostic. Written for humans <em>and</em> AI agents.</h3>
+        <div class="spec-list">
+          <div class="spec-item fragment">
+            <code>PROTOCOL.md</code>
+            <div class="spec-desc">UIDL protocol, Feature IDs, constant hashes, bundle format</div>
+          </div>
+          <div class="spec-item fragment">
+            <code>RPC.md</code>
+            <div class="spec-desc">RPC message formats, change types, client processing order</div>
+          </div>
+          <div class="spec-item fragment">
+            <code>PITFALLS.md</code>
+            <div class="spec-desc">45 critical pitfalls &mdash; each saves days of debugging</div>
+          </div>
+          <div class="spec-item fragment">
+            <code>COMPONENTS.md</code>
+            <div class="spec-desc">All 49 components: complexity, connectors, dependencies</div>
+          </div>
+          <div class="spec-item fragment">
+            <code>IMPLEMENTATION.md</code>
+            <div class="spec-desc">8 phases: HTTP &rarr; Init &rarr; Nav &rarr; Components &rarr; Push</div>
+          </div>
+          <div class="spec-item fragment">
+            <code>connectors/grid.md</code>
+            <div class="spec-desc">Grid connector protocol &mdash; the most complex component</div>
+          </div>
+        </div>
+        <aside class="notes">These are the 6 spec files.<br><b>&rarr;</b> Each one written by reading the Java source.<br><b>&rarr;</b> They are language-agnostic.<br>You could use them to build a Rust port. Or a Go port.<br><b>&rarr;</b> PITFALLS dot MD alone has 45 entries.<br><b>&rarr;</b> Each one is a bug that took hours to find the first time.<br><b>&rarr;</b></aside>
+      </section>
+
+      <!-- SLIDE 19: Spec → Code -->
+      <section data-background-image="images/bg-ai-coding.jpg"
+               data-background-opacity="0.50"
+               data-background-size="cover"
+>
+        <h2><span class="gradient-text">Spec</span> &rarr; <span class="gradient-text">Code</span></h2>
+        <div class="two-columns" style="min-height: 340px;">
+          <div>
+            <pre><code data-trim data-noescape class="language-text" style="font-size: 0.6em;">
+## UI-TEST-SPECS.md
+
+V24.01  Click Start, label shows "done"
+V24.02  Click Multi, counter reaches 3
+V24.03  Click Progress, bar reaches 100%
+            </code></pre>
+          </div>
+          <div>
+            <pre class="typewriter-code" data-speed="20"><code data-trim data-noescape class="language-python">
+    def test_single_push(self, page):
+        page.locator("#start").click()
+        expect(page.locator("#push-result")).to_have_text("done")
+
+    def test_multiple_push(self, page):
+        page.locator("#multi").click()
+        expect(page.locator("#push-count")).to_have_text("3")
+
+    def test_progress_bar(self, page):
+        page.locator("#progress").click()
+        expect(page.locator("#push-pb")).to_have_js_property("value", 1.0)
+            </code></pre>
+          </div>
+        </div>
+        <aside class="notes">With short sentences in the specs we can generate full working code at the right.</aside>
+      </section>
+
+      <!-- SLIDE 20: Beyond Code -->
+      <section data-background-image="images/bg-ai-coding.jpg"
+               data-background-opacity="0.06"
+               data-background-size="cover">
+        <h2>Beyond <span class="gradient-text">Code</span></h2>
+        <h3 style="font-size: 0.6em; color: #8899aa; font-weight: 400; margin-top: -0.3em;">An MVP needs more than just code</h3>
+        <div class="spec-list">
+          <div class="spec-item fragment">
+            <code>Specs</code>
+            <div class="spec-desc">11 language-agnostic specification files</div>
+          </div>
+          <div class="spec-item fragment">
+            <code>Code</code>
+            <div class="spec-desc">78 Python files, ~18K lines of code</div>
+          </div>
+          <div class="spec-item fragment">
+            <code>Tests</code>
+            <div class="spec-desc">2,457 unit tests + 446 UI tests</div>
+          </div>
+          <div class="spec-item fragment">
+            <code>Logo &amp; Branding</code>
+            <div class="spec-desc">Designed by AI from a prompt</div>
+          </div>
+          <div class="spec-item fragment">
+            <code>Website &amp; Docs</code>
+            <div class="spec-desc">README, STATUS, API coverage</div>
+          </div>
+          <div class="spec-item fragment">
+            <code>Presentations</code>
+            <div class="spec-desc">This very slide deck, generated from specs</div>
+          </div>
+        </div>
+        <aside class="notes">Spec-driven development is not just about code.<br><b>&rarr;</b> You need specs.<br><b>&rarr;</b> You need code.<br><b>&rarr;</b> You need tests.<br><b>&rarr;</b> But also you need a branding for your product.<br><b>&rarr;</b> A website.<br><b>&rarr;</b> and even these slides.<br><br>NOTE that everything in this project was generated with AI from specs.</aside>
+      </section>
+
+      <!-- SLIDE 21: 3 Separations -->
+      <section data-visibility="hidden" data-background-image="images/bg-ai-coding.jpg"
+               data-background-opacity="0.08"
+               data-background-size="cover">
+        <h2>Three <span class="gradient-text">Separations</span></h2>
+        <div class="three-cards" style="margin-top: 0.8em;">
+          <div class="card fragment">
+            <h3>Thinking / Doing</h3>
+            <p>Humans write specs (the "what"). AI generates code (the "how"). Each plays to their strength.</p>
+          </div>
+          <div class="card fragment">
+            <h3>Strategy / Tactics</h3>
+            <p>Specs define architecture decisions. Code is a tactical detail that can be regenerated.</p>
+          </div>
+          <div class="card fragment">
+            <h3>Patterns / Projects</h3>
+            <p>Specs are reusable across languages and projects. Code is a single instance.</p>
+          </div>
+        </div>
+        <aside class="notes">Three key separations in SDD. Thinking vs Doing: humans are good at understanding systems, AI is good at generating code. Strategy vs Tactics: specs are durable, code is disposable. Patterns vs Projects: the same specs could generate a Rust port tomorrow.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- ACT 4: PYFLOW — THE RESULT                                -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+
+      <!-- SLIDE 22: Part 4 Divider — The Result -->
+      <section class="section-divider"
+               data-background-image="images/bg-rocket.jpg"
+               data-background-opacity="0.12"
+               data-background-size="cover">
+        <span class="section-number">4</span>
+        <h2>The Result: <span class="gradient-text">PyFlow</span></h2>
+        <div class="stats-row" style="margin-top: 0.8em;">
+          <div class="stat-box fragment">
+            <div class="num glow">~18K</div>
+            <div class="label">lines of code</div>
+          </div>
+          <div class="stat-box fragment">
+            <div class="num glow">49</div>
+            <div class="label">components</div>
+          </div>
+          <div class="stat-box fragment">
+            <div class="num glow">2,457</div>
+            <div class="label">unit tests</div>
+          </div>
+          <div class="stat-box fragment">
+            <div class="num glow">446</div>
+            <div class="label">UI tests</div>
+          </div>
+        </div>
+        <div class="fragment" style="margin-top: 1em;">
+          <div class="coverage-bar">
+            <div class="coverage-fill" id="coverage-fill"><span class="coverage-title">API Coverage</span></div>
+            <span class="coverage-label">92%</span>
+            <span class="coverage-remaining">8%</span>
+          </div>
+          <div class="coverage-bar" style="margin-top: 0.3em;">
+            <div class="coverage-fill" id="test-coverage-fill"><span class="coverage-title">Test Coverage</span></div>
+            <span class="coverage-label">89%</span>
+            <span class="coverage-remaining">11%</span>
+          </div>
+        </div>
+        <div class="fragment stats-row" style="margin-top: 0.8em;">
+          <div class="stat-box">
+            <div class="num" style="font-size: 1.2em; color: #1676f3;">26:1</div>
+            <div class="label">LOC ratio (Java &rarr; Python)</div>
+          </div>
+        </div>
+        <aside class="notes">Part four.<br>Three ideas became one project.<br>And here are the numbers.<br><b>&rarr;</b> 18,000 lines of Python.<br><b>&rarr;</b> 49 components.<br><b>&rarr;</b> Over 24 hundred unit tests.<br><b>&rarr;</b> Over 400 UI tests.<br><b>&rarr;</b> 92 percent API coverage. 89 percent test coverage.<br><b>&rarr;</b> And the ratio is 26 to 1 in lines of code considering the java classes implementing the same features.</aside>
+      </section>
+
+      <!-- SLIDE 24: Enterprise Patterns -->
+      <section data-visibility="hidden" data-background-image="images/screenshot-master-detail.gif"
+               data-background-opacity="0.06"
+               data-background-size="contain"
+               data-background-position="left center">
+        <h2>Enterprise Patterns</h2>
+        <div class="two-columns">
+          <div>
+            <img src="images/screenshot-master-detail.gif" alt="Master-Detail CRUD view" class="fragment fade-in" style="max-width: 480px;">
+          </div>
+          <div>
+            <pre class="typewriter-code" data-speed="25"><code data-trim data-noescape class="language-python">
+binder = Binder(Person)
+binder.for_field(self.name).bind("name")
+binder.for_field(self.email) \
+    .with_validator(EmailValidator()) \
+    .bind("email")
+
+@ClientCallable
+def save(self):
+    if binder.write_bean(self.person):
+        service.save(self.person)
+            </code></pre>
+          </div>
+        </div>
+        <p class="caption">Binder + Validation + @ClientCallable &mdash; the enterprise CRUD pattern.</p>
+        <aside class="notes">The most common enterprise pattern: Master-Detail. Grid on the left, form on the right. Binder does two-way data binding with validation. @ClientCallable lets the browser call server methods directly. Same patterns Java developers know, now in Python.</aside>
+      </section>
+
+      <!-- SLIDE 26: Developer Experience -->
+      <section data-background-image="images/bg-developer.jpg"
+               data-background-opacity="0.10"
+               data-background-size="cover">
+        <h2>Developer <span class="gradient-text">Experience</span></h2>
+        <div class="dx-grid">
+          <div class="dx-card fragment">
+            <span class="dx-icon">&#x1F40D;</span>
+            <strong>Pure Python</strong>
+            <span>Classes, decorators, lambdas</span>
+          </div>
+          <div class="dx-card fragment">
+            <span class="dx-icon">&#x2328;&#xFE0F;</span>
+            <strong>Type Hints</strong>
+            <span>IDE autocomplete &amp; checking</span>
+          </div>
+          <div class="dx-card fragment">
+            <span class="dx-icon">&#x1F4E6;</span>
+            <strong>pip install</strong>
+            <span>One command setup</span>
+          </div>
+          <div class="dx-card fragment">
+            <span class="dx-icon">&#x26A1;</span>
+            <strong>asyncio Native</strong>
+            <span>Background tasks, push</span>
+          </div>
+          <div class="dx-card fragment">
+            <span class="dx-icon">&#x1F9F1;</span>
+            <strong>49 Components</strong>
+            <span>Forms, grids, dialogs, menus</span>
+          </div>
+          <div class="dx-card fragment">
+            <span class="dx-icon">&#x1F3A8;</span>
+            <strong>Two Themes</strong>
+            <span>Lumo &amp; Aura, light &amp; dark</span>
+          </div>
+        </div>
+        <aside class="notes">The developer experience is simple.<br><b>&rarr;</b> Pure Python. Classes, decorators, lambdas.<br><b>&rarr;</b> Type hints for autocomplete.<br><b>&rarr;</b> pip install.<br><b>&rarr;</b> asyncio for real-time updates.<br><b>&rarr;</b> 49 components covering most used cases.<br><b>&rarr;</b> Two themes: Lumo and Aura.</aside>
+      </section>
+
+      <!-- SLIDE 27: What's Next -->
+      <section class="left-aligned"
+               data-background-image="images/bg-cycle.jpg"
+               data-background-opacity="0.08"
+               data-background-size="cover">
+        <h2>What's <span class="gradient-text">Next</span></h2>
+        <ul>
+          <li class="fragment"><strong>PWA</strong> <span class="next-desc">&mdash; Service worker, offline, install prompt</span></li>
+          <li class="fragment"><strong>Grid Editor</strong> <span class="next-desc">&mdash; Inline row editing, save/cancel</span></li>
+          <li class="fragment"><strong>Renderers</strong> <span class="next-desc">&mdash; NumberRenderer, DateRenderer, IconRenderer</span></li>
+          <li class="fragment"><strong>More Validators &amp; Converters</strong> <span class="next-desc">&mdash; Date ranges, typed converters, BeanValidator</span></li>
+          <li class="fragment"><strong>i18n</strong> <span class="next-desc">&mdash; I18NProvider for multi-language apps</span></li>
+          <li class="fragment"><strong>Pro Components</strong> <span class="next-desc">&mdash; Commercial components</span></li>
+        </ul>
+        <p class="fragment caption" style="margin-top: 1em;">The architecture supports it. It's just more of the same loop.</p>
+        <aside class="notes">What is missing?<br><b>&rarr;</b> PWA support.<br><b>&rarr;</b> Grid inline editing.<br><b>&rarr;</b> Specialized renderers.<br><b>&rarr;</b> More validators and converters.<br><b>&rarr;</b> Internationalization.<br><b>&rarr;</b> Pro components.<br><b>&rarr;</b> But the architecture already supports all of them.<br>It is just more of the same loop.</aside>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- ACT 5: CLOSING                                            -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+
+      <!-- SLIDE 28: Three Sentences -->
+      <section data-visibility="hidden" data-background-image="images/bg-rocket.jpg"
+               data-background-opacity="0.10"
+               data-background-size="cover">
+        <h2>Three <span class="gradient-text">Sentences</span></h2>
+        <div style="max-width: 85%; margin: 1em auto;">
+          <div class="closing-sentence fragment">
+            <div class="quote-text">Look for the essence &mdash; not what is there, but what should be there.</div>
+            <div class="quote-source">&mdash; Dan North</div>
+          </div>
+          <div class="closing-sentence fragment">
+            <div class="quote-text">Full-stack teams ship quality software faster.</div>
+            <div class="quote-source">&mdash; Marcus Hellberg</div>
+          </div>
+          <div class="closing-sentence fragment">
+            <div class="quote-text">Run slow to run fast.</div>
+            <div class="quote-source">&mdash; Arun Gupta</div>
+          </div>
+        </div>
+        <p class="fragment" style="font-size: 0.85em; margin-top: 1em; color: #e6edf3;">
+          <strong class="gradient-text">Find the essence. Build it in one language. Let specs guide AI.</strong>
+        </p>
+        <aside class="notes">Let me bring it all together.<br><b>&rarr;</b> Dan North: look for the essence.<br><b>&rarr;</b> Marcus Hellberg: full-stack teams ship faster.<br><b>&rarr;</b> Arun Gupta: run slow to run fast.<br><b>&rarr;</b> Combined: find the essence. Build it in one language. Let specs guide AI.<br>That is PyFlow.</aside>
+      </section>
+
+      <!-- SLIDE 29: Thank You -->
+      <section data-background-image="images/bg-rocket.jpg"
+               data-background-opacity="0.12"
+               data-background-size="cover">
+        <h1><span class="gradient-text" style="font-size: 1.5em;">Thank You</span></h1>
+        <div class="terminal" style="margin-top: 1em;">
+          <pre class="typewriter-code" data-speed="40"><code data-trim class="language-bash">
+pip install git+https://github.com/manolo/pyflow.git
+mkdir myapp && cd myapp && mkdir views
+pyflow --setup
+pyflow --dev --port 8080
+          </code></pre>
+        </div>
+        <div id="thankyou-logo" style="margin-top: 1.5em; display: flex; align-items: center; justify-content: center; gap: 0.6em; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease;">
+          <img src="images/logo.png" alt="PyFlow logo" class="logo" style="max-width: 80px;">
+          <span class="gradient-text" style="font-size: 1.8em; font-weight: 800; letter-spacing: -0.02em;">PyFlow</span>
+        </div>
+        <div id="thankyou-links" style="margin-top: 1em; display: flex; justify-content: center; gap: 2em; font-size: 0.7em; opacity: 0; transition: opacity 0.6s ease;">
+          <a href="https://github.com/manolo/pyflow" target="_blank" style="color: #00d2ff; text-decoration: none;">GitHub</a>
+          <span style="color: rgba(255,255,255,0.3);">|</span>
+          <a href="https://manolo.github.io/pyflow/" target="_blank" style="color: #00d2ff; text-decoration: none;">Website</a>
+        </div>
+        <aside class="notes">Here is how to get started.<br>pip install. Create a folder.<br>Run vaadin setup. Run vaadin dev.<br>That is it.<br><br>The repo and the website are here.<br><br>Let's continue with a demo.</aside>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ─── Scripts ─── -->
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/notes/notes.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      transition: 'slide',
+      plugins: [RevealHighlight, RevealNotes],
+      slideNumber: true,
+      center: true,
+      pdfSeparateFragments: true,
+      controlsLayout: 'edges',
+      keyboard: {
+        48: function() { Reveal.slide(0); },
+        49: function() { Reveal.slide(2); },
+        50: function() { Reveal.slide(6); },
+        51: function() { Reveal.slide(11); },
+        52: function() { Reveal.slide(15); },
+        53: function() { Reveal.slide(18); }
+      }
+    });
+
+    // ─── Talk progress bar ───
+    // Slide index (0-based) → part mapping:
+    //   0-1: opening (no part)  |  2-5: Part 1  |  6-12: Part 2
+    //   13-19: Part 3  |  20-25: Part 4  |  26-27: closing (all done)
+    function updateTalkProgress(slideIndex) {
+      var part = 0;
+      // Visible indices (slides 10,12,13,17,21,24,28 hidden)
+      // 0:Title 1:Talks 2:P1Div 3:Gall 4:Thin 5:Platform
+      // 6:P2Div 7:Lang 8:MVP 9:Hello 10:Push
+      // 11:P3Div 12:SDD 13:Spec 14:Beyond
+      // 15:P4Div 16:DX 17:Next 18:ThankYou
+      if (slideIndex >= 2 && slideIndex <= 5) part = 1;
+      else if (slideIndex >= 6 && slideIndex <= 10) part = 2;
+      else if (slideIndex >= 11 && slideIndex <= 14) part = 3;
+      else if (slideIndex >= 15 && slideIndex <= 17) part = 4;
+      else if (slideIndex >= 18) part = 5; // closing -- all done
+
+      var bar = document.getElementById('talk-progress');
+      bar.style.opacity = slideIndex === 0 ? '0' : '1';
+
+      var items = bar.querySelectorAll('.tp-seg');
+      items.forEach(function (item) {
+        var p = parseInt(item.getAttribute('data-part'));
+        item.classList.toggle('lit', part > 0 && p <= part);
+        item.classList.toggle('current', part > 0 && p === part);
+      });
+
+      // Gradient background: 0 → full, ending at start of next section
+      var ends = [0, 33, 60, 83, 100];
+      var pct = ends[Math.min(part, 4)];
+      bar.style.background = part > 0
+        ? 'linear-gradient(to right, rgba(0,210,255,0) 0%, rgba(0,210,255,0.18) ' + pct + '%, transparent ' + pct + '%)'
+        : 'none';
+    }
+
+    Reveal.on('slidechanged', function (event) {
+      updateTalkProgress(Reveal.getIndices().h);
+
+      // Reset coverage bars when navigating to/from the slide
+      var fill = event.currentSlide.querySelector('#coverage-fill');
+      if (fill) { fill.classList.remove('animate'); }
+      var testFill = event.currentSlide.querySelector('#test-coverage-fill');
+      if (testFill) { testFill.classList.remove('animate'); }
+    });
+    // Shared: set background opacity for a slide by its section element
+    function setSlideBgOpacity(sectionId, opacity) {
+      var backgrounds = document.querySelector('.backgrounds');
+      if (!backgrounds) return;
+      var sections = document.querySelectorAll('.reveal .slides > section');
+      for (var i = 0; i < sections.length; i++) {
+        if (sections[i].id === sectionId) {
+          var bg = backgrounds.querySelectorAll('.slide-background')[i]?.querySelector('.slide-background-content');
+          if (bg) bg.style.opacity = opacity;
+          break;
+        }
+      }
+    }
+    // Slide 5: zoom architecture image to background on first fragment
+    // Slide 8: hide iframe and show screenshot background on caption fragment
+    Reveal.on('fragmentshown', function (event) {
+      var section = event.fragment.closest('section');
+      var idx = event.fragment.getAttribute('data-fragment-index');
+      // Slide 5: Thin Client
+      if (section && section.id === 'slide-thin-client') {
+        var archImg = section.querySelector('img[data-id="arch-img"]');
+        if (archImg && idx === '0') {
+          event.fragment.style.opacity = '1';
+          event.fragment.style.transform = 'translateY(0)';
+          archImg.style.transform = 'scale(1.8)';
+          archImg.style.opacity = '0';
+          setSlideBgOpacity('slide-thin-client', '0.15');
+          setTimeout(function () { archImg.classList.add('shrink-away'); }, 900);
+        }
+      }
+      // Slide 8: TIOBE
+      if (section && section.id === 'slide-tiobe' && idx === '1') {
+        var wrapper = document.getElementById('tiobe-iframe-wrapper');
+        if (wrapper) {
+          wrapper.style.opacity = '0';
+          wrapper.style.maxHeight = '0';
+        }
+        var quote = document.getElementById('tiobe-quote');
+        if (quote) quote.style.opacity = '1';
+      }
+      // Animate coverage bars when their fragment becomes visible
+      var fill = event.fragment.querySelector('#coverage-fill');
+      if (fill) {
+        fill.classList.remove('animate');
+        setTimeout(function () { fill.classList.add('animate'); }, 100);
+      }
+      var testFill = event.fragment.querySelector('#test-coverage-fill');
+      if (testFill) {
+        testFill.classList.remove('animate');
+        setTimeout(function () { testFill.classList.add('animate'); }, 100);
+      }
+    });
+    // Reset if fragment is hidden (navigating backwards)
+    Reveal.on('fragmenthidden', function (event) {
+      var section = event.fragment.closest('section');
+      var idx = event.fragment.getAttribute('data-fragment-index');
+      // Slide 5: Thin Client
+      if (section && section.id === 'slide-thin-client') {
+        var archImg = section.querySelector('img[data-id="arch-img"]');
+        if (archImg && idx === '0') {
+          event.fragment.style.opacity = '0';
+          event.fragment.style.transform = 'translateY(20px)';
+          archImg.classList.remove('shrink-away');
+          archImg.style.transform = 'scale(1)';
+          archImg.style.opacity = '1';
+          setSlideBgOpacity('slide-thin-client', '0');
+        }
+      }
+      // Slide 8: TIOBE
+      if (section && section.id === 'slide-tiobe' && idx === '1') {
+        var quote = document.getElementById('tiobe-quote');
+        if (quote) quote.style.opacity = '0';
+        var wrapper = document.getElementById('tiobe-iframe-wrapper');
+        if (wrapper) {
+          wrapper.style.maxHeight = '540px';
+          wrapper.style.opacity = '1';
+        }
+        setSlideBgOpacity('slide-tiobe', '0.08');
+      }
+      var fill = event.fragment.querySelector('#coverage-fill');
+      if (fill) { fill.classList.remove('animate'); }
+      var testFill = event.fragment.querySelector('#test-coverage-fill');
+      if (testFill) { testFill.classList.remove('animate'); }
+    });
+    // Reset arch image when navigating away from slide 5
+    Reveal.on('slidechanged', function resetSlides(event) {
+      // Reset slide 5 (Thin Client)
+      var thinClient = document.getElementById('slide-thin-client');
+      if (thinClient && event.currentSlide !== thinClient) {
+        var archImg = thinClient.querySelector('img[data-id="arch-img"]');
+        if (archImg) {
+          archImg.classList.remove('shrink-away');
+          archImg.style.transition = 'none';
+          archImg.style.transform = 'scale(1)';
+          archImg.style.opacity = '1';
+          setTimeout(function () {
+            archImg.style.transition = 'transform 0.8s ease, opacity 0.6s ease 0.4s';
+          }, 50);
+        }
+        setSlideBgOpacity('slide-thin-client', '0');
+      }
+      // Reset slide 8 (TIOBE)
+      var tiobe = document.getElementById('slide-tiobe');
+      if (tiobe && event.currentSlide !== tiobe) {
+        var quote = document.getElementById('tiobe-quote');
+        if (quote) { quote.style.transition = 'none'; quote.style.opacity = '0'; setTimeout(function () { quote.style.transition = 'opacity 0.6s ease'; }, 50); }
+        var wrapper = document.getElementById('tiobe-iframe-wrapper');
+        if (wrapper) {
+          wrapper.style.transition = 'none';
+          wrapper.style.maxHeight = '540px';
+          wrapper.style.opacity = '1';
+          setTimeout(function () {
+            wrapper.style.transition = 'opacity 0.5s ease, max-height 0.8s ease 0.3s';
+          }, 50);
+        }
+        setSlideBgOpacity('slide-tiobe', '0.08');
+      }
+    });
+    Reveal.on('ready', function (event) {
+      updateTalkProgress(Reveal.getIndices().h);
+    });
+
+    // Thank You: auto-reveal logo + links after typewriter finishes
+    var thankyouTimer = null;
+    Reveal.on('slidechanged', function (event) {
+      var logo = document.getElementById('thankyou-logo');
+      var links = document.getElementById('thankyou-links');
+      if (!logo || !links) return;
+      clearTimeout(thankyouTimer);
+      if (event.currentSlide.querySelector('#thankyou-logo')) {
+        // Estimate typewriter duration: ~140 chars * 40ms + newline pauses + delay
+        thankyouTimer = setTimeout(function () {
+          logo.style.opacity = '1';
+          logo.style.transform = 'translateY(0)';
+          setTimeout(function () { links.style.opacity = '1'; }, 600);
+        }, 7000);
+      } else {
+        logo.style.transition = 'none';
+        links.style.transition = 'none';
+        logo.style.opacity = '0';
+        logo.style.transform = 'translateY(20px)';
+        links.style.opacity = '0';
+        setTimeout(function () {
+          logo.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+          links.style.transition = 'opacity 0.6s ease';
+        }, 50);
+      }
+    });
+  </script>
+
+  <!-- Reusable libs (load after Reveal init) -->
+  <script src="lib/typewriter.js"></script>
+
+  <!-- Print-pdf: fix JS-driven animations that don't run in print mode -->
+  <script>
+  if (/print-pdf/i.test(window.location.search)) {
+    // Reveal creates .pdf-page wrappers after 'ready' — wait for them
+    Reveal.on('pdf-ready', function () {
+      // Thin Client: hide foreground image, show background when cards visible
+      document.querySelectorAll('.pdf-page').forEach(function (page) {
+        var section = page.querySelector('section#slide-thin-client');
+        if (!section) return;
+        var hasVisibleCards = section.querySelector('.card.visible');
+        if (hasVisibleCards) {
+          var img = section.querySelector('img[data-id="arch-img"]');
+          if (img) img.style.display = 'none';
+          var bg = page.querySelector('.slide-background');
+          if (bg) bg.style.opacity = '0.15';
+        }
+      });
+
+      // Thank You: show logo and links
+      var logo = document.getElementById('thankyou-logo');
+      if (logo) { logo.style.opacity = '1'; logo.style.transform = 'none'; }
+      var links = document.getElementById('thankyou-links');
+      if (links) links.style.opacity = '1';
+
+      // Coverage bars: set final width when their fragment is visible
+      document.querySelectorAll('.pdf-page .fragment.visible .coverage-fill').forEach(function (el) {
+        el.classList.add('animate');
+      });
+      // Coverage labels
+      document.querySelectorAll('.pdf-page .fragment.visible .coverage-label').forEach(function (el) {
+        el.style.opacity = '1';
+      });
+
+      // Remove .fragment class from non-visible fragments so Reveal's
+      // @media print rule (.fragment { opacity:1!important }) doesn't apply.
+      document.querySelectorAll('.pdf-page .fragment:not(.visible)').forEach(function (el) {
+        el.classList.remove('fragment');
+        el.classList.add('fragment-hidden');
+      });
+
+    });
+  }
+  </script>
+</body>
+</html>

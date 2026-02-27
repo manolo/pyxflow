@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+*{margin:0;box-sizing:border-box}
+body{background:#0d1117;display:flex;align-items:center;justify-content:center;min-height:100vh;overflow:hidden;padding:1em}
+.container{width:100%;max-width:960px}
+.stats{display:flex;gap:1.2em;justify-content:center;margin-bottom:0.8em}
+.stat{text-align:center;padding:0.6em 1.2em;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px}
+.stat .num{font-family:system-ui,-apple-system,sans-serif;font-size:1.8em;font-weight:800;letter-spacing:-0.02em}
+.stat .num.glow{color:#00d2ff;text-shadow:0 0 20px rgba(0,210,255,0.4)}
+.stat .num.dim{color:#8899aa}
+.stat .label{font-family:system-ui,-apple-system,sans-serif;font-size:0.7em;color:#8899aa;margin-top:0.2em}
+#tiobe-chart{width:100%;height:380px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06);padding:0.5em}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="stats">
+    <div class="stat" id="python-stat" style="cursor:pointer">
+      <div class="num glow">21.81%</div>
+      <div class="label">Python #1 &mdash; TIOBE Feb 2026</div>
+    </div>
+    <div class="stat" id="java-stat" style="cursor:pointer">
+      <div class="num dim">8.12%</div>
+      <div class="label">Java #3 &mdash; 13+ points behind</div>
+    </div>
+  </div>
+  <div id="tiobe-chart"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/highcharts@11/highcharts.min.js"></script>
+<script src="../lib/tiobe-data.js"></script>
+<script>
+// Inline chart init (no Reveal dependency)
+Highcharts.chart('tiobe-chart', {
+  chart: {
+    type: 'spline',
+    backgroundColor: 'transparent',
+    style: { fontFamily: 'system-ui, -apple-system, sans-serif' },
+    animation: { duration: 1500 }
+  },
+  title: {
+    text: 'TIOBE Programming Community Index',
+    style: { color: '#e6edf3', fontSize: '14px', fontWeight: '600' }
+  },
+  subtitle: {
+    text: 'Source: www.tiobe.com',
+    style: { color: '#8899aa', fontSize: '10px' }
+  },
+  xAxis: {
+    type: 'datetime',
+    labels: { style: { color: '#8899aa', fontSize: '9px' }, format: '{value:%Y}' },
+    lineColor: 'rgba(255,255,255,0.1)',
+    tickColor: 'rgba(255,255,255,0.1)',
+    gridLineColor: 'rgba(255,255,255,0.03)'
+  },
+  yAxis: {
+    title: { text: 'Ratings (%)', style: { color: '#8899aa', fontSize: '10px' } },
+    labels: { style: { color: '#8899aa', fontSize: '9px' }, format: '{value}%' },
+    gridLineColor: 'rgba(255,255,255,0.05)',
+    min: 0
+  },
+  legend: {
+    itemStyle: { color: '#e6edf3', fontSize: '10px', fontWeight: '400' },
+    itemHoverStyle: { color: '#00d2ff' },
+    itemHiddenStyle: { color: '#444' }
+  },
+  tooltip: {
+    backgroundColor: 'rgba(13,17,23,0.95)',
+    borderColor: 'rgba(255,255,255,0.1)',
+    style: { color: '#e6edf3', fontSize: '11px' },
+    shared: false,
+    headerFormat: '<span style="font-size:10px;color:#8899aa">{point.key:%B %Y}</span><br/>',
+    pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y:.2f}%</b>'
+  },
+  plotOptions: {
+    spline: {
+      lineWidth: 2,
+      states: { hover: { lineWidth: 4 } },
+      marker: { enabled: false },
+      animation: { duration: 2000 }
+    },
+    series: { states: { inactive: { opacity: 0.15 } } }
+  },
+  credits: { enabled: false },
+  series: TIOBE_SERIES.map(function (s) {
+    return { name: s.name, color: s.color, data: s.data, lineWidth: s.name === 'Python' ? 3 : 1.5 };
+  })
+});
+
+var chart = Highcharts.charts[0];
+var pyIsolated = false;
+var javaIsolated = false;
+
+document.getElementById('python-stat').addEventListener('click', function () {
+  pyIsolated = !pyIsolated;
+  javaIsolated = false;
+  chart.series.forEach(function (s) {
+    s.update({ visible: pyIsolated ? s.name === 'Python' : true }, false);
+  });
+  chart.redraw();
+});
+
+document.getElementById('java-stat').addEventListener('click', function () {
+  javaIsolated = !javaIsolated;
+  pyIsolated = false;
+  chart.series.forEach(function (s) {
+    s.update({ visible: javaIsolated ? (s.name === 'Python' || s.name === 'Java') : true }, false);
+  });
+  chart.redraw();
+});
+</script>
+</body>
+</html>
