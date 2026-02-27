@@ -34,9 +34,7 @@ Capturas de la **app demo de PyFlow** corriendo en localhost con **Lumo Dark the
 
 | Archivo | Origen |
 |---------|--------|
-| `_logo.svg` | SVG del logo de PyFlow (serpiente Python + motivo flow, gradiente azul/cyan) |
-| `logo.png` | Versión PNG del logo |
-| `logo2.png` | Variante alternativa del logo |
+| `logo.png` | PNG del logo de PyFlow (serpiente Python + motivo flow, gradiente azul/cyan) |
 
 ### Código fuente de referencia
 
@@ -88,9 +86,7 @@ Para generar una página similar desde cero, usar un prompt como:
 ```
 web/
 ├── index.html              # La página (HTML + CSS + JS, todo en uno)
-├── _logo.svg               # Logo SVG fuente
 ├── logo.png                # Logo PNG
-├── logo2.png               # Logo PNG variante
 ├── screenshots/            # Capturas de la demo (Lumo Dark)
 │   ├── screenshot-hello.png
 │   ├── screenshot-grid.png
