@@ -85,6 +85,9 @@ pyflow bundle
 
 # Pin a specific version
 pyflow bundle --vaadin-version 25.1.0
+
+# Use the optimized (code-split) bundle (larger on disk, lazy-loaded chunks)
+pyflow bundle --optimized
 ```
 
 The command extracts the bundle from 4 Maven JARs (prod-bundle, flow-push, lumo-theme, aura-theme). If any JAR is not in `~/.m2/repository/`, it is automatically downloaded from Maven Central.
@@ -119,18 +122,40 @@ flow-version = "25.0.7"
 
 ## Optimized vs Unoptimized Bundle
 
-The JAR contains two versions:
+The `vaadin-prod-bundle` JAR contains two variants:
 
-| Version | Path | Size | Structure |
-|---------|------|------|-----------|
-| Optimized | `vaadin-prod-bundle/webapp/` | ~4MB | Multiple chunks (code splitting) |
-| Unoptimized | `vaadin-prod-bundle-unoptimized/webapp/` | ~5MB | Single `generated-flow-imports.js` |
+| | Unoptimized (default) | Optimized (`--optimized`) |
+|---|---|---|
+| JAR path | `vaadin-prod-bundle-unoptimized/webapp/` | `vaadin-prod-bundle/webapp/` |
+| JS files | 6 (single `generated-flow-imports.js`) | 28 (~10 chunks x 3 browser variants) |
+| JS on disk | 4.07 MB | 11.17 MB |
+| Brotli on disk | 0.91 MB | 2.61 MB |
+| JS per browser | 4.07 MB (all upfront) | ~3.9 MB (lazy-loaded chunks) |
+| Other files | 34 (icons, sw.js) - 728 KB | 34 (identical) - 728 KB |
+| **Total on disk** | **5.69 MB (47 files)** | **14.49 MB (91 files)** |
 
-We use **unoptimized** because:
-- Simpler (one file for all components)
-- No chunk loading logic needed
+The **optimized** bundle is code-split into lazy chunks, but each chunk ships in 3 variants
+(ES2020/ES2022/ESNext) for different browser targets -- so the on-disk size is ~3x larger.
+The browser only downloads one variant per chunk, so the actual network transfer is slightly
+smaller (~3.9 MB vs 4.07 MB before compression).
+
+The default is **unoptimized** because:
+- Much smaller on disk (5.7 MB vs 14.5 MB) -- matters for wheel/package size
+- Simpler (one JS file, no chunk loading logic)
 - Easier to debug
-- Size difference is minimal with compression
+- PyFlow loads all components anyway, so lazy loading has little benefit
+- Network difference is negligible with Brotli compression (~0.9 MB either way)
+
+Use `pyflow bundle --optimized` to switch to the code-split version if lazy chunk loading is desired.
+
+The `--optimized` flag works with both modes:
+- **Copy mode** (`pyflow bundle --optimized`): extracts from `vaadin-prod-bundle/webapp/`
+  instead of `vaadin-prod-bundle-unoptimized/webapp/`.
+- **Build mode** (`pyflow bundle --build --optimized`): sets `<optimizeBundle>true</optimizeBundle>`
+  in the Maven plugin config so Vite produces code-split chunks. Without it, `<optimizeBundle>false</optimizeBundle>`
+  generates a single monolithic JS file.
+
+Note: `--build` defaults to `--optimized` being off (single JS file), matching the copy mode default.
 
 ## Troubleshooting
 
@@ -152,14 +177,14 @@ The UIDL protocol might have changed between Vaadin versions:
 
 Clear the browser cache or use incognito mode to ensure the latest bundle is loaded.
 
-## File Sizes (v25.0.6)
+## File Sizes (v25.0.6, unoptimized -- default)
 
 | File | Original | Brotli |
 |------|----------|--------|
-| generated-flow-imports-*.js | 3.7 MB | 807 KB |
-| indexhtml-*.js | 329 KB | 92 KB |
+| generated-flow-imports-*.js | 3,668 KB | 807 KB |
+| indexhtml-*.js | 331 KB | 92 KB |
 | FlowClient-*.js | 145 KB | 41 KB |
-| FlowBootstrap-*.js | 2.7 KB | 0.9 KB |
-| **Total** | **~4.2 MB** | **~942 KB** |
+| FlowBootstrap-*.js | 3 KB | 0.9 KB |
+| **Total JS** | **4.07 MB** | **~942 KB** |
 
-With Brotli compression (enabled by default in browsers), the download is under 1MB.
+With Brotli compression (enabled by default in browsers), the JS download is under 1 MB.

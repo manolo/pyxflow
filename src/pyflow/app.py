@@ -174,6 +174,7 @@ def _usage() -> None:
     print("  --copy      Copy bundle from Maven JARs in ~/.m2 (default, fast)")
     print("  --build     Full Maven build (slower, generates custom bundle)")
     print("  --keep      Keep bundle-project/ after build (only with --build)")
+    print("  --optimized Use optimized bundle (code-split chunks, larger on disk)")
     print("  --vscode    Generate .vscode/ config and install recommended extensions")
     print("  --setup     Scaffold a new Vaadin PyFlow project (views, static, __main__.py)")
     sys.exit(0)
@@ -410,6 +411,7 @@ def main():
 
         keep = "--keep" in rest
         use_build = "--build" in rest
+        optimized = "--optimized" in rest
         vaadin_version = _DEFAULT_VAADIN_VERSION
         if "--vaadin-version" in rest:
             idx = rest.index("--vaadin-version")
@@ -426,7 +428,7 @@ def main():
             sys.path.insert(0, cwd)
 
         if use_build:
-            generate_and_build(app_dir=app_dir, keep=keep, vaadin_version=vaadin_version)
+            generate_and_build(app_dir=app_dir, keep=keep, vaadin_version=vaadin_version, optimized=optimized)
         else:
             # Default: copy from Maven JARs (fast, no build needed)
             is_pyflow_dev = (Path.cwd() / "src" / "pyflow").is_dir()
@@ -447,7 +449,7 @@ def main():
             print(f"  Bundle output:  {bundle_dir}")
             print()
 
-            copy_from_jars(bundle_dir, vaadin_version)
+            copy_from_jars(bundle_dir, vaadin_version, optimized=optimized)
 
             print()
             print("===================================================")

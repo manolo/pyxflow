@@ -48,6 +48,18 @@ class TestGeneratePomXml:
         pom = generate_pom_xml("25.0.4")
         assert "<java.version>17</java.version>" in pom
 
+    def test_optimize_bundle_true(self):
+        pom = generate_pom_xml("25.0.4", optimize_bundle=True)
+        assert "<optimizeBundle>true</optimizeBundle>" in pom
+
+    def test_optimize_bundle_false(self):
+        pom = generate_pom_xml("25.0.4", optimize_bundle=False)
+        assert "<optimizeBundle>false</optimizeBundle>" in pom
+
+    def test_optimize_bundle_default_true(self):
+        pom = generate_pom_xml("25.0.4")
+        assert "<optimizeBundle>true</optimizeBundle>" in pom
+
 
 class TestDiscoverJavaComponents:
     """Test auto-discovery of _v_fqcn from Component subclasses."""

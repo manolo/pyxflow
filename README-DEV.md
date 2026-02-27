@@ -48,6 +48,30 @@ UI tests are in `tests/ui/` and excluded from the default `pytest` run. Use `pyt
 
 <img src="docs/screenshots/screenshots-tests.gif" alt="UI Tests" width="650">
 
+## Frontend bundle
+
+PyFlow ships with a pre-built Vaadin frontend bundle at `src/pyflow/bundle/`. This is the **optimized** version (code-split into lazy-loaded chunks) so the browser only downloads what it needs.
+
+In normal development you **do not need** to run `pyflow bundle` -- the committed bundle is ready to use.
+
+You must regenerate and commit the bundle when:
+- Upgrading the Vaadin version in `pyproject.toml` (`vaadin-version` / `flow-version`)
+- Adding a new component with `_v_fqcn` (only needed with `--build`, the pre-built JAR already includes all components)
+
+```bash
+# Regenerate from Maven Central JARs (fast, seconds)
+pyflow bundle --optimized
+
+# Verify it works
+python -m demo  # check http://localhost:8088
+
+# Commit the updated bundle
+git add src/pyflow/bundle/
+git commit -m "Update frontend bundle to Vaadin X.Y.Z"
+```
+
+See `BUNDLE.md` for details on optimized vs unoptimized variants and `--build` mode.
+
 ## Project structure
 
 ```

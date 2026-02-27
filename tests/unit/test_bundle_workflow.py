@@ -23,7 +23,7 @@ class TestGenerateAndBuildPyflowDev:
         with patch("pyflow.bundle_generator.generate_project") as mock_gen, \
              patch("pyflow.bundle_generator.build_and_extract") as mock_build:
             # generate_project is mocked, so create the dir it would create
-            mock_gen.side_effect = lambda d, v: d.mkdir(parents=True, exist_ok=True)
+            mock_gen.side_effect = lambda d, v, **kw: d.mkdir(parents=True, exist_ok=True)
             generate_and_build(app_dir=None, keep=False, vaadin_version="25.0.6")
 
             # Should target src/pyflow/bundle/
@@ -176,6 +176,55 @@ class TestGenerateAndBuildReuse:
             assert mock_build.call_args[1]["clean"] is True
 
 
+class TestBundleCopyOptimized:
+    """Test --optimized flag for copy_from_jars."""
+
+    def _run_main_copy(self, argv):
+        """Run main() with copy mode, capturing the copy_from_jars call."""
+        with patch("sys.argv", ["pyflow"] + argv), \
+             patch("pyflow.bundle_generator.copy_from_jars") as mock_cfj:
+            from pyflow.app import main
+            with pytest.raises(SystemExit) as exc_info:
+                main()
+            assert exc_info.value.code == 0
+            return mock_cfj
+
+    def test_bundle_copy_optimized(self):
+        """pyflow bundle --optimized -> copy_from_jars(optimized=True)."""
+        mock = self._run_main_copy(["bundle", "--optimized"])
+        assert mock.call_args[1]["optimized"] is True
+
+    def test_bundle_copy_default_not_optimized(self):
+        """pyflow bundle -> copy_from_jars(optimized=False)."""
+        mock = self._run_main_copy(["bundle"])
+        assert mock.call_args[1]["optimized"] is False
+
+    def test_copy_from_jars_optimized_prefix(self, tmp_path):
+        """copy_from_jars(optimized=True) uses vaadin-prod-bundle/webapp/ prefix."""
+        from pyflow.bundle_generator import copy_from_jars, _extract_jar_to
+        with patch("pyflow.bundle_generator._find_m2_jar") as mock_find, \
+             patch("pyflow.bundle_generator._download_jar") as mock_dl, \
+             patch("pyflow.bundle_generator._extract_jar_to") as mock_extract:
+            mock_find.return_value = Path("/fake.jar")
+            mock_extract.return_value = 1
+            copy_from_jars(tmp_path, "25.0.6", optimized=True)
+            # First call is the prod-bundle extraction
+            first_call = mock_extract.call_args_list[0]
+            assert first_call[0][1] == "vaadin-prod-bundle/webapp/"
+
+    def test_copy_from_jars_unoptimized_prefix(self, tmp_path):
+        """copy_from_jars(optimized=False) uses vaadin-prod-bundle-unoptimized/webapp/ prefix."""
+        from pyflow.bundle_generator import copy_from_jars, _extract_jar_to
+        with patch("pyflow.bundle_generator._find_m2_jar") as mock_find, \
+             patch("pyflow.bundle_generator._download_jar") as mock_dl, \
+             patch("pyflow.bundle_generator._extract_jar_to") as mock_extract:
+            mock_find.return_value = Path("/fake.jar")
+            mock_extract.return_value = 1
+            copy_from_jars(tmp_path, "25.0.6", optimized=False)
+            first_call = mock_extract.call_args_list[0]
+            assert first_call[0][1] == "vaadin-prod-bundle-unoptimized/webapp/"
+
+
 class TestCliArgParsing:
     """Test CLI argument parsing in main()."""
 
@@ -205,6 +254,12 @@ class TestCliArgParsing:
         mock.assert_called_once()
         assert mock.call_args[1]["app_dir"] is None
         assert mock.call_args[1]["keep"] is False
+        assert mock.call_args[1]["optimized"] is False
+
+    def test_bundle_build_optimized(self):
+        """pyflow --bundle --build --optimized -> optimized=True."""
+        mock = self._run_main_build(["--bundle", "--build", "--optimized"])
+        assert mock.call_args[1]["optimized"] is True
 
     def test_bundle_build_with_module(self):
         """pyflow my_app --bundle --build -> app_dir=cwd/my_app."""

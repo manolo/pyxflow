@@ -64,8 +64,9 @@ def _read_pyproject_versions() -> tuple[str, str]:
 _DEFAULT_VAADIN_VERSION, _DEFAULT_FLOW_VERSION = _read_pyproject_versions()
 
 
-def generate_pom_xml(vaadin_version: str) -> str:
+def generate_pom_xml(vaadin_version: str, *, optimize_bundle: bool = True) -> str:
     """Minimal pom.xml: WAR packaging, vaadin-core, vaadin-maven-plugin."""
+    optimize_str = "true" if optimize_bundle else "false"
     return f"""\
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -117,6 +118,9 @@ def generate_pom_xml(vaadin_version: str) -> str:
                             <goal>prepare-frontend</goal>
                             <goal>build-frontend</goal>
                         </goals>
+                        <configuration>
+                            <optimizeBundle>{optimize_str}</optimizeBundle>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -192,7 +196,7 @@ def generate_feature_flags() -> str:
     return "com.vaadin.experimental.masterDetailLayoutComponent=true\n"
 
 
-def generate_project(output_dir: Path, vaadin_version: str) -> None:
+def generate_project(output_dir: Path, vaadin_version: str, *, optimized: bool = True) -> None:
     """Create a complete Maven project in output_dir."""
     registry = discover_java_components()
 
@@ -208,7 +212,7 @@ def generate_project(output_dir: Path, vaadin_version: str) -> None:
     resources_dir.mkdir(parents=True)
 
     # pom.xml
-    (output_dir / "pom.xml").write_text(generate_pom_xml(vaadin_version))
+    (output_dir / "pom.xml").write_text(generate_pom_xml(vaadin_version, optimize_bundle=optimized))
 
     # FakeView.java
     (java_dir / "FakeView.java").write_text(
@@ -463,6 +467,8 @@ def _extract_jar_to(jar_path: Path, prefix: str, dest_dir: Path, *, strip_prefix
 def copy_from_jars(
     bundle_dir: Path,
     vaadin_version: str = _DEFAULT_VAADIN_VERSION,
+    *,
+    optimized: bool = False,
 ) -> None:
     """Extract a complete bundle from pre-built Vaadin Maven JARs.
 
@@ -495,9 +501,12 @@ def copy_from_jars(
             shutil.rmtree(d)
     bundle_dir.mkdir(parents=True, exist_ok=True)
 
-    # --- Extract prod-bundle (unoptimized -- includes ALL components) ---------
+    # --- Extract prod-bundle -------------------------------------------------
     prod_jar = found["prod-bundle"]
-    prefix = "vaadin-prod-bundle-unoptimized/webapp/"
+    if optimized:
+        prefix = "vaadin-prod-bundle/webapp/"
+    else:
+        prefix = "vaadin-prod-bundle-unoptimized/webapp/"
     n = _extract_jar_to(prod_jar, prefix, bundle_dir)
     print(f"  prod-bundle: {n} files from {prod_jar.name}")
 
@@ -529,6 +538,8 @@ def generate_and_build(
     app_dir: Path | None = None,
     keep: bool = False,
     vaadin_version: str = _DEFAULT_VAADIN_VERSION,
+    *,
+    optimized: bool = True,
 ) -> None:
     """CLI entry point: generate project, build, extract bundle.
 
@@ -537,6 +548,8 @@ def generate_and_build(
                  auto-detects pyflow dev tree.
         keep: If *True*, keep ``bundle-project/`` after extraction.
         vaadin_version: Vaadin platform version for the pom.xml.
+        optimized: If *True* (default), Vite produces code-split chunks.
+                   If *False*, produces a single monolithic JS file.
     """
     is_pyflow_dev = (Path.cwd() / "src" / "pyflow").is_dir()
 
@@ -569,7 +582,7 @@ def generate_and_build(
         print()
         build_and_extract(project_dir, bundle_dir, clean=False)
     else:
-        generate_project(project_dir, vaadin_version)
+        generate_project(project_dir, vaadin_version, optimized=optimized)
         print()
         build_and_extract(project_dir, bundle_dir, clean=True)
 
