@@ -104,7 +104,7 @@ class DashboardView(VerticalLayout):
 
 ## Application shell
 
-The application shell is the global layout shared by all views. It defines the navbar, drawer, theme, and stylesheets. Decorate one class with `@AppShell`.
+`@AppShell` marks the global app configuration: push, theme, stylesheets. Only one per app. In practice, you put it on your main layout class (`AppLayout`) which provides the navbar, drawer, and content area.
 
 ```python
 from vaadin.flow import AppShell, Push, ColorScheme, StyleSheet
@@ -140,7 +140,7 @@ def my_fetch(offset, limit, sort_orders):
 
 ## Real-time push
 
-Update the UI from background tasks without polling. The server pushes changes to the browser via WebSocket. Just call `ui.access()` from any async task.
+Update the UI from business background tasks running in the server. The server pushes changes to the browser via WebSocket. Just call `ui.access()` from any async task.
 
 ```python
 import asyncio

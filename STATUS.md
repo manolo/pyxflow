@@ -228,6 +228,12 @@
 | Grid item details renderer | Low | Expandable row details via `set_item_details_renderer` (set_details_visible_on_click already implemented) |
 | Specialized renderers | Low | NumberRenderer, LocalDateRenderer, LocalDateTimeRenderer, NativeButtonRenderer, IconRenderer |
 | ConfigurableFilterDataProvider | Low | Advanced filtering for DataProvider |
+| AppShell `@Meta` | Low | Inject `<meta>` tags into index.html (Java's `@Meta(name, content)`) |
+| AppShell `@Viewport` | Low | Set viewport meta tag (Java's `@Viewport("width=device-width, initial-scale=1")`) |
+| AppShell `@BodySize` | Low | Configure body height/width CSS (Java's `@BodySize(height, width)`) |
+| AppShell `@Inline` | Low | Inline static resources (JS/CSS/HTML) into index.html (Java's `@Inline("file.js")`) |
+| AppShell `@PageTitle` | Low | Set default page title at AppShell level (currently only per-route via `@Route(page_title=)`) |
+| AppShell `configurePage()` | Low | Programmatic page config method (Java's `AppShellConfigurator.configurePage(AppShellSettings)`) |
 
 ### Missing API Methods — Summary by Component
 
