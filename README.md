@@ -61,8 +61,8 @@ The included demo app showcases real-world patterns across 8 views:
 ### Run the demo
 
 ```bash
-git clone https://github.com/manolo/vaadin-pyflow.git
-cd vaadin-pyflow
+git clone https://github.com/manolo/pyflow.git
+cd pyflow
 python -m venv .venv && source .venv/bin/activate
 pip install -e .
 python -m demo          # http://localhost:8088

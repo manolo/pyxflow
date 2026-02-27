@@ -20,7 +20,7 @@ MAX_CONSECUTIVE = 4
 DEFAULT_PORT = 8088
 DEFAULT_BASE_URL = f"http://localhost:{DEFAULT_PORT}"
 
-# Root of the vaadin-pyflow project
+# Root of the pyflow project
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 # The views module that the test server must be running
@@ -64,7 +64,7 @@ def base_url(request):
     if isinstance(status, str):
         pytest.fail(
             f"Port {DEFAULT_PORT} is running '{status}' but UI tests need '{_EXPECTED_VIEWS}'.\n"
-            f"Stop it and run:  cd vaadin-pyflow && python -m tests"
+            f"Stop it and run:  cd pyflow && python -m tests"
         )
 
     # Port occupied by something that's not a PyFlow dev server

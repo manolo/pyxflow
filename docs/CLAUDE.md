@@ -78,13 +78,13 @@ Or use Playwright MCP:
 
 ## GitHub URLs
 
-- Repository: `https://github.com/manolo/vaadin-pyflow`
-- Issues: `https://github.com/manolo/vaadin-pyflow/issues`
-- Nav GitHub link: `https://github.com/vaadin/vaadin-pyflow`
+- Repository: `https://github.com/manolo/pyflow`
+- Issues: `https://github.com/manolo/pyflow/issues`
+- Nav GitHub link: `https://github.com/vaadin/pyflow`
 
 ## PyFlow API Patterns (for code snippets)
 
-Code snippets must match the real PyFlow API. Reference source at `~/Github/platform/python/vaadin-pyflow/`.
+Code snippets must match the real PyFlow API. Reference source at `~/Github/platform/python/pyflow/`.
 
 ### Imports
 ```python

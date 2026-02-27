@@ -89,7 +89,7 @@ curl -LO "https://repo1.maven.org/maven2/com/vaadin/vaadin-prod-bundle/25.0.4/va
 unzip -o vaadin-prod-bundle-25.0.4.jar "vaadin-prod-bundle-unoptimized/webapp/VAADIN/build/*" -d extracted
 
 # Copy to PyFlow (bundle lives inside the package)
-cd /path/to/vaadin-pyflow
+cd /path/to/pyflow
 rm -rf src/pyflow/bundle/VAADIN/build/*
 cp /tmp/extracted/vaadin-prod-bundle-unoptimized/webapp/VAADIN/build/* src/pyflow/bundle/VAADIN/build/
 ```

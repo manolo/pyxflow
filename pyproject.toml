@@ -44,7 +44,7 @@ pyflow = "pyflow.app:main"
 vaadin = "pyflow.app:main_deprecated"
 
 [project.urls]
-Homepage = "https://github.com/manolo/vaadin-pyflow"
+Homepage = "https://github.com/manolo/pyflow"
 Documentation = "https://vaadin.com/docs"
 
 [tool.hatch.build.targets.wheel]

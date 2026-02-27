@@ -1,1 +1,1 @@
-# Tests for vaadin-pyflow
+# Tests for pyflow

@@ -38,7 +38,7 @@ Capturas de la **app demo de PyFlow** corriendo en localhost con **Lumo Dark the
 
 ### Código fuente de referencia
 
-Los snippets de código en la página deben coincidir con la API real de PyFlow. Referencia: `vaadin-pyflow` repo (`https://github.com/manolo/vaadin-pyflow`).
+Los snippets de código en la página deben coincidir con la API real de PyFlow. Referencia: `pyflow` repo (`https://github.com/manolo/pyflow`).
 
 Patrones clave de la API:
 - `@Route("path")`, `@Menu("Title", icon="vaadin:icon")`, `@Push`, `@AppShell`

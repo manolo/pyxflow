@@ -280,7 +280,7 @@ All 12 implementation phases are complete:
 Plus: `@ClientCallable`, `@ColorScheme`, runtime theme switching, field mixins, Binder, `pyflow --bundle`.
 
 ### Packaging & Bundle
-- [x] PyPI-ready wheel — `pip install vaadin-pyflow`
+- [x] PyPI-ready wheel — `pip install pyflow`
 - [x] Bundle inside package — `src/pyflow/bundle/` ships in wheel (1.5 MB compressed)
 - [x] CLI entry point — `pyflow [app_module] [--dev] [--debug] [--port N]`
 - [x] `pyflow --bundle` — Auto-generate bundle from `_v_fqcn` component registry

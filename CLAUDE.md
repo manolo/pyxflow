@@ -52,7 +52,7 @@ cd ../bundle-generator && ./mvnw package jetty:run-war
 ## Project Structure
 
 ```
-vaadin-pyflow/
+pyflow/
 ├── src/pyflow/
 │   ├── core/           # StateTree, StateNode, Element, Component
 │   ├── components/     # Button, TextField, Grid, Dialog, etc. (49 components)
@@ -145,7 +145,7 @@ The Vaadin frontend bundle (FlowClient, web components, Lumo/Aura themes) is pre
 
 ### Regenerating the bundle (PyFlow developers)
 
-From the `vaadin-pyflow/` checkout:
+From the `pyflow/` checkout:
 
 ```bash
 pyflow --bundle                          # build → src/pyflow/bundle/

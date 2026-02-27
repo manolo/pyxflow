@@ -2,7 +2,7 @@
 
 Usage (via CLI)::
 
-    # PyFlow developer (from vaadin-pyflow/ checkout)
+    # PyFlow developer (from pyflow/ checkout)
     pyflow --bundle                          # → src/pyflow/bundle/
     pyflow --bundle --keep                   # keep bundle-project/ for debugging
     pyflow --bundle --vaadin-version 25.0.4  # pin Vaadin version

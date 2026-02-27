@@ -3,8 +3,8 @@
 ## Setup
 
 ```bash
-git clone https://github.com/manolo/vaadin-pyflow.git
-cd vaadin-pyflow
+git clone https://github.com/manolo/pyflow.git
+cd pyflow
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
