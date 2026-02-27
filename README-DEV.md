@@ -8,7 +8,10 @@ cd vaadin-pyflow
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
+playwright install chromium
 ```
+
+This installs everything needed for development: the project in editable mode, unit tests (pytest), UI tests (Playwright), and slide PDF export (Pillow, pyyaml).
 
 ## Run the demo
 
@@ -31,12 +34,9 @@ pytest --all
 pytest tests/unit/test_rpc_events.py -v
 ```
 
-UI integration tests require Playwright:
+UI integration tests (Playwright is installed with `.[dev]`):
 
 ```bash
-pip install playwright pytest-playwright
-playwright install chromium
-
 # Run UI tests only (auto-starts the server if needed)
 pytest tests/ui/
 
