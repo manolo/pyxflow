@@ -1,33 +1,36 @@
-# Vaadin Flow for Python
+<img src="docs/logo.png" alt="PyFlow" width="80" align="left" style="margin-right: 16px;">
 
-Build web applications in Python using [Vaadin](https://vaadin.com/) web components. Write server-side Python code, get a fully interactive UI in the browser — no JavaScript required.
+# PyFlow
+
+**Build full-stack web apps in pure Python with Vaadin components.**
+
+No JavaScript. No HTML templates. Your code runs on the server -- the browser is just a thin client.
+
+---
 
 ```python
 from vaadin.flow import Route
-from vaadin.flow.components import Button, Notification, TextField, VerticalLayout
+from vaadin.flow.components import *
 
-@Route("")
-class HelloView(VerticalLayout):
+@Route("hello")
+class HelloView(HorizontalLayout):
     def __init__(self):
-        self.name = TextField("Your name")
-        self.add(
-            self.name,
-            Button("Say hello", on_click=self._greet),
-        )
-
-    def _greet(self, event):
-        Notification.show(f"Hello {self.name.value}")
+        name = TextField("Your name")
+        button = Button("Say hello", lambda e:
+            Notification.show(f"Hello {name.value}"))
+        self.add(name, button)
 ```
+
+<img src="docs/screenshots/screenshot-hello-crop.gif" alt="Hello World" width="500">
 
 ## Features
 
-- **49 components** — buttons, text fields, grids, dialogs, date pickers, menus, and more
-- **Server-side only** — all logic runs in Python, no JavaScript to write
-- **Lazy data loading** — Grid with virtual scrolling and server-side sorting
-- **Real-time push** — update the UI from background tasks via WebSocket
-- **Theming** — Lumo and Aura themes with dark mode support
-- **Form validation** — Binder with validators and converters
-- **Hot reload** — `--dev` mode watches for file changes
+- **Server-side only** -- all logic runs in Python, no JavaScript to write
+- **Real-time push** -- update the UI from background tasks via WebSocket
+- **Lazy data loading** -- Grid with virtual scrolling and server-side sorting
+- **Form validation** -- Binder with validators and converters
+- **Theming** -- Lumo and Aura themes with dark mode support
+- **Hot reload** -- `--dev` mode watches for file changes
 
 ## Installation
 
@@ -37,17 +40,17 @@ pip install git+https://github.com/manolo/vaadin-pyflow.git
 
 ## Quick start
 
-### New project
-
 ```bash
 mkdir my-app && cd my-app
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install git+https://github.com/manolo/vaadin-pyflow.git
 vaadin --setup
+vaadin
+# http://localhost:8080
 ```
 
-This creates views, static files, and VSCode config in the current directory:
+This scaffolds a project with `views/`, `static/`, and VSCode config:
 
 ```
 my-app/
@@ -62,34 +65,6 @@ my-app/
   .vscode/            # VSCode settings, snippets, extensions
 ```
 
-Run it:
-
-```bash
-vaadin
-# http://localhost:8080
-```
-
-### Existing project
-
-If you already have a project with other code and want to add Vaadin as a subpackage:
-
-```bash
-cd my-project
-source .venv/bin/activate
-pip install git+https://github.com/manolo/vaadin-pyflow.git
-vaadin --setup
-```
-
-This creates  `views/`,  `static/` folders and the example view.
-
-Run it:
-
-```bash
-vaadin
-```
-
-VSCode configuration is included automatically. If you only need the VSCode config, use `vaadin --vscode`.
-
 ### Running
 
 ```bash
@@ -103,95 +78,7 @@ vaadin [app_module] [options]
   --port PORT              Server port (default: 8080)
   --host HOST              Server host (default: localhost)
   --bundle                 Generate frontend bundle
-  --bundle --keep          Keep build artifacts after generation
-  --bundle --vaadin-version VERSION   Pin a Vaadin version
 ```
-
-Examples:
-
-```bash
-vaadin                  # auto-detect views/ and run
-vaadin myapp            # explicit module
-vaadin --dev            # hot-reload on source changes
-vaadin --port 3000      # custom port
-```
-
-### Project structure
-
-The `--setup` command generates this structure. Only `views/` is required -- everything else is optional:
-
-| File | Purpose |
-|------|---------|
-| `__main__.py` | Entry point (`python -m myapp`) |
-| `views/main_layout.py` | `@AppShell` with `AppLayout`, drawer, navigation |
-| `views/hello_world.py` | Sample view with `@Route` and `@Menu` |
-| `views/*.py` | Add more views here -- one class per file |
-| `static/styles/*.css` | CSS loaded via `@StyleSheet` in the layout |
-| `static/images/` | Images served at `/images/...` |
-| `static/favicon.ico` | Browser favicon |
-
-## Components
-
-### Forms and input
-
-| Component | Description |
-|-----------|-------------|
-| `TextField` | Single-line text input |
-| `TextArea` | Multi-line text input |
-| `PasswordField` | Masked password input |
-| `EmailField` | Email input with RFC 5322 validation |
-| `NumberField` | Numeric input with min/max/step |
-| `IntegerField` | Integer-only variant |
-| `Checkbox` / `CheckboxGroup` | Toggle and multiple selection |
-| `RadioButtonGroup` | Single selection from options |
-| `Select` | Dropdown single selection |
-| `ComboBox` / `MultiSelectComboBox` | Filterable dropdown (multi-select) |
-| `DatePicker` / `TimePicker` / `DateTimePicker` | Date and time selection |
-| `Upload` | File upload |
-| `CustomField` | Composite custom field |
-
-### Data
-
-| Component | Description |
-|-----------|-------------|
-| `Grid` | Data table with sorting, selection, lazy loading, renderers |
-| `TreeGrid` | Hierarchical data table with expand/collapse |
-
-### Layout
-
-| Component | Description |
-|-----------|-------------|
-| `VerticalLayout` / `HorizontalLayout` | Stack children vertically or horizontally |
-| `FlexLayout` | CSS Flexbox layout |
-| `FormLayout` | Responsive form with labels and colspan |
-| `SplitLayout` | Resizable two-panel split |
-| `AppLayout` | Application shell with navbar and drawer |
-| `Scroller` | Scrollable container |
-| `Card` | Styled card container |
-| `Details` / `Accordion` | Collapsible sections |
-| `Dialog` / `ConfirmDialog` | Modal dialogs |
-| `MasterDetailLayout` | Master-detail pattern |
-
-### Navigation
-
-| Component | Description |
-|-----------|-------------|
-| `Tabs` / `TabSheet` | Tab navigation with content panels |
-| `SideNav` | Side navigation with items |
-| `MenuBar` / `ContextMenu` | Hierarchical and right-click menus |
-| `RouterLink` | Client-side navigation link |
-
-### Display
-
-| Component | Description |
-|-----------|-------------|
-| `Button` | Click listener, icon support, keyboard shortcuts |
-| `Icon` | Vaadin and Lumo icon sets |
-| `Notification` | Toast notifications with position and duration |
-| `ProgressBar` | Determinate and indeterminate progress |
-| `Avatar` / `AvatarGroup` | User avatars |
-| `Span`, `H1`–`H6`, `Paragraph`, `Pre` | Text elements |
-| `Image`, `Anchor`, `IFrame` | Media and links |
 
 ## Routing
 
@@ -204,9 +91,9 @@ class DashboardView(VerticalLayout):
     ...
 ```
 
-- `@Route(path)` — register a view at a URL path
-- `@Route(path, layout=MainLayout)` — wrap in a layout
-- `@Menu(title, order, icon)` — add to the navigation menu
+- `@Route(path)` -- register a view at a URL path
+- `@Route(path, layout=MainLayout)` -- wrap in a layout
+- `@Menu(title, order, icon)` -- add to the navigation menu
 - Route parameters: `@Route("greet/:name")` with `on_parameter_changed(self, params)`
 
 ## Application shell
@@ -228,11 +115,6 @@ class MainLayout(AppLayout):
             nav.add_item(SideNavItem(entry.title, entry.path))
         self.add_to_drawer(nav)
 ```
-
-- `@AppShell` — global configuration (one per app)
-- `@Push` — enable WebSocket push for real-time updates
-- `@ColorScheme("dark")` — initial color scheme
-- `@StyleSheet(...)` — inject CSS files
 
 ## Grid with lazy data
 
@@ -270,9 +152,52 @@ class LiveView(VerticalLayout):
 
 Requires `@Push` on the `@AppShell` class.
 
+## Components
+
+<img src="docs/screenshots/screenshot-components.gif" alt="Components" width="650">
+
+| Type | Component | Description |
+|------|-----------|-------------|
+| Input | `TextField` | Single-line text input |
+| Input | `TextArea` | Multi-line text input |
+| Input | `PasswordField` | Masked password input |
+| Input | `EmailField` | Email input with RFC 5322 validation |
+| Input | `NumberField` | Numeric input with min/max/step |
+| Input | `IntegerField` | Integer-only variant |
+| Input | `Checkbox` / `CheckboxGroup` | Toggle and multiple selection |
+| Input | `RadioButtonGroup` | Single selection from options |
+| Input | `Select` | Dropdown single selection |
+| Input | `ComboBox` / `MultiSelectComboBox` | Filterable dropdown (multi-select) |
+| Input | `DatePicker` / `TimePicker` / `DateTimePicker` | Date and time selection |
+| Input | `Upload` | File upload |
+| Input | `CustomField` | Composite custom field |
+| Data | `Grid` | Data table with sorting, selection, lazy loading, renderers |
+| Data | `TreeGrid` | Hierarchical data table with expand/collapse |
+| Layout | `VerticalLayout` / `HorizontalLayout` | Stack children vertically or horizontally |
+| Layout | `FlexLayout` | CSS Flexbox layout |
+| Layout | `FormLayout` | Responsive form with labels and colspan |
+| Layout | `SplitLayout` | Resizable two-panel split |
+| Layout | `AppLayout` | Application shell with navbar and drawer |
+| Layout | `Scroller` | Scrollable container |
+| Layout | `Card` | Styled card container |
+| Layout | `Details` / `Accordion` | Collapsible sections |
+| Layout | `Dialog` / `ConfirmDialog` | Modal dialogs |
+| Layout | `MasterDetailLayout` | Master-detail pattern |
+| Navigation | `Tabs` / `TabSheet` | Tab navigation with content panels |
+| Navigation | `SideNav` | Side navigation with items |
+| Navigation | `MenuBar` / `ContextMenu` | Hierarchical and right-click menus |
+| Navigation | `RouterLink` | Client-side navigation link |
+| Display | `Button` | Click listener, icon support, keyboard shortcuts |
+| Display | `Icon` | Vaadin and Lumo icon sets |
+| Display | `Notification` | Toast notifications with position and duration |
+| Display | `ProgressBar` | Determinate and indeterminate progress |
+| Display | `Avatar` / `AvatarGroup` | User avatars |
+| Display | `Span`, `H1`-`H6`, `Paragraph`, `Pre` | Text elements |
+| Display | `Image`, `Anchor`, `IFrame` | Media and links |
+
 ## Development
 
-See [README-DEV.md](README-DEV.md) for setup, running the demo, tests, project structure, and architecture.
+See [README-DEV.md](README-DEV.md) for setup, tests, project structure, and architecture.
 
 ## License
 

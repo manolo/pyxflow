@@ -46,6 +46,8 @@ pytest tests/ui/ --headed
 
 UI tests are in `tests/ui/` and excluded from the default `pytest` run. Use `pytest --all` to run everything in one go. They use a shared browser session with SPA navigation across 29 test views in `tests/views/`, each backed by a `TestMainLayout` with a menu sidebar. The test server auto-starts via `python -m tests`.
 
+<img src="docs/screenshots/screenshots-tests.gif" alt="UI Tests" width="650">
+
 ## Project structure
 
 ```
