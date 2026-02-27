@@ -64,8 +64,8 @@ vaadin-pyflow/
 │   └── services/       # PeopleService (data access layer)
 ├── tests/
 │   ├── views/          # 29 test views with TestMainLayout (independent app, python -m tests)
-│   ├── unit/           # 2331 unit tests (default pytest target)
-│   └── ui/             # 415 Playwright UI tests (run explicitly via pytest tests/ui/)
+│   ├── unit/           # 2457 unit tests (default pytest target)
+│   └── ui/             # 446 Playwright UI tests (run explicitly via pytest tests/ui/)
 └── STATUS.md           # Implementation progress
 ../bundle-generator/    # Java project → frontend bundle (shared, at root level)
 ```
@@ -100,18 +100,13 @@ vaadin-pyflow/
 
 ---
 
-## Event Hashes (Java Flow Compatible)
+## Event Hashes
 
-PyFlow uses hardcoded hashes from Java Flow for exact protocol compatibility.
-Full hash table in `../specs/PROTOCOL.md`. Most common:
+PyFlow computes event hashes dynamically using `compute_event_hash(config)` in `server/uidl_handler.py`. The function uses `base64(sha256(BOM + json.encode('utf-16-be'))[:8])` -- the same algorithm as Java Flow.
 
-| Event | Hash |
-|-------|------|
-| click | `F8oCtNArLiI=` |
-| change | `Fg73o1qebBo=` |
-| keydown | `OSoHnU3SjNg=` |
-| opened-changed (Dialog) | `t7mULTj4JVU=` |
-| ui-navigate | `msDV4SvCysE=` |
+All hash constants are computed at module load from their config dicts (e.g. `_CLICK_HASH = compute_event_hash(_CLICK_CONFIG)`). No hardcoded hash strings -- if a config changes, the hash updates automatically.
+
+Hash constants are centralized in `server/uidl_handler.py`. Component files import from there.
 
 ---
 
@@ -122,7 +117,7 @@ When the user asks "qué falta" / "what's missing" / "what's pending", perform a
 1. **Unimplemented features** — Check `STATUS.md` § "What's Missing" → "Unimplemented Features" (PWA, Security, etc.)
 2. **Missing API methods** — Check `STATUS.API.md` for `[ ]` markers. Count `[x]` vs `[ ]` for coverage %.
 3. **Missing tests** — Compare unit test count (`pytest --co -q | tail -1`) and UI test count (`pytest tests/ui/ --co -q | tail -1`) against `STATUS.md`. Check `tests/ui/SPECS.md` for pending UI test scenarios.
-4. **LOC** — Run `find src -name '*.py' | xargs wc -l | tail -1` (core) and `find src demo tests -name '*.py' | xargs wc -l | tail -1` (total).
+4. **LOC** — Run `find src -name '*.py' | xargs wc -l | tail -1` (implementation) and `find tests -name '*.py' | xargs wc -l | tail -1` (tests). Demo code is not counted.
 
 **After ANY implementation work**, update these files:
 - `STATUS.md` — Update test counts, LOC, move items from "Missing" to "Implemented", update API coverage ratio
