@@ -1,6 +1,6 @@
 <img src="docs/logo.png" alt="PyFlow" width="80" align="left" style="margin-right: 16px;">
 
-# PyFlow
+# [PyFlow](https://manolo.github.io/pyflow/)
 
 **Build full-stack web apps in pure Python. No JavaScript. No HTML templates.**
 
