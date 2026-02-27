@@ -2,11 +2,11 @@
 
 import pytest
 
-from vaadin.flow.components.tabs import Tab, Tabs
-from vaadin.flow.components.tab_sheet import TabSheet
-from vaadin.flow.components.span import Span
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.components.tabs import Tab, Tabs
+from pyflow.components.tab_sheet import TabSheet
+from pyflow.components.span import Span
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 class TestTabSheet:

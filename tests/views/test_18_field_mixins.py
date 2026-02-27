@@ -1,11 +1,11 @@
 """Test View 21: HasReadOnly, HasValidation, HasRequired — /test/field-mixins"""
 
-from vaadin.flow import Route
-from vaadin.flow.components import (
+from pyflow import Route
+from pyflow.components import (
     Button, ComboBox, DatePicker, Select, Span, TextField,
     VerticalLayout,
 )
-from vaadin.flow.menu import Menu
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

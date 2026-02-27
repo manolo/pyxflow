@@ -2,10 +2,10 @@
 
 import pytest
 
-from vaadin.flow.components.grid import TreeGrid, Column, HeaderRow, HeaderCell, ColumnGroup
-from vaadin.flow.components.renderer import LitRenderer
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.components.grid import TreeGrid, Column, HeaderRow, HeaderCell, ColumnGroup
+from pyflow.components.renderer import LitRenderer
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 # --- Test data ---

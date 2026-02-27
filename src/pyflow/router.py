@@ -6,7 +6,7 @@ from typing import Type, TYPE_CHECKING
 from urllib.parse import parse_qs
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.component import Component
+    from pyflow.core.component import Component
 
 
 # ---------------------------------------------------------------------------

@@ -4,17 +4,17 @@ import json
 import re
 from typing import Callable, TYPE_CHECKING, Any
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.core.state_node import Feature
-from vaadin.flow.components.renderer import Renderer, LitRenderer, ComponentRenderer
-from vaadin.flow.components.constants import (
+from pyflow.core.component import Component
+from pyflow.core.state_node import Feature
+from pyflow.components.renderer import Renderer, LitRenderer, ComponentRenderer
+from pyflow.components.constants import (
     SortDirection, SelectionMode, ColumnTextAlign, GridVariant, GridDropMode,
 )
-from vaadin.flow.data.provider import DataProvider, ListDataProvider, Query
-from vaadin.flow.server.uidl_handler import _ITEM_CLICK_HASH
+from pyflow.data.provider import DataProvider, ListDataProvider, Query
+from pyflow.server.uidl_handler import _ITEM_CLICK_HASH
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 
 class GridSortOrder:

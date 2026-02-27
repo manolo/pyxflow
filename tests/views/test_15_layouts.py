@@ -1,12 +1,12 @@
 """Test View 15: Layouts — /test/layouts"""
 
-from vaadin.flow import Route
-from vaadin.flow.components import (
+from pyflow import Route
+from pyflow.components import (
     Button, FlexLayout, FlexDirection, FlexWrap, FormLayout, HorizontalLayout,
     ResponsiveStep, Span, SplitLayout, TextField, VerticalLayout,
 )
-from vaadin.flow.components.horizontal_layout import Alignment, JustifyContentMode
-from vaadin.flow.menu import Menu
+from pyflow.components.horizontal_layout import Alignment, JustifyContentMode
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

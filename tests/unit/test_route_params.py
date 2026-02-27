@@ -2,7 +2,7 @@
 
 import pytest
 
-from vaadin.flow.router import (
+from pyflow.router import (
     BeforeEnterEvent,
     Location,
     QueryParameters,
@@ -11,7 +11,7 @@ from vaadin.flow.router import (
     clear_routes,
     match_route,
 )
-from vaadin.flow.components import VerticalLayout
+from pyflow.components import VerticalLayout
 
 
 # ---------------------------------------------------------------------------

@@ -1,10 +1,10 @@
 """Test View 32: MasterDetailLayout with navigation -- /test/mdl-nav/:id?"""
 
-from vaadin.flow import Route, BeforeEnterEvent
-from vaadin.flow.components import (
+from pyflow import Route, BeforeEnterEvent
+from pyflow.components import (
     Button, MasterDetailLayout, Span, VerticalLayout,
 )
-from vaadin.flow.menu import Menu
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

@@ -3,7 +3,7 @@ Dialog header/footer, Button disable-on-click."""
 
 import pytest
 
-from vaadin.flow.components import (
+from pyflow.components import (
     Button, Checkbox, CheckboxGroup, ComboBox, CustomField,
     DatePicker, DateTimePicker, Dialog, EmailField, FlexLayout,
     Grid, HorizontalLayout, IntegerField, ListBox, MultiSelectComboBox,
@@ -12,7 +12,7 @@ from vaadin.flow.components import (
     TextArea, TextField, TimePicker, VerticalLayout,
     HasReadOnly,
 )
-from vaadin.flow.core.state_tree import StateTree
+from pyflow.core.state_tree import StateTree
 
 
 def create_tree():

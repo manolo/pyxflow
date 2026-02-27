@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Callable, Generic, TypeVar
 
-from vaadin.flow.data.converter import Converter
-from vaadin.flow.data.result import Result, ValidationResult
+from pyflow.data.converter import Converter
+from pyflow.data.result import Result, ValidationResult
 
 T = TypeVar("T")  # Bean type
 
@@ -145,7 +145,7 @@ class BindingBuilder:
 
     def as_required(self, message: str = "This field is required") -> BindingBuilder:
         """Mark this binding as required."""
-        from vaadin.flow.data.validator import required
+        from pyflow.data.validator import required
         self._required_validator = required(message)
         if hasattr(self._field, "set_required_indicator_visible"):
             self._field.set_required_indicator_visible(True)

@@ -6,8 +6,8 @@ Tests CSRF token validation, clientId sequencing, and message handling.
 
 import pytest
 
-from vaadin.flow.server.uidl_handler import UidlHandler
-from vaadin.flow.core.state_tree import StateTree
+from pyflow.server.uidl_handler import UidlHandler
+from pyflow.core.state_tree import StateTree
 
 
 class TestCsrfValidation:

@@ -1,6 +1,6 @@
-from vaadin.flow import AppShell, ColorScheme, Push, StyleSheet
-from vaadin.flow.components import *
-from vaadin.flow.menu import get_menu_entries, get_page_header
+from pyflow import AppShell, ColorScheme, Push, StyleSheet
+from pyflow.components import *
+from pyflow.menu import get_menu_entries, get_page_header
 
 
 @AppShell

@@ -9,9 +9,9 @@ Routes:
 
 from demo.services.sample_person_service import SamplePerson, sample_person_service
 from demo.views.main_layout import MainLayout
-from vaadin.flow import BeforeEnterEvent, Menu, Route
-from vaadin.flow.components import *
-from vaadin.flow.data import Binder, ValidationError
+from pyflow import BeforeEnterEvent, Menu, Route
+from pyflow.components import *
+from pyflow.data import Binder, ValidationError
 
 
 @Route("crud/:id?/:action?", page_title="CRUD", layout=MainLayout)

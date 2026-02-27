@@ -1,8 +1,8 @@
 """Data binding: Binder, Validators, Converters, DataProvider."""
 
-from vaadin.flow.data.binder import Binder, Binding, BindingBuilder, ValidationError
-from vaadin.flow.data.converter import Converter, string_to_float, string_to_int
-from vaadin.flow.data.provider import (
+from pyflow.data.binder import Binder, Binding, BindingBuilder, ValidationError
+from pyflow.data.converter import Converter, string_to_float, string_to_int
+from pyflow.data.provider import (
     CallbackDataProvider,
     DataProvider,
     ListDataProvider,
@@ -10,8 +10,8 @@ from vaadin.flow.data.provider import (
     from_callbacks,
     items_provider,
 )
-from vaadin.flow.data.result import Result, ValidationResult
-from vaadin.flow.data.validator import (
+from pyflow.data.result import Result, ValidationResult
+from pyflow.data.validator import (
     email,
     max_length,
     min_length,

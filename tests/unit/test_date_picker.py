@@ -4,9 +4,9 @@ import datetime
 
 import pytest
 
-from vaadin.flow.components.date_picker import DatePicker
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.components.date_picker import DatePicker
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 class TestDatePicker:

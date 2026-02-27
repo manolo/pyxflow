@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from typing import Callable, TypeVar
 
-from vaadin.flow.data.result import ValidationResult
+from pyflow.data.result import ValidationResult
 
 T = TypeVar("T")
 

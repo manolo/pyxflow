@@ -2,12 +2,12 @@
 
 from datetime import date, time, datetime
 
-from vaadin.flow import Route
-from vaadin.flow.components import (
+from pyflow import Route
+from pyflow.components import (
     Button, DatePicker, DateTimePicker, Span, TimePicker,
     VerticalLayout,
 )
-from vaadin.flow.menu import Menu
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

@@ -2,11 +2,11 @@
 
 from typing import TYPE_CHECKING
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.components.constants import CardVariant
+from pyflow.core.component import Component
+from pyflow.components.constants import CardVariant
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 
 class Card(Component):
@@ -70,7 +70,7 @@ class Card(Component):
 
     def _attach_title(self, tree: "StateTree"):
         if isinstance(self._title, str):
-            from vaadin.flow.components.html import Div
+            from pyflow.components.html import Div
             comp = Div(self._title)
             self._title_component = comp
         else:
@@ -80,7 +80,7 @@ class Card(Component):
 
     def _attach_subtitle(self, tree: "StateTree"):
         if isinstance(self._subtitle, str):
-            from vaadin.flow.components.html import Div
+            from pyflow.components.html import Div
             comp = Div(self._subtitle)
             self._subtitle_component = comp
         else:

@@ -1,7 +1,7 @@
 import asyncio
 
-from vaadin.flow import Menu, Route
-from vaadin.flow.components import *
+from pyflow import Menu, Route
+from pyflow.components import *
 from demo.views.main_layout import MainLayout
 
 @Route("push-demo", page_title="Stopwatch", layout=MainLayout)

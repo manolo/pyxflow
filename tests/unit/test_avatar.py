@@ -1,9 +1,9 @@
 """Tests for Avatar and AvatarGroup components."""
 
 import pytest
-from vaadin.flow.components import Avatar, AvatarGroup, AvatarGroupItem
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.components import Avatar, AvatarGroup, AvatarGroupItem
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 @pytest.fixture

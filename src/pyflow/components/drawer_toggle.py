@@ -1,6 +1,6 @@
 """DrawerToggle component."""
 
-from vaadin.flow.components.button import Button
+from pyflow.components.button import Button
 
 
 class DrawerToggle(Button):

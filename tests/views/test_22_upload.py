@@ -1,10 +1,10 @@
 """Test View 17: Upload — /test/upload"""
 
-from vaadin.flow import Route
-from vaadin.flow.components import (
+from pyflow import Route
+from pyflow.components import (
     Span, Upload, VerticalLayout,
 )
-from vaadin.flow.menu import Menu
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

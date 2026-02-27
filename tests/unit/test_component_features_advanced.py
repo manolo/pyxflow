@@ -2,10 +2,10 @@
 
 import pytest
 
-from vaadin.flow.components import Button, TextField, Span
-from vaadin.flow.core.keys import Key
-from vaadin.flow.core.state_node import Feature
-from vaadin.flow.core.state_tree import StateTree
+from pyflow.components import Button, TextField, Span
+from pyflow.core.keys import Key
+from pyflow.core.state_node import Feature
+from pyflow.core.state_tree import StateTree
 
 
 class TestSetId:
@@ -248,7 +248,7 @@ class TestClickShortcut:
         btn.add_click_listener(lambda e: clicked.append(True))
 
         # Simulate keydown dispatch
-        from vaadin.flow.server.uidl_handler import UidlHandler
+        from pyflow.server.uidl_handler import UidlHandler
         handler = UidlHandler(tree)
         handler._handle_keydown(btn.element.node_id, {"event.key": "Enter"})
 

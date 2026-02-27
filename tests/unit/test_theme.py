@@ -2,11 +2,11 @@
 
 import pytest
 
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.component import UI
-from vaadin.flow.server.uidl_handler import UidlHandler
-from vaadin.flow.router import Route, clear_routes
-from vaadin.flow.components import VerticalLayout, Span
+from pyflow.core.state_tree import StateTree
+from pyflow.core.component import UI
+from pyflow.server.uidl_handler import UidlHandler
+from pyflow.router import Route, clear_routes
+from pyflow.components import VerticalLayout, Span
 
 
 class TestSetTheme:
@@ -101,7 +101,7 @@ class TestGetTheme:
 
     @pytest.fixture(autouse=True)
     def _clear_shell(self):
-        from vaadin.flow.router import clear_app_shell
+        from pyflow.router import clear_app_shell
         clear_app_shell()
         yield
         clear_app_shell()
@@ -160,7 +160,7 @@ class TestGetTheme:
 
     def test_color_scheme_initializes_variant(self):
         """UI should read @ColorScheme from AppShell on creation."""
-        from vaadin.flow.router import AppShell, clear_app_shell
+        from pyflow.router import AppShell, clear_app_shell
         try:
             @AppShell
             class TestShell:

@@ -2,12 +2,12 @@
 
 from typing import Callable, Generic, TypeVar, Optional, Set, TYPE_CHECKING
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasReadOnly
-from vaadin.flow.core.state_node import Feature
+from pyflow.core.component import Component
+from pyflow.components.mixins import HasReadOnly
+from pyflow.core.state_node import Feature
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 T = TypeVar('T')
 

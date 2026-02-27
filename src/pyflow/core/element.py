@@ -2,10 +2,10 @@
 
 from typing import TYPE_CHECKING, Any, Callable
 
-from vaadin.flow.core.state_node import Feature, StateNode
+from pyflow.core.state_node import Feature, StateNode
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 
 class Style:

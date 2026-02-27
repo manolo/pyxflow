@@ -2,14 +2,14 @@
 
 import pytest
 
-from vaadin.flow.components import (
+from pyflow.components import (
     TextField, EmailField, PasswordField, TextArea,
     NumberField, IntegerField, DatePicker, TimePicker, DateTimePicker,
     ComboBox, MultiSelectComboBox, Select, RadioButtonGroup, CheckboxGroup,
     Checkbox, CustomField,
     HasValidation, HasRequired,
 )
-from vaadin.flow.core.state_tree import StateTree
+from pyflow.core.state_tree import StateTree
 
 
 def create_tree():

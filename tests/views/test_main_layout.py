@@ -1,8 +1,8 @@
 """Shared layout for all test views — provides SideNav menu."""
 
-from vaadin.flow import AppShell, Push, StyleSheet
-from vaadin.flow.components import HorizontalLayout, SideNav, SideNavItem, Span, VerticalLayout
-from vaadin.flow.menu import get_menu_entries, get_page_header
+from pyflow import AppShell, Push, StyleSheet
+from pyflow.components import HorizontalLayout, SideNav, SideNavItem, Span, VerticalLayout
+from pyflow.menu import get_menu_entries, get_page_header
 
 
 @AppShell

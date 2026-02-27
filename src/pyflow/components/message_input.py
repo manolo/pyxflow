@@ -3,12 +3,12 @@
 import json
 from typing import Callable, TYPE_CHECKING
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.components.constants import MessageInputVariant
-from vaadin.flow.server.uidl_handler import _SUBMIT_HASH
+from pyflow.core.component import Component
+from pyflow.components.constants import MessageInputVariant
+from pyflow.server.uidl_handler import _SUBMIT_HASH
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 
 class MessageInput(Component):

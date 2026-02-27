@@ -2,17 +2,17 @@
 
 import pytest
 
-from vaadin.flow.components.app_layout import AppLayout
-from vaadin.flow.components.constants import AppLayoutSection
-from vaadin.flow.components.button import Button
-from vaadin.flow.components.drawer_toggle import DrawerToggle
-from vaadin.flow.components.icon import Icon
-from vaadin.flow.components.side_nav import SideNav, SideNavItem
-from vaadin.flow.components.html import H1, Div
-from vaadin.flow.components.vertical_layout import VerticalLayout
-from vaadin.flow.core.component import UI
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.components.app_layout import AppLayout
+from pyflow.components.constants import AppLayoutSection
+from pyflow.components.button import Button
+from pyflow.components.drawer_toggle import DrawerToggle
+from pyflow.components.icon import Icon
+from pyflow.components.side_nav import SideNav, SideNavItem
+from pyflow.components.html import H1, Div
+from pyflow.components.vertical_layout import VerticalLayout
+from pyflow.core.component import UI
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 class TestAppLayout:

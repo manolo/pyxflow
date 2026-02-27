@@ -1,10 +1,10 @@
 """Test View 28: VirtualList — /test/virtual-list"""
 
-from vaadin.flow import Route
-from vaadin.flow.components import (
+from pyflow import Route
+from pyflow.components import (
     Button, LitRenderer, Span, VerticalLayout, VirtualList,
 )
-from vaadin.flow.menu import Menu
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

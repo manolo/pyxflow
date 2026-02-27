@@ -3,16 +3,16 @@
 import json
 from typing import Callable, TYPE_CHECKING
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.core.state_node import Feature
-from vaadin.flow.components.constants import UploadVariant
-from vaadin.flow.server.uidl_handler import (
+from pyflow.core.component import Component
+from pyflow.core.state_node import Feature
+from pyflow.components.constants import UploadVariant
+from pyflow.server.uidl_handler import (
     _FILE_REJECT_HASH, _UPLOAD_SUCCESS_HASH,
     _UPLOAD_ERROR_HASH, _FILE_REMOVE_HASH,
 )
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 
 class Upload(Component):
@@ -154,7 +154,7 @@ class Upload(Component):
             self.element.add_child(self._drop_label_icon.element)
 
         # Register upload handler in HTTP server and set target attribute
-        from vaadin.flow.server.http_server import register_upload_handler, _sessions
+        from pyflow.server.http_server import register_upload_handler, _sessions
         # Find session_id for this tree
         session_id = self._find_session_id()
         self._resource_id = register_upload_handler(session_id, self._handle_upload)
@@ -182,7 +182,7 @@ class Upload(Component):
 
     def _find_session_id(self) -> str:
         """Find the session ID that owns this tree."""
-        from vaadin.flow.server.http_server import _sessions
+        from pyflow.server.http_server import _sessions
         for sid, session in _sessions.items():
             if session.get("tree") is self.element._tree:
                 return sid

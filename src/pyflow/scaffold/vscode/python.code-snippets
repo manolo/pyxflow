@@ -4,8 +4,8 @@
         "prefix": "vview",
         "description": "Create a new Vaadin Flow Python view",
         "body": [
-            "from vaadin.flow import *",
-            "from vaadin.flow.components import *",
+            "from pyflow import *",
+            "from pyflow.components import *",
             "",
             "@Route(\"${1:path}\")",
             "class ${3:MyView}(${2:Div}):",

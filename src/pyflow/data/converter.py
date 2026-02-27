@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Callable, Generic, TypeVar
 
-from vaadin.flow.data.result import Result
+from pyflow.data.result import Result
 
 P = TypeVar("P")  # Presentation type
 M = TypeVar("M")  # Model type

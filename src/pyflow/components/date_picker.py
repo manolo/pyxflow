@@ -4,9 +4,9 @@ import datetime
 import json
 from typing import Callable, Optional
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
-from vaadin.flow.components.constants import DatePickerVariant
+from pyflow.core.component import Component
+from pyflow.components.mixins import HasReadOnly, HasValidation, HasRequired
+from pyflow.components.constants import DatePickerVariant
 
 
 class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):

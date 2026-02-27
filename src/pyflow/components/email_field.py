@@ -2,9 +2,9 @@
 
 from typing import Callable
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
-from vaadin.flow.components.constants import ValueChangeMode, Autocomplete
+from pyflow.core.component import Component
+from pyflow.components.mixins import HasReadOnly, HasValidation, HasRequired
+from pyflow.components.constants import ValueChangeMode, Autocomplete
 
 
 class EmailField(HasReadOnly, HasValidation, HasRequired, Component):

@@ -2,10 +2,10 @@
 
 import pytest
 
-from vaadin.flow.router import Route, StyleSheet, AppShell, Push, clear_routes, clear_app_shell
-from vaadin.flow.components import VerticalLayout
-from vaadin.flow.server.uidl_handler import UidlHandler
-from vaadin.flow.core.state_tree import StateTree
+from pyflow.router import Route, StyleSheet, AppShell, Push, clear_routes, clear_app_shell
+from pyflow.components import VerticalLayout
+from pyflow.server.uidl_handler import UidlHandler
+from pyflow.core.state_tree import StateTree
 
 
 class TestStyleSheetDecorator:

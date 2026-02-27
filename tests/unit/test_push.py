@@ -8,15 +8,15 @@ import aiohttp
 from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase
 
-from vaadin.flow.server.http_server import _sessions
-from vaadin.flow.router import AppShell, Push, clear_app_shell
+from pyflow.server.http_server import _sessions
+from pyflow.router import AppShell, Push, clear_app_shell
 
 
 class PushTestBase(AioHTTPTestCase):
     """Base class with helpers for push tests."""
 
     async def get_application(self):
-        from vaadin.flow.server.http_server import create_app
+        from pyflow.server.http_server import create_app
         return create_app()
 
     def setUp(self):

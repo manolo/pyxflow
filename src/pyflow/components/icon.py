@@ -1,6 +1,6 @@
 """Icon component."""
 
-from vaadin.flow.core.component import Component
+from pyflow.core.component import Component
 
 
 class Icon(Component):

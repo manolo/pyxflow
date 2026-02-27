@@ -83,7 +83,7 @@ def base_url(request):
     # Nothing running — auto-start the test server
     proc = subprocess.Popen(
         [sys.executable, "-c",
-         "import vaadin.flow.app as _a; "
+         "import pyflow.app as _a; "
          f"_a._serve('tests.views', 'localhost', {DEFAULT_PORT}, False, dev=True)"],
         cwd=str(_PROJECT_ROOT),
         stdout=subprocess.PIPE,

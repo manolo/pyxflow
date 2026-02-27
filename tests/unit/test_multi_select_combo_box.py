@@ -2,9 +2,9 @@
 
 import pytest
 
-from vaadin.flow.components.multi_select_combo_box import MultiSelectComboBox
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.components.multi_select_combo_box import MultiSelectComboBox
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 class TestMultiSelectComboBox:
@@ -379,13 +379,13 @@ class TestMultiSelectComboBoxAutoExpand:
 
     def test_default_auto_expand(self):
         """Default auto-expand mode is NONE."""
-        from vaadin.flow.components.constants import AutoExpandMode
+        from pyflow.components.constants import AutoExpandMode
         cb = MultiSelectComboBox()
         assert cb.get_auto_expand() == AutoExpandMode.NONE
 
     def test_set_auto_expand_horizontal(self, tree):
         """HORIZONTAL mode sets autoExpandHorizontally=true, autoExpandVertically=false."""
-        from vaadin.flow.components.constants import AutoExpandMode
+        from pyflow.components.constants import AutoExpandMode
         cb = MultiSelectComboBox()
         cb.set_auto_expand(AutoExpandMode.HORIZONTAL)
         cb._attach(tree)
@@ -398,7 +398,7 @@ class TestMultiSelectComboBoxAutoExpand:
 
     def test_set_auto_expand_vertical(self, tree):
         """VERTICAL mode sets autoExpandVertically=true, autoExpandHorizontally=false."""
-        from vaadin.flow.components.constants import AutoExpandMode
+        from pyflow.components.constants import AutoExpandMode
         cb = MultiSelectComboBox()
         cb.set_auto_expand(AutoExpandMode.VERTICAL)
         cb._attach(tree)
@@ -411,7 +411,7 @@ class TestMultiSelectComboBoxAutoExpand:
 
     def test_set_auto_expand_both(self, tree):
         """BOTH mode sets both properties to true."""
-        from vaadin.flow.components.constants import AutoExpandMode
+        from pyflow.components.constants import AutoExpandMode
         cb = MultiSelectComboBox()
         cb.set_auto_expand(AutoExpandMode.BOTH)
         cb._attach(tree)
@@ -424,7 +424,7 @@ class TestMultiSelectComboBoxAutoExpand:
 
     def test_set_auto_expand_none_no_properties(self, tree):
         """NONE mode does not set any autoExpand properties on attach."""
-        from vaadin.flow.components.constants import AutoExpandMode
+        from pyflow.components.constants import AutoExpandMode
         cb = MultiSelectComboBox()
         cb.set_auto_expand(AutoExpandMode.NONE)
         cb._attach(tree)
@@ -437,14 +437,14 @@ class TestMultiSelectComboBoxAutoExpand:
 
     def test_get_auto_expand(self):
         """get_auto_expand returns the mode that was set."""
-        from vaadin.flow.components.constants import AutoExpandMode
+        from pyflow.components.constants import AutoExpandMode
         cb = MultiSelectComboBox()
         cb.set_auto_expand(AutoExpandMode.BOTH)
         assert cb.get_auto_expand() == AutoExpandMode.BOTH
 
     def test_set_auto_expand_after_attach(self, tree):
         """Setting auto-expand after attach updates properties immediately."""
-        from vaadin.flow.components.constants import AutoExpandMode
+        from pyflow.components.constants import AutoExpandMode
         cb = MultiSelectComboBox()
         cb._attach(tree)
         tree.collect_changes()

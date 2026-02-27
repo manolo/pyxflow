@@ -6,9 +6,9 @@ Tests property sync from client to server.
 
 import pytest
 
-from vaadin.flow.server.uidl_handler import UidlHandler
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.server.uidl_handler import UidlHandler
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 class TestPropertySync:

@@ -12,7 +12,7 @@ class TestHttpServerRoutes(AioHTTPTestCase):
 
     async def get_application(self):
         """Create the application for testing."""
-        from vaadin.flow.server.http_server import create_app
+        from pyflow.server.http_server import create_app
         return create_app()
 
     async def test_root_returns_html(self):
@@ -49,7 +49,7 @@ class TestStaticFiles(AioHTTPTestCase):
     """Test static file serving."""
 
     async def get_application(self):
-        from vaadin.flow.server.http_server import create_app
+        from pyflow.server.http_server import create_app
         return create_app()
 
     async def test_vaadin_build_files_served(self):
@@ -64,7 +64,7 @@ class TestSessionManagement(AioHTTPTestCase):
     """Test session and CSRF management."""
 
     async def get_application(self):
-        from vaadin.flow.server.http_server import create_app
+        from pyflow.server.http_server import create_app
         return create_app()
 
     async def test_init_sets_session_cookie(self):
@@ -100,7 +100,7 @@ class TestSessionExpired(AioHTTPTestCase):
     """Test session-expired response triggers client reload."""
 
     async def get_application(self):
-        from vaadin.flow.server.http_server import create_app
+        from pyflow.server.http_server import create_app
         return create_app()
 
     async def test_uidl_without_session_returns_session_expired_json(self):
@@ -125,7 +125,7 @@ class TestHeartbeat(AioHTTPTestCase):
     """Test heartbeat endpoint keeps sessions alive."""
 
     async def get_application(self):
-        from vaadin.flow.server.http_server import create_app
+        from pyflow.server.http_server import create_app
         return create_app()
 
     async def test_heartbeat_without_session_returns_403(self):
@@ -159,19 +159,19 @@ class TestSessionCleanup:
 
     def setup_method(self):
         """Clear global session state before each test."""
-        from vaadin.flow.server.http_server import _sessions, _upload_handlers
+        from pyflow.server.http_server import _sessions, _upload_handlers
         _sessions.clear()
         _upload_handlers.clear()
 
     def teardown_method(self):
         """Clear global session state after each test."""
-        from vaadin.flow.server.http_server import _sessions, _upload_handlers
+        from pyflow.server.http_server import _sessions, _upload_handlers
         _sessions.clear()
         _upload_handlers.clear()
 
     def test_expired_session_is_cleaned_up(self):
         """Sessions idle longer than SESSION_TIMEOUT are removed."""
-        from vaadin.flow.server.http_server import (
+        from pyflow.server.http_server import (
             _sessions, _cleanup_expired_sessions, SESSION_TIMEOUT,
         )
         _sessions["old-session"] = {
@@ -182,7 +182,7 @@ class TestSessionCleanup:
 
     def test_active_session_not_cleaned(self):
         """Sessions with recent activity are kept."""
-        from vaadin.flow.server.http_server import (
+        from pyflow.server.http_server import (
             _sessions, _cleanup_expired_sessions,
         )
         _sessions["active-session"] = {
@@ -193,7 +193,7 @@ class TestSessionCleanup:
 
     def test_upload_handlers_cleaned_with_session(self):
         """Upload handlers belonging to expired sessions are also removed."""
-        from vaadin.flow.server.http_server import (
+        from pyflow.server.http_server import (
             _sessions, _upload_handlers, _cleanup_expired_sessions,
             SESSION_TIMEOUT,
         )
@@ -214,7 +214,7 @@ class TestUidlEncoder:
 
     def test_date_serialized_as_iso(self):
         import datetime
-        from vaadin.flow.server.http_server import _UidlEncoder
+        from pyflow.server.http_server import _UidlEncoder
         import json
         d = datetime.date(2025, 6, 15)
         result = json.dumps({"col": d}, cls=_UidlEncoder)
@@ -222,14 +222,14 @@ class TestUidlEncoder:
 
     def test_datetime_serialized_as_iso(self):
         import datetime
-        from vaadin.flow.server.http_server import _UidlEncoder
+        from pyflow.server.http_server import _UidlEncoder
         import json
         dt = datetime.datetime(2025, 6, 15, 14, 30, 0)
         result = json.dumps({"col": dt}, cls=_UidlEncoder)
         assert result == '{"col": "2025-06-15T14:30:00"}'
 
     def test_normal_types_unchanged(self):
-        from vaadin.flow.server.http_server import _UidlEncoder
+        from pyflow.server.http_server import _UidlEncoder
         import json
         data = {"a": 1, "b": "text", "c": True, "d": None, "e": [1, 2]}
         result = json.dumps(data, cls=_UidlEncoder)
@@ -237,7 +237,7 @@ class TestUidlEncoder:
 
     def test_unknown_type_falls_back_to_str(self):
         """Unknown types are serialized as str() instead of raising."""
-        from vaadin.flow.server.http_server import _UidlEncoder
+        from pyflow.server.http_server import _UidlEncoder
         import json
         from decimal import Decimal
         result = json.dumps({"val": Decimal("3.14")}, cls=_UidlEncoder)
@@ -249,7 +249,7 @@ class TestCriticalErrorJson:
 
     def test_critical_error_json_format(self):
         """Should produce for(;;);[{syncId:-1, meta:{appError:...}}]."""
-        from vaadin.flow.server.http_server import _critical_error_json
+        from pyflow.server.http_server import _critical_error_json
         import json
         result = _critical_error_json("Error", "Something broke")
         assert result.startswith("for(;;);[")
@@ -265,7 +265,7 @@ class TestCriticalErrorJson:
 
     def test_critical_error_json_all_none(self):
         """All-None fields should produce valid JSON (client refreshes silently)."""
-        from vaadin.flow.server.http_server import _critical_error_json
+        from pyflow.server.http_server import _critical_error_json
         import json
         result = _critical_error_json()
         json_str = result[len("for(;;);["):-1]
@@ -275,7 +275,7 @@ class TestCriticalErrorJson:
 
     def test_critical_error_json_with_url(self):
         """URL field should be passed through for redirect."""
-        from vaadin.flow.server.http_server import _critical_error_json
+        from pyflow.server.http_server import _critical_error_json
         import json
         result = _critical_error_json(url="/login")
         json_str = result[len("for(;;);["):-1]
@@ -287,7 +287,7 @@ class TestDevModeMetaTag:
     """Test pyflow-views meta tag injection in dev mode."""
 
     def setup_method(self):
-        import vaadin.flow.server.http_server as _http
+        import pyflow.server.http_server as _http
         self._http = _http
         self._orig_dev = _http._dev_mode
         self._orig_views = _http._views_module
@@ -329,7 +329,7 @@ class TestFaviconFallbackHttp(AioHTTPTestCase):
     """Test that /favicon.ico is served from scaffold when no app static."""
 
     async def get_application(self):
-        from vaadin.flow.server.http_server import create_app
+        from pyflow.server.http_server import create_app
         return create_app()
 
     async def test_favicon_returns_200(self):
@@ -351,7 +351,7 @@ class TestUidlErrorHandling(AioHTTPTestCase):
     """Test that UIDL errors return meta.appError instead of HTTP 500."""
 
     async def get_application(self):
-        from vaadin.flow.server.http_server import create_app
+        from pyflow.server.http_server import create_app
         return create_app()
 
     async def test_uidl_error_returns_app_error_not_500(self):
@@ -368,7 +368,7 @@ class TestUidlErrorHandling(AioHTTPTestCase):
 
         # Patch handle_uidl on the UidlHandler to raise
         with patch(
-            "vaadin.flow.server.uidl_handler.UidlHandler.handle_uidl",
+            "pyflow.server.uidl_handler.UidlHandler.handle_uidl",
             side_effect=RuntimeError("boom"),
         ):
             resp = await self.client.request(

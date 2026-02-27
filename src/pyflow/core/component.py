@@ -5,11 +5,11 @@ from __future__ import annotations
 import functools
 from typing import TYPE_CHECKING
 
-from vaadin.flow.core.element import Element, Style
+from pyflow.core.element import Element, Style
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.keys import Key
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.keys import Key
+    from pyflow.core.state_tree import StateTree
 
 
 class _BufferedStyle:
@@ -144,11 +144,11 @@ class Component:
         # Apply deferred focus/blur listeners
         if getattr(self, "_focus_listeners", None) and not getattr(self, "_focus_event_registered", False):
             self._focus_event_registered = True
-            from vaadin.flow.server.uidl_handler import _FOCUS_HASH
+            from pyflow.server.uidl_handler import _FOCUS_HASH
             self._element.add_event_listener("focus", self._dispatch_focus, hash_key=_FOCUS_HASH)
         if getattr(self, "_blur_listeners", None) and not getattr(self, "_blur_event_registered", False):
             self._blur_event_registered = True
-            from vaadin.flow.server.uidl_handler import _BLUR_HASH
+            from pyflow.server.uidl_handler import _BLUR_HASH
             self._element.add_event_listener("blur", self._dispatch_blur, hash_key=_BLUR_HASH)
         # Apply deferred class names
         if self._class_names:
@@ -172,7 +172,7 @@ class Component:
 
     def _register_client_callable_methods(self, tree: "StateTree"):
         """Register @ClientCallable methods in Feature 19 (CLIENT_DELEGATE_HANDLERS)."""
-        from vaadin.flow.core.state_node import Feature
+        from pyflow.core.state_node import Feature
         callable_methods = []
         seen = set()
         for cls in type(self).__mro__:
@@ -502,7 +502,7 @@ class Component:
         self._focus_listeners.append(listener)
         if self._element is not None and not getattr(self, "_focus_event_registered", False):
             self._focus_event_registered = True
-            from vaadin.flow.server.uidl_handler import _FOCUS_HASH
+            from pyflow.server.uidl_handler import _FOCUS_HASH
             self._element.add_event_listener("focus", self._dispatch_focus, hash_key=_FOCUS_HASH)
 
     def _dispatch_focus(self, event_data: dict):
@@ -516,7 +516,7 @@ class Component:
         self._blur_listeners.append(listener)
         if self._element is not None and not getattr(self, "_blur_event_registered", False):
             self._blur_event_registered = True
-            from vaadin.flow.server.uidl_handler import _BLUR_HASH
+            from pyflow.server.uidl_handler import _BLUR_HASH
             self._element.add_event_listener("blur", self._dispatch_blur, hash_key=_BLUR_HASH)
 
     def _dispatch_blur(self, event_data: dict):
@@ -586,7 +586,7 @@ class Component:
 
     def _register_click_shortcut(self, key: Key):
         """Internal: register the keydown listener for the click shortcut."""
-        from vaadin.flow.server.uidl_handler import _KEYDOWN_HASH
+        from pyflow.server.uidl_handler import _KEYDOWN_HASH
 
         # Register keydown event listener with the ENTER hash
         # The uidl_handler will dispatch keydown → click for this component
@@ -618,7 +618,7 @@ class UI:
         self._theme: str = "lumo"
         self._variant: str = "light"
         # Initialize from @ColorScheme on @AppShell if set
-        from vaadin.flow.router import get_app_shell
+        from pyflow.router import get_app_shell
         app_shell = get_app_shell()
         cs = getattr(app_shell, '_color_scheme', None) if app_shell else None
         if cs and cs != "normal":

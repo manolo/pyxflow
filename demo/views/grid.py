@@ -1,11 +1,11 @@
 import logging
 
-from vaadin.flow import Menu, Route
+from pyflow import Menu, Route
 
-log = logging.getLogger("vaadin.flow")
+log = logging.getLogger("pyflow")
 from demo.services import people_service
 from demo.views.main_layout import MainLayout
-from vaadin.flow.components import *
+from pyflow.components import *
 
 
 # Pre-load for lazy data provider

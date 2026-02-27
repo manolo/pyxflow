@@ -1,12 +1,12 @@
 """Test View 2: Text Input Fields — /test/text-inputs"""
 
-from vaadin.flow import Route
-from vaadin.flow.components import (
+from pyflow import Route
+from pyflow.components import (
     Button, EmailField, Icon, PasswordField, Span,
     TextArea, TextField, VerticalLayout,
 )
-from vaadin.flow.components.value_change_mode import ValueChangeMode
-from vaadin.flow.menu import Menu
+from pyflow.components.value_change_mode import ValueChangeMode
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

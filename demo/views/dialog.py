@@ -1,5 +1,5 @@
-from vaadin.flow import Route, Menu
-from vaadin.flow.components import *
+from pyflow import Route, Menu
+from pyflow.components import *
 
 @Route("dialog-demo", page_title="Dialog Demo")
 class DialogDemoView(VerticalLayout):

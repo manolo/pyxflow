@@ -1,9 +1,9 @@
 """Tests for @Menu decorator and MenuConfiguration."""
 
 import pytest
-from vaadin.flow.menu import Menu, MenuEntry, get_menu_entries, get_page_header
-from vaadin.flow.router import Route, PageTitle, _routes, clear_routes
-from vaadin.flow.core.component import Component
+from pyflow.menu import Menu, MenuEntry, get_menu_entries, get_page_header
+from pyflow.router import Route, PageTitle, _routes, clear_routes
+from pyflow.core.component import Component
 
 
 @pytest.fixture(autouse=True)

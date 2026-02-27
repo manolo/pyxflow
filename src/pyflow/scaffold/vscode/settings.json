@@ -21,15 +21,15 @@
             "structure": [
                 {
                     "fileName": "<FTName>_view.py",
-                    "template": "vaadin_view"
+                    "template": "pyflow_view"
                 }
             ]
         }
     ],
     "folderTemplates.fileTemplates": {
-        "vaadin_view": [
-            "from vaadin.flow import Route",
-            "from vaadin.flow.components import (",
+        "pyflow_view": [
+            "from pyflow import Route",
+            "from pyflow.components import (",
             "    Div,",
             "    H3,",
             "    VerticalLayout,",

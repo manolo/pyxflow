@@ -12,7 +12,7 @@ class FlowApp:
     Usage::
 
         # demo/__main__.py
-        from vaadin.flow import FlowApp
+        from pyflow import FlowApp
 
         FlowApp(port=8088).run()
 
@@ -103,7 +103,7 @@ class FlowApp:
         def start_child():
             return subprocess.Popen(
                 [sys.executable, "-c",
-                 "from vaadin.flow.app import _dev_serve; _dev_serve()"],
+                 "from pyflow.app import _dev_serve; _dev_serve()"],
                 pass_fds=(fd,),
                 env=env,
             )
@@ -160,10 +160,10 @@ def _auto_detect_app() -> str | None:
 
 
 def _usage() -> None:
-    print("Usage: vaadin [app_module] [--dev] [--debug] [--port PORT] [--host HOST]")
-    print("       vaadin [app_module] bundle [--keep] [--vaadin-version VERSION]")
-    print("       vaadin --vscode")
-    print("       vaadin --setup [app_name]")
+    print("Usage: pyflow [app_module] [--dev] [--debug] [--port PORT] [--host HOST]")
+    print("       pyflow [app_module] bundle [--keep] [--vaadin-version VERSION]")
+    print("       pyflow --vscode")
+    print("       pyflow --setup [app_name]")
     print()
     print("  app_module  Python module with views (auto-detected if omitted)")
     print("  --dev       Auto-reload on source changes")
@@ -180,7 +180,7 @@ def _usage() -> None:
 def _scaffold_dir():
     """Return the scaffold resource directory."""
     import importlib.resources
-    return importlib.resources.files("vaadin.flow") / "scaffold"
+    return importlib.resources.files("pyflow") / "scaffold"
 
 
 def _setup_project(app_name: str | None = None) -> None:
@@ -306,11 +306,11 @@ def _setup_vscode() -> None:
     snippets_path.write_text((scaffold / "python.code-snippets").read_text())
     print(f"  Created {_rel(snippets_path)}")
 
-    # --- templates/vaadin_view.py ---
+    # --- templates/pyflow_view.py ---
     templates_dir = vscode_dir / "templates"
     templates_dir.mkdir(exist_ok=True)
-    template_dest = templates_dir / "vaadin_view.py"
-    template_dest.write_text((scaffold / "templates" / "vaadin_view.py").read_text())
+    template_dest = templates_dir / "pyflow_view.py"
+    template_dest.write_text((scaffold / "templates" / "pyflow_view.py").read_text())
     print(f"  Created {_rel(template_dest)}")
 
     # --- Install extensions ---
@@ -357,8 +357,14 @@ def _ensure_importable(views: str) -> None:
             sys.path.insert(0, cwd)
 
 
+def main_deprecated():
+    """Deprecated CLI entry point (``vaadin`` command)."""
+    print("WARNING: 'vaadin' command is deprecated. Use 'pyflow' instead.", file=sys.stderr)
+    main()
+
+
 def main():
-    """CLI entry point: ``vaadin [app_module] [--dev] [--debug]``."""
+    """CLI entry point: ``pyflow [app_module] [--dev] [--debug]``."""
     if len(sys.argv) >= 2 and sys.argv[1] in ("-h", "--help"):
         _usage()
 
@@ -396,7 +402,7 @@ def main():
 
     if "--bundle" in rest:
         from pathlib import Path
-        from vaadin.flow.bundle_generator import generate_and_build
+        from pyflow.bundle_generator import generate_and_build
 
         keep = "--keep" in rest
         vaadin_version = "25.0.4"
@@ -471,9 +477,9 @@ def _dev_serve():
 def _serve(views: str, host: str, port: int, debug: bool, *, dev: bool = False, socket_fd: int | None = None):
     import importlib
     from pathlib import Path
-    from vaadin.flow.router import discover_views
-    from vaadin.flow.server.http_server import run_server, set_app_directory
-    import vaadin.flow.server.http_server as _http
+    from pyflow.router import discover_views
+    from pyflow.server.http_server import run_server, set_app_directory
+    import pyflow.server.http_server as _http
 
     _http._dev_mode = dev
     _http._views_module = views

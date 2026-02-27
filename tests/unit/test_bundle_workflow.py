@@ -8,35 +8,35 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from vaadin.flow.bundle_generator import generate_and_build
+from pyflow.bundle_generator import generate_and_build
 
 
 class TestGenerateAndBuildPyflowDev:
     """Test generate_and_build() in pyflow developer mode."""
 
     def test_detects_pyflow_dev_tree(self, tmp_path, monkeypatch):
-        """When src/vaadin/flow/ exists, targets src/vaadin/flow/bundle/."""
+        """When src/pyflow/ exists, targets src/pyflow/bundle/."""
         # Create pyflow source tree marker
-        (tmp_path / "src" / "vaadin" / "flow").mkdir(parents=True)
+        (tmp_path / "src" / "pyflow").mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        with patch("vaadin.flow.bundle_generator.generate_project") as mock_gen, \
-             patch("vaadin.flow.bundle_generator.build_and_extract") as mock_build:
+        with patch("pyflow.bundle_generator.generate_project") as mock_gen, \
+             patch("pyflow.bundle_generator.build_and_extract") as mock_build:
             # generate_project is mocked, so create the dir it would create
             mock_gen.side_effect = lambda d, v: d.mkdir(parents=True, exist_ok=True)
             generate_and_build(app_dir=None, keep=False, vaadin_version="25.0.4")
 
-            # Should target src/vaadin/flow/bundle/
+            # Should target src/pyflow/bundle/
             bundle_dir = mock_build.call_args[0][1]
-            assert str(bundle_dir).endswith("src/vaadin/flow/bundle")
+            assert str(bundle_dir).endswith("src/pyflow/bundle")
 
     def test_project_dir_is_bundle_project(self, tmp_path, monkeypatch):
         """Maven project should be at cwd/bundle-project."""
-        (tmp_path / "src" / "vaadin" / "flow").mkdir(parents=True)
+        (tmp_path / "src" / "pyflow").mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        with patch("vaadin.flow.bundle_generator.generate_project") as mock_gen, \
-             patch("vaadin.flow.bundle_generator.build_and_extract"):
+        with patch("pyflow.bundle_generator.generate_project") as mock_gen, \
+             patch("pyflow.bundle_generator.build_and_extract"):
             generate_and_build(app_dir=None, keep=True)
 
             project_dir = mock_gen.call_args[0][0]
@@ -52,20 +52,20 @@ class TestGenerateAndBuildPyflowDev:
 
     def test_keep_preserves_project_dir(self, tmp_path, monkeypatch):
         """With keep=True, bundle-project/ should not be deleted."""
-        (tmp_path / "src" / "vaadin" / "flow").mkdir(parents=True)
+        (tmp_path / "src" / "pyflow").mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        with patch("vaadin.flow.bundle_generator.build_and_extract"):
+        with patch("pyflow.bundle_generator.build_and_extract"):
             self._create_bundle_project(tmp_path)
             generate_and_build(keep=True)
             assert (tmp_path / "bundle-project").exists()
 
     def test_no_keep_deletes_project_dir(self, tmp_path, monkeypatch):
         """With keep=False, bundle-project/ should be deleted after build."""
-        (tmp_path / "src" / "vaadin" / "flow").mkdir(parents=True)
+        (tmp_path / "src" / "pyflow").mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        with patch("vaadin.flow.bundle_generator.build_and_extract"):
+        with patch("pyflow.bundle_generator.build_and_extract"):
             bp = self._create_bundle_project(tmp_path)
             generate_and_build(keep=False)
             assert not bp.exists()
@@ -80,8 +80,8 @@ class TestGenerateAndBuildUserProject:
         app_dir = tmp_path / "my_app"
         app_dir.mkdir()
 
-        with patch("vaadin.flow.bundle_generator.generate_project") as mock_gen, \
-             patch("vaadin.flow.bundle_generator.build_and_extract") as mock_build:
+        with patch("pyflow.bundle_generator.generate_project") as mock_gen, \
+             patch("pyflow.bundle_generator.build_and_extract") as mock_build:
             generate_and_build(app_dir=app_dir, keep=True)
 
             bundle_dir = mock_build.call_args[0][1]
@@ -93,8 +93,8 @@ class TestGenerateAndBuildUserProject:
         app_dir = tmp_path / "my_app"
         app_dir.mkdir()
 
-        with patch("vaadin.flow.bundle_generator.generate_project") as mock_gen, \
-             patch("vaadin.flow.bundle_generator.build_and_extract"):
+        with patch("pyflow.bundle_generator.generate_project") as mock_gen, \
+             patch("pyflow.bundle_generator.build_and_extract"):
             generate_and_build(app_dir=app_dir, keep=True)
 
             project_dir = mock_gen.call_args[0][0]
@@ -113,8 +113,8 @@ class TestGenerateAndBuildUserProject:
         app_dir = tmp_path / "my_app"
         app_dir.mkdir()
 
-        with patch("vaadin.flow.bundle_generator.generate_project") as mock_gen, \
-             patch("vaadin.flow.bundle_generator.build_and_extract"):
+        with patch("pyflow.bundle_generator.generate_project") as mock_gen, \
+             patch("pyflow.bundle_generator.build_and_extract"):
             generate_and_build(app_dir=app_dir, keep=True, vaadin_version="25.1.0")
 
             version = mock_gen.call_args[0][1]
@@ -136,8 +136,8 @@ class TestGenerateAndBuildReuse:
         java_dir.mkdir(parents=True)
         (java_dir / "FakeView.java").write_text("// old")
 
-        with patch("vaadin.flow.bundle_generator.generate_project") as mock_gen, \
-             patch("vaadin.flow.bundle_generator.build_and_extract") as mock_build:
+        with patch("pyflow.bundle_generator.generate_project") as mock_gen, \
+             patch("pyflow.bundle_generator.build_and_extract") as mock_build:
             generate_and_build(app_dir=app_dir, keep=True)
 
             # generate_project should NOT be called
@@ -156,7 +156,7 @@ class TestGenerateAndBuildReuse:
         java_dir.mkdir(parents=True)
         (java_dir / "FakeView.java").write_text("// old content")
 
-        with patch("vaadin.flow.bundle_generator.build_and_extract"):
+        with patch("pyflow.bundle_generator.build_and_extract"):
             generate_and_build(app_dir=app_dir, keep=True)
 
             new_content = (java_dir / "FakeView.java").read_text()
@@ -169,8 +169,8 @@ class TestGenerateAndBuildReuse:
         app_dir = tmp_path / "my_app"
         app_dir.mkdir()
 
-        with patch("vaadin.flow.bundle_generator.generate_project"), \
-             patch("vaadin.flow.bundle_generator.build_and_extract") as mock_build:
+        with patch("pyflow.bundle_generator.generate_project"), \
+             patch("pyflow.bundle_generator.build_and_extract") as mock_build:
             generate_and_build(app_dir=app_dir, keep=True)
 
             assert mock_build.call_args[1]["clean"] is True
@@ -182,8 +182,8 @@ class TestCliArgParsing:
     def _run_main(self, argv):
         """Run main() with given argv, capturing the generate_and_build call."""
         with patch("sys.argv", ["vaadin"] + argv), \
-             patch("vaadin.flow.bundle_generator.generate_and_build") as mock_gab:
-            from vaadin.flow.app import main
+             patch("pyflow.bundle_generator.generate_and_build") as mock_gab:
+            from pyflow.app import main
             with pytest.raises(SystemExit) as exc_info:
                 main()
             assert exc_info.value.code == 0

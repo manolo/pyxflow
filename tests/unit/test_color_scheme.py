@@ -2,10 +2,10 @@
 
 import pytest
 
-from vaadin.flow.router import ColorScheme, AppShell, clear_app_shell
-from vaadin.flow.server.http_server import get_index_html
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.component import UI
+from pyflow.router import ColorScheme, AppShell, clear_app_shell
+from pyflow.server.http_server import get_index_html
+from pyflow.core.state_tree import StateTree
+from pyflow.core.component import UI
 
 
 class TestColorSchemeDecorator:

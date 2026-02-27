@@ -2,7 +2,7 @@
 
 import pytest
 
-from vaadin.flow.core.state_node import Feature
+from pyflow.core.state_node import Feature
 
 
 class TestClickEvent:
@@ -11,8 +11,8 @@ class TestClickEvent:
     @pytest.fixture
     def session_with_view(self):
         """Create session with HelloWorldView loaded."""
-        from vaadin.flow.server.uidl_handler import UidlHandler
-        from vaadin.flow.core.state_tree import StateTree
+        from pyflow.server.uidl_handler import UidlHandler
+        from pyflow.core.state_tree import StateTree
 
         tree = StateTree()
         handler = UidlHandler(tree)
@@ -84,8 +84,8 @@ class TestValueSync:
     @pytest.fixture
     def session_with_view(self):
         """Create session with HelloWorldView loaded."""
-        from vaadin.flow.server.uidl_handler import UidlHandler
-        from vaadin.flow.core.state_tree import StateTree
+        from pyflow.server.uidl_handler import UidlHandler
+        from pyflow.core.state_tree import StateTree
 
         tree = StateTree()
         handler = UidlHandler(tree)
@@ -178,8 +178,8 @@ class TestChangeEvent:
     @pytest.fixture
     def session_with_view(self):
         """Create session with HelloWorldView loaded."""
-        from vaadin.flow.server.uidl_handler import UidlHandler
-        from vaadin.flow.core.state_tree import StateTree
+        from pyflow.server.uidl_handler import UidlHandler
+        from pyflow.core.state_tree import StateTree
 
         tree = StateTree()
         handler = UidlHandler(tree)

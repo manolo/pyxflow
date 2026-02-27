@@ -2,14 +2,14 @@
 
 from typing import Callable, Generic, TypeVar, Optional, Set, TYPE_CHECKING
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasReadOnly, HasValidation, HasRequired
-from vaadin.flow.core.state_node import Feature
-from vaadin.flow.components.constants import MultiSelectComboBoxVariant, AutoExpandMode
-from vaadin.flow.data.provider import DataProvider, Query
+from pyflow.core.component import Component
+from pyflow.components.mixins import HasReadOnly, HasValidation, HasRequired
+from pyflow.core.state_node import Feature
+from pyflow.components.constants import MultiSelectComboBoxVariant, AutoExpandMode
+from pyflow.data.provider import DataProvider, Query
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 T = TypeVar('T')
 

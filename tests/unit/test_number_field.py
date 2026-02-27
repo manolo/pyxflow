@@ -2,8 +2,8 @@
 
 import pytest
 
-from vaadin.flow.components import NumberField, IntegerField
-from vaadin.flow.core.state_tree import StateTree
+from pyflow.components import NumberField, IntegerField
+from pyflow.core.state_tree import StateTree
 
 
 class TestNumberField:

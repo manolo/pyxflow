@@ -2,9 +2,9 @@
 
 import pytest
 
-from vaadin.flow.router import Route, RouteAlias, PageTitle, match_route, get_view_class, get_page_title, get_all_routes, clear_routes, discover_views, AppShell, Push, get_app_shell, clear_app_shell
-from vaadin.flow.menu import get_menu_entries
-from vaadin.flow.components import VerticalLayout
+from pyflow.router import Route, RouteAlias, PageTitle, match_route, get_view_class, get_page_title, get_all_routes, clear_routes, discover_views, AppShell, Push, get_app_shell, clear_app_shell
+from pyflow.menu import get_menu_entries
+from pyflow.components import VerticalLayout
 
 
 class TestRouteDecorator:
@@ -528,7 +528,7 @@ class TestRouteAlias:
 
     def test_alias_not_in_menu(self):
         """Aliases should not generate @Menu entries (only primary @Route does)."""
-        from vaadin.flow.menu import Menu
+        from pyflow.menu import Menu
 
         @Route("dashboard")
         @RouteAlias("admin-dashboard")

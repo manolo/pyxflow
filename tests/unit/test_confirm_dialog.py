@@ -2,9 +2,9 @@
 
 import pytest
 
-from vaadin.flow.components.confirm_dialog import ConfirmDialog
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.components.confirm_dialog import ConfirmDialog
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 class TestConfirmDialog:
@@ -261,7 +261,7 @@ class TestConfirmDialog:
 
     def test_reopen_after_close(self):
         """Auto-added ConfirmDialog can be reopened after close."""
-        from vaadin.flow.components.notification import _set_current_tree
+        from pyflow.components.notification import _set_current_tree
         tree = StateTree()
         tree.create_node()  # node 1 = body
         tree.create_node()  # node 2 = container
@@ -291,7 +291,7 @@ class TestConfirmDialog:
 
     def test_reopen_after_confirm(self):
         """Auto-added ConfirmDialog can be reopened after confirm event."""
-        from vaadin.flow.components.notification import _set_current_tree
+        from pyflow.components.notification import _set_current_tree
         tree = StateTree()
         tree.create_node()  # node 1 = body
         tree.create_node()  # node 2 = container

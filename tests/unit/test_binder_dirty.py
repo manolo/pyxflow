@@ -2,11 +2,11 @@
 
 import pytest
 
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.components.text_field import TextField
-from vaadin.flow.components.email_field import EmailField
-from vaadin.flow.components.select import Select
-from vaadin.flow.data import Binder, string_to_int
+from pyflow.core.state_tree import StateTree
+from pyflow.components.text_field import TextField
+from pyflow.components.email_field import EmailField
+from pyflow.components.select import Select
+from pyflow.data import Binder, string_to_int
 
 
 # --- Helpers ---

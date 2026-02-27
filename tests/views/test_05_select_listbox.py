@@ -1,11 +1,11 @@
 """Test View 5: Select & ListBox — /test/select-listbox"""
 
-from vaadin.flow import Route
-from vaadin.flow.components import (
+from pyflow import Route
+from pyflow.components import (
     Button, Icon, ListBox, MultiSelectListBox, Select, Span,
     VerticalLayout,
 )
-from vaadin.flow.menu import Menu
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

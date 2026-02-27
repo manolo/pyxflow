@@ -5,9 +5,9 @@ import json
 from typing import Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.component import Component
-    from vaadin.flow.core.element import Element
-    from vaadin.flow.core.state_node import StateNode
+    from pyflow.core.component import Component
+    from pyflow.core.element import Element
+    from pyflow.core.state_node import StateNode
 
 
 class StateTree:
@@ -45,7 +45,7 @@ class StateTree:
 
     def create_node(self) -> "StateNode":
         """Create a new state node."""
-        from vaadin.flow.core.state_node import StateNode
+        from pyflow.core.state_node import StateNode
         node_id = self._next_node_id
         self._next_node_id += 1
         node = StateNode(node_id, self)

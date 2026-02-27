@@ -2,13 +2,13 @@
 
 from typing import TYPE_CHECKING
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.core.element import Element
-from vaadin.flow.core.state_node import Feature
-from vaadin.flow.components.constants import SideNavVariant
+from pyflow.core.component import Component
+from pyflow.core.element import Element
+from pyflow.core.state_node import Feature
+from pyflow.components.constants import SideNavVariant
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 
 class SideNavItem(Component):

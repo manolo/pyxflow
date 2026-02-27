@@ -1,12 +1,12 @@
 """Test View 1: Buttons & Icons — /test/buttons-icons"""
 
-from vaadin.flow import Route, RouteAlias
-from vaadin.flow.components import (
+from pyflow import Route, RouteAlias
+from pyflow.components import (
     Button, DrawerToggle, HorizontalLayout, Icon, Span,
     TextField, VerticalLayout,
 )
-from vaadin.flow.core.keys import Key
-from vaadin.flow.menu import Menu
+from pyflow.core.keys import Key
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

@@ -1,8 +1,8 @@
 """Test View 31: Enhanced Route Parameters -- /test/route-params"""
 
-from vaadin.flow import Route, BeforeEnterEvent
-from vaadin.flow.components import Span, VerticalLayout
-from vaadin.flow.menu import Menu
+from pyflow import Route, BeforeEnterEvent
+from pyflow.components import Span, VerticalLayout
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

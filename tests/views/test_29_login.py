@@ -1,10 +1,10 @@
 """Test View 29: LoginForm & LoginOverlay — /test/login"""
 
-from vaadin.flow import Route
-from vaadin.flow.components import (
+from pyflow import Route
+from pyflow.components import (
     Button, LoginForm, LoginOverlay, Span, VerticalLayout,
 )
-from vaadin.flow.menu import Menu
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

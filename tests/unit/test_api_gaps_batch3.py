@@ -2,15 +2,15 @@
 ValueChangeMode, and set_i18n.
 """
 
-from vaadin.flow.components import (
+from pyflow.components import (
     DatePicker, DateTimePicker, EmailField, HorizontalLayout, NumberField,
     PasswordField, Select, Span, TextArea, TextField, TimePicker,
     Upload, ValueChangeMode, VerticalLayout,
 )
-from vaadin.flow.components.login import LoginForm, LoginOverlay
-from vaadin.flow.components.message_input import MessageInput
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.components.login import LoginForm, LoginOverlay
+from pyflow.components.message_input import MessageInput
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 def tree():

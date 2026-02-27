@@ -2,11 +2,11 @@
 
 from typing import TYPE_CHECKING
 
-from vaadin.flow.components.constants import AppLayoutSection
-from vaadin.flow.core.component import Component
+from pyflow.components.constants import AppLayoutSection
+from pyflow.core.component import Component
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 
 class AppLayout(Component):

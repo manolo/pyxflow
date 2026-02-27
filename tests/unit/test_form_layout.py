@@ -4,9 +4,9 @@ import json
 
 import pytest
 
-from vaadin.flow.components import FormLayout, FormItem, FormRow, ResponsiveStep
-from vaadin.flow.components import TextField, Button, Span
-from vaadin.flow.core.state_tree import StateTree
+from pyflow.components import FormLayout, FormItem, FormRow, ResponsiveStep
+from pyflow.components import TextField, Button, Span
+from pyflow.core.state_tree import StateTree
 
 
 class TestResponsiveStep:

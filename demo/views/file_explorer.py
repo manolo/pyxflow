@@ -3,9 +3,9 @@ import pathlib
 import subprocess
 import sys
 
-from vaadin.flow import Menu, Route
-from vaadin.flow.components import *
-from vaadin.flow.core.component import ClientCallable
+from pyflow import Menu, Route
+from pyflow.components import *
+from pyflow.core.component import ClientCallable
 from demo.views.main_layout import MainLayout
 
 _DEMO_ROOT = pathlib.Path(__file__).resolve().parent.parent

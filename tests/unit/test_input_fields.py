@@ -2,7 +2,7 @@
 
 import pytest
 
-from vaadin.flow.components import (
+from pyflow.components import (
     PasswordField,
     EmailField,
     ProgressBar,
@@ -10,7 +10,7 @@ from vaadin.flow.components import (
     RadioButtonGroup,
     CheckboxGroup,
 )
-from vaadin.flow.core.state_tree import StateTree
+from pyflow.core.state_tree import StateTree
 
 
 class TestPasswordField:

@@ -1,11 +1,11 @@
 """Test View 13: Tabs, TabSheet, Accordion, Details — /test/tabs-accordion"""
 
-from vaadin.flow import Route
-from vaadin.flow.components import (
+from pyflow import Route
+from pyflow.components import (
     Accordion, Button, Details, Span, Tab, TabSheet, Tabs,
     VerticalLayout,
 )
-from vaadin.flow.menu import Menu
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

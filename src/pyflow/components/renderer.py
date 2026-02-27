@@ -4,7 +4,7 @@ import secrets
 from typing import Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.component import Component
+    from pyflow.core.component import Component
 
 
 class Renderer:

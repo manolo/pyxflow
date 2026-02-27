@@ -2,8 +2,8 @@
 
 import pytest
 
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import StateNode, Feature
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import StateNode, Feature
 
 
 class TestStateTree:

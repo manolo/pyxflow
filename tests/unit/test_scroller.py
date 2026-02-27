@@ -1,9 +1,9 @@
 """Tests for Scroller component."""
 
 import pytest
-from vaadin.flow.components import Scroller, ScrollDirection, Span, VerticalLayout
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.components import Scroller, ScrollDirection, Span, VerticalLayout
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 @pytest.fixture

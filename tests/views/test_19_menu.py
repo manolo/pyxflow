@@ -1,10 +1,10 @@
 """Test View 14: MenuBar & ContextMenu — /test/menu"""
 
-from vaadin.flow import Route
-from vaadin.flow.components import (
+from pyflow import Route
+from pyflow.components import (
     Button, ContextMenu, Div, MenuBar, Span, VerticalLayout,
 )
-from vaadin.flow.menu import Menu
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

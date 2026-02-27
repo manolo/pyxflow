@@ -1,10 +1,10 @@
 """Test View 6: ComboBox & MultiSelectComboBox — /test/combo-box"""
 
-from vaadin.flow import Route
-from vaadin.flow.components import (
+from pyflow import Route
+from pyflow.components import (
     Button, ComboBox, MultiSelectComboBox, Span, VerticalLayout,
 )
-from vaadin.flow.menu import Menu
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 
@@ -112,7 +112,7 @@ class TestComboBoxView(VerticalLayout):
         mscb_ro.set_read_only(True)
 
         # --- ComboBox prefix component ---
-        from vaadin.flow.components.icon import Icon
+        from pyflow.components.icon import Icon
         cb_prefix = ComboBox("With icon")
         cb_prefix.set_id("cb-prefix")
         cb_prefix.set_items("Red", "Green", "Blue")

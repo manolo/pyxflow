@@ -4,13 +4,13 @@ import threading
 from enum import Enum
 from typing import Callable, TYPE_CHECKING
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.core.state_node import Feature
-from vaadin.flow.components.constants import NotificationVariant
-from vaadin.flow.server.uidl_handler import _CLOSED_HASH, _OPENED_CHANGED_HASH
+from pyflow.core.component import Component
+from pyflow.core.state_node import Feature
+from pyflow.components.constants import NotificationVariant
+from pyflow.server.uidl_handler import _CLOSED_HASH, _OPENED_CHANGED_HASH
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 
 # Thread-local storage for the current tree context.

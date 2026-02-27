@@ -1,11 +1,11 @@
 """Test View 16: Card, Scroller, MasterDetailLayout — /test/card-scroller"""
 
-from vaadin.flow import Route
-from vaadin.flow.components import (
+from pyflow import Route
+from pyflow.components import (
     Button, Card, MasterDetailLayout, Scroller, ScrollDirection,
     Span, VerticalLayout,
 )
-from vaadin.flow.menu import Menu
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 
@@ -43,7 +43,7 @@ class TestCardScrollerView(VerticalLayout):
         scroller_h = Scroller(scroll_direction=ScrollDirection.HORIZONTAL)
         scroller_h.set_id("scroller-h")
         scroller_h.set_height("50px")
-        from vaadin.flow.components import HorizontalLayout
+        from pyflow.components import HorizontalLayout
         wide = HorizontalLayout()
         for i in range(20):
             s = Span(f"Item {i}")

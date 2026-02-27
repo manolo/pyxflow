@@ -7,15 +7,15 @@ notification rather than crashing the server.
 
 import pytest
 
-from vaadin.flow.server.uidl_handler import UidlHandler
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
-from vaadin.flow.core.component import Component
-from vaadin.flow.core.element import Element
-from vaadin.flow.components.vertical_layout import VerticalLayout
-from vaadin.flow.components.button import Button
-from vaadin.flow.components.text_field import TextField
-from vaadin.flow.router import Route, clear_routes
+from pyflow.server.uidl_handler import UidlHandler
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
+from pyflow.core.component import Component
+from pyflow.core.element import Element
+from pyflow.components.vertical_layout import VerticalLayout
+from pyflow.components.button import Button
+from pyflow.components.text_field import TextField
+from pyflow.router import Route, clear_routes
 
 
 def _find_notification_in_changes(changes):

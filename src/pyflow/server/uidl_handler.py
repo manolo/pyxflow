@@ -8,13 +8,13 @@ import random
 import secrets
 from typing import Any, TYPE_CHECKING
 
-log = logging.getLogger("vaadin.flow")
+log = logging.getLogger("pyflow")
 
-from vaadin.flow.core.state_node import Feature
+from pyflow.core.state_node import Feature
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.component import Component
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.component import Component
+    from pyflow.core.state_tree import StateTree
 
 
 # =============================================================================
@@ -243,7 +243,7 @@ class UidlHandler:
         self._layout_class: type | None = None  # Class of current layout
         self._current_route: str | None = None  # Track current route for re-navigation
         # UI is a singleton per session (like Java Flow's VaadinSession → UI)
-        from vaadin.flow.core.component import UI
+        from pyflow.core.component import UI
         self._ui = UI(tree)
 
         # Node references
@@ -316,7 +316,7 @@ class UidlHandler:
         }
 
         # AppShell stylesheets → included in init UIDL as EAGER dependencies
-        from vaadin.flow.router import get_app_shell
+        from pyflow.router import get_app_shell
         app_shell = get_app_shell()
         if app_shell:
             sheets = getattr(app_shell, '_stylesheets', [])
@@ -346,7 +346,7 @@ class UidlHandler:
 
     def _is_push_enabled(self) -> bool:
         """Check if push is enabled via @AppShell @Push."""
-        from vaadin.flow.router import get_app_shell
+        from pyflow.router import get_app_shell
         app_shell = get_app_shell()
         return getattr(app_shell, '_push_enabled', False) if app_shell else False
 
@@ -454,7 +454,7 @@ class UidlHandler:
         so that property values (e.g. text field value) are up-to-date before
         event handlers (e.g. click shortcuts) run.
         """
-        from vaadin.flow.components.notification import _set_current_tree
+        from pyflow.components.notification import _set_current_tree
         _set_current_tree(self._tree)
         try:
             # Pass 1: process all mSync RPCs first (property syncs)
@@ -490,7 +490,7 @@ class UidlHandler:
 
     def _show_error_notification(self):
         """Show an error notification in the UI after an unhandled exception."""
-        from vaadin.flow.components.notification import Notification, NotificationVariant
+        from pyflow.components.notification import Notification, NotificationVariant
         n = Notification("An internal error has occurred. Please contact the administrator.")
         n.position = Notification.Position.MIDDLE
         n.duration = 5000
@@ -523,16 +523,16 @@ class UidlHandler:
 
         In dev mode, also lists all registered routes as clickable links.
         """
-        from vaadin.flow.components.html import H3, Paragraph, Div
-        from vaadin.flow.server.http_server import _dev_mode
+        from pyflow.components.html import H3, Paragraph, Div
+        from pyflow.server.http_server import _dev_mode
 
         if _dev_mode:
             class _NotFoundView(Div):
                 def __init__(self):
                     super().__init__()
-                    from vaadin.flow.router import _routes
-                    from vaadin.flow.components.router_link import RouterLink
-                    from vaadin.flow.components.vertical_layout import VerticalLayout
+                    from pyflow.router import _routes
+                    from pyflow.components.router_link import RouterLink
+                    from pyflow.components.vertical_layout import VerticalLayout
 
                     self.get_style().set("padding", "1em")
                     self.add(H3(f"Could not navigate to '{route}'"))
@@ -582,7 +582,7 @@ class UidlHandler:
         # Java Flow also calls beforeEnter on every navigation.
 
         # Use router to find view class and params
-        from vaadin.flow.router import match_route, _resolve_title
+        from pyflow.router import match_route, _resolve_title
 
         result = match_route(route)
         view_class = None
@@ -595,7 +595,7 @@ class UidlHandler:
 
         if view_class is None:
             # Fallback to http_server._view_class for backwards compatibility
-            from vaadin.flow.server.http_server import _view_class
+            from pyflow.server.http_server import _view_class
             if _view_class is not None:
                 view_class = _view_class
             else:
@@ -610,7 +610,7 @@ class UidlHandler:
         is_first_navigation = (self._view is None and self._layout is None)
 
         # Set tree context so Notification.show() works during view construction
-        from vaadin.flow.components.notification import _set_current_tree
+        from pyflow.components.notification import _set_current_tree
         _set_current_tree(self._tree)
         try:
             ui = self._ui
@@ -699,7 +699,7 @@ class UidlHandler:
         replaced -- enabling animations (e.g., MasterDetailLayout close)
         to complete without interruption.
         """
-        from vaadin.flow.router import (
+        from pyflow.router import (
             BeforeEnterEvent, Location, QueryParameters, RouteParameters,
         )
         if params and hasattr(view, 'set_parameter'):
@@ -721,7 +721,7 @@ class UidlHandler:
     def _create_view(self, view_class: type, params: dict, ui: Any,
                       query_string: str = "") -> Any:
         """Create and attach a view instance."""
-        from vaadin.flow.router import (
+        from pyflow.router import (
             BeforeEnterEvent, Location, QueryParameters, RouteParameters,
         )
         view = view_class()

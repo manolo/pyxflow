@@ -3,7 +3,7 @@
 import pytest
 from pathlib import Path
 
-from vaadin.flow.bundle_generator import (
+from pyflow.bundle_generator import (
     generate_pom_xml,
     generate_fake_view,
     generate_feature_flags,

@@ -12,10 +12,10 @@ Tests that:
 
 import pytest
 
-from vaadin.flow.core.component import Component, ClientCallable
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
-from vaadin.flow.server.uidl_handler import UidlHandler
+from pyflow.core.component import Component, ClientCallable
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
+from pyflow.server.uidl_handler import UidlHandler
 
 
 class MyComponent(Component):
@@ -342,5 +342,5 @@ class TestExport:
     """Test that ClientCallable is properly exported."""
 
     def test_import_from_components(self):
-        from vaadin.flow.components import ClientCallable as CC
+        from pyflow.components import ClientCallable as CC
         assert CC is ClientCallable

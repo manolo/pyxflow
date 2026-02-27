@@ -1,6 +1,6 @@
-from vaadin.flow import Menu, Route
-from vaadin.flow.components import *
-from vaadin.flow.components.horizontal_layout import Alignment
+from pyflow import Menu, Route
+from pyflow.components import *
+from pyflow.components.horizontal_layout import Alignment
 from demo.views.main_layout import MainLayout
 
 

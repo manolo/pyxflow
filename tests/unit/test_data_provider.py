@@ -2,7 +2,7 @@
 
 import pytest
 
-from vaadin.flow.data.provider import (
+from pyflow.data.provider import (
     CallbackDataProvider,
     DataProvider,
     ListDataProvider,
@@ -10,9 +10,9 @@ from vaadin.flow.data.provider import (
     from_callbacks,
     items_provider,
 )
-from vaadin.flow.components.grid import Grid, Column, GridSortOrder, SortDirection
-from vaadin.flow.components.combo_box import ComboBox
-from vaadin.flow.core.state_tree import StateTree
+from pyflow.components.grid import Grid, Column, GridSortOrder, SortDirection
+from pyflow.components.combo_box import ComboBox
+from pyflow.core.state_tree import StateTree
 
 
 class TestQuery:

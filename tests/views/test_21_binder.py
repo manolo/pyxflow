@@ -2,14 +2,14 @@
 
 from datetime import date, time
 
-from vaadin.flow import Route
-from vaadin.flow.components import (
+from pyflow import Route
+from pyflow.components import (
     Button, ComboBox, DatePicker, Select, Span, TextField, TimePicker,
     VerticalLayout,
 )
-from vaadin.flow.data.binder import Binder
-from vaadin.flow.data.converter import string_to_int
-from vaadin.flow.menu import Menu
+from pyflow.data.binder import Binder
+from pyflow.data.converter import string_to_int
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

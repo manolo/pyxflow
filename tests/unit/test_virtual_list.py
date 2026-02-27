@@ -2,11 +2,11 @@
 
 import pytest
 
-from vaadin.flow.components.virtual_list import VirtualList
-from vaadin.flow.components.renderer import LitRenderer, ComponentRenderer
-from vaadin.flow.components.button import Button
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.components.virtual_list import VirtualList
+from pyflow.components.renderer import LitRenderer, ComponentRenderer
+from pyflow.components.button import Button
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 class TestVirtualList:

@@ -2,12 +2,12 @@
 
 from typing import Callable, TYPE_CHECKING
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.components.constants import DialogVariant
-from vaadin.flow.server.uidl_handler import _CLOSED_HASH
+from pyflow.core.component import Component
+from pyflow.components.constants import DialogVariant
+from pyflow.server.uidl_handler import _CLOSED_HASH
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 
 class ConfirmDialog(Component):
@@ -87,7 +87,7 @@ class ConfirmDialog(Component):
         """
         self._opened = True
         if not self._element:
-            from vaadin.flow.components.notification import _get_current_tree
+            from pyflow.components.notification import _get_current_tree
             tree = _get_current_tree()
             if tree:
                 self._attach(tree)

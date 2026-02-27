@@ -2,8 +2,8 @@
 
 import pytest
 
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 class TestVerticalLayout:
@@ -12,8 +12,8 @@ class TestVerticalLayout:
     @pytest.fixture
     def attached_layout(self):
         """Create and attach a VerticalLayout."""
-        from vaadin.flow.components import VerticalLayout
-        from vaadin.flow.core.component import UI
+        from pyflow.components import VerticalLayout
+        from pyflow.core.component import UI
 
         tree = StateTree()
         ui = UI(tree)
@@ -50,7 +50,7 @@ class TestVerticalLayout:
         assert "spacing" in theme["value"]
 
     def test_add_child_creates_splice(self, attached_layout):
-        from vaadin.flow.components import Span
+        from pyflow.components import Span
 
         layout, tree = attached_layout
         tree.collect_changes()  # Clear initial changes
@@ -69,8 +69,8 @@ class TestHorizontalLayout:
 
     @pytest.fixture
     def attached_layout(self):
-        from vaadin.flow.components import HorizontalLayout
-        from vaadin.flow.core.component import UI
+        from pyflow.components import HorizontalLayout
+        from pyflow.core.component import UI
 
         tree = StateTree()
         ui = UI(tree)
@@ -102,8 +102,8 @@ class TestTextField:
 
     @pytest.fixture
     def attached_field(self):
-        from vaadin.flow.components import TextField
-        from vaadin.flow.core.component import UI
+        from pyflow.components import TextField
+        from pyflow.core.component import UI
 
         tree = StateTree()
         ui = UI(tree)
@@ -143,8 +143,8 @@ class TestButton:
 
     @pytest.fixture
     def attached_button(self):
-        from vaadin.flow.components import Button
-        from vaadin.flow.core.component import UI
+        from pyflow.components import Button
+        from pyflow.core.component import UI
 
         tree = StateTree()
         ui = UI(tree)
@@ -181,8 +181,8 @@ class TestButton:
 
     def test_button_with_icon_has_both_children(self):
         """Button(text, icon) should have both text node and icon element."""
-        from vaadin.flow.components import Button, Icon
-        from vaadin.flow.core.component import UI
+        from pyflow.components import Button, Icon
+        from pyflow.core.component import UI
 
         tree = StateTree()
         ui = UI(tree)
@@ -210,8 +210,8 @@ class TestButton:
 
     def test_button_icon_after_text(self):
         """set_icon_after_text(True) should set slot='suffix' on icon."""
-        from vaadin.flow.components import Button, Icon
-        from vaadin.flow.core.component import UI
+        from pyflow.components import Button, Icon
+        from pyflow.core.component import UI
 
         tree = StateTree()
         ui = UI(tree)
@@ -231,8 +231,8 @@ class TestButton:
 
     def test_button_icon_after_text_toggle(self):
         """Toggling icon_after_text on attached button updates slot attribute."""
-        from vaadin.flow.components import Button, Icon
-        from vaadin.flow.core.component import UI
+        from pyflow.components import Button, Icon
+        from pyflow.core.component import UI
 
         tree = StateTree()
         ui = UI(tree)
@@ -260,8 +260,8 @@ class TestButton:
 
     def test_button_on_click_constructor(self):
         """Button(on_click=fn) should register the click listener."""
-        from vaadin.flow.components import Button
-        from vaadin.flow.core.component import UI
+        from pyflow.components import Button
+        from pyflow.core.component import UI
 
         tree = StateTree()
         ui = UI(tree)
@@ -275,8 +275,8 @@ class TestButton:
 
     def test_button_icon_as_second_positional(self):
         """Button("text", Icon(...)) should detect Icon and not treat it as on_click."""
-        from vaadin.flow.components import Button, Icon
-        from vaadin.flow.core.component import UI
+        from pyflow.components import Button, Icon
+        from pyflow.core.component import UI
 
         tree = StateTree()
         ui = UI(tree)
@@ -297,8 +297,8 @@ class TestButton:
 
     def test_button_icon_as_first_positional(self):
         """Button(Icon(...)) should detect Icon as first arg."""
-        from vaadin.flow.components import Button, Icon
-        from vaadin.flow.core.component import UI
+        from pyflow.components import Button, Icon
+        from pyflow.core.component import UI
 
         tree = StateTree()
         ui = UI(tree)
@@ -317,8 +317,8 @@ class TestButton:
 
     def test_button_icon_first_with_click(self):
         """Button(Icon(...), lambda e: ...) should detect both."""
-        from vaadin.flow.components import Button, Icon
-        from vaadin.flow.core.component import UI
+        from pyflow.components import Button, Icon
+        from pyflow.core.component import UI
 
         tree = StateTree()
         ui = UI(tree)
@@ -338,8 +338,8 @@ class TestSpan:
 
     @pytest.fixture
     def attached_span(self):
-        from vaadin.flow.components import Span
-        from vaadin.flow.core.component import UI
+        from pyflow.components import Span
+        from pyflow.core.component import UI
 
         tree = StateTree()
         ui = UI(tree)
@@ -370,8 +370,8 @@ class TestVerticalLayoutAddComponentAsFirst:
 
     @pytest.fixture
     def attached_layout(self):
-        from vaadin.flow.components import VerticalLayout
-        from vaadin.flow.core.component import UI
+        from pyflow.components import VerticalLayout
+        from pyflow.core.component import UI
 
         tree = StateTree()
         ui = UI(tree)
@@ -382,7 +382,7 @@ class TestVerticalLayoutAddComponentAsFirst:
 
     def test_add_component_as_first_empty_layout(self, attached_layout):
         """Adding to an empty layout places component as first."""
-        from vaadin.flow.components import Span
+        from pyflow.components import Span
 
         layout, tree = attached_layout
         tree.collect_changes()
@@ -394,7 +394,7 @@ class TestVerticalLayoutAddComponentAsFirst:
 
     def test_add_component_as_first_with_existing_children(self, attached_layout):
         """Component added as first should precede existing children."""
-        from vaadin.flow.components import Span
+        from pyflow.components import Span
 
         layout, tree = attached_layout
         a = Span("A")
@@ -412,7 +412,7 @@ class TestVerticalLayoutAddComponentAsFirst:
 
     def test_add_component_as_first_creates_splice_at_index_0(self, attached_layout):
         """The splice change should be at index 0."""
-        from vaadin.flow.components import Span
+        from pyflow.components import Span
 
         layout, tree = attached_layout
         layout.add(Span("A"))
@@ -438,8 +438,8 @@ class TestHorizontalLayoutAddComponentAsFirst:
 
     @pytest.fixture
     def attached_layout(self):
-        from vaadin.flow.components import HorizontalLayout
-        from vaadin.flow.core.component import UI
+        from pyflow.components import HorizontalLayout
+        from pyflow.core.component import UI
 
         tree = StateTree()
         ui = UI(tree)
@@ -450,7 +450,7 @@ class TestHorizontalLayoutAddComponentAsFirst:
 
     def test_add_component_as_first_empty_layout(self, attached_layout):
         """Adding to an empty layout places component as first."""
-        from vaadin.flow.components import Span
+        from pyflow.components import Span
 
         layout, tree = attached_layout
         tree.collect_changes()
@@ -462,7 +462,7 @@ class TestHorizontalLayoutAddComponentAsFirst:
 
     def test_add_component_as_first_with_existing_children(self, attached_layout):
         """Component added as first should precede existing children."""
-        from vaadin.flow.components import Span
+        from pyflow.components import Span
 
         layout, tree = attached_layout
         a = Span("A")
@@ -480,7 +480,7 @@ class TestHorizontalLayoutAddComponentAsFirst:
 
     def test_add_component_as_first_creates_splice_at_index_0(self, attached_layout):
         """The splice change should be at index 0."""
-        from vaadin.flow.components import Span
+        from pyflow.components import Span
 
         layout, tree = attached_layout
         layout.add(Span("A"))

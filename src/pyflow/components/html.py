@@ -2,11 +2,11 @@
 
 from typing import TYPE_CHECKING
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.core.state_node import Feature
+from pyflow.core.component import Component
+from pyflow.core.state_node import Feature
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 
 class _TextComponent(Component):

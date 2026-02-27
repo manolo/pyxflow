@@ -2,11 +2,11 @@
 
 import pytest
 
-from vaadin.flow.router import Route, PageTitle, match_route, get_view_class, get_page_title, clear_routes
-from vaadin.flow.components import VerticalLayout, Span, RouterLink
-from vaadin.flow.core.state_node import Feature
-from vaadin.flow.server.uidl_handler import UidlHandler
-from vaadin.flow.core.state_tree import StateTree
+from pyflow.router import Route, PageTitle, match_route, get_view_class, get_page_title, clear_routes
+from pyflow.components import VerticalLayout, Span, RouterLink
+from pyflow.core.state_node import Feature
+from pyflow.server.uidl_handler import UidlHandler
+from pyflow.core.state_tree import StateTree
 
 
 # =============================================================================

@@ -1,9 +1,9 @@
 """Tests for Accordion component."""
 
 import pytest
-from vaadin.flow.components import Accordion, AccordionPanel, Span
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.components import Accordion, AccordionPanel, Span
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def tree():
 
 class TestAccordionPanel:
     def test_extends_details(self):
-        from vaadin.flow.components.details import Details
+        from pyflow.components.details import Details
         panel = AccordionPanel("Title", Span("Content"))
         assert isinstance(panel, Details)
 

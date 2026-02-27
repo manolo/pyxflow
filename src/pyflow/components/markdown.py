@@ -1,6 +1,6 @@
 """Markdown component — renders markdown content as HTML."""
 
-from vaadin.flow.core.component import Component
+from pyflow.core.component import Component
 
 
 class Markdown(Component):

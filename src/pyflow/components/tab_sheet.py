@@ -3,12 +3,12 @@
 import uuid
 from typing import Callable, TYPE_CHECKING
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.components.tabs import Tab, Tabs
-from vaadin.flow.components.constants import TabSheetVariant
+from pyflow.core.component import Component
+from pyflow.components.tabs import Tab, Tabs
+from pyflow.components.constants import TabSheetVariant
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 
 class TabSheet(Component):

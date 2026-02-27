@@ -2,9 +2,9 @@
 
 import pytest
 
-from vaadin.flow.components import Dialog, Button, Span
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.components import Dialog, Button, Span
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 class TestDialog:
@@ -259,7 +259,7 @@ class TestDialogAutoAdd:
 
     def test_open_auto_attaches_to_container(self, tree):
         """open() auto-attaches dialog to container node when not manually added."""
-        from vaadin.flow.components.notification import _set_current_tree
+        from pyflow.components.notification import _set_current_tree
         # Create body (node 1) and container (node 2)
         tree.create_node()  # node 1 = body
         tree.create_node()  # node 2 = container
@@ -284,7 +284,7 @@ class TestDialogAutoAdd:
 
     def test_close_auto_removes_from_container(self, tree):
         """close() auto-removes dialog from container (matching Java's OverlayAutoAddController)."""
-        from vaadin.flow.components.notification import _set_current_tree
+        from pyflow.components.notification import _set_current_tree
         tree.create_node()  # node 1 = body
         tree.create_node()  # node 2 = container
         tree._container_node_id = 2
@@ -307,7 +307,7 @@ class TestDialogAutoAdd:
 
     def test_reopen_after_close(self, tree):
         """Auto-added dialog can be reopened after being closed."""
-        from vaadin.flow.components.notification import _set_current_tree
+        from pyflow.components.notification import _set_current_tree
         tree.create_node()  # node 1 = body
         tree.create_node()  # node 2 = container
         tree._container_node_id = 2

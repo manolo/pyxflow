@@ -2,10 +2,10 @@
 
 import pytest
 
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.components.text_field import TextField
-from vaadin.flow.components.checkbox import Checkbox
-from vaadin.flow.data import (
+from pyflow.core.state_tree import StateTree
+from pyflow.components.text_field import TextField
+from pyflow.components.checkbox import Checkbox
+from pyflow.data import (
     Binder,
     Converter,
     Result,

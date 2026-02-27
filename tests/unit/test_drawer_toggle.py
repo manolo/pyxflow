@@ -2,10 +2,10 @@
 
 import pytest
 
-from vaadin.flow.components.drawer_toggle import DrawerToggle
-from vaadin.flow.components.button import Button
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.components.drawer_toggle import DrawerToggle
+from pyflow.components.button import Button
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 class TestDrawerToggle:

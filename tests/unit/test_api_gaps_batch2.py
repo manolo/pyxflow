@@ -10,7 +10,7 @@ APIs, Upload slotted components, HTML elements, Binder, SplitLayout, Card,
 MasterDetailLayout.
 """
 
-from vaadin.flow.components import (
+from pyflow.components import (
     Accordion, AccordionPanel, Anchor, Article, Aside, Button, Card,
     CheckboxGroup, ContextMenu, DatePicker, DateTimePicker, Details, Dialog,
     Div, EmailField, FlexLayout, Grid, H5, H6, HorizontalLayout, Hr, IFrame,
@@ -20,15 +20,15 @@ from vaadin.flow.components import (
     SplitLayout, Tab, TabSheet, Tabs, TextArea, TextField, TimePicker,
     VerticalLayout,
 )
-from vaadin.flow.components.confirm_dialog import ConfirmDialog
-from vaadin.flow.components.horizontal_layout import Alignment, JustifyContentMode
-from vaadin.flow.components.master_detail_layout import MasterDetailLayout
-from vaadin.flow.components.upload import Upload
-from vaadin.flow.components.combo_box import ComboBox
-from vaadin.flow.core.component import Component
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
-from vaadin.flow.data.binder import Binder
+from pyflow.components.confirm_dialog import ConfirmDialog
+from pyflow.components.horizontal_layout import Alignment, JustifyContentMode
+from pyflow.components.master_detail_layout import MasterDetailLayout
+from pyflow.components.upload import Upload
+from pyflow.components.combo_box import ComboBox
+from pyflow.core.component import Component
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
+from pyflow.data.binder import Binder
 
 
 def tree():

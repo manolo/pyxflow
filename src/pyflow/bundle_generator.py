@@ -3,13 +3,13 @@
 Usage (via CLI)::
 
     # PyFlow developer (from vaadin-pyflow/ checkout)
-    vaadin --bundle                          # → src/vaadin/flow/bundle/
-    vaadin --bundle --keep                   # keep bundle-project/ for debugging
-    vaadin --bundle --vaadin-version 25.0.4  # pin Vaadin version
+    pyflow --bundle                          # → src/pyflow/bundle/
+    pyflow --bundle --keep                   # keep bundle-project/ for debugging
+    pyflow --bundle --vaadin-version 25.0.4  # pin Vaadin version
 
     # User project
-    vaadin my_app --bundle                   # → my_app/bundle/
-    vaadin my_app --bundle --keep            # keep my_app/bundle-project/
+    pyflow my_app --bundle                   # → my_app/bundle/
+    pyflow my_app --bundle --keep            # keep my_app/bundle-project/
 """
 
 import os
@@ -95,12 +95,12 @@ def generate_pom_xml(vaadin_version: str) -> str:
 def discover_java_components() -> dict[str, str]:
     """Auto-discover all Component subclasses that have _v_fqcn.
 
-    Imports vaadin.flow.components (which imports all component modules),
+    Imports pyflow.components (which imports all component modules),
     then walks the Component class hierarchy collecting _v_fqcn values.
     Returns {PythonClassName: JavaFQCN}.
     """
-    from vaadin.flow.core.component import Component
-    import vaadin.flow.components  # noqa: F401 — triggers all component imports
+    from pyflow.core.component import Component
+    import pyflow.components  # noqa: F401 — triggers all component imports
 
     registry: dict[str, str] = {}
     queue = list(Component.__subclasses__())
@@ -348,18 +348,18 @@ def generate_and_build(
         keep: If *True*, keep ``bundle-project/`` after extraction.
         vaadin_version: Vaadin platform version for the pom.xml.
     """
-    is_pyflow_dev = (Path.cwd() / "src" / "vaadin" / "flow").is_dir()
+    is_pyflow_dev = (Path.cwd() / "src" / "pyflow").is_dir()
 
     if is_pyflow_dev:
         project_dir = Path.cwd() / "bundle-project"
-        bundle_dir = Path.cwd() / "src" / "vaadin" / "flow" / "bundle"
+        bundle_dir = Path.cwd() / "src" / "pyflow" / "bundle"
     elif app_dir:
         project_dir = app_dir / "bundle-project"
         bundle_dir = app_dir / "bundle"
     else:
         print("ERROR: Cannot determine bundle output directory.")
-        print("  Run from a pyflow source tree (src/vaadin/flow/ exists)")
-        print("  or specify an app module: vaadin <app_module> --bundle")
+        print("  Run from a pyflow source tree (src/pyflow/ exists)")
+        print("  or specify an app module: pyflow <app_module> --bundle")
         sys.exit(1)
 
     print("===================================================")

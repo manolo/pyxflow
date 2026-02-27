@@ -1,5 +1,5 @@
-from vaadin.flow import Menu, Route, StyleSheet
-from vaadin.flow.components import Div, H1, Image, Paragraph
+from pyflow import Menu, Route, StyleSheet
+from pyflow.components import Div, H1, Image, Paragraph
 from demo.views.main_layout import MainLayout
 
 

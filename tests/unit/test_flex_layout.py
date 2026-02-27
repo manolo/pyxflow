@@ -2,7 +2,7 @@
 
 import pytest
 
-from vaadin.flow.components.flex_layout import (
+from pyflow.components.flex_layout import (
     Alignment,
     ContentAlignment,
     FlexDirection,
@@ -10,9 +10,9 @@ from vaadin.flow.components.flex_layout import (
     FlexWrap,
     JustifyContentMode,
 )
-from vaadin.flow.components.span import Span
-from vaadin.flow.core.state_node import Feature
-from vaadin.flow.core.state_tree import StateTree
+from pyflow.components.span import Span
+from pyflow.core.state_node import Feature
+from pyflow.core.state_tree import StateTree
 
 
 class TestFlexLayout:

@@ -1,7 +1,7 @@
 """ProgressBar component."""
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.components.constants import ProgressBarVariant
+from pyflow.core.component import Component
+from pyflow.components.constants import ProgressBarVariant
 
 
 class ProgressBar(Component):

@@ -4,10 +4,10 @@ import json
 from enum import Enum
 from typing import Any, TYPE_CHECKING, Union
 
-from vaadin.flow.core.component import Component
+from pyflow.core.component import Component
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 
 class ResponsiveStep:
@@ -170,7 +170,7 @@ class FormRow(Component):
 
     def add_form_item(self, field: Component, label: Union[str, Component]) -> FormItem:
         """Add a field with a label, wrapped in a FormItem."""
-        from vaadin.flow.components.span import Span
+        from pyflow.components.span import Span
 
         item = FormItem(field)
         if isinstance(label, str):
@@ -278,7 +278,7 @@ class FormLayout(Component):
         Returns:
             The created FormItem.
         """
-        from vaadin.flow.components.span import Span
+        from pyflow.components.span import Span
 
         item = FormItem(field)
         if isinstance(label, str):

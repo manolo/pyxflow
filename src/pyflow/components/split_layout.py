@@ -2,11 +2,11 @@
 
 from typing import TYPE_CHECKING
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.components.constants import Orientation, SplitLayoutVariant
+from pyflow.core.component import Component
+from pyflow.components.constants import Orientation, SplitLayoutVariant
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 
 class SplitLayout(Component):
@@ -71,7 +71,7 @@ class SplitLayout(Component):
         if len(components) == 1:
             comp = components[0]
         else:
-            from vaadin.flow.components.html import Div
+            from pyflow.components.html import Div
             comp = Div()
             for c in components:
                 comp.add(c)
@@ -86,7 +86,7 @@ class SplitLayout(Component):
         if len(components) == 1:
             comp = components[0]
         else:
-            from vaadin.flow.components.html import Div
+            from pyflow.components.html import Div
             comp = Div()
             for c in components:
                 comp.add(c)

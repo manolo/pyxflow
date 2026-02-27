@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Type, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.component import Component
+    from pyflow.core.component import Component
 
 
 def Menu(title: str | None = None, order: int = 0, icon: str | None = None, exclude: bool = False):
@@ -52,7 +52,7 @@ def get_menu_entries() -> list[MenuEntry]:
 
     Returns entries sorted by (order, path).
     """
-    from vaadin.flow.router import _routes
+    from pyflow.router import _routes
 
     entries = []
     for path, (cls, page_title, param_names, regex, layout_cls) in _routes.items():
@@ -117,7 +117,7 @@ def get_page_header(view: "Component") -> str | None:
     """
     if view is None:
         return None
-    from vaadin.flow.router import _resolve_title
+    from pyflow.router import _resolve_title
     return _resolve_title(type(view), view)
 
 

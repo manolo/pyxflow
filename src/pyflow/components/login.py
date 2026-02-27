@@ -3,11 +3,11 @@
 import json
 from typing import Callable, TYPE_CHECKING
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.server.uidl_handler import _LOGIN_HASH, _CLOSED_HASH as _FORGOT_PASSWORD_HASH
+from pyflow.core.component import Component
+from pyflow.server.uidl_handler import _LOGIN_HASH, _CLOSED_HASH as _FORGOT_PASSWORD_HASH
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 
 class LoginForm(Component):

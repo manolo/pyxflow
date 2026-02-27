@@ -1,10 +1,10 @@
 """Test View 9: Grid — Selection, Sorting, Events — /test/grid-features"""
 
-from vaadin.flow import Route
-from vaadin.flow.components import (
+from pyflow import Route
+from pyflow.components import (
     Button, Grid, GridDropMode, SelectionMode, Span, VerticalLayout,
 )
-from vaadin.flow.menu import Menu
+from pyflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

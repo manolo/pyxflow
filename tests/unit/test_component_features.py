@@ -2,8 +2,8 @@
 
 import pytest
 
-from vaadin.flow.components import Button, TextField
-from vaadin.flow.core.state_tree import StateTree
+from pyflow.components import Button, TextField
+from pyflow.core.state_tree import StateTree
 
 
 class TestComponentVisibility:

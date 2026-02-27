@@ -2,10 +2,10 @@
 
 from typing import TYPE_CHECKING
 
-from vaadin.flow.core.component import Component
+from pyflow.core.component import Component
 
 if TYPE_CHECKING:
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.core.state_tree import StateTree
 
 
 class MessageListItem:

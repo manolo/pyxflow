@@ -12,9 +12,9 @@ class TestCompleteFlow:
 
     def test_full_hello_world_flow(self):
         """Test the complete HelloWorld flow."""
-        from vaadin.flow.server.uidl_handler import UidlHandler
-        from vaadin.flow.core.state_tree import StateTree
-        from vaadin.flow.core.state_node import Feature
+        from pyflow.server.uidl_handler import UidlHandler
+        from pyflow.core.state_tree import StateTree
+        from pyflow.core.state_node import Feature
 
         # 1. Create handler
         tree = StateTree()
@@ -90,8 +90,8 @@ class TestUidlResponseFormat:
 
     def test_response_has_required_fields(self):
         """Response should have syncId, clientId, changes."""
-        from vaadin.flow.server.uidl_handler import UidlHandler
-        from vaadin.flow.core.state_tree import StateTree
+        from pyflow.server.uidl_handler import UidlHandler
+        from pyflow.core.state_tree import StateTree
 
         tree = StateTree()
         handler = UidlHandler(tree)
@@ -116,8 +116,8 @@ class TestUidlResponseFormat:
 
     def test_change_format(self):
         """Each change should have node, type, and appropriate fields."""
-        from vaadin.flow.server.uidl_handler import UidlHandler
-        from vaadin.flow.core.state_tree import StateTree
+        from pyflow.server.uidl_handler import UidlHandler
+        from pyflow.core.state_tree import StateTree
 
         tree = StateTree()
         handler = UidlHandler(tree)

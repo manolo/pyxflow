@@ -1,8 +1,8 @@
 """VerticalLayout component."""
 
-from vaadin.flow.components.horizontal_layout import Alignment, JustifyContentMode
-from vaadin.flow.core.component import Component
-from vaadin.flow.components.constants import VerticalLayoutVariant
+from pyflow.components.horizontal_layout import Alignment, JustifyContentMode
+from pyflow.core.component import Component
+from pyflow.components.constants import VerticalLayoutVariant
 
 
 class VerticalLayout(Component):

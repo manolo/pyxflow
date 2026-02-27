@@ -2,10 +2,10 @@
 
 import pytest
 
-from vaadin.flow.components.upload import Upload
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
-from vaadin.flow.server.http_server import _upload_handlers, _sessions
+from pyflow.components.upload import Upload
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
+from pyflow.server.http_server import _upload_handlers, _sessions
 
 
 class TestUpload:

@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "vaadin-pyflow"
+name = "pyflow"
 version = "0.2.0"
 description = "Python implementation of Vaadin Flow"
 readme = "README.md"
@@ -40,14 +40,15 @@ dev = [
 ]
 
 [project.scripts]
-vaadin = "vaadin.flow.app:main"
+pyflow = "pyflow.app:main"
+vaadin = "pyflow.app:main_deprecated"
 
 [project.urls]
 Homepage = "https://github.com/manolo/vaadin-pyflow"
 Documentation = "https://vaadin.com/docs"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/vaadin"]
+packages = ["src/pyflow"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

@@ -2,13 +2,13 @@
 
 from typing import Callable, TYPE_CHECKING
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.core.state_node import Feature
-from vaadin.flow.components.constants import ButtonVariant
+from pyflow.core.component import Component
+from pyflow.core.state_node import Feature
+from pyflow.components.constants import ButtonVariant
 
 if TYPE_CHECKING:
-    from vaadin.flow.components.icon import Icon
-    from vaadin.flow.core.state_tree import StateTree
+    from pyflow.components.icon import Icon
+    from pyflow.core.state_tree import StateTree
 
 
 class Button(Component):

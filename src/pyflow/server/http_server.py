@@ -13,10 +13,10 @@ from typing import Any, Callable
 import aiohttp
 from aiohttp import web
 
-from vaadin.flow.server.uidl_handler import UidlHandler
-from vaadin.flow.core.state_tree import StateTree
+from pyflow.server.uidl_handler import UidlHandler
+from pyflow.core.state_tree import StateTree
 
-log = logging.getLogger("vaadin.flow")
+log = logging.getLogger("pyflow")
 
 SESSION_TIMEOUT = 1800  # 30 minutes (matches Java servlet default)
 
@@ -543,7 +543,7 @@ def get_index_html() -> str:
                 '</head>'
             )
             # Apply @ColorScheme from AppShell to <html> tag
-            from vaadin.flow.router import get_app_shell
+            from pyflow.router import get_app_shell
             app_shell = get_app_shell()
             color_scheme = getattr(app_shell, '_color_scheme', None) if app_shell else None
             if color_scheme and color_scheme != "normal":
@@ -728,14 +728,14 @@ async def handle_route(request: web.Request) -> web.Response:
         if path == "favicon.ico":
             import importlib.resources
             try:
-                favicon = importlib.resources.files("vaadin.flow") / "scaffold" / "favicon.ico"
+                favicon = importlib.resources.files("pyflow") / "scaffold" / "favicon.ico"
                 with importlib.resources.as_file(favicon) as f:
                     if f.is_file():
                         return web.FileResponse(f, headers={"Content-Type": "image/x-icon", "Cache-Control": "no-cache"})  # type: ignore[return-value]
             except (FileNotFoundError, TypeError):
                 pass
         # Check if a route matches (wildcard routes)
-        from vaadin.flow.router import match_route
+        from pyflow.router import match_route
         if match_route(path):
             html = get_index_html()
             return web.Response(text=html, content_type="text/html")
@@ -787,7 +787,7 @@ def run_server(host: str = "localhost", port: int = 8080, debug: bool = False, s
         log.setLevel(logging.DEBUG)
 
     # Show registered routes
-    from vaadin.flow.router import get_all_routes
+    from pyflow.router import get_all_routes
     routes = get_all_routes()
     if routes:
         print("Registered routes:")

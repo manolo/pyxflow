@@ -131,7 +131,7 @@ class ListDataProvider(DataProvider[T, None]):
         # Apply query sort orders (from Grid columns)
         if query.sort_orders and not self._comparator:
             # Import here to avoid circular imports
-            from vaadin.flow.components.grid import SortDirection
+            from pyflow.components.grid import SortDirection
 
             for order in reversed(query.sort_orders):
                 prop = order.column.property_name

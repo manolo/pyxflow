@@ -2,8 +2,8 @@
 
 import pytest
 
-from vaadin.flow.components import TextArea
-from vaadin.flow.core.state_tree import StateTree
+from pyflow.components import TextArea
+from pyflow.core.state_tree import StateTree
 
 
 class TestTextArea:

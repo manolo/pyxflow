@@ -2,9 +2,9 @@
 
 from typing import Callable
 
-from vaadin.flow.core.component import Component
-from vaadin.flow.components.mixins import HasReadOnly, HasRequired
-from vaadin.flow.components.constants import CheckboxVariant
+from pyflow.core.component import Component
+from pyflow.components.mixins import HasReadOnly, HasRequired
+from pyflow.components.constants import CheckboxVariant
 
 
 class Checkbox(HasReadOnly, HasRequired, Component):

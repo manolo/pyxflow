@@ -3,12 +3,12 @@
 import json
 import pytest
 
-from vaadin.flow.components.grid import (
+from pyflow.components.grid import (
     Grid, Column, SortDirection, GridSortOrder, SelectionMode, _GridSelectionColumn,
     HeaderRow,
 )
-from vaadin.flow.core.state_tree import StateTree
-from vaadin.flow.core.state_node import Feature
+from pyflow.core.state_tree import StateTree
+from pyflow.core.state_node import Feature
 
 
 class TestColumn:
@@ -976,7 +976,7 @@ class TestGridNewAPIMethods:
 
     def test_set_drop_mode_enum_before_attach(self, tree):
         """set_drop_mode with GridDropMode enum before attach buffers and applies on attach."""
-        from vaadin.flow.components.constants import GridDropMode
+        from pyflow.components.constants import GridDropMode
 
         grid = Grid()
         grid.add_column("name", header="Name")
@@ -1004,7 +1004,7 @@ class TestGridNewAPIMethods:
 
     def test_set_drop_mode_after_attach(self, tree):
         """set_drop_mode after attach sets property immediately."""
-        from vaadin.flow.components.constants import GridDropMode
+        from pyflow.components.constants import GridDropMode
 
         grid = Grid()
         grid.add_column("name", header="Name")
@@ -1019,7 +1019,7 @@ class TestGridNewAPIMethods:
 
     def test_set_drop_mode_on_grid(self, tree):
         """GridDropMode.ON_GRID value is correct."""
-        from vaadin.flow.components.constants import GridDropMode
+        from pyflow.components.constants import GridDropMode
 
         grid = Grid()
         grid.add_column("name", header="Name")
@@ -1038,7 +1038,7 @@ class TestGridNewAPIMethods:
 
     def test_set_drop_mode_none_after_attach(self, tree):
         """set_drop_mode(None) after setting a mode clears it."""
-        from vaadin.flow.components.constants import GridDropMode
+        from pyflow.components.constants import GridDropMode
 
         grid = Grid()
         grid.add_column("name", header="Name")
@@ -1277,7 +1277,7 @@ class TestGridNewAPIMethods:
 
     def test_all_buffered_properties_applied_on_attach(self, tree):
         """Multiple buffered properties are all applied when the grid attaches."""
-        from vaadin.flow.components.constants import GridDropMode
+        from pyflow.components.constants import GridDropMode
 
         grid = Grid()
         grid.add_column("name", header="Name")
