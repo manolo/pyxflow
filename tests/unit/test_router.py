@@ -353,10 +353,10 @@ class TestDiscoverViews:
     def test_discover_views_returns_module_names(self):
         """discover_views should return list of imported module names."""
         imported = discover_views("demo.views")
-        assert "demo.views.hello_world" in imported
-        assert "demo.views.about" in imported
-        assert "demo.views.components" in imported
-        assert "demo.views.grid" in imported
+        assert "demo.views.hello_view" in imported
+        assert "demo.views.about_view" in imported
+        assert "demo.views.components_view" in imported
+        assert "demo.views.grid_view" in imported
 
     def test_discover_views_menu_entries(self):
         """After discover_views, get_menu_entries should return @Menu entries."""
@@ -364,7 +364,7 @@ class TestDiscoverViews:
         entries = get_menu_entries()
         assert len(entries) == 8
         titles = [e.title for e in entries]
-        assert titles == ["About", "Hello", "Components", "Grid", "Master-Detail", "CRUD", "Stopwatch", "File Explorer"]
+        assert titles == ["About", "Hello", "Components", "Grid", "Master-Detail", "Responsive CRUD", "Stopwatch", "File Explorer"]
         # Verify sorted by (order, path)
         orders = [e.order for e in entries]
         assert orders == sorted(orders)

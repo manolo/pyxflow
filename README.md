@@ -36,6 +36,33 @@ class HelloView(HorizontalLayout):
 - **Theming** -- Lumo and Aura themes with dark mode support
 - **Hot reload** -- `--dev` mode watches for file changes
 
+## Demo
+
+The included demo app showcases real-world patterns across 8 views:
+
+| View | Route | What it shows |
+|------|-------|---------------|
+| About | `/` | Landing page with logo and architecture diagram |
+| Hello | `/hello` | Simplest view -- TextField + Button + Notification |
+| Components | `/components` | 20+ components in a responsive CSS grid |
+| Grid | `/grid` | Lazy data provider with sorting and selection (200 rows) |
+| Master-Detail | `/master-detail` | Grid + side form with Binder validation |
+| Responsive CRUD | `/crud` | Full CRUD with route parameters and FAB |
+| Stopwatch | `/push-demo` | WebSocket push -- server updates UI every second |
+| File Explorer | `/file-explorer` | TreeGrid + @ClientCallable for server method calls |
+
+<img src="docs/screenshots/demo-tour.gif" alt="Demo tour" width="700">
+
+### Run the demo
+
+```bash
+git clone https://github.com/manolo/vaadin-pyflow.git
+cd vaadin-pyflow
+python -m venv .venv && source .venv/bin/activate
+pip install -e .
+python -m demo          # http://localhost:8088
+```
+
 ## Installation
 
 ```bash

@@ -1,20 +1,23 @@
-/* ===== About View ===== */
 .about-view {
-  padding: 0;
   max-width: 900px;
   margin: 0 auto;
 }
 
-/* ── Hero ── */
 .about-hero {
   text-align: center;
   padding: var(--lumo-space-xl) var(--lumo-space-l);
 }
 
+.about-logo,
+.about-arch-img {
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 4px 12px var(--lumo-primary-color-50pct));
+}
+
 .about-logo {
   width: 120px;
-  margin: 0 auto var(--lumo-space-m);
-  filter: drop-shadow(0 4px 12px var(--lumo-primary-color-50pct));
+  margin-bottom: var(--lumo-space-m);
 }
 
 .about-title {
@@ -36,12 +39,8 @@
   line-height: 1.6;
 }
 
-/* ── Architecture image ── */
 .about-arch-img {
-  display: block;
   width: 100%;
   max-width: 680px;
-  margin: 0 auto;
   border-radius: var(--lumo-border-radius-l);
-  box-shadow: 0 8px 32px var(--lumo-shade-50pct);
 }
