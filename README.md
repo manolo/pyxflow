@@ -86,6 +86,8 @@ vaadin [app_module] [options]
 
 ## Routing
 
+Each view is a Python class with a `@Route` decorator that defines the URL path. Add `@Menu` to include it in the navigation. PyFlow handles client-side URL routing automatically.
+
 ```python
 from vaadin.flow import Route, Menu
 
@@ -101,6 +103,8 @@ class DashboardView(VerticalLayout):
 - Route parameters: `@Route("greet/:name")` with `on_parameter_changed(self, params)`
 
 ## Application shell
+
+The application shell is the global layout shared by all views. It defines the navbar, drawer, theme, and stylesheets. Decorate one class with `@AppShell`.
 
 ```python
 from vaadin.flow import AppShell, Push, ColorScheme, StyleSheet
@@ -122,6 +126,8 @@ class MainLayout(AppLayout):
 
 ## Grid with lazy data
 
+Grid fetches only the rows visible in the viewport. Provide a callback that returns a slice of your data and the total count -- Grid handles virtual scrolling, sorting, and pagination.
+
 ```python
 grid = Grid()
 grid.add_column("name", header="Name").set_sortable(True).set_auto_width(True)
@@ -133,6 +139,8 @@ def my_fetch(offset, limit, sort_orders):
 ```
 
 ## Real-time push
+
+Update the UI from background tasks without polling. The server pushes changes to the browser via WebSocket. Just call `ui.access()` from any async task.
 
 ```python
 import asyncio
