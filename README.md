@@ -6,6 +6,8 @@
 
 No JavaScript. No HTML templates. Your code runs on the server -- the browser is just a thin client.
 
+<img src="docs/screenshots/architecture-diagram.png" alt="Architecture" >
+
 ---
 
 ```python
