@@ -106,8 +106,10 @@ The Vaadin version is configured in `pyproject.toml`:
 ```toml
 [tool.pyflow]
 vaadin-version = "25.0.6"
-flow-version = "25.0.7"
 ```
+
+The Flow version (needed for the `flow-push` JAR) is resolved automatically from the
+`vaadin-spring-bom` POM in the Maven BOM chain -- no need to track it separately.
 
 | PyFlow Version | Vaadin Bundle Version | Notes |
 |----------------|----------------------|-------|
@@ -115,8 +117,8 @@ flow-version = "25.0.7"
 
 ### Upgrading Vaadin Version
 
-1. Update `vaadin-version` (and `flow-version` if needed) in `pyproject.toml`
-2. Run `pyflow bundle` (auto-downloads new JARs)
+1. Update `vaadin-version` in `pyproject.toml`
+2. Run `pyflow bundle` (auto-downloads new JARs and resolves flow version from BOM)
 3. Test that PyFlow still works
 4. Update this table
 

@@ -27,21 +27,18 @@ import os
 import shutil
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
 
-def _read_pyproject_versions() -> tuple[str, str]:
-    """Read Vaadin and Flow versions from pyproject.toml [tool.pyflow] section.
-
-    Returns (vaadin_version, flow_version).
-    """
+def _read_pyproject_version() -> str:
+    """Read Vaadin version from pyproject.toml [tool.pyflow] section."""
     pyproject = Path(__file__).parent.parent.parent / "pyproject.toml"
     if not pyproject.is_file():
         # Fallback: look relative to package install location
         pyproject = Path(__file__).parent / "pyproject.toml"
     vaadin_ver = "25.0.6"
-    flow_ver = "25.0.7"
     if pyproject.is_file():
         in_section = False
         for line in pyproject.read_text().splitlines():
@@ -56,12 +53,77 @@ def _read_pyproject_versions() -> tuple[str, str]:
                 val = val.strip().strip('"')
                 if key.strip() == "vaadin-version":
                     vaadin_ver = val
-                elif key.strip() == "flow-version":
-                    flow_ver = val
-    return vaadin_ver, flow_ver
+    return vaadin_ver
 
 
-_DEFAULT_VAADIN_VERSION, _DEFAULT_FLOW_VERSION = _read_pyproject_versions()
+_DEFAULT_VAADIN_VERSION = _read_pyproject_version()
+
+
+def _resolve_flow_version(vaadin_version: str) -> str:
+    """Resolve the Flow version from the vaadin-spring-bom POM.
+
+    Looks up ``vaadin-spring-bom-<vaadin_version>.pom`` in
+    ``~/.m2/repository/``.  If not found locally, downloads from Maven
+    Central.  Parses ``<properties><flow.version>`` from the POM XML.
+    """
+    group_path = "com/vaadin"
+    artifact = "vaadin-spring-bom"
+    pom_dir = _m2_repo() / group_path / artifact / vaadin_version
+    pom_path = pom_dir / f"{artifact}-{vaadin_version}.pom"
+
+    if not pom_path.is_file():
+        pom_path = _download_pom(group_path, artifact, vaadin_version)
+
+    return _parse_flow_version(pom_path)
+
+
+def _download_pom(group_path: str, artifact: str, version: str) -> Path:
+    """Download a POM from Maven Central into ~/.m2/repository/.
+
+    Returns the local path to the downloaded POM.
+    """
+    import urllib.request
+    import urllib.error
+
+    pom_dir = _m2_repo() / group_path / artifact / version
+    pom_path = pom_dir / f"{artifact}-{version}.pom"
+
+    group_url = group_path.replace(os.sep, "/")
+    url = f"https://repo1.maven.org/maven2/{group_url}/{artifact}/{version}/{artifact}-{version}.pom"
+
+    print(f"  Downloading {artifact}-{version}.pom ...", end="", flush=True)
+    try:
+        with urllib.request.urlopen(url) as resp:
+            data = resp.read()
+            pom_dir.mkdir(parents=True, exist_ok=True)
+            pom_path.write_bytes(data)
+            print(f" ({len(data) / 1024:.1f} KB)")
+    except urllib.error.HTTPError as e:
+        print(f" FAILED")
+        print(f"\n  ERROR: HTTP {e.code} downloading {url}")
+        sys.exit(1)
+    except urllib.error.URLError as e:
+        print(f" FAILED")
+        print(f"\n  ERROR: {e.reason}")
+        sys.exit(1)
+
+    return pom_path
+
+
+def _parse_flow_version(pom_path: Path) -> str:
+    """Parse <flow.version> from a Maven POM's <properties> section."""
+    tree = ET.parse(pom_path)
+    root = tree.getroot()
+    # Maven POM uses a namespace
+    ns = {"m": "http://maven.apache.org/POM/4.0.0"}
+    flow_ver = root.findtext("m:properties/m:flow.version", namespaces=ns)
+    if not flow_ver:
+        # Try without namespace (some POMs omit it)
+        flow_ver = root.findtext("properties/flow.version")
+    if not flow_ver:
+        print(f"  ERROR: <flow.version> not found in {pom_path}")
+        sys.exit(1)
+    return flow_ver
 
 
 def generate_pom_xml(vaadin_version: str, *, optimize_bundle: bool = True) -> str:
@@ -475,7 +537,7 @@ def copy_from_jars(
     This is much faster than a full Maven build and produces the exact same
     files.  Requires the JARs to be present in ``~/.m2/repository/``.
     """
-    flow_version = _DEFAULT_FLOW_VERSION
+    flow_version = _resolve_flow_version(vaadin_version)
 
     # --- Locate all 4 JARs (download if missing) -----------------------------
     specs = [

@@ -10,8 +10,9 @@ from pyflow.bundle_generator import (
     discover_java_components,
     generate_project,
     _DEFAULT_VAADIN_VERSION,
-    _DEFAULT_FLOW_VERSION,
-    _read_pyproject_versions,
+    _read_pyproject_version,
+    _parse_flow_version,
+    _resolve_flow_version,
 )
 
 
@@ -231,19 +232,73 @@ class TestDefaultVaadinVersion:
     def test_default_version_is_set(self):
         assert _DEFAULT_VAADIN_VERSION == "25.0.6"
 
-    def test_default_flow_version_is_set(self):
-        assert _DEFAULT_FLOW_VERSION == "25.0.7"
 
-
-class TestReadPyprojectVersions:
-    """Test _read_pyproject_versions() reads from pyproject.toml."""
+class TestReadPyprojectVersion:
+    """Test _read_pyproject_version() reads from pyproject.toml."""
 
     def test_reads_from_pyproject(self):
-        vaadin_ver, flow_ver = _read_pyproject_versions()
+        vaadin_ver = _read_pyproject_version()
         assert vaadin_ver == "25.0.6"
-        assert flow_ver == "25.0.7"
 
-    def test_versions_match_module_constants(self):
-        vaadin_ver, flow_ver = _read_pyproject_versions()
+    def test_version_matches_module_constant(self):
+        vaadin_ver = _read_pyproject_version()
         assert vaadin_ver == _DEFAULT_VAADIN_VERSION
-        assert flow_ver == _DEFAULT_FLOW_VERSION
+
+
+class TestParseFlowVersion:
+    """Test _parse_flow_version() parsing from a Maven POM."""
+
+    def test_parses_flow_version_from_pom(self, tmp_path):
+        pom_content = """\
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.vaadin</groupId>
+  <artifactId>vaadin-spring-bom</artifactId>
+  <version>25.0.6</version>
+  <properties>
+    <flow.version>25.0.7</flow.version>
+    <hilla.version>25.0.6</hilla.version>
+  </properties>
+</project>
+"""
+        pom = tmp_path / "test.pom"
+        pom.write_text(pom_content)
+        assert _parse_flow_version(pom) == "25.0.7"
+
+    def test_parses_different_flow_version(self, tmp_path):
+        pom_content = """\
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <properties>
+    <flow.version>25.1.0</flow.version>
+  </properties>
+</project>
+"""
+        pom = tmp_path / "test.pom"
+        pom.write_text(pom_content)
+        assert _parse_flow_version(pom) == "25.1.0"
+
+    def test_missing_flow_version_exits(self, tmp_path):
+        pom_content = """\
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <properties>
+    <hilla.version>25.0.6</hilla.version>
+  </properties>
+</project>
+"""
+        pom = tmp_path / "test.pom"
+        pom.write_text(pom_content)
+        with pytest.raises(SystemExit):
+            _parse_flow_version(pom)
+
+
+class TestResolveFlowVersion:
+    """Test _resolve_flow_version() resolves from local Maven repo."""
+
+    def test_resolves_from_local_pom(self):
+        """Should resolve flow version from the local Maven repo."""
+        flow_ver = _resolve_flow_version("25.0.6")
+        assert flow_ver == "25.0.7"
