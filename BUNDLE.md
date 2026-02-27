@@ -4,10 +4,10 @@ PyFlow reuses Vaadin's frontend infrastructure (FlowClient, web components, Lumo
 
 ## What's in the Bundle
 
-The bundle lives inside the Python package at `src/vaadin/flow/bundle/` so it ships with the wheel.
+The bundle lives inside the Python package at `src/pyflow/bundle/` so it ships with the wheel.
 
 ```
-src/vaadin/flow/bundle/
+src/pyflow/bundle/
 ├── index.html                     # Entry point HTML
 ├── VAADIN/build/
 │   ├── indexhtml-*.js              # Entry point, initializes FlowClient
@@ -90,14 +90,14 @@ unzip -o vaadin-prod-bundle-25.0.4.jar "vaadin-prod-bundle-unoptimized/webapp/VA
 
 # Copy to PyFlow (bundle lives inside the package)
 cd /path/to/vaadin-pyflow
-rm -rf src/vaadin/flow/bundle/VAADIN/build/*
-cp /tmp/extracted/vaadin-prod-bundle-unoptimized/webapp/VAADIN/build/* src/vaadin/flow/bundle/VAADIN/build/
+rm -rf src/pyflow/bundle/VAADIN/build/*
+cp /tmp/extracted/vaadin-prod-bundle-unoptimized/webapp/VAADIN/build/* src/pyflow/bundle/VAADIN/build/
 ```
 
 ### Verify
 
 ```bash
-ls src/vaadin/flow/bundle/VAADIN/build/
+ls src/pyflow/bundle/VAADIN/build/
 # Should show: FlowClient-*.js, indexhtml-*.js, generated-flow-imports-*.js, etc.
 ```
 

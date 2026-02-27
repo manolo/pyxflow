@@ -88,9 +88,9 @@ Code snippets must match the real PyFlow API. Reference source at `~/Github/plat
 
 ### Imports
 ```python
-from vaadin.flow import Route, Menu, Push       # decorators
-from vaadin.flow.components import *             # UI components
-from vaadin.flow.data import Binder, ...         # data binding
+from pyflow import Route, Menu, Push       # decorators
+from pyflow.components import *             # UI components
+from pyflow.data import Binder, ...         # data binding
 ```
 
 ### Decorators

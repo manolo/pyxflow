@@ -45,7 +45,7 @@ Patrones clave de la API:
 - Vistas son clases que extienden layouts (`VerticalLayout`, `HorizontalLayout`, `SplitLayout`)
 - `Button("text", callback)` — detección automática de parámetros, sin `on_click=`
 - `Grid`, `TreeGrid`, `Binder`, `Notification.show()`
-- `from vaadin.flow import ...` y `from vaadin.flow.components import *`
+- `from pyflow import ...` y `from pyflow.components import *`
 
 ## Prompt de regeneración
 

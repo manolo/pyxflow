@@ -13,8 +13,8 @@ Under the hood, PyFlow uses the same server-driven architecture as [Vaadin Flow]
 ---
 
 ```python
-from vaadin.flow import Route
-from vaadin.flow.components import *
+from pyflow import Route
+from pyflow.components import *
 
 @Route("hello")
 class HelloView(HorizontalLayout):
@@ -39,7 +39,7 @@ class HelloView(HorizontalLayout):
 ## Installation
 
 ```bash
-pip install git+https://github.com/manolo/vaadin-pyflow.git
+pip install pyflow
 ```
 
 ## Quick start
@@ -48,9 +48,9 @@ pip install git+https://github.com/manolo/vaadin-pyflow.git
 mkdir my-app && cd my-app
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install git+https://github.com/manolo/vaadin-pyflow.git
-vaadin --setup
-vaadin
+pip install pyflow
+pyflow --setup
+pyflow
 # http://localhost:8080
 ```
 
@@ -72,7 +72,7 @@ my-app/
 ### Running
 
 ```bash
-vaadin [app_module] [options]
+pyflow [app_module] [options]
 
   app_module               Python module with views/ (auto-detected if omitted)
   --setup [app_name]       Scaffold a new project (views, static, .vscode/)
@@ -89,7 +89,7 @@ vaadin [app_module] [options]
 Each view is a Python class with a `@Route` decorator that defines the URL path. Add `@Menu` to include it in the navigation. PyFlow handles client-side URL routing automatically.
 
 ```python
-from vaadin.flow import Route, Menu
+from pyflow import Route, Menu
 
 @Route("dashboard", page_title="Dashboard", layout=MainLayout)
 @Menu(title="Dashboard", order=1, icon="vaadin:dashboard")
@@ -107,9 +107,9 @@ class DashboardView(VerticalLayout):
 `@AppShell` marks the global app configuration: push, theme, stylesheets. Only one per app. In practice, you put it on your main layout class (`AppLayout`) which provides the navbar, drawer, and content area.
 
 ```python
-from vaadin.flow import AppShell, Push, ColorScheme, StyleSheet
-from vaadin.flow.components import AppLayout, DrawerToggle, H1, SideNav, SideNavItem
-from vaadin.flow.menu import get_menu_entries
+from pyflow import AppShell, Push, ColorScheme, StyleSheet
+from pyflow.components import AppLayout, DrawerToggle, H1, SideNav, SideNavItem
+from pyflow.menu import get_menu_entries
 
 @AppShell
 @Push

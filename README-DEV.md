@@ -51,7 +51,7 @@ UI tests are in `tests/ui/` and excluded from the default `pytest` run. Use `pyt
 ## Project structure
 
 ```
-src/vaadin/flow/
+src/pyflow/
 ├── core/           # StateTree, StateNode, Element, Component
 ├── components/     # 49 Vaadin components
 ├── data/           # Binder, DataProvider, validators, converters

@@ -67,8 +67,8 @@
 | Animation | Character-by-character reveal, 35-60ms/char, 120ms between lines, blinking cursor |
 
 ```python
-from vaadin.flow import Route, Menu
-from vaadin.flow.components import *
+from pyflow import Route, Menu
+from pyflow.components import *
 
 @Route("hello")
 @Menu("Hello", icon="vaadin:hand")
@@ -166,8 +166,8 @@ class HelloView(HorizontalLayout):
 | Layout | Normal (code left, screenshot right) |
 
 ```python
-from vaadin.flow import Route, Menu
-from vaadin.flow.components import *
+from pyflow import Route, Menu
+from pyflow.components import *
 
 @Route("hello")
 @Menu("Hello", icon="vaadin:hand")
@@ -219,8 +219,8 @@ class GridView(VerticalLayout):
 | Layout | Normal (code left, screenshot right) |
 
 ```python
-from vaadin.flow.components import *
-from vaadin.flow.data import Binder
+from pyflow.components import *
+from pyflow.data import Binder
 
 @Route("master-detail")
 @Menu("Master-Detail", icon="vaadin:split-h")
@@ -276,17 +276,17 @@ class MasterDetailView(Div):
 
 ```bash
 # Install PyFlow
-$ pip install git+https://github.com/manolo/vaadin-pyflow.git
+$ pip install pyflow
 
 # Create your app
 $ mkdir myapp && cd myapp
 $ mkdir views
 
 # Optionally create some demo views
-$ vaadin --setup
+$ pyflow --setup
 
 # Run with hot reload
-$ vaadin --dev
+$ pyflow --dev
 ```
 
 **File tree:**
