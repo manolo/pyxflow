@@ -80,7 +80,7 @@ Or use Playwright MCP:
 
 - Repository: `https://github.com/manolo/pyflow`
 - Issues: `https://github.com/manolo/pyflow/issues`
-- Nav GitHub link: `https://github.com/vaadin/pyflow`
+- Nav GitHub link: `https://github.com/manolo/pyflow`
 
 ## PyFlow API Patterns (for code snippets)
 

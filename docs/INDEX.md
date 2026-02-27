@@ -35,7 +35,7 @@
 | Examples | `#showcase` |
 | Components | `#gallery` |
 | Quick Start | `#quickstart` |
-| GitHub | `https://github.com/vaadin/pyflow` (external) |
+| GitHub | `https://github.com/manolo/pyflow` (external) |
 
 **Responsive**: Links hidden on mobile (<768px), only brand visible.
 
@@ -56,7 +56,7 @@
 | Headline | `Build Web Apps` / `in Pure Python` (gradient accent on "Pure Python") |
 | Subtitle | `No JavaScript. No HTML. Just Python.` / `Enterprise-grade Vaadin components, powered by Python.` |
 | CTA primary | "Get Started" → `#quickstart` |
-| CTA secondary | "View on GitHub" (with GitHub SVG icon) → `https://github.com/vaadin/pyflow` |
+| CTA secondary | "View on GitHub" (with GitHub SVG icon) → `https://github.com/manolo/pyflow` |
 
 **Right column — code block with typing animation:**
 
@@ -306,7 +306,7 @@ myapp/
 | Field | Value |
 |-------|-------|
 | ID | *(none — `<footer>` element)* |
-| Links | GitHub (`https://github.com/vaadin/pyflow`), Issues (`https://github.com/vaadin/pyflow/issues`) |
+| Links | GitHub (`https://github.com/manolo/pyflow`), Issues (`https://github.com/manolo/pyflow/issues`) |
 | Text | `PyFlow by Vaadin }> — Open source under the Apache 2.0 License.` |
 
 ---
