@@ -2,7 +2,7 @@
 
 ## Current State: All 49 Components + WebSocket Push + Multi-UI Sessions + Full UIDL Compatibility
 
-**Vaadin version:** 25.0.4
+**Vaadin version:** 25.0.6
 **Components:** 49 implemented (all Vaadin 25 UI components)
 **Lines of code:** ~18,300 (core src/), ~56,100 (total with demo + tests)
 **Test structure:** `tests/unit/` (2457 unit tests, default `pytest`) + `tests/ui/` (446 Playwright, run explicitly)

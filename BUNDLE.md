@@ -28,7 +28,7 @@ src/pyflow/bundle/
 
 ### Theme CSS
 
-The `lumo/` directory contains the Lumo theme CSS extracted from `vaadin-lumo-theme-25.0.4.jar`.
+The `lumo/` directory contains the Lumo theme CSS extracted from `vaadin-lumo-theme-25.0.6.jar`.
 **Without this CSS, components render with browser defaults** (no Lumo styling).
 The server injects `<link rel="stylesheet" href="lumo/lumo.css">` into the HTML at serve time.
 
@@ -44,7 +44,7 @@ The bundle includes **all Vaadin components**:
 The bundle comes from **vaadin-prod-bundle** on Maven Central:
 
 ```
-https://repo1.maven.org/maven2/com/vaadin/vaadin-prod-bundle/25.0.4/vaadin-prod-bundle-25.0.4.jar
+https://repo1.maven.org/maven2/com/vaadin/vaadin-prod-bundle/25.0.6/vaadin-prod-bundle-25.0.6.jar
 ```
 
 We use the **unoptimized** version (single file, no code splitting) for simplicity.
@@ -77,22 +77,17 @@ We use the **unoptimized** version (single file, no code splitting) for simplici
 
 ## Updating the Bundle
 
-### Download from Maven Central
+### Using `pyflow bundle` (recommended)
 
 ```bash
-cd /tmp
+# Copy bundle from Maven JARs (auto-downloads from Maven Central if missing)
+pyflow bundle
 
-# Download the JAR
-curl -LO "https://repo1.maven.org/maven2/com/vaadin/vaadin-prod-bundle/25.0.4/vaadin-prod-bundle-25.0.4.jar"
-
-# Extract the unoptimized bundle
-unzip -o vaadin-prod-bundle-25.0.4.jar "vaadin-prod-bundle-unoptimized/webapp/VAADIN/build/*" -d extracted
-
-# Copy to PyFlow (bundle lives inside the package)
-cd /path/to/pyflow
-rm -rf src/pyflow/bundle/VAADIN/build/*
-cp /tmp/extracted/vaadin-prod-bundle-unoptimized/webapp/VAADIN/build/* src/pyflow/bundle/VAADIN/build/
+# Pin a specific version
+pyflow bundle --vaadin-version 25.1.0
 ```
+
+The command extracts the bundle from 4 Maven JARs (prod-bundle, flow-push, lumo-theme, aura-theme). If any JAR is not in `~/.m2/repository/`, it is automatically downloaded from Maven Central.
 
 ### Verify
 
@@ -103,14 +98,22 @@ ls src/pyflow/bundle/VAADIN/build/
 
 ## Bundle Versions
 
+The Vaadin version is configured in `pyproject.toml`:
+
+```toml
+[tool.pyflow]
+vaadin-version = "25.0.6"
+flow-version = "25.0.7"
+```
+
 | PyFlow Version | Vaadin Bundle Version | Notes |
 |----------------|----------------------|-------|
-| Current        | 25.0.4               | All components included |
+| Current        | 25.0.6               | All components included |
 
 ### Upgrading Vaadin Version
 
-1. Find the new version on Maven Central
-2. Download and extract as shown above
+1. Update `vaadin-version` (and `flow-version` if needed) in `pyproject.toml`
+2. Run `pyflow bundle` (auto-downloads new JARs)
 3. Test that PyFlow still works
 4. Update this table
 
@@ -149,7 +152,7 @@ The UIDL protocol might have changed between Vaadin versions:
 
 Clear the browser cache or use incognito mode to ensure the latest bundle is loaded.
 
-## File Sizes (v25.0.4)
+## File Sizes (v25.0.6)
 
 | File | Original | Brotli |
 |------|----------|--------|

@@ -1,15 +1,26 @@
-"""Generate a Maven project that produces the frontend bundle for PyFlow.
+"""Generate or copy the frontend bundle for PyFlow.
+
+Two modes:
+
+1. **copy** (default) -- extract pre-built bundle from Vaadin Maven JARs
+   in ``~/.m2/repository/``.  Instant (seconds), no Java/Maven build needed.
+
+2. **build** -- generate a Maven project, run a full Vite production build,
+   and extract the bundle from the resulting WAR.
 
 Usage (via CLI)::
 
-    # PyFlow developer (from pyflow/ checkout)
-    pyflow --bundle                          # → src/pyflow/bundle/
-    pyflow --bundle --keep                   # keep bundle-project/ for debugging
-    pyflow --bundle --vaadin-version 25.0.4  # pin Vaadin version
+    # Copy from Maven JARs (fast, default)
+    pyflow bundle                            # → src/pyflow/bundle/
+    pyflow bundle --copy                     # explicit
+    pyflow bundle --vaadin-version 25.0.6    # pin version
+
+    # Full Maven build
+    pyflow bundle --build                    # → src/pyflow/bundle/
+    pyflow bundle --build --keep             # keep bundle-project/
 
     # User project
-    pyflow my_app --bundle                   # → my_app/bundle/
-    pyflow my_app --bundle --keep            # keep my_app/bundle-project/
+    pyflow my_app bundle                     # → my_app/bundle/
 """
 
 import os
@@ -19,8 +30,38 @@ import sys
 import zipfile
 from pathlib import Path
 
-# Default Vaadin version (matches bundle-generator/pom.xml)
-_DEFAULT_VAADIN_VERSION = "25.0.4"
+
+def _read_pyproject_versions() -> tuple[str, str]:
+    """Read Vaadin and Flow versions from pyproject.toml [tool.pyflow] section.
+
+    Returns (vaadin_version, flow_version).
+    """
+    pyproject = Path(__file__).parent.parent.parent / "pyproject.toml"
+    if not pyproject.is_file():
+        # Fallback: look relative to package install location
+        pyproject = Path(__file__).parent / "pyproject.toml"
+    vaadin_ver = "25.0.6"
+    flow_ver = "25.0.7"
+    if pyproject.is_file():
+        in_section = False
+        for line in pyproject.read_text().splitlines():
+            stripped = line.strip()
+            if stripped == "[tool.pyflow]":
+                in_section = True
+                continue
+            if in_section and stripped.startswith("["):
+                break
+            if in_section and "=" in stripped:
+                key, _, val = stripped.partition("=")
+                val = val.strip().strip('"')
+                if key.strip() == "vaadin-version":
+                    vaadin_ver = val
+                elif key.strip() == "flow-version":
+                    flow_ver = val
+    return vaadin_ver, flow_ver
+
+
+_DEFAULT_VAADIN_VERSION, _DEFAULT_FLOW_VERSION = _read_pyproject_versions()
 
 
 def generate_pom_xml(vaadin_version: str) -> str:
@@ -333,6 +374,155 @@ def _extract_jar_resources(lib_dir: Path, jar_prefix: str, bundle_dir: Path, lab
                     dst.write(src.read())
 
     print(f"  {label} extracted from {jar_files[0].name}")
+
+
+def _m2_repo() -> Path:
+    """Return the local Maven repository root (~/.m2/repository)."""
+    return Path.home() / ".m2" / "repository"
+
+
+def _find_m2_jar(group_path: str, artifact: str, version: str) -> Path | None:
+    """Locate a JAR in the local Maven repository.
+
+    Args:
+        group_path: e.g. ``"com/vaadin"``
+        artifact: e.g. ``"vaadin-prod-bundle"``
+        version: e.g. ``"25.0.6"``
+
+    Returns the Path if the JAR exists, else *None*.
+    """
+    jar = _m2_repo() / group_path / artifact / version / f"{artifact}-{version}.jar"
+    return jar if jar.is_file() else None
+
+
+def _download_jar(group_path: str, artifact: str, version: str) -> Path:
+    """Download a JAR from Maven Central into ~/.m2/repository/.
+
+    Returns the local path to the downloaded JAR.
+    Raises SystemExit on failure.
+    """
+    import urllib.request
+    import urllib.error
+
+    jar_dir = _m2_repo() / group_path / artifact / version
+    jar_path = jar_dir / f"{artifact}-{version}.jar"
+
+    # Maven Central URL
+    group_url = group_path.replace(os.sep, "/")
+    url = f"https://repo1.maven.org/maven2/{group_url}/{artifact}/{version}/{artifact}-{version}.jar"
+
+    print(f"  Downloading {artifact}-{version}.jar ...", end="", flush=True)
+    try:
+        with urllib.request.urlopen(url) as resp:
+            data = resp.read()
+            size_mb = len(data) / 1024 / 1024
+            jar_dir.mkdir(parents=True, exist_ok=True)
+            jar_path.write_bytes(data)
+            print(f" ({size_mb:.1f} MB)")
+    except urllib.error.HTTPError as e:
+        print(f" FAILED")
+        print(f"\n  ERROR: HTTP {e.code} downloading {url}")
+        print(f"  Check that the artifact and version exist on Maven Central.")
+        sys.exit(1)
+    except urllib.error.URLError as e:
+        print(f" FAILED")
+        print(f"\n  ERROR: {e.reason}")
+        print(f"  URL: {url}")
+        sys.exit(1)
+
+    return jar_path
+
+
+def _extract_jar_to(jar_path: Path, prefix: str, dest_dir: Path, *, strip_prefix: str = "") -> int:
+    """Extract files from *jar_path* whose names start with *prefix*.
+
+    Args:
+        jar_path: Path to the JAR file.
+        prefix: Only extract entries starting with this.
+        dest_dir: Root directory to write into.
+        strip_prefix: Remove this prefix from entry names before writing.
+            Defaults to *prefix* itself.
+
+    Returns the number of files extracted.
+    """
+    if not strip_prefix:
+        strip_prefix = prefix
+    count = 0
+    with zipfile.ZipFile(jar_path) as zf:
+        for entry in zf.namelist():
+            if entry.startswith(prefix) and not entry.endswith("/"):
+                rel = entry[len(strip_prefix):]
+                dest = dest_dir / rel
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                with zf.open(entry) as src, open(dest, "wb") as dst:
+                    dst.write(src.read())
+                count += 1
+    return count
+
+
+def copy_from_jars(
+    bundle_dir: Path,
+    vaadin_version: str = _DEFAULT_VAADIN_VERSION,
+) -> None:
+    """Extract a complete bundle from pre-built Vaadin Maven JARs.
+
+    This is much faster than a full Maven build and produces the exact same
+    files.  Requires the JARs to be present in ``~/.m2/repository/``.
+    """
+    flow_version = _DEFAULT_FLOW_VERSION
+
+    # --- Locate all 4 JARs (download if missing) -----------------------------
+    specs = [
+        ("prod-bundle", "vaadin-prod-bundle", vaadin_version),
+        ("flow-push", "flow-push", flow_version),
+        ("lumo-theme", "vaadin-lumo-theme", vaadin_version),
+        ("aura-theme", "vaadin-aura-theme", vaadin_version),
+    ]
+    found: dict[str, Path] = {}
+    for label, artifact, ver in specs:
+        jar = _find_m2_jar("com/vaadin", artifact, ver)
+        if jar is None:
+            jar = _download_jar("com/vaadin", artifact, ver)
+        found[label] = jar
+
+    # --- Clean existing bundle ------------------------------------------------
+    vaadin_dir = bundle_dir / "VAADIN"
+    if vaadin_dir.exists():
+        shutil.rmtree(vaadin_dir)
+    for theme in ("lumo", "aura"):
+        d = bundle_dir / theme
+        if d.exists():
+            shutil.rmtree(d)
+    bundle_dir.mkdir(parents=True, exist_ok=True)
+
+    # --- Extract prod-bundle (unoptimized -- includes ALL components) ---------
+    prod_jar = found["prod-bundle"]
+    prefix = "vaadin-prod-bundle-unoptimized/webapp/"
+    n = _extract_jar_to(prod_jar, prefix, bundle_dir)
+    print(f"  prod-bundle: {n} files from {prod_jar.name}")
+
+    # --- Extract flow-push (push scripts) -------------------------------------
+    push_jar = found["flow-push"]
+    n = _extract_jar_to(push_jar, "META-INF/resources/", bundle_dir, strip_prefix="META-INF/resources/")
+    print(f"  flow-push:   {n} files from {push_jar.name}")
+
+    # --- Extract Lumo theme ---------------------------------------------------
+    lumo_jar = found["lumo-theme"]
+    n = _extract_jar_to(lumo_jar, "META-INF/resources/lumo/", bundle_dir, strip_prefix="META-INF/resources/")
+    print(f"  lumo-theme:  {n} files from {lumo_jar.name}")
+
+    # --- Extract Aura theme ---------------------------------------------------
+    aura_jar = found["aura-theme"]
+    n = _extract_jar_to(aura_jar, "META-INF/resources/aura/", bundle_dir, strip_prefix="META-INF/resources/")
+    print(f"  aura-theme:  {n} files from {aura_jar.name}")
+
+    # --- Report ---------------------------------------------------------------
+    js_size = sum(f.stat().st_size for f in bundle_dir.rglob("*.js"))
+    css_size = sum(f.stat().st_size for f in bundle_dir.rglob("*.css"))
+    print()
+    print(f"  JavaScript: {js_size / 1024 / 1024:.2f} MB")
+    print(f"  CSS: {css_size / 1024:.1f} KB")
+    print(f"  Bundle extracted to: {bundle_dir}")
 
 
 def generate_and_build(

@@ -50,6 +50,10 @@ Documentation = "https://vaadin.com/docs"
 [tool.hatch.build.targets.wheel]
 packages = ["src/pyflow"]
 
+[tool.pyflow]
+vaadin-version = "25.0.6"
+flow-version = "25.0.7"
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests/unit"]

@@ -24,7 +24,7 @@ class TestGenerateAndBuildPyflowDev:
              patch("pyflow.bundle_generator.build_and_extract") as mock_build:
             # generate_project is mocked, so create the dir it would create
             mock_gen.side_effect = lambda d, v: d.mkdir(parents=True, exist_ok=True)
-            generate_and_build(app_dir=None, keep=False, vaadin_version="25.0.4")
+            generate_and_build(app_dir=None, keep=False, vaadin_version="25.0.6")
 
             # Should target src/pyflow/bundle/
             bundle_dir = mock_build.call_args[0][1]
@@ -179,9 +179,9 @@ class TestGenerateAndBuildReuse:
 class TestCliArgParsing:
     """Test CLI argument parsing in main()."""
 
-    def _run_main(self, argv):
-        """Run main() with given argv, capturing the generate_and_build call."""
-        with patch("sys.argv", ["vaadin"] + argv), \
+    def _run_main_build(self, argv):
+        """Run main() with --build flag, capturing the generate_and_build call."""
+        with patch("sys.argv", ["pyflow"] + argv), \
              patch("pyflow.bundle_generator.generate_and_build") as mock_gab:
             from pyflow.app import main
             with pytest.raises(SystemExit) as exc_info:
@@ -189,56 +189,72 @@ class TestCliArgParsing:
             assert exc_info.value.code == 0
             return mock_gab
 
-    def test_bundle_only(self):
-        """vaadin --bundle → generate_and_build(app_dir=None)."""
-        mock = self._run_main(["--bundle"])
+    def _run_main_copy(self, argv):
+        """Run main() with copy mode, capturing the copy_from_jars call."""
+        with patch("sys.argv", ["pyflow"] + argv), \
+             patch("pyflow.bundle_generator.copy_from_jars") as mock_cfj:
+            from pyflow.app import main
+            with pytest.raises(SystemExit) as exc_info:
+                main()
+            assert exc_info.value.code == 0
+            return mock_cfj
+
+    def test_bundle_build_only(self):
+        """pyflow --bundle --build -> generate_and_build(app_dir=None)."""
+        mock = self._run_main_build(["--bundle", "--build"])
         mock.assert_called_once()
         assert mock.call_args[1]["app_dir"] is None
         assert mock.call_args[1]["keep"] is False
 
-    def test_bundle_with_module(self):
-        """vaadin my_app --bundle → app_dir=cwd/my_app."""
-        mock = self._run_main(["my_app", "--bundle"])
+    def test_bundle_build_with_module(self):
+        """pyflow my_app --bundle --build -> app_dir=cwd/my_app."""
+        mock = self._run_main_build(["my_app", "--bundle", "--build"])
         mock.assert_called_once()
         app_dir = mock.call_args[1]["app_dir"]
         assert app_dir is not None
         assert app_dir.name == "my_app"
 
-    def test_bundle_with_keep(self):
-        """vaadin --bundle --keep → keep=True."""
-        mock = self._run_main(["--bundle", "--keep"])
+    def test_bundle_build_with_keep(self):
+        """pyflow --bundle --build --keep -> keep=True."""
+        mock = self._run_main_build(["--bundle", "--build", "--keep"])
         assert mock.call_args[1]["keep"] is True
 
-    def test_bundle_with_module_and_keep(self):
-        """vaadin my_app --bundle --keep → app_dir + keep=True."""
-        mock = self._run_main(["my_app", "--bundle", "--keep"])
+    def test_bundle_build_with_module_and_keep(self):
+        """pyflow my_app --bundle --build --keep -> app_dir + keep=True."""
+        mock = self._run_main_build(["my_app", "--bundle", "--build", "--keep"])
         assert mock.call_args[1]["app_dir"].name == "my_app"
         assert mock.call_args[1]["keep"] is True
 
-    def test_bundle_with_vaadin_version(self):
-        """vaadin --bundle --vaadin-version 25.1.0 → custom version."""
-        mock = self._run_main(["--bundle", "--vaadin-version", "25.1.0"])
+    def test_bundle_build_with_vaadin_version(self):
+        """pyflow --bundle --build --vaadin-version 25.1.0 -> custom version."""
+        mock = self._run_main_build(["--bundle", "--build", "--vaadin-version", "25.1.0"])
         assert mock.call_args[1]["vaadin_version"] == "25.1.0"
 
     def test_bundle_default_vaadin_version(self):
-        """vaadin --bundle → default version 25.0.4."""
-        mock = self._run_main(["--bundle"])
-        assert mock.call_args[1]["vaadin_version"] == "25.0.4"
+        """pyflow bundle -> default version from pyproject.toml (25.0.6)."""
+        from pyflow.bundle_generator import _DEFAULT_VAADIN_VERSION
+        mock = self._run_main_copy(["bundle"])
+        assert mock.call_args[0][1] == _DEFAULT_VAADIN_VERSION
+
+    def test_bundle_copy_custom_version(self):
+        """pyflow bundle --vaadin-version 25.1.0 -> custom version."""
+        mock = self._run_main_copy(["bundle", "--vaadin-version", "25.1.0"])
+        assert mock.call_args[0][1] == "25.1.0"
 
     def test_module_with_hyphen_converted_to_underscore(self):
-        """vaadin my-app --bundle → app_dir=cwd/my_app."""
-        mock = self._run_main(["my-app", "--bundle"])
+        """pyflow my-app --bundle --build -> app_dir=cwd/my_app."""
+        mock = self._run_main_build(["my-app", "--bundle", "--build"])
         assert mock.call_args[1]["app_dir"].name == "my_app"
 
     def test_bundle_flag_after_module(self):
-        """vaadin demo --bundle works (not just vaadin --bundle)."""
-        mock = self._run_main(["demo", "--bundle"])
+        """pyflow demo --bundle --build works."""
+        mock = self._run_main_build(["demo", "--bundle", "--build"])
         mock.assert_called_once()
         assert mock.call_args[1]["app_dir"].name == "demo"
 
     def test_all_flags_combined(self):
-        """vaadin my_app --bundle --keep --vaadin-version 25.1.0."""
-        mock = self._run_main(["my_app", "--bundle", "--keep", "--vaadin-version", "25.1.0"])
+        """pyflow my_app --bundle --build --keep --vaadin-version 25.1.0."""
+        mock = self._run_main_build(["my_app", "--bundle", "--build", "--keep", "--vaadin-version", "25.1.0"])
         assert mock.call_args[1]["app_dir"].name == "my_app"
         assert mock.call_args[1]["keep"] is True
         assert mock.call_args[1]["vaadin_version"] == "25.1.0"

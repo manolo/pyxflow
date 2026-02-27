@@ -161,7 +161,7 @@ def _auto_detect_app() -> str | None:
 
 def _usage() -> None:
     print("Usage: pyflow [app_module] [--dev] [--debug] [--port PORT] [--host HOST]")
-    print("       pyflow [app_module] bundle [--keep] [--vaadin-version VERSION]")
+    print("       pyflow [app_module] bundle [--copy|--build] [--vaadin-version VERSION]")
     print("       pyflow --vscode")
     print("       pyflow --setup [app_name]")
     print()
@@ -170,8 +170,10 @@ def _usage() -> None:
     print("  --debug     Verbose UIDL protocol logging")
     print("  --port N    Server port (default: 8080)")
     print("  --host H    Server host (default: localhost)")
-    print("  bundle      Generate frontend bundle from component registry")
-    print("  --keep      Keep build/bundle-project/ after extraction")
+    print("  bundle      Generate frontend bundle")
+    print("  --copy      Copy bundle from Maven JARs in ~/.m2 (default, fast)")
+    print("  --build     Full Maven build (slower, generates custom bundle)")
+    print("  --keep      Keep bundle-project/ after build (only with --build)")
     print("  --vscode    Generate .vscode/ config and install recommended extensions")
     print("  --setup     Scaffold a new Vaadin PyFlow project (views, static, __main__.py)")
     sys.exit(0)
@@ -402,10 +404,13 @@ def main():
 
     if "--bundle" in rest:
         from pathlib import Path
-        from pyflow.bundle_generator import generate_and_build
+        from pyflow.bundle_generator import (
+            generate_and_build, copy_from_jars, _DEFAULT_VAADIN_VERSION,
+        )
 
         keep = "--keep" in rest
-        vaadin_version = "25.0.4"
+        use_build = "--build" in rest
+        vaadin_version = _DEFAULT_VAADIN_VERSION
         if "--vaadin-version" in rest:
             idx = rest.index("--vaadin-version")
             vaadin_version = rest[idx + 1]
@@ -420,7 +425,34 @@ def main():
         if cwd not in sys.path:
             sys.path.insert(0, cwd)
 
-        generate_and_build(app_dir=app_dir, keep=keep, vaadin_version=vaadin_version)
+        if use_build:
+            generate_and_build(app_dir=app_dir, keep=keep, vaadin_version=vaadin_version)
+        else:
+            # Default: copy from Maven JARs (fast, no build needed)
+            is_pyflow_dev = (Path.cwd() / "src" / "pyflow").is_dir()
+            if is_pyflow_dev:
+                bundle_dir = Path.cwd() / "src" / "pyflow" / "bundle"
+            elif app_dir:
+                bundle_dir = app_dir / "bundle"
+            else:
+                print("ERROR: Cannot determine bundle output directory.")
+                print("  Run from a pyflow source tree (src/pyflow/ exists)")
+                print("  or specify an app module: pyflow <app_module> bundle")
+                sys.exit(1)
+
+            print("===================================================")
+            print("  Vaadin PyFlow Bundle Generator (copy mode)")
+            print("===================================================")
+            print(f"  Vaadin version: {vaadin_version}")
+            print(f"  Bundle output:  {bundle_dir}")
+            print()
+
+            copy_from_jars(bundle_dir, vaadin_version)
+
+            print()
+            print("===================================================")
+            print("  Bundle copied successfully!")
+            print("===================================================")
         sys.exit(0)
 
     if views is None or views == ".":
