@@ -8,7 +8,9 @@ Write your code and business logic in Python. It runs on the server. The browser
 
 Under the hood, PyFlow uses the same server-driven architecture as [Vaadin Flow](https://vaadin.com/flow) but entirely written in Python, and ships with 49 [Vaadin web components](https://vaadin.com/components): enterprise-grade, accessible, and battle-tested over years.
 
-<img src="docs/screenshots/architecture-diagram.png" alt="Architecture" >
+<p align="center">
+  <img src="docs/screenshots/architecture-diagram.png" alt="Architecture">
+</p>
 
 ---
 
@@ -20,12 +22,13 @@ from pyflow.components import *
 class HelloView(HorizontalLayout):
     def __init__(self):
         name = TextField("Your name")
-        button = Button("Say hello", lambda e:
-            Notification.show(f"Hello {name.value}"))
+        button = Button("Say hello", lambda e: Notification.show(f"Hello {name.value}"))
         self.add(name, button)
 ```
 
-<img src="docs/screenshots/screenshot-hello-crop.gif" alt="Hello World" width="500">
+<p align="center">
+  <img src="docs/screenshots/screenshot-hello-crop.gif" alt="Hello World" width="500">
+</p>
 
 ## Features
 
@@ -51,7 +54,9 @@ The included demo app showcases real-world patterns across 8 views:
 | Stopwatch | `/push-demo` | WebSocket push -- server updates UI every second |
 | File Explorer | `/file-explorer` | TreeGrid + @ClientCallable for server method calls |
 
-<img src="docs/screenshots/demo-tour.gif" alt="Demo tour" width="700">
+<p align="center">
+  <img src="docs/screenshots/demo-tour.gif" alt="Demo tour" width="700">
+</p>
 
 ### Run the demo
 
@@ -193,7 +198,9 @@ Requires `@Push` on the `@AppShell` class.
 
 ## Components
 
-<img src="docs/screenshots/screenshot-components.gif" alt="Components" width="650">
+<p align="center">
+  <img src="docs/screenshots/screenshot-components.gif" alt="Components" width="650">
+</p>
 
 | Type | Component | Description |
 |------|-----------|-------------|
