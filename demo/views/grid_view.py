@@ -176,14 +176,14 @@ class GridEditorDemoView(VerticalLayout):
 
         # Escape key on grid triggers cancel (client-side JS -- grid stops
         # propagation of keydown so server-side listeners never fire)
-        grid.execute_js("""
-            $0.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    var btn = document.getElementById('editor-cancel-btn');
-                    if (btn && !btn.disabled) btn.click();
-                }
-            });
-        """)
+        # grid.execute_js("""
+        #     $0.addEventListener('keydown', function(e) {
+        #         if (e.key === 'Escape') {
+        #             var btn = document.getElementById('editor-cancel-btn');
+        #             if (btn && !btn.disabled) btn.click();
+        #         }
+        #     });
+        # """)
 
         editor.add_save_listener(
             lambda e: Notification.show(
