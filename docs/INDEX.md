@@ -96,7 +96,7 @@ class HelloView(HorizontalLayout):
 | # | Icon | Title | Description |
 |---|------|-------|-------------|
 | 1 | Star | Pure Python | Write your entire UI in Python. No JavaScript, no HTML templates, no CSS. Just clean, idiomatic Python code. |
-| 2 | Grid (4 squares) | 49+ Vaadin Components | Enterprise-grade UI components: Grid, Forms, Charts, Login, MenuBar, TreeGrid, and many more. Battle-tested at scale. |
+| 2 | Grid (4 squares) | 50+ Vaadin Components | Enterprise-grade UI components: Grid, Forms, Charts, Login, MenuBar, TreeGrid, and many more. Battle-tested at scale. |
 | 3 | Lightning bolt | Real-time Push | Built-in WebSocket support for live updates. Stream data to the browser in real time with server push. |
 | 4 | Refresh arrow | Hot Reload | Instant feedback with `--dev` mode. Edit your Python code and see changes reflected immediately in the browser. |
 
@@ -252,7 +252,7 @@ class MasterDetailView(Div):
 |-------|-------|
 | ID | `gallery` |
 | Title | `Component Gallery` |
-| Subtitle | `49+ enterprise-grade Vaadin components, all accessible from Python.` |
+| Subtitle | `50+ enterprise-grade Vaadin components, all accessible from Python.` |
 
 **Images:**
 

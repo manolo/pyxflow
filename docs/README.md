@@ -64,7 +64,7 @@ Para generar una página similar desde cero, usar un prompt como:
 > **Secciones (en orden):**
 > 1. **Nav fija** — Logo + links a secciones, efecto frosted glass con backdrop-filter
 > 2. **Hero** (full viewport) — Título "Build Web Apps in Pure Python", animación de typing character-by-character en un bloque de código hello world, botones CTA
-> 3. **Why PyXFlow** — 4 cards: Pure Python, 49+ Components, Real-time Push, Hot Reload. Con iconos SVG inline
+> 3. **Why PyXFlow** — 4 cards: Pure Python, 50+ Components, Real-time Push, Hot Reload. Con iconos SVG inline
 > 4. **Architecture** — Diagrama animado Server ↔ WebSocket ↔ Browser (thin client), con items positivos en server y negativos con escudos en browser. Subtítulo: "Your code runs on the server. The browser is just a Thin-Client." + 3 benefit cards (Zero Attack Surface, Server-side State, Minimal Bandwidth)
 > 5. **Code Showcase** — 3 ejemplos side-by-side (código + screenshot): Hello World, Data Grid, Master-Detail CRUD. Layout alternado
 > 6. **Component Gallery** — Screenshots de componentes (galería, file explorer, stopwatch)

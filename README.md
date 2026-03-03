@@ -6,7 +6,7 @@
 
 Write your code and business logic in Python. It runs on the server. The browser is just a thin client rendering standard web components: you never touch the frontend.
 
-Under the hood, PyXFlow uses the same server-driven architecture as [Vaadin Flow](https://vaadin.com/flow) but entirely written in Python, and ships with 49 [Vaadin web components](https://vaadin.com/components): enterprise-grade, accessible, and battle-tested over years.
+Under the hood, PyXFlow uses the same server-driven architecture as [Vaadin Flow](https://vaadin.com/flow) but entirely written in Python, and ships with 50+ [Vaadin web components](https://vaadin.com/components): enterprise-grade, accessible, and battle-tested over years.
 
 <p align="center">
   <img src="docs/screenshots/architecture-diagram.png" alt="Architecture">
