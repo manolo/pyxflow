@@ -55,7 +55,7 @@ The included demo app showcases real-world patterns across 8 views:
 | File Explorer | `/file-explorer` | TreeGrid + @ClientCallable for server method calls |
 
 <p align="center">
-  <img src="https://github.com/manolo/pyxflow/releases/download/v0.4.1/demo-tour.gif" alt="Demo tour" width="700">
+  <img src="https://raw.githubusercontent.com/manolo/pyxflow/main/docs/screenshots/screenshot-master-detail.png" alt="Demo - Master Detail" width="700">
 </p>
 
 ### Run the demo
@@ -199,7 +199,7 @@ Requires `@Push` on the `@AppShell` class.
 ## Components
 
 <p align="center">
-  <img src="https://github.com/manolo/pyxflow/releases/download/v0.4.1/screenshot-components.gif" alt="Components" width="650">
+  <img src="https://raw.githubusercontent.com/manolo/pyxflow/main/docs/screenshots/screenshot-components.png" alt="Components" width="650">
 </p>
 
 | Type | Component | Description |
