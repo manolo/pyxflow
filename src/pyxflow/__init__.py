@@ -1,6 +1,6 @@
 """Vaadin Flow for Python - Server-side UI framework."""
 
-__version__ = "0.1.0"
+__version__ = "0.4.0"
 
 from pyxflow.core.component import Component
 from pyxflow.core.element import Element
