@@ -5,7 +5,7 @@
 <style>
 *{margin:0;box-sizing:border-box}
 body{background:linear-gradient(135deg,#0d1117,#161b22 50%,#0d1117);display:flex;align-items:center;justify-content:center;min-height:100vh;overflow:hidden}
-.sdd-text,.pyflow-text{transition:opacity 0.5s ease}
+.sdd-text,.pyxflow-text{transition:opacity 0.5s ease}
 .step{transition:transform 0.5s ease}
 .step.active{transform:scale(1.6)}
 .btn{position:fixed;bottom:24px;right:24px;background:rgba(22,118,243,0.15);border:1px solid rgba(22,118,243,0.3);color:#8899aa;font-family:system-ui,-apple-system,sans-serif;font-size:13px;padding:8px 18px;border-radius:8px;cursor:pointer;transition:all 0.2s;z-index:10}
@@ -42,7 +42,7 @@ body{background:linear-gradient(135deg,#0d1117,#161b22 50%,#0d1117);display:flex
       <stop offset="100%" stop-color="#0d3b7a"/>
       <animateTransform attributeName="gradientTransform" type="translate" values="-50,0;450,0;-50,0" dur="14s" repeatCount="indefinite"/>
     </linearGradient>
-    <!-- Animated sweeping gradient for PyFlow label -->
+    <!-- Animated sweeping gradient for PyXFlow label -->
     <linearGradient id="grad-green" x1="0" y1="0" x2="200" y2="0" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#064e3b"/>
       <stop offset="40%" stop-color="#6ee7b7"/>
@@ -69,7 +69,7 @@ body{background:linear-gradient(135deg,#0d1117,#161b22 50%,#0d1117);display:flex
   <text id="mode-sdd" class="mode-label" x="310" y="252" text-anchor="middle"
         font-family="system-ui,-apple-system,sans-serif" font-size="20" font-weight="800"
         letter-spacing="0.5" fill="url(#grad-blue)">Spec-Driven Development</text>
-  <text id="mode-pyflow" class="mode-label hidden slide-down" x="310" y="252" text-anchor="middle"
+  <text id="mode-pyxflow" class="mode-label hidden slide-down" x="310" y="252" text-anchor="middle"
         font-family="system-ui,-apple-system,sans-serif" font-size="20" font-weight="800"
         letter-spacing="0.5" fill="url(#grad-green)">Python Flow Implementation</text>
 
@@ -80,7 +80,7 @@ body{background:linear-gradient(135deg,#0d1117,#161b22 50%,#0d1117);display:flex
       <text x="310" y="56" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif"><tspan fill="#1676f3" font-size="12" font-weight="700">1. </tspan><tspan fill="#e6edf3" font-size="14" font-weight="600">Define</tspan></text>
       <text x="310" y="76" text-anchor="middle" fill="#8899aa" font-family="system-ui,-apple-system,sans-serif" font-size="11">Specs define WHAT</text>
     </g>
-    <g class="pyflow-text" style="opacity:0">
+    <g class="pyxflow-text" style="opacity:0">
       <text x="310" y="56" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif"><tspan fill="#10b981" font-size="12" font-weight="700">1. </tspan><tspan fill="#e6edf3" font-size="14" font-weight="600">Write spec</tspan></text>
       <text x="310" y="76" text-anchor="middle" fill="#8899aa" font-family="system-ui,-apple-system,sans-serif" font-size="11">from Java source</text>
     </g>
@@ -93,7 +93,7 @@ body{background:linear-gradient(135deg,#0d1117,#161b22 50%,#0d1117);display:flex
       <text x="486" y="184" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif"><tspan fill="#1676f3" font-size="12" font-weight="700">2. </tspan><tspan fill="#e6edf3" font-size="14" font-weight="600">Generate</tspan></text>
       <text x="486" y="204" text-anchor="middle" fill="#8899aa" font-family="system-ui,-apple-system,sans-serif" font-size="11">Agents define HOW</text>
     </g>
-    <g class="pyflow-text" style="opacity:0">
+    <g class="pyxflow-text" style="opacity:0">
       <text x="486" y="184" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif"><tspan fill="#10b981" font-size="12" font-weight="700">2. </tspan><tspan fill="#e6edf3" font-size="14" font-weight="600">Generate code</tspan></text>
       <text x="486" y="204" text-anchor="middle" fill="#8899aa" font-family="system-ui,-apple-system,sans-serif" font-size="11">AI agent from spec</text>
     </g>
@@ -106,7 +106,7 @@ body{background:linear-gradient(135deg,#0d1117,#161b22 50%,#0d1117);display:flex
       <text x="419" y="391" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif"><tspan fill="#1676f3" font-size="12" font-weight="700">3. </tspan><tspan fill="#e6edf3" font-size="14" font-weight="600">Validate</tspan></text>
       <text x="419" y="411" text-anchor="middle" fill="#8899aa" font-family="system-ui,-apple-system,sans-serif" font-size="11">Tests + human review</text>
     </g>
-    <g class="pyflow-text" style="opacity:0">
+    <g class="pyxflow-text" style="opacity:0">
       <text x="419" y="391" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif"><tspan fill="#10b981" font-size="12" font-weight="700">3. </tspan><tspan fill="#e6edf3" font-size="14" font-weight="600">Run tests</tspan></text>
       <text x="419" y="411" text-anchor="middle" fill="#8899aa" font-family="system-ui,-apple-system,sans-serif" font-size="11">2,457 unit · 446 UI</text>
     </g>
@@ -119,7 +119,7 @@ body{background:linear-gradient(135deg,#0d1117,#161b22 50%,#0d1117);display:flex
       <text x="201" y="391" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif"><tspan fill="#1676f3" font-size="12" font-weight="700">4. </tspan><tspan fill="#e6edf3" font-size="14" font-weight="600">Discover</tspan></text>
       <text x="201" y="411" text-anchor="middle" fill="#8899aa" font-family="system-ui,-apple-system,sans-serif" font-size="11">Drift, edge cases</text>
     </g>
-    <g class="pyflow-text" style="opacity:0">
+    <g class="pyxflow-text" style="opacity:0">
       <text x="201" y="391" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif"><tspan fill="#10b981" font-size="12" font-weight="700">4. </tspan><tspan fill="#e6edf3" font-size="14" font-weight="600">Find pitfall</tspan></text>
       <text x="201" y="411" text-anchor="middle" fill="#8899aa" font-family="system-ui,-apple-system,sans-serif" font-size="11">45 documented</text>
     </g>
@@ -132,7 +132,7 @@ body{background:linear-gradient(135deg,#0d1117,#161b22 50%,#0d1117);display:flex
       <text x="134" y="184" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif"><tspan fill="#1676f3" font-size="12" font-weight="700">5. </tspan><tspan fill="#e6edf3" font-size="14" font-weight="600">Refine</tspan></text>
       <text x="134" y="204" text-anchor="middle" fill="#8899aa" font-family="system-ui,-apple-system,sans-serif" font-size="11">Update specs, iterate</text>
     </g>
-    <g class="pyflow-text" style="opacity:0">
+    <g class="pyxflow-text" style="opacity:0">
       <text x="134" y="184" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif"><tspan fill="#10b981" font-size="12" font-weight="700">5. </tspan><tspan fill="#e6edf3" font-size="14" font-weight="600">Update spec</tspan></text>
       <text x="134" y="204" text-anchor="middle" fill="#8899aa" font-family="system-ui,-apple-system,sans-serif" font-size="11">prevent recurrence</text>
     </g>
@@ -145,7 +145,7 @@ body{background:linear-gradient(135deg,#0d1117,#161b22 50%,#0d1117);display:flex
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/>
   </svg>
 </button>
-<!-- PyFlow: Python snake icon -->
+<!-- PyXFlow: Python snake icon -->
 <button class="icon-btn pyf" onclick="jumpPyflow()" title="Python Flow Implementation">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 2C8 2 8 4 8 5v3h5v1H6c-2 0-3 1.5-3 4s1 4 3 4h2v-3c0-2 1-3 3-3h4c2 0 3-1 3-3V5c0-2-2-3-6-3z"/><path d="M12 22c4 0 4-2 4-3v-3h-5v-1h7c2 0 3-1.5 3-4s-1-4-3-4h-2v3c0 2-1 3-3 3h-4c-2 0-3 1-3 3v4c0 2 2 3 6 3z"/><circle cx="10" cy="5" r="0.8" fill="currentColor"/><circle cx="14" cy="19" r="0.8" fill="currentColor"/>
@@ -160,9 +160,9 @@ body{background:linear-gradient(135deg,#0d1117,#161b22 50%,#0d1117);display:flex
 <script>
 const steps = document.querySelectorAll('.step');
 const sdd = document.querySelectorAll('.sdd-text');
-const pyflow = document.querySelectorAll('.pyflow-text');
+const pyxflow = document.querySelectorAll('.pyxflow-text');
 const modeSdd = document.getElementById('mode-sdd');
-const modePyflow = document.getElementById('mode-pyflow');
+const modePyflow = document.getElementById('mode-pyxflow');
 const svg = document.getElementById('svg');
 
 // Color schemes
@@ -198,7 +198,7 @@ function advance() {
     const i = pos - 5;
     switched[i] = true;
     sdd[i].style.opacity = '0';
-    pyflow[i].style.opacity = '1';
+    pyxflow[i].style.opacity = '1';
     if (i === 0) {
       modeSdd.classList.add('hidden', 'slide-up');
       modePyflow.classList.remove('hidden', 'slide-down');
@@ -213,7 +213,7 @@ function advance() {
     for (let i = 0; i < 5; i++) {
       switched[i] = false;
       sdd[i].style.opacity = '1';
-      pyflow[i].style.opacity = '0';
+      pyxflow[i].style.opacity = '0';
     }
     activate(-1);
   }
@@ -224,7 +224,7 @@ function jumpSdd() {
   for (let i = 0; i < 5; i++) {
     switched[i] = false;
     sdd[i].style.opacity = '1';
-    pyflow[i].style.opacity = '0';
+    pyxflow[i].style.opacity = '0';
   }
   modePyflow.classList.add('hidden', 'slide-down');
   modeSdd.classList.remove('hidden', 'slide-up');
@@ -236,7 +236,7 @@ function jumpPyflow() {
   for (let i = 0; i < 5; i++) {
     switched[i] = true;
     sdd[i].style.opacity = '0';
-    pyflow[i].style.opacity = '1';
+    pyxflow[i].style.opacity = '1';
   }
   modeSdd.classList.add('hidden', 'slide-up');
   modePyflow.classList.remove('hidden', 'slide-down');

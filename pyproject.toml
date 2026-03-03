@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pyflow"
-version = "0.2.0"
+name = "pyxflow"
+version = "0.3.0"
 description = "Python implementation of Vaadin Flow"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -40,17 +40,17 @@ dev = [
 ]
 
 [project.scripts]
-pyflow = "pyflow.app:main"
-vaadin = "pyflow.app:main_deprecated"
+pyxflow = "pyxflow.app:main"
+vaadin = "pyxflow.app:main_deprecated"
 
 [project.urls]
-Homepage = "https://github.com/manolo/pyflow"
+Homepage = "https://github.com/manolo/pyxflow"
 Documentation = "https://vaadin.com/docs"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/pyflow"]
+packages = ["src/pyxflow"]
 
-[tool.pyflow]
+[tool.pyxflow]
 vaadin-version = "25.0.6"
 
 [tool.pytest.ini_options]

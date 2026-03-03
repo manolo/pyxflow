@@ -1,5 +1,5 @@
-from pyflow import Route, Menu
-from pyflow.components import *
+from pyxflow import Route, Menu
+from pyxflow.components import *
 
 @Route("dialog-demo", page_title="Dialog Demo")
 class DialogDemoView(VerticalLayout):

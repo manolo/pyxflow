@@ -10,8 +10,8 @@ class TestAppConfig:
     @pytest.fixture
     def init_response(self):
         """Simulated init response for testing."""
-        from pyflow.server.uidl_handler import UidlHandler
-        from pyflow.core.state_tree import StateTree
+        from pyxflow.server.uidl_handler import UidlHandler
+        from pyxflow.core.state_tree import StateTree
 
         tree = StateTree()
         handler = UidlHandler(tree)
@@ -58,7 +58,7 @@ class TestInitialNodes:
 
     @pytest.fixture(autouse=True)
     def setup(self):
-        from pyflow.router import clear_app_shell
+        from pyxflow.router import clear_app_shell
         clear_app_shell()
         yield
         clear_app_shell()
@@ -66,8 +66,8 @@ class TestInitialNodes:
     @pytest.fixture
     def init_changes(self):
         """Get changes from init response."""
-        from pyflow.server.uidl_handler import UidlHandler
-        from pyflow.core.state_tree import StateTree
+        from pyxflow.server.uidl_handler import UidlHandler
+        from pyxflow.core.state_tree import StateTree
 
         tree = StateTree()
         handler = UidlHandler(tree)

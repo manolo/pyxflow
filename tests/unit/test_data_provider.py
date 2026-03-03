@@ -2,7 +2,7 @@
 
 import pytest
 
-from pyflow.data.provider import (
+from pyxflow.data.provider import (
     CallbackDataProvider,
     DataProvider,
     ListDataProvider,
@@ -10,9 +10,9 @@ from pyflow.data.provider import (
     from_callbacks,
     items_provider,
 )
-from pyflow.components.grid import Grid, Column, GridSortOrder, SortDirection
-from pyflow.components.combo_box import ComboBox
-from pyflow.core.state_tree import StateTree
+from pyxflow.components.grid import Grid, Column, GridSortOrder, SortDirection
+from pyxflow.components.combo_box import ComboBox
+from pyxflow.core.state_tree import StateTree
 
 
 class TestQuery:

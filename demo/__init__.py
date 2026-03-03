@@ -1,1 +1,1 @@
-"""Demo application for PyFlow."""
+"""Demo application for PyXFlow."""

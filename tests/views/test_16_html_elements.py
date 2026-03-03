@@ -1,12 +1,12 @@
 """Test View 19: HTML Elements — /test/html-elements"""
 
-from pyflow import Route
-from pyflow.components import (
+from pyxflow import Route
+from pyxflow.components import (
     Anchor, Div, H1, H2, H3, H4, H5, H6, Hr, IFrame, Image, NativeLabel,
     Paragraph, Pre, Span, VerticalLayout,
     Header, Footer, Section, Nav, Main,
 )
-from pyflow.menu import Menu
+from pyxflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

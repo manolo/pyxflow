@@ -2,9 +2,9 @@
 
 import pytest
 
-from pyflow.components.message_input import MessageInput
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.components.message_input import MessageInput
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 class TestMessageInput:

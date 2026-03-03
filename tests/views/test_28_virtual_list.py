@@ -1,10 +1,10 @@
 """Test View 28: VirtualList — /test/virtual-list"""
 
-from pyflow import Route
-from pyflow.components import (
+from pyxflow import Route
+from pyxflow.components import (
     Button, LitRenderer, Span, VerticalLayout, VirtualList,
 )
-from pyflow.menu import Menu
+from pyxflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

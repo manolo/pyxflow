@@ -2,9 +2,9 @@
 
 import pytest
 
-from pyflow.components.combo_box import ComboBox
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.components.combo_box import ComboBox
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 class TestComboBox:
@@ -382,7 +382,7 @@ class TestComboBoxPrefixComponent:
 
     def test_set_prefix_component_before_attach(self, tree):
         """Prefix component set before attach is attached during ComboBox attach."""
-        from pyflow.components.icon import Icon
+        from pyxflow.components.icon import Icon
         cb = ComboBox()
         icon = Icon("search")
         cb.set_prefix_component(icon)
@@ -400,7 +400,7 @@ class TestComboBoxPrefixComponent:
 
     def test_set_prefix_component_after_attach(self, tree):
         """Prefix component set after attach is attached immediately."""
-        from pyflow.components.span import Span
+        from pyxflow.components.span import Span
         cb = ComboBox()
         cb._attach(tree)
         tree.collect_changes()
@@ -418,7 +418,7 @@ class TestComboBoxPrefixComponent:
 
     def test_prefix_component_becomes_child(self, tree):
         """Prefix component is added as child of the combo box element."""
-        from pyflow.components.icon import Icon
+        from pyxflow.components.icon import Icon
         cb = ComboBox()
         icon = Icon("search")
         cb.set_prefix_component(icon)

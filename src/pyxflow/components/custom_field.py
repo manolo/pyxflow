@@ -1,0 +1,121 @@
+"""CustomField component."""
+
+from typing import Callable, Optional, TYPE_CHECKING
+
+from pyxflow.core.component import Component
+from pyxflow.components.mixins import HasReadOnly, HasValidation, HasRequired
+from pyxflow.components.constants import CustomFieldVariant
+
+if TYPE_CHECKING:
+    from pyxflow.core.state_tree import StateTree
+
+
+class CustomField(HasReadOnly, HasValidation, HasRequired, Component):
+    """A field wrapper that composes a value from its children.
+
+    CustomField allows you to group multiple input fields into a single
+    logical field with a combined value. The value is a tab-separated
+    string of the children's values by default.
+
+    Usage::
+
+        cf = CustomField("Phone")
+        prefix = Select()
+        prefix.set_items("+1", "+44")
+        number = TextField()
+        cf.add(prefix, number)
+    """
+
+    _v_fqcn = "com.vaadin.flow.component.customfield.CustomField"
+    _tag = "vaadin-custom-field"
+
+    def __init__(self, label: str = ""):
+        self._label = label
+        self._children: list[Component] = []
+        self._value: str = ""
+        self._change_listeners: list[Callable] = []
+        self._helper_text_val = ""
+
+    def _attach(self, tree: "StateTree"):
+        super()._attach(tree)
+        if self._label:
+            self.element.set_property("label", self._label)
+        if self._helper_text_val:
+            self.element.set_property("helperText", self._helper_text_val)
+
+        # Attach children
+        for child in self._children:
+            child._attach(tree)
+            self.element.node.add_child(child.element.node)
+
+        # Listen for change events
+        self.element.add_event_listener("change", self._handle_change)
+
+    def add(self, *components: Component):
+        """Add child components to the custom field."""
+        for component in components:
+            self._children.append(component)
+            if self._element:
+                component._attach(self._element._tree)
+                self.element.node.add_child(component.element.node)
+
+    def remove_all(self):
+        """Remove all child components."""
+        if self._element:
+            for child in self._children:
+                if child._element:
+                    self.element.node.remove_child(child.element.node)
+        for child in self._children:
+            child._parent = None
+        self._children.clear()
+
+    def set_label(self, label: str):
+        self._label = label
+        if self._element:
+            self.element.set_property("label", label)
+
+    def get_label(self) -> str:
+        return self._label
+
+    def set_helper_text(self, text: str):
+        self._helper_text_val = text
+        if self._element:
+            self.element.set_property("helperText", text)
+
+    def get_helper_text(self) -> str:
+        return self._helper_text_val
+
+    def get_value(self) -> str:
+        return self._value
+
+    def set_value(self, value: str):
+        old_value = self._value
+        self._value = value
+        if self._element:
+            self.element.set_property("value", value)
+        if value != old_value:
+            for listener in self._change_listeners:
+                listener({"value": value, "from_client": False})
+
+    def add_value_change_listener(self, listener: Callable):
+        self._change_listeners.append(listener)
+
+    def _handle_change(self, event_data: dict):
+        """Handle change event.
+
+        Value arrives via mSync (_sync_property), not event_data.
+        """
+        for listener in self._change_listeners:
+            listener({"value": self._value, "from_client": True})
+
+    def add_theme_variants(self, *variants: CustomFieldVariant):
+        """Add theme variants to the custom field."""
+        self.add_theme_name(*variants)
+
+    def remove_theme_variants(self, *variants: CustomFieldVariant):
+        """Remove theme variants from the custom field."""
+        self.remove_theme_name(*variants)
+
+    def _sync_property(self, name: str, value):
+        if name == "value":
+            self._value = value or ""

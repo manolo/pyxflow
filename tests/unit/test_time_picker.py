@@ -4,9 +4,9 @@ import datetime
 
 import pytest
 
-from pyflow.components.time_picker import TimePicker
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.components.time_picker import TimePicker
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 class TestTimePicker:

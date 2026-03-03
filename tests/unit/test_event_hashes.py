@@ -2,7 +2,7 @@
 
 import pytest
 
-from pyflow.server.uidl_handler import (
+from pyxflow.server.uidl_handler import (
     compute_event_hash,
     _CLICK_HASH, _CLICK_CONFIG,
     _CHANGE_HASH, _CHANGE_CONFIG,

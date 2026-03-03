@@ -1,6 +1,6 @@
-from pyflow import AppShell, ColorScheme, Push, StyleSheet
-from pyflow.components import *
-from pyflow.menu import get_menu_entries, get_page_header
+from pyxflow import AppShell, ColorScheme, Push, StyleSheet
+from pyxflow.components import *
+from pyxflow.menu import get_menu_entries, get_page_header
 
 
 @AppShell
@@ -10,15 +10,15 @@ from pyflow.menu import get_menu_entries, get_page_header
 class MainLayout(AppLayout):
     def __init__(self):
         # Navbar
-        self._page_header = H2("PyFlow")
+        self._page_header = H2("PyXFlow")
         self.add_to_navbar(DrawerToggle(), self._page_header)
 
         # Drawer with SideNav — populated from @Menu-annotated routes
         nav = SideNav()
-        logo = Image("/images/logo2.png", "PyFlow")
+        logo = Image("/images/logo2.png", "PyXFlow")
         logo.get_style().set("height", "60px")
         name = HorizontalLayout()
-        name.add(H2("PyFlow"))
+        name.add(H2("PyXFlow"))
         name.set_align_items(FlexAlignment.CENTER)
         name.get_style().set("padding", "10px")
         for entry in get_menu_entries():
@@ -30,5 +30,5 @@ class MainLayout(AppLayout):
 
     def show_router_layout_content(self, content):
         super().show_router_layout_content(content)
-        title = get_page_header(content) or "PyFlow"
+        title = get_page_header(content) or "PyXFlow"
         self._page_header.set_text(title)

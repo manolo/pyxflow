@@ -2,10 +2,10 @@
 
 import pytest
 
-from pyflow.components import Button, TextField, Span
-from pyflow.core.keys import Key
-from pyflow.core.state_node import Feature
-from pyflow.core.state_tree import StateTree
+from pyxflow.components import Button, TextField, Span
+from pyxflow.core.keys import Key
+from pyxflow.core.state_node import Feature
+from pyxflow.core.state_tree import StateTree
 
 
 class TestSetId:
@@ -248,7 +248,7 @@ class TestClickShortcut:
         btn.add_click_listener(lambda e: clicked.append(True))
 
         # Simulate keydown dispatch
-        from pyflow.server.uidl_handler import UidlHandler
+        from pyxflow.server.uidl_handler import UidlHandler
         handler = UidlHandler(tree)
         handler._handle_keydown(btn.element.node_id, {"event.key": "Enter"})
 

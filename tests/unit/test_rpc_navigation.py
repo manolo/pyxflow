@@ -6,9 +6,9 @@ Tests view creation, execute commands, and navigation behavior.
 
 import pytest
 
-from pyflow.server.uidl_handler import UidlHandler
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.server.uidl_handler import UidlHandler
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 class TestNavigationCreatesView:
@@ -568,7 +568,7 @@ class TestRouteNotFoundDevMode:
 
     @pytest.fixture
     def session(self):
-        import pyflow.server.http_server as http
+        import pyxflow.server.http_server as http
         old = http._dev_mode
         http._dev_mode = True
         tree = StateTree()
@@ -612,7 +612,7 @@ class TestRouteNotFoundDevMode:
 
     def test_dev_mode_includes_registered_routes(self, session):
         """Dev mode should list actual registered route paths."""
-        from pyflow.router import _routes
+        from pyxflow.router import _routes
         response = self._navigate(session, "nonexistent")
         changes = response.get("changes", [])
         # Check that href attributes include registered paths
@@ -624,7 +624,7 @@ class TestRouteNotFoundDevMode:
 
     def test_production_mode_no_route_links(self):
         """Production mode should NOT show route links."""
-        import pyflow.server.http_server as http
+        import pyxflow.server.http_server as http
         old = http._dev_mode
         http._dev_mode = False
         try:

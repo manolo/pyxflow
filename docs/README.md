@@ -1,16 +1,16 @@
-# PyFlow Landing Website — Asset Sources & Regeneration Guide
+# PyXFlow Landing Website — Asset Sources & Regeneration Guide
 
 **Content source of truth**: `INDEX.md` — section-by-section content for regenerating `index.html`.
 **Design specs**: `SPECS.md` — colors, typography, animations, responsive rules.
 
-Single-page marketing landing for Vaadin PyFlow. Zero external dependencies (no CDN, no fonts, no JS libs, no build tools).
+Single-page marketing landing for Vaadin PyXFlow. Zero external dependencies (no CDN, no fonts, no JS libs, no build tools).
 
 ## Cómo se generó
 
 Se generó con Claude Code en varias sesiones iterativas. El proceso fue:
 
-1. Se describió el concepto general ("landing page para PyFlow, estilo dark, como las de frameworks modernos")
-2. Se capturaron screenshots de la app demo de PyFlow corriendo en local
+1. Se describió el concepto general ("landing page para PyXFlow, estilo dark, como las de frameworks modernos")
+2. Se capturaron screenshots de la app demo de PyXFlow corriendo en local
 3. Se iteró sección por sección: hero con typing animation, feature cards, architecture, code showcase, gallery, quick start
 4. Se refinaron textos, snippets de código, y detalles visuales a lo largo de varias sesiones
 
@@ -18,7 +18,7 @@ Se generó con Claude Code en varias sesiones iterativas. El proceso fue:
 
 ### Screenshots (`screenshots/`)
 
-Capturas de la **app demo de PyFlow** corriendo en localhost con **Lumo Dark theme**, usando Playwright MCP:
+Capturas de la **app demo de PyXFlow** corriendo en localhost con **Lumo Dark theme**, usando Playwright MCP:
 
 | Archivo | Qué muestra | Cómo se capturó |
 |---------|-------------|-----------------|
@@ -34,18 +34,18 @@ Capturas de la **app demo de PyFlow** corriendo en localhost con **Lumo Dark the
 
 | Archivo | Origen |
 |---------|--------|
-| `logo.png` | PNG del logo de PyFlow (serpiente Python + motivo flow, gradiente azul/cyan) |
+| `logo.png` | PNG del logo de PyXFlow (serpiente Python + motivo flow, gradiente azul/cyan) |
 
 ### Código fuente de referencia
 
-Los snippets de código en la página deben coincidir con la API real de PyFlow. Referencia: `pyflow` repo (`https://github.com/manolo/pyflow`).
+Los snippets de código en la página deben coincidir con la API real de PyXFlow. Referencia: `pyxflow` repo (`https://github.com/manolo/pyxflow`).
 
 Patrones clave de la API:
 - `@Route("path")`, `@Menu("Title", icon="vaadin:icon")`, `@Push`, `@AppShell`
 - Vistas son clases que extienden layouts (`VerticalLayout`, `HorizontalLayout`, `SplitLayout`)
 - `Button("text", callback)` — detección automática de parámetros, sin `on_click=`
 - `Grid`, `TreeGrid`, `Binder`, `Notification.show()`
-- `from pyflow import ...` y `from pyflow.components import *`
+- `from pyxflow import ...` y `from pyxflow.components import *`
 
 ## Prompt de regeneración
 
@@ -53,7 +53,7 @@ Para generar una página similar desde cero, usar un prompt como:
 
 ---
 
-> Crea una landing page single-page para **Vaadin PyFlow**, un framework Python para construir web apps con componentes Vaadin. La página debe:
+> Crea una landing page single-page para **Vaadin PyXFlow**, un framework Python para construir web apps con componentes Vaadin. La página debe:
 >
 > **Requisitos técnicos:**
 > - Un solo archivo HTML con CSS y JS embebidos (sin dependencias externas, sin CDN, sin fonts remotas)
@@ -64,7 +64,7 @@ Para generar una página similar desde cero, usar un prompt como:
 > **Secciones (en orden):**
 > 1. **Nav fija** — Logo + links a secciones, efecto frosted glass con backdrop-filter
 > 2. **Hero** (full viewport) — Título "Build Web Apps in Pure Python", animación de typing character-by-character en un bloque de código hello world, botones CTA
-> 3. **Why PyFlow** — 4 cards: Pure Python, 49+ Components, Real-time Push, Hot Reload. Con iconos SVG inline
+> 3. **Why PyXFlow** — 4 cards: Pure Python, 49+ Components, Real-time Push, Hot Reload. Con iconos SVG inline
 > 4. **Architecture** — Diagrama animado Server ↔ WebSocket ↔ Browser (thin client), con items positivos en server y negativos con escudos en browser. Subtítulo: "Your code runs on the server. The browser is just a Thin-Client." + 3 benefit cards (Zero Attack Surface, Server-side State, Minimal Bandwidth)
 > 5. **Code Showcase** — 3 ejemplos side-by-side (código + screenshot): Hello World, Data Grid, Master-Detail CRUD. Layout alternado
 > 6. **Component Gallery** — Screenshots de componentes (galería, file explorer, stopwatch)

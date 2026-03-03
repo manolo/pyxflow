@@ -2,7 +2,7 @@
 
 import pytest
 
-from pyflow.router import (
+from pyxflow.router import (
     BeforeEnterEvent,
     Location,
     QueryParameters,
@@ -11,7 +11,7 @@ from pyflow.router import (
     clear_routes,
     match_route,
 )
-from pyflow.components import VerticalLayout
+from pyxflow.components import VerticalLayout
 
 
 # ---------------------------------------------------------------------------

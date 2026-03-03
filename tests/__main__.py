@@ -6,6 +6,6 @@ import sys
 if "--dev" not in sys.argv:
     sys.argv.append("--dev")
 
-from pyflow import FlowApp
+from pyxflow import FlowApp
 
 FlowApp(port=8088).run()

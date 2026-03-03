@@ -1,8 +1,8 @@
-# PyFlow Landing Website
+# PyXFlow Landing Website
 
 ## What This Is
 
-Single-page marketing landing site for Vaadin PyFlow. Pure HTML+CSS+JS, zero dependencies, no build tools.
+Single-page marketing landing site for Vaadin PyXFlow. Pure HTML+CSS+JS, zero dependencies, no build tools.
 
 **Content source of truth**: `INDEX.md` — section-by-section content for regenerating `index.html`.
 **Design specs**: `SPECS.md` — colors, typography, animations, responsive rules.
@@ -43,7 +43,7 @@ The showcase section has 3 examples with hand-written syntax-highlighted HTML. E
 3. The hero typing animation code is in the `<script>` section — the `codeLines` array contains HTML-encoded lines
 
 ### Updating screenshots
-Screenshots come from the PyFlow demo app. To refresh:
+Screenshots come from the PyXFlow demo app. To refresh:
 1. Start the demo app (ask user which port)
 2. Use Playwright MCP: `browser_navigate` → `browser_take_screenshot`
 3. Save PNGs to `docs/screenshots/`
@@ -78,19 +78,19 @@ Or use Playwright MCP:
 
 ## GitHub URLs
 
-- Repository: `https://github.com/manolo/pyflow`
-- Issues: `https://github.com/manolo/pyflow/issues`
-- Nav GitHub link: `https://github.com/manolo/pyflow`
+- Repository: `https://github.com/manolo/pyxflow`
+- Issues: `https://github.com/manolo/pyxflow/issues`
+- Nav GitHub link: `https://github.com/manolo/pyxflow`
 
-## PyFlow API Patterns (for code snippets)
+## PyXFlow API Patterns (for code snippets)
 
-Code snippets must match the real PyFlow API. Reference source at `~/Github/platform/python/pyflow/`.
+Code snippets must match the real PyXFlow API. Reference source at `~/Github/platform/python/pyxflow/`.
 
 ### Imports
 ```python
-from pyflow import Route, Menu, Push       # decorators
-from pyflow.components import *             # UI components
-from pyflow.data import Binder, ...         # data binding
+from pyxflow import Route, Menu, Push       # decorators
+from pyxflow.components import *             # UI components
+from pyxflow.data import Binder, ...         # data binding
 ```
 
 ### Decorators
@@ -128,7 +128,7 @@ class HelloView(VerticalLayout):
 4. Hero (full viewport, gradient, grid layout)
 5. Hero Code Block (typing animation, window chrome)
 6. Syntax colors (`.kw`, `.fn`, `.str`, `.cls`, `.dec`, `.cmt`, `.op`)
-7. Why PyFlow (feature cards grid)
+7. Why PyXFlow (feature cards grid)
 8. Architecture (illustration, animated diagram with 🛡️ icons for browser negatives, benefit cards)
 9. Code Showcase (alternating side-by-side)
 10. Component Gallery (hero image + grid)

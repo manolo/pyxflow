@@ -2,11 +2,11 @@
 
 import pytest
 
-from pyflow.core.state_tree import StateTree
-from pyflow.components.text_field import TextField
-from pyflow.components.email_field import EmailField
-from pyflow.components.select import Select
-from pyflow.data import Binder, string_to_int
+from pyxflow.core.state_tree import StateTree
+from pyxflow.components.text_field import TextField
+from pyxflow.components.email_field import EmailField
+from pyxflow.components.select import Select
+from pyxflow.data import Binder, string_to_int
 
 
 # --- Helpers ---

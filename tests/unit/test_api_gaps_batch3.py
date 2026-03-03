@@ -2,15 +2,15 @@
 ValueChangeMode, and set_i18n.
 """
 
-from pyflow.components import (
+from pyxflow.components import (
     DatePicker, DateTimePicker, EmailField, HorizontalLayout, NumberField,
     PasswordField, Select, Span, TextArea, TextField, TimePicker,
     Upload, ValueChangeMode, VerticalLayout,
 )
-from pyflow.components.login import LoginForm, LoginOverlay
-from pyflow.components.message_input import MessageInput
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.components.login import LoginForm, LoginOverlay
+from pyxflow.components.message_input import MessageInput
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 def tree():

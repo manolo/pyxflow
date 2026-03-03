@@ -3,8 +3,8 @@
 ## Setup
 
 ```bash
-git clone https://github.com/manolo/pyflow.git
-cd pyflow
+git clone https://github.com/manolo/pyxflow.git
+cd pyxflow
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
@@ -50,9 +50,9 @@ UI tests are in `tests/ui/` and excluded from the default `pytest` run. Use `pyt
 
 ## Frontend bundle
 
-PyFlow ships with a pre-built Vaadin frontend bundle at `src/pyflow/bundle/`. This is the **optimized** version (code-split into lazy-loaded chunks) so the browser only downloads what it needs.
+PyXFlow ships with a pre-built Vaadin frontend bundle at `src/pyxflow/bundle/`. This is the **optimized** version (code-split into lazy-loaded chunks) so the browser only downloads what it needs.
 
-In normal development you **do not need** to run `pyflow bundle` -- the committed bundle is ready to use.
+In normal development you **do not need** to run `pyxflow bundle` -- the committed bundle is ready to use.
 
 You must regenerate and commit the bundle when:
 - Upgrading the Vaadin version in `pyproject.toml` (`vaadin-version` / `flow-version`)
@@ -60,13 +60,13 @@ You must regenerate and commit the bundle when:
 
 ```bash
 # Regenerate from Maven Central JARs (fast, seconds)
-pyflow bundle --optimized
+pyxflow bundle --optimized
 
 # Verify it works
 python -m demo  # check http://localhost:8088
 
 # Commit the updated bundle
-git add src/pyflow/bundle/
+git add src/pyxflow/bundle/
 git commit -m "Update frontend bundle to Vaadin X.Y.Z"
 ```
 
@@ -75,7 +75,7 @@ See `BUNDLE.md` for details on optimized vs unoptimized variants and `--build` m
 ## Project structure
 
 ```
-src/pyflow/
+src/pyxflow/
 ├── core/           # StateTree, StateNode, Element, Component
 ├── components/     # 49 Vaadin components
 ├── data/           # Binder, DataProvider, validators, converters

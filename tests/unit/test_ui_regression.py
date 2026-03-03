@@ -6,8 +6,8 @@ These unit tests ensure the fixes don't regress.
 
 import pytest
 
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 @pytest.fixture
@@ -25,7 +25,7 @@ class TestCheckboxHandleChange:
     """
 
     def test_listener_receives_normalized_event(self, tree):
-        from pyflow.components import Checkbox
+        from pyxflow.components import Checkbox
 
         cb = Checkbox("Accept")
         cb._attach(tree)
@@ -41,7 +41,7 @@ class TestCheckboxHandleChange:
 
     def test_handle_change_casts_to_bool(self, tree):
         """Truthy non-bool values (e.g. 1) must be cast to bool."""
-        from pyflow.components import Checkbox
+        from pyxflow.components import Checkbox
 
         cb = Checkbox("Accept")
         cb._attach(tree)
@@ -52,7 +52,7 @@ class TestCheckboxHandleChange:
 
     def test_handle_change_without_checked_key(self, tree):
         """If event_data has no 'checked' key, don't clobber current value."""
-        from pyflow.components import Checkbox
+        from pyxflow.components import Checkbox
 
         cb = Checkbox("Accept")
         cb._attach(tree)
@@ -71,7 +71,7 @@ class TestCheckboxGroupInitialValue:
     when items are pre-selected before attach."""
 
     def test_initial_value_synced_on_attach(self, tree):
-        from pyflow.components import CheckboxGroup
+        from pyxflow.components import CheckboxGroup
 
         group = CheckboxGroup()
         group.set_items("A", "B", "C")
@@ -99,7 +99,7 @@ class TestComboBoxHandleChangeMSync:
     WITHOUT "value" key (mSync already set it). Must NOT reset to None."""
 
     def test_no_value_key_preserves_msync(self, tree):
-        from pyflow.components import ComboBox
+        from pyxflow.components import ComboBox
 
         cb = ComboBox()
         cb.set_items("Firefox", "Chrome", "Safari")
@@ -115,7 +115,7 @@ class TestComboBoxHandleChangeMSync:
         assert cb.get_value() == "Chrome"  # Must NOT become None
 
     def test_listener_receives_normalized_event(self, tree):
-        from pyflow.components import ComboBox
+        from pyxflow.components import ComboBox
 
         cb = ComboBox()
         cb.set_items("A", "B")
@@ -138,7 +138,7 @@ class TestComboBoxSyncPropertyListeners:
     same as the selected-changed pattern used by Tabs/ListBox."""
 
     def test_sync_property_fires_listener(self, tree):
-        from pyflow.components import ComboBox
+        from pyxflow.components import ComboBox
 
         cb = ComboBox()
         cb.set_items("A", "B", "C")
@@ -154,7 +154,7 @@ class TestComboBoxSyncPropertyListeners:
 
     def test_sync_property_no_event_if_same_value(self, tree):
         """Don't fire listener if value didn't actually change."""
-        from pyflow.components import ComboBox
+        from pyxflow.components import ComboBox
 
         cb = ComboBox()
         cb.set_items("A", "B")
@@ -177,7 +177,7 @@ class TestComboBoxAutoOpenBuffering:
     autoOpenDisabled property when the component is attached."""
 
     def test_auto_open_disabled_before_attach(self, tree):
-        from pyflow.components import ComboBox
+        from pyxflow.components import ComboBox
 
         cb = ComboBox()
         cb.set_auto_open(False)
@@ -199,7 +199,7 @@ class TestNumberFieldHandleChangeMSync:
     must not reset the value that mSync already set."""
 
     def test_no_value_key_preserves_msync(self, tree):
-        from pyflow.components import NumberField
+        from pyxflow.components import NumberField
 
         field = NumberField("Amount")
         field._attach(tree)
@@ -212,7 +212,7 @@ class TestNumberFieldHandleChangeMSync:
         assert field.get_value() == 42.5  # Must NOT become None
 
     def test_listener_receives_normalized_event(self, tree):
-        from pyflow.components import NumberField
+        from pyxflow.components import NumberField
 
         field = NumberField("Amount")
         field._attach(tree)
@@ -233,7 +233,7 @@ class TestIntegerFieldHandleChangeMSync:
     """Same pattern as NumberField."""
 
     def test_no_value_key_preserves_msync(self, tree):
-        from pyflow.components import IntegerField
+        from pyxflow.components import IntegerField
 
         field = IntegerField("Count")
         field._attach(tree)
@@ -246,7 +246,7 @@ class TestIntegerFieldHandleChangeMSync:
         assert field.get_value() == 7  # Must NOT become None
 
     def test_listener_receives_normalized_event(self, tree):
-        from pyflow.components import IntegerField
+        from pyxflow.components import IntegerField
 
         field = IntegerField("Count")
         field._attach(tree)
@@ -269,7 +269,7 @@ class TestGridSelectItem:
     not by string key."""
 
     def test_select_item_by_reference(self, tree):
-        from pyflow.components import Grid
+        from pyxflow.components import Grid
 
         grid = Grid()
         grid.add_column("name", header="Name")
@@ -283,7 +283,7 @@ class TestGridSelectItem:
         assert grid.get_selected_items() == [items[1]]
 
     def test_select_item_by_equality(self, tree):
-        from pyflow.components import Grid
+        from pyxflow.components import Grid
 
         grid = Grid()
         grid.add_column("name", header="Name")
@@ -305,14 +305,14 @@ class TestPopoverInit:
     Component base class attributes (_element, etc.) are initialized."""
 
     def test_has_element_attribute(self):
-        from pyflow.components import Popover
+        from pyxflow.components import Popover
 
         p = Popover()
         assert hasattr(p, "_element")
         assert p._element is None
 
     def test_attach_works(self, tree):
-        from pyflow.components import Popover
+        from pyxflow.components import Popover
 
         p = Popover()
         p._attach(tree)
@@ -329,7 +329,7 @@ class TestNotificationBodyAttachment:
 
     def test_attach_alone_does_not_add_to_body(self, tree):
         """_attach() must NOT add to body — that's for open() only."""
-        from pyflow.components import Notification
+        from pyxflow.components import Notification
 
         n = Notification("Test")
         n._attach(tree)
@@ -347,7 +347,7 @@ class TestNotificationBodyAttachment:
 
     def test_open_attaches_to_body(self, tree):
         """open() with tree context must add to body node."""
-        from pyflow.components.notification import (
+        from pyxflow.components.notification import (
             Notification,
             _set_current_tree,
         )
@@ -382,7 +382,7 @@ class TestElementExecuteJsFormat:
     tree.queue_execute(), not property changes in tree.add_change()."""
 
     def test_execute_js_goes_to_execute_queue(self, tree):
-        from pyflow.components import Button
+        from pyxflow.components import Button
 
         btn = Button("Test")
         btn._attach(tree)
@@ -398,7 +398,7 @@ class TestElementExecuteJsFormat:
         assert cmds[0][0] == {"@v-node": btn.element.node_id}
 
     def test_execute_js_not_in_changes(self, tree):
-        from pyflow.components import Button
+        from pyxflow.components import Button
 
         btn = Button("Test")
         btn._attach(tree)
@@ -413,7 +413,7 @@ class TestElementExecuteJsFormat:
 
     def test_execute_js_element_ref_args(self, tree):
         """Element arguments are converted to @v-node references."""
-        from pyflow.components import Button, Span
+        from pyxflow.components import Button, Span
 
         btn = Button("Test")
         span = Span("Target")
@@ -439,7 +439,7 @@ class TestClearButtonBuffering:
     flushed as a property on attach."""
 
     def test_date_picker_clear_button_before_attach(self, tree):
-        from pyflow.components import DatePicker
+        from pyxflow.components import DatePicker
 
         dp = DatePicker()
         dp.set_clear_button_visible(True)
@@ -450,7 +450,7 @@ class TestClearButtonBuffering:
         assert any(c["value"] is True for c in cbv)
 
     def test_time_picker_clear_button_before_attach(self, tree):
-        from pyflow.components import TimePicker
+        from pyxflow.components import TimePicker
 
         tp = TimePicker()
         tp.set_clear_button_visible(True)
@@ -461,7 +461,7 @@ class TestClearButtonBuffering:
         assert any(c["value"] is True for c in cbv)
 
     def test_multi_select_combo_box_clear_button_before_attach(self, tree):
-        from pyflow.components import MultiSelectComboBox
+        from pyxflow.components import MultiSelectComboBox
 
         mscb = MultiSelectComboBox()
         mscb.set_clear_button_visible(True)
@@ -484,9 +484,9 @@ class TestMSyncBeforeEvents:
     def test_msync_processed_before_keydown(self, tree):
         """Simulate an RPC batch where keydown arrives before mSync.
         The click handler must see the synced value."""
-        from pyflow.components import Button, TextField, VerticalLayout
-        from pyflow.core.keys import Key
-        from pyflow.server.uidl_handler import UidlHandler
+        from pyxflow.components import Button, TextField, VerticalLayout
+        from pyxflow.core.keys import Key
+        from pyxflow.server.uidl_handler import UidlHandler
 
         layout = VerticalLayout()
         tf = TextField("Filter")
@@ -518,9 +518,9 @@ class TestMSyncBeforeEvents:
 
     def test_msync_order_preserved_for_multiple_syncs(self, tree):
         """Multiple mSync RPCs should all be processed before any event."""
-        from pyflow.components import Button, TextField, VerticalLayout
-        from pyflow.core.keys import Key
-        from pyflow.server.uidl_handler import UidlHandler
+        from pyxflow.components import Button, TextField, VerticalLayout
+        from pyxflow.core.keys import Key
+        from pyxflow.server.uidl_handler import UidlHandler
 
         layout = VerticalLayout()
         tf1 = TextField("A")

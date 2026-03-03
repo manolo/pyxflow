@@ -1,5 +1,5 @@
-from pyflow import Menu, Route, StyleSheet
-from pyflow.components import Div, H1, Image, Paragraph
+from pyxflow import Menu, Route, StyleSheet
+from pyxflow.components import Div, H1, Image, Paragraph
 from demo.views.main_layout import MainLayout
 
 
@@ -14,7 +14,7 @@ class AboutView(Div):
         hero = Div()
         hero.add_class_name("about-hero")
 
-        logo = Image("images/logo.png", "PyFlow")
+        logo = Image("images/logo.png", "PyXFlow")
         logo.add_class_name("about-logo")
 
         title = H1("Build Web Apps in Pure Python")

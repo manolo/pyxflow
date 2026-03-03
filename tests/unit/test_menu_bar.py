@@ -2,9 +2,9 @@
 
 import pytest
 
-from pyflow.components.menu_bar import MenuBar, MenuItem, SubMenu
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.components.menu_bar import MenuBar, MenuItem, SubMenu
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 class TestMenuItem:

@@ -1,4 +1,4 @@
-# PyFlow Implementation Status
+# PyXFlow Implementation Status
 
 ## Current State: All 49 Components + WebSocket Push + Multi-UI Sessions + Full UIDL Compatibility
 
@@ -277,13 +277,13 @@ All 12 implementation phases are complete:
 11. ~~Data & Specialized Components (ListBox, MultiSelectComboBox, VirtualList, MessageInput/List, Login, CustomField)~~ ✓
 12. ~~WebSocket Push (Atmosphere protocol, UI.access, push sender)~~ ✓
 
-Plus: `@ClientCallable`, `@ColorScheme`, runtime theme switching, field mixins, Binder, `pyflow --bundle`.
+Plus: `@ClientCallable`, `@ColorScheme`, runtime theme switching, field mixins, Binder, `pyxflow --bundle`.
 
 ### Packaging & Bundle
-- [x] PyPI-ready wheel — `pip install pyflow`
-- [x] Bundle inside package — `src/pyflow/bundle/` ships in wheel (1.5 MB compressed)
-- [x] CLI entry point — `pyflow [app_module] [--dev] [--debug] [--port N]`
-- [x] `pyflow --bundle` — Auto-generate bundle from `_v_fqcn` component registry
-- [x] `pyflow <app> --bundle` — User projects can generate their own bundle
+- [x] PyPI-ready wheel — `pip install pyxflow`
+- [x] Bundle inside package — `src/pyxflow/bundle/` ships in wheel (1.5 MB compressed)
+- [x] CLI entry point — `pyxflow [app_module] [--dev] [--debug] [--port N]`
+- [x] `pyxflow --bundle` — Auto-generate bundle from `_v_fqcn` component registry
+- [x] `pyxflow <app> --bundle` — User projects can generate their own bundle
 - [x] Bundle discovery priority — app-dir bundle > package-internal > cwd fallback
 - [x] Apache 2.0 LICENSE file

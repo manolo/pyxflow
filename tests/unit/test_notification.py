@@ -2,11 +2,11 @@
 
 import pytest
 
-from pyflow.components import Notification, NotificationVariant
-from pyflow.components.notification import _set_current_tree, _get_current_tree
-from pyflow.components.span import Span
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.components import Notification, NotificationVariant
+from pyxflow.components.notification import _set_current_tree, _get_current_tree
+from pyxflow.components.span import Span
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 class TestNotification:
@@ -158,7 +158,7 @@ class TestNotification:
 
     def test_body_attachment_via_open(self, tree):
         """Notification.open() auto-attaches to body (node 1) via tree context."""
-        from pyflow.components.notification import _set_current_tree
+        from pyxflow.components.notification import _set_current_tree
         _set_current_tree(tree)
         try:
             n = Notification("Test")

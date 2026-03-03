@@ -4,9 +4,9 @@ Each test verifies a specific bug that was discovered via Playwright UI tests
 and fixed in the Python port. The tests ensure these regressions don't recur.
 """
 
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
-from pyflow.core.component import UI
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
+from pyxflow.core.component import UI
 
 
 # ---------------------------------------------------------------------------
@@ -42,7 +42,7 @@ class TestSpanSetTextLazyCreation:
 
     def test_empty_span_then_set_text_after_attach(self):
         """set_text() after attach creates text node lazily."""
-        from pyflow.components import Span
+        from pyxflow.components import Span
 
         tree, ui = make_tree()
         span = Span("")
@@ -64,7 +64,7 @@ class TestSpanSetTextLazyCreation:
 
     def test_empty_span_default_no_text_node(self):
         """Span("") should NOT create a text node on attach (no content)."""
-        from pyflow.components import Span
+        from pyxflow.components import Span
 
         tree, ui = make_tree()
         span = Span("")
@@ -79,7 +79,7 @@ class TestSpanSetTextLazyCreation:
 
     def test_span_with_initial_text_creates_node_on_attach(self):
         """Span("hi") should create text node on attach normally."""
-        from pyflow.components import Span
+        from pyxflow.components import Span
 
         tree, ui = make_tree()
         span = Span("hi")
@@ -95,7 +95,7 @@ class TestSpanSetTextLazyCreation:
 
     def test_set_text_updates_existing_node(self):
         """set_text() on a span with existing text node should update it."""
-        from pyflow.components import Span
+        from pyxflow.components import Span
 
         tree, ui = make_tree()
         span = Span("first")
@@ -114,7 +114,7 @@ class TestSpanSetTextLazyCreation:
 
     def test_get_text_reflects_set_text(self):
         """get_text() should return the value set by set_text()."""
-        from pyflow.components import Span
+        from pyxflow.components import Span
 
         tree, ui = make_tree()
         span = Span("")
@@ -139,7 +139,7 @@ class TestSetEnabledFlushOnAttach:
 
     def test_disabled_before_attach_produces_attribute(self):
         """set_enabled(False) before attach should set disabled attribute on attach."""
-        from pyflow.components import Button
+        from pyxflow.components import Button
 
         tree, ui = make_tree()
         button = Button("Save")
@@ -158,7 +158,7 @@ class TestSetEnabledFlushOnAttach:
 
     def test_enabled_before_attach_no_disabled_attribute(self):
         """A normally enabled button should NOT have a disabled attribute."""
-        from pyflow.components import Button
+        from pyxflow.components import Button
 
         tree, ui = make_tree()
         button = Button("Save")
@@ -176,7 +176,7 @@ class TestSetEnabledFlushOnAttach:
 
     def test_enabled_state_tracked_internally(self):
         """is_enabled() should return False after set_enabled(False)."""
-        from pyflow.components import Button
+        from pyxflow.components import Button
 
         button = Button("Save")
         button.set_enabled(False)
@@ -184,7 +184,7 @@ class TestSetEnabledFlushOnAttach:
 
     def test_disabled_span_before_attach(self):
         """set_enabled(False) works on non-button components too."""
-        from pyflow.components import Span
+        from pyxflow.components import Span
 
         tree, ui = make_tree()
         span = Span("text")
@@ -214,7 +214,7 @@ class TestButtonIconOnlyTheme:
 
     def test_icon_only_button_has_icon_theme(self):
         """Icon-only button should have theme='icon'."""
-        from pyflow.components import Button, Icon
+        from pyxflow.components import Button, Icon
 
         tree, ui = make_tree()
         icon = Icon("lumo:plus")
@@ -233,7 +233,7 @@ class TestButtonIconOnlyTheme:
 
     def test_button_with_text_and_icon_no_icon_theme(self):
         """Button with both text and icon should NOT have theme='icon'."""
-        from pyflow.components import Button, Icon
+        from pyxflow.components import Button, Icon
 
         tree, ui = make_tree()
         icon = Icon("lumo:plus")
@@ -253,7 +253,7 @@ class TestButtonIconOnlyTheme:
 
     def test_icon_only_button_has_icon_element(self):
         """Icon-only button should have an icon child element."""
-        from pyflow.components import Button, Icon
+        from pyxflow.components import Button, Icon
 
         tree, ui = make_tree()
         icon = Icon("lumo:plus")
@@ -283,7 +283,7 @@ class TestButtonDisableOnClick:
 
     def test_disable_on_click_disables_on_handle_click(self):
         """_handle_click should disable button when disableOnClick is True."""
-        from pyflow.components import Button
+        from pyxflow.components import Button
 
         tree, ui = make_tree()
         button = Button("Submit")
@@ -306,7 +306,7 @@ class TestButtonDisableOnClick:
 
     def test_disable_on_click_still_fires_listeners(self):
         """Click listeners should still fire even when disableOnClick is True."""
-        from pyflow.components import Button
+        from pyxflow.components import Button
 
         tree, ui = make_tree()
         clicks = []
@@ -321,7 +321,7 @@ class TestButtonDisableOnClick:
 
     def test_no_disable_without_flag(self):
         """Without disableOnClick, button should stay enabled after click."""
-        from pyflow.components import Button
+        from pyxflow.components import Button
 
         tree, ui = make_tree()
         button = Button("Normal")
@@ -333,7 +333,7 @@ class TestButtonDisableOnClick:
 
     def test_programmatic_click_also_disables(self):
         """button.click() (programmatic) should also trigger disableOnClick."""
-        from pyflow.components import Button
+        from pyxflow.components import Button
 
         tree, ui = make_tree()
         button = Button("Submit")
@@ -359,7 +359,7 @@ class TestTextFieldMaxLengthFlush:
 
     def test_maxlength_set_before_attach(self):
         """set_max_length() before attach should be flushed on attach."""
-        from pyflow.components import TextField
+        from pyxflow.components import TextField
 
         tree, ui = make_tree()
         tf = TextField("Name")
@@ -378,7 +378,7 @@ class TestTextFieldMaxLengthFlush:
 
     def test_maxlength_set_after_attach(self):
         """set_max_length() after attach should also work."""
-        from pyflow.components import TextField
+        from pyxflow.components import TextField
 
         tree, ui = make_tree()
         tf = TextField("Name")
@@ -399,7 +399,7 @@ class TestTextFieldMaxLengthFlush:
 
     def test_get_max_length(self):
         """get_max_length() should return the set value."""
-        from pyflow.components import TextField
+        from pyxflow.components import TextField
 
         tf = TextField("Name")
         tf.set_max_length(5)
@@ -420,7 +420,7 @@ class TestTextFieldSuffixFlush:
 
     def test_suffix_set_before_attach(self):
         """set_suffix_component() before attach should be flushed on attach."""
-        from pyflow.components import TextField, Span
+        from pyxflow.components import TextField, Span
 
         tree, ui = make_tree()
         tf = TextField("Weight")
@@ -449,7 +449,7 @@ class TestTextFieldSuffixFlush:
 
     def test_suffix_set_after_attach(self):
         """set_suffix_component() after attach should work immediately."""
-        from pyflow.components import TextField, Span
+        from pyxflow.components import TextField, Span
 
         tree, ui = make_tree()
         tf = TextField("Weight")
@@ -478,8 +478,8 @@ class TestTextFieldSuffixFlush:
 
     def test_prefix_set_before_attach(self):
         """set_prefix_component() before attach should also be flushed."""
-        from pyflow.components import TextField
-        from pyflow.components.icon import Icon
+        from pyxflow.components import TextField
+        from pyxflow.components.icon import Icon
 
         tree, ui = make_tree()
         tf = TextField("Search")
@@ -513,7 +513,7 @@ class TestHandleChangeEventData:
 
     def test_handle_change_passes_value_to_listener(self):
         """_handle_change should pass {value, from_client} to listeners."""
-        from pyflow.components import TextField
+        from pyxflow.components import TextField
 
         tree, ui = make_tree()
         tf = TextField("Name")
@@ -530,7 +530,7 @@ class TestHandleChangeEventData:
 
     def test_handle_change_updates_internal_value(self):
         """_handle_change should update the internal _value."""
-        from pyflow.components import TextField
+        from pyxflow.components import TextField
 
         tree, ui = make_tree()
         tf = TextField("Name")
@@ -542,7 +542,7 @@ class TestHandleChangeEventData:
 
     def test_handle_change_with_empty_event_data(self):
         """_handle_change with empty dict should keep current value."""
-        from pyflow.components import TextField
+        from pyxflow.components import TextField
 
         tree, ui = make_tree()
         tf = TextField("Name")
@@ -560,7 +560,7 @@ class TestHandleChangeEventData:
 
     def test_handle_change_multiple_listeners(self):
         """All listeners should receive the proper event object."""
-        from pyflow.components import TextField
+        from pyxflow.components import TextField
 
         tree, ui = make_tree()
         tf = TextField("Name")

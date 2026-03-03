@@ -2,14 +2,14 @@
 
 import pytest
 
-from pyflow.components import (
+from pyxflow.components import (
     TextField, EmailField, PasswordField, TextArea,
     NumberField, IntegerField, DatePicker, TimePicker, DateTimePicker,
     ComboBox, MultiSelectComboBox, Select, RadioButtonGroup, CheckboxGroup,
     Checkbox, CustomField,
     HasValidation, HasRequired,
 )
-from pyflow.core.state_tree import StateTree
+from pyxflow.core.state_tree import StateTree
 
 
 def create_tree():

@@ -2,8 +2,8 @@
 
 import pytest
 
-from pyflow.components import Checkbox
-from pyflow.core.state_tree import StateTree
+from pyxflow.components import Checkbox
+from pyxflow.core.state_tree import StateTree
 
 
 class TestCheckbox:

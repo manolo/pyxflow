@@ -3,7 +3,7 @@
 from pathlib import Path
 from unittest.mock import patch
 
-from pyflow.server.http_server import (
+from pyxflow.server.http_server import (
     get_bundle_directory,
     set_app_directory,
     _app_directory,
@@ -15,13 +15,13 @@ class TestBundleDiscovery:
 
     def setup_method(self):
         """Save and clear _app_directory."""
-        import pyflow.server.http_server as mod
+        import pyxflow.server.http_server as mod
         self._original = mod._app_directory
         mod._app_directory = None
 
     def teardown_method(self):
         """Restore _app_directory."""
-        import pyflow.server.http_server as mod
+        import pyxflow.server.http_server as mod
         mod._app_directory = self._original
 
     def test_app_directory_bundle_has_highest_priority(self, tmp_path):
@@ -35,7 +35,7 @@ class TestBundleDiscovery:
 
     def test_package_internal_bundle(self):
         """Package-internal bundle (ships in wheel) is found."""
-        import pyflow.server.http_server as mod
+        import pyxflow.server.http_server as mod
         mod._app_directory = None
 
         result = get_bundle_directory()
@@ -57,7 +57,7 @@ class TestBundleDiscovery:
 
     def test_no_bundle_returns_none(self, tmp_path, monkeypatch):
         """When no bundle exists anywhere, returns None."""
-        import pyflow.server.http_server as mod
+        import pyxflow.server.http_server as mod
         mod._app_directory = tmp_path / "nonexistent"
         monkeypatch.chdir(tmp_path)
 
@@ -81,7 +81,7 @@ class TestBundleDiscovery:
 
     def test_cwd_bundle_fallback(self, tmp_path, monkeypatch):
         """./bundle/ in cwd is checked as last resort."""
-        import pyflow.server.http_server as mod
+        import pyxflow.server.http_server as mod
         mod._app_directory = None
         monkeypatch.chdir(tmp_path)
         (tmp_path / "bundle" / "VAADIN").mkdir(parents=True)
@@ -104,23 +104,23 @@ class TestSetAppDirectory:
     """Test set_app_directory()."""
 
     def setup_method(self):
-        import pyflow.server.http_server as mod
+        import pyxflow.server.http_server as mod
         self._original = mod._app_directory
         mod._app_directory = None
 
     def teardown_method(self):
-        import pyflow.server.http_server as mod
+        import pyxflow.server.http_server as mod
         mod._app_directory = self._original
 
     def test_sets_directory(self, tmp_path):
         set_app_directory(tmp_path)
-        import pyflow.server.http_server as mod
+        import pyxflow.server.http_server as mod
         assert mod._app_directory == tmp_path
 
     def test_overwrite(self, tmp_path):
         set_app_directory(tmp_path / "a")
         set_app_directory(tmp_path / "b")
-        import pyflow.server.http_server as mod
+        import pyxflow.server.http_server as mod
         assert mod._app_directory == tmp_path / "b"
 
 
@@ -134,8 +134,8 @@ class TestNamespacePackageResolution:
         views_dir = pkg_dir / "views"
         views_dir.mkdir(parents=True)
         (views_dir / "__init__.py").write_text(
-            "from pyflow.router import Route\n"
-            "from pyflow.components import VerticalLayout\n"
+            "from pyxflow.router import Route\n"
+            "from pyxflow.components import VerticalLayout\n"
             "@Route('')\n"
             "class TestView(VerticalLayout): pass\n"
         )
@@ -150,7 +150,7 @@ class TestNamespacePackageResolution:
         assert hasattr(pkg, "__path__")
 
         # Simulate what _serve does
-        from pyflow.server import http_server
+        from pyxflow.server import http_server
         original = http_server._app_directory
         try:
             http_server._app_directory = None

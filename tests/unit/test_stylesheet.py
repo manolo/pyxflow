@@ -2,10 +2,10 @@
 
 import pytest
 
-from pyflow.router import Route, StyleSheet, AppShell, Push, clear_routes, clear_app_shell
-from pyflow.components import VerticalLayout
-from pyflow.server.uidl_handler import UidlHandler
-from pyflow.core.state_tree import StateTree
+from pyxflow.router import Route, StyleSheet, AppShell, Push, clear_routes, clear_app_shell
+from pyxflow.components import VerticalLayout
+from pyxflow.server.uidl_handler import UidlHandler
+from pyxflow.core.state_tree import StateTree
 
 
 class TestStyleSheetDecorator:

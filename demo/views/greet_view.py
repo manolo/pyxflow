@@ -1,6 +1,6 @@
-from pyflow import Route, PageTitle
+from pyxflow import Route, PageTitle
 from demo.views.main_layout import MainLayout
-from pyflow.components import H2, RouterLink, Span, VerticalLayout
+from pyxflow.components import H2, RouterLink, Span, VerticalLayout
 
 
 @Route("greet/:name", layout=MainLayout)

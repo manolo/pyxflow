@@ -2,8 +2,8 @@
 
 import pytest
 
-from pyflow.components import NumberField, IntegerField
-from pyflow.core.state_tree import StateTree
+from pyxflow.components import NumberField, IntegerField
+from pyxflow.core.state_tree import StateTree
 
 
 class TestNumberField:

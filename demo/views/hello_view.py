@@ -1,6 +1,6 @@
-from pyflow import Menu, Route
-from pyflow.components import *
-from pyflow.components.horizontal_layout import Alignment
+from pyxflow import Menu, Route
+from pyxflow.components import *
+from pyxflow.components.horizontal_layout import Alignment
 from demo.views.main_layout import MainLayout
 
 

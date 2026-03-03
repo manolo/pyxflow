@@ -1,9 +1,9 @@
 """Tests for MasterDetailLayout component."""
 
 import pytest
-from pyflow.components import MasterDetailLayout, Span
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.components import MasterDetailLayout, Span
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 @pytest.fixture

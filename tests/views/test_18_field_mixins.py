@@ -1,11 +1,11 @@
 """Test View 21: HasReadOnly, HasValidation, HasRequired — /test/field-mixins"""
 
-from pyflow import Route
-from pyflow.components import (
+from pyxflow import Route
+from pyxflow.components import (
     Button, ComboBox, DatePicker, Select, Span, TextField,
     VerticalLayout,
 )
-from pyflow.menu import Menu
+from pyxflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

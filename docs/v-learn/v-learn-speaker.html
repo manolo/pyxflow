@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PyFlow — 3 Talks. 3 Ideas. 1 Project.</title>
+  <title>PyXFlow — 3 Talks. 3 Ideas. 1 Project.</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/black.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/monokai.css">
@@ -457,10 +457,10 @@
                data-background-image="images/background-code.png"
                data-background-opacity="0.10"
                data-background-size="cover">
-        <h1><span class="gradient-text" style="font-size: 1.8em;">PyFlow</span></h1>
+        <h1><span class="gradient-text" style="font-size: 1.8em;">PyXFlow</span></h1>
         <p style="font-size: 1.9em;"><em>Build Web Apps in Pure Python</em></p>
         <p style="font-size: 0.75em; color: #8899aa; margin-top: 0.6em;"><code>3 talks. 3 ideas. 1 project.</code></p>
-        <aside class="notes">Hello everyone. This is Manolo from the Releases Team.<br>Let's talk today about: how to build webapps in pure Python.<br>This speech is about how 3 talks at Jfokus 3 weeks ago gave me 3 ideas.<br>And those 3 ideas became one CF project with the name PyFlow.</aside>
+        <aside class="notes">Hello everyone. This is Manolo from the Releases Team.<br>Let's talk today about: how to build webapps in pure Python.<br>This speech is about how 3 talks at Jfokus 3 weeks ago gave me 3 ideas.<br>And those 3 ideas became one CF project with the name PyXFlow.</aside>
       </section>
 
       <!-- SLIDE 2: Three Talks -->
@@ -485,7 +485,7 @@
             <p>Run slow to run fast. Specs before code.</p>
           </div>
         </div>
-        <aside class="notes">These are the 3 speakers who inspired PyFlow.<br><b>&rarr;</b> Dan North says: find the essence. Strip the rest.<br><b>&rarr;</b> Marcus Hellberg says: one language, full-stack. No JavaScript needed.<br><b>&rarr;</b> Arun Gupta says: write specs first, then let the AI to code.<br><br>So, Three ideas.<br>Let me show you what happens when you combine them.</aside>
+        <aside class="notes">These are the 3 speakers who inspired PyXFlow.<br><b>&rarr;</b> Dan North says: find the essence. Strip the rest.<br><b>&rarr;</b> Marcus Hellberg says: one language, full-stack. No JavaScript needed.<br><b>&rarr;</b> Arun Gupta says: write specs first, then let the AI to code.<br><br>So, Three ideas.<br>Let me show you what happens when you combine them.</aside>
       </section>
 
       <!-- ═══════════════════════════════════════════════════════════ -->
@@ -762,7 +762,7 @@ async def _tick(self):
         <iframe src="specs/sdd-loop.html"
                 style="width: 100%; height: 520px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: #0d1117;"
                 loading="lazy"></iframe>
-        <aside class="notes">This is the spec-driven loop.<br><b>[CLICK Next in the iframe to walk through the 5 steps]</b><br>It has 5 phases<br>Then, write specs.<br>Then, generate code.<br>Then, test.<br>Then, observe.<br>Then, repeat.<br><b>[Keep clicking -- it cycles to show PyFlow-specific steps]</b></aside>
+        <aside class="notes">This is the spec-driven loop.<br><b>[CLICK Next in the iframe to walk through the 5 steps]</b><br>It has 5 phases<br>Then, write specs.<br>Then, generate code.<br>Then, test.<br>Then, observe.<br>Then, repeat.<br><b>[Keep clicking -- it cycles to show PyXFlow-specific steps]</b></aside>
       </section>
 
       <!-- SLIDE 17: The Specs -->
@@ -902,7 +902,7 @@ V24.03  Click Progress, bar reaches 100%
                data-background-opacity="0.12"
                data-background-size="cover">
         <span class="section-number">4</span>
-        <h2>The Result: <span class="gradient-text">PyFlow</span></h2>
+        <h2>The Result: <span class="gradient-text">PyXFlow</span></h2>
         <div class="stats-row" style="margin-top: 0.8em;">
           <div class="stat-box fragment">
             <div class="num glow">~18K</div>
@@ -1055,7 +1055,7 @@ def save(self):
         <p class="fragment" style="font-size: 0.85em; margin-top: 1em; color: #e6edf3;">
           <strong class="gradient-text">Find the essence. Build it in one language. Let specs guide AI.</strong>
         </p>
-        <aside class="notes">Let me bring it all together.<br><b>&rarr;</b> Dan North: look for the essence.<br><b>&rarr;</b> Marcus Hellberg: full-stack teams ship faster.<br><b>&rarr;</b> Arun Gupta: run slow to run fast.<br><b>&rarr;</b> Combined: find the essence. Build it in one language. Let specs guide AI.<br>That is PyFlow.</aside>
+        <aside class="notes">Let me bring it all together.<br><b>&rarr;</b> Dan North: look for the essence.<br><b>&rarr;</b> Marcus Hellberg: full-stack teams ship faster.<br><b>&rarr;</b> Arun Gupta: run slow to run fast.<br><b>&rarr;</b> Combined: find the essence. Build it in one language. Let specs guide AI.<br>That is PyXFlow.</aside>
       </section>
 
       <!-- SLIDE 29: Thank You -->
@@ -1065,20 +1065,20 @@ def save(self):
         <h1><span class="gradient-text" style="font-size: 1.5em;">Thank You</span></h1>
         <div class="terminal" style="margin-top: 1em;">
           <pre class="typewriter-code" data-speed="40"><code data-trim class="language-bash">
-pip install git+https://github.com/manolo/pyflow.git
+pip install git+https://github.com/manolo/pyxflow.git
 mkdir myapp && cd myapp && mkdir views
-pyflow --setup
-pyflow --dev --port 8080
+pyxflow --setup
+pyxflow --dev --port 8080
           </code></pre>
         </div>
         <div id="thankyou-logo" style="margin-top: 1.5em; display: flex; align-items: center; justify-content: center; gap: 0.6em; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease;">
-          <img src="images/logo.png" alt="PyFlow logo" class="logo" style="max-width: 80px;">
-          <span class="gradient-text" style="font-size: 1.8em; font-weight: 800; letter-spacing: -0.02em;">PyFlow</span>
+          <img src="images/logo.png" alt="PyXFlow logo" class="logo" style="max-width: 80px;">
+          <span class="gradient-text" style="font-size: 1.8em; font-weight: 800; letter-spacing: -0.02em;">PyXFlow</span>
         </div>
         <div id="thankyou-links" style="margin-top: 1em; display: flex; justify-content: center; gap: 2em; font-size: 0.7em; opacity: 0; transition: opacity 0.6s ease;">
-          <a href="https://github.com/manolo/pyflow" target="_blank" style="color: #00d2ff; text-decoration: none;">GitHub</a>
+          <a href="https://github.com/manolo/pyxflow" target="_blank" style="color: #00d2ff; text-decoration: none;">GitHub</a>
           <span style="color: rgba(255,255,255,0.3);">|</span>
-          <a href="https://manolo.github.io/pyflow/" target="_blank" style="color: #00d2ff; text-decoration: none;">Website</a>
+          <a href="https://manolo.github.io/pyxflow/" target="_blank" style="color: #00d2ff; text-decoration: none;">Website</a>
         </div>
         <aside class="notes">Here is how to get started.<br>pip install. Create a folder.<br>Run vaadin setup. Run vaadin dev.<br>That is it.<br><br>The repo and the website are here.<br><br>Let's continue with a demo.</aside>
       </section>

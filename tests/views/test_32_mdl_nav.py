@@ -1,10 +1,10 @@
 """Test View 32: MasterDetailLayout with navigation -- /test/mdl-nav/:id?"""
 
-from pyflow import Route, BeforeEnterEvent
-from pyflow.components import (
+from pyxflow import Route, BeforeEnterEvent
+from pyxflow.components import (
     Button, MasterDetailLayout, Span, VerticalLayout,
 )
-from pyflow.menu import Menu
+from pyxflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

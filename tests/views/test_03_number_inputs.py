@@ -1,10 +1,10 @@
 """Test View 3: Number Input Fields — /test/number-inputs"""
 
-from pyflow import Route
-from pyflow.components import (
+from pyxflow import Route
+from pyxflow.components import (
     Button, Icon, IntegerField, NumberField, Span, VerticalLayout,
 )
-from pyflow.menu import Menu
+from pyxflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

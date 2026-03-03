@@ -1,12 +1,12 @@
 """Test View 1: Buttons & Icons — /test/buttons-icons"""
 
-from pyflow import Route, RouteAlias
-from pyflow.components import (
+from pyxflow import Route, RouteAlias
+from pyxflow.components import (
     Button, DrawerToggle, HorizontalLayout, Icon, Span,
     TextField, VerticalLayout,
 )
-from pyflow.core.keys import Key
-from pyflow.menu import Menu
+from pyxflow.core.keys import Key
+from pyxflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

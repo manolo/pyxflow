@@ -3,7 +3,7 @@
 import pytest
 from pathlib import Path
 
-from pyflow.bundle_generator import (
+from pyxflow.bundle_generator import (
     generate_pom_xml,
     generate_fake_view,
     generate_feature_flags,
@@ -130,7 +130,7 @@ class TestGenerateFakeView:
     def test_has_jsmodule_annotation(self):
         registry = {"Button": "com.vaadin.flow.component.button.Button"}
         java = generate_fake_view(registry)
-        assert '@JsModule("./pyflow-bundle.js")' in java
+        assert '@JsModule("./pyxflow-bundle.js")' in java
 
     def test_extends_div(self):
         registry = {}
@@ -153,7 +153,7 @@ class TestGenerateFakeView:
     def test_package_declaration(self):
         registry = {}
         java = generate_fake_view(registry)
-        assert "package com.vaadin.pyflow;" in java
+        assert "package com.vaadin.pyxflow;" in java
 
     def test_with_real_registry(self):
         """Generate FakeView from the actual component registry."""
@@ -182,10 +182,10 @@ class TestGenerateProject:
         generate_project(output_dir, "25.0.4")
 
         assert (output_dir / "pom.xml").is_file()
-        assert (output_dir / "frontend" / "pyflow-bundle.js").is_file()
+        assert (output_dir / "frontend" / "pyxflow-bundle.js").is_file()
         assert (output_dir / "src" / "main" / "resources" / "vaadin-featureflags.properties").is_file()
 
-        java_dir = output_dir / "src" / "main" / "java" / "com" / "vaadin" / "pyflow"
+        java_dir = output_dir / "src" / "main" / "java" / "com" / "vaadin" / "pyxflow"
         assert (java_dir / "FakeView.java").is_file()
 
     def test_pom_has_correct_version(self, tmp_path):
@@ -197,7 +197,7 @@ class TestGenerateProject:
     def test_fake_view_has_uses(self, tmp_path):
         output_dir = tmp_path / "test-project"
         generate_project(output_dir, "25.0.4")
-        java_dir = output_dir / "src" / "main" / "java" / "com" / "vaadin" / "pyflow"
+        java_dir = output_dir / "src" / "main" / "java" / "com" / "vaadin" / "pyxflow"
         java = (java_dir / "FakeView.java").read_text()
         assert "@Uses(Button.class)" in java
 

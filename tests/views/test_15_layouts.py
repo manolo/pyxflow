@@ -1,12 +1,12 @@
 """Test View 15: Layouts — /test/layouts"""
 
-from pyflow import Route
-from pyflow.components import (
+from pyxflow import Route
+from pyxflow.components import (
     Button, FlexLayout, FlexDirection, FlexWrap, FormLayout, HorizontalLayout,
     ResponsiveStep, Span, SplitLayout, TextField, VerticalLayout,
 )
-from pyflow.components.horizontal_layout import Alignment, JustifyContentMode
-from pyflow.menu import Menu
+from pyxflow.components.horizontal_layout import Alignment, JustifyContentMode
+from pyxflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

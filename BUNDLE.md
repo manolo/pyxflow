@@ -1,13 +1,13 @@
 # Vaadin Frontend Bundle
 
-PyFlow reuses Vaadin's frontend infrastructure (FlowClient, web components, Lumo theme) by serving a pre-built JavaScript bundle.
+PyXFlow reuses Vaadin's frontend infrastructure (FlowClient, web components, Lumo theme) by serving a pre-built JavaScript bundle.
 
 ## What's in the Bundle
 
-The bundle lives inside the Python package at `src/pyflow/bundle/` so it ships with the wheel.
+The bundle lives inside the Python package at `src/pyxflow/bundle/` so it ships with the wheel.
 
 ```
-src/pyflow/bundle/
+src/pyxflow/bundle/
 ├── index.html                     # Entry point HTML
 ├── VAADIN/build/
 │   ├── indexhtml-*.js              # Entry point, initializes FlowClient
@@ -66,7 +66,7 @@ We use the **unoptimized** version (single file, no code splitting) for simplici
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                       PyFlow Server                              │
+│                       PyXFlow Server                              │
 ├─────────────────────────────────────────────────────────────────┤
 │  - Generates index.html                                         │
 │  - Serves VAADIN/* static files from package bundle              │
@@ -77,17 +77,17 @@ We use the **unoptimized** version (single file, no code splitting) for simplici
 
 ## Updating the Bundle
 
-### Using `pyflow bundle` (recommended)
+### Using `pyxflow bundle` (recommended)
 
 ```bash
 # Copy bundle from Maven JARs (auto-downloads from Maven Central if missing)
-pyflow bundle
+pyxflow bundle
 
 # Pin a specific version
-pyflow bundle --vaadin-version 25.1.0
+pyxflow bundle --vaadin-version 25.1.0
 
 # Use the optimized (code-split) bundle (larger on disk, lazy-loaded chunks)
-pyflow bundle --optimized
+pyxflow bundle --optimized
 ```
 
 The command extracts the bundle from 4 Maven JARs (prod-bundle, flow-push, lumo-theme, aura-theme). If any JAR is not in `~/.m2/repository/`, it is automatically downloaded from Maven Central.
@@ -95,7 +95,7 @@ The command extracts the bundle from 4 Maven JARs (prod-bundle, flow-push, lumo-
 ### Verify
 
 ```bash
-ls src/pyflow/bundle/VAADIN/build/
+ls src/pyxflow/bundle/VAADIN/build/
 # Should show: FlowClient-*.js, indexhtml-*.js, generated-flow-imports-*.js, etc.
 ```
 
@@ -104,22 +104,22 @@ ls src/pyflow/bundle/VAADIN/build/
 The Vaadin version is configured in `pyproject.toml`:
 
 ```toml
-[tool.pyflow]
+[tool.pyxflow]
 vaadin-version = "25.0.6"
 ```
 
 The Flow version (needed for the `flow-push` JAR) is resolved automatically from the
 `vaadin-spring-bom` POM in the Maven BOM chain -- no need to track it separately.
 
-| PyFlow Version | Vaadin Bundle Version | Notes |
+| PyXFlow Version | Vaadin Bundle Version | Notes |
 |----------------|----------------------|-------|
 | Current        | 25.0.6               | All components included |
 
 ### Upgrading Vaadin Version
 
 1. Update `vaadin-version` in `pyproject.toml`
-2. Run `pyflow bundle` (auto-downloads new JARs and resolves flow version from BOM)
-3. Test that PyFlow still works
+2. Run `pyxflow bundle` (auto-downloads new JARs and resolves flow version from BOM)
+3. Test that PyXFlow still works
 4. Update this table
 
 ## Optimized vs Unoptimized Bundle
@@ -145,15 +145,15 @@ The default is **unoptimized** because:
 - Much smaller on disk (5.7 MB vs 14.5 MB) -- matters for wheel/package size
 - Simpler (one JS file, no chunk loading logic)
 - Easier to debug
-- PyFlow loads all components anyway, so lazy loading has little benefit
+- PyXFlow loads all components anyway, so lazy loading has little benefit
 - Network difference is negligible with Brotli compression (~0.9 MB either way)
 
-Use `pyflow bundle --optimized` to switch to the code-split version if lazy chunk loading is desired.
+Use `pyxflow bundle --optimized` to switch to the code-split version if lazy chunk loading is desired.
 
 The `--optimized` flag works with both modes:
-- **Copy mode** (`pyflow bundle --optimized`): extracts from `vaadin-prod-bundle/webapp/`
+- **Copy mode** (`pyxflow bundle --optimized`): extracts from `vaadin-prod-bundle/webapp/`
   instead of `vaadin-prod-bundle-unoptimized/webapp/`.
-- **Build mode** (`pyflow bundle --build --optimized`): sets `<optimizeBundle>true</optimizeBundle>`
+- **Build mode** (`pyxflow bundle --build --optimized`): sets `<optimizeBundle>true</optimizeBundle>`
   in the Maven plugin config so Vite produces code-split chunks. Without it, `<optimizeBundle>false</optimizeBundle>`
   generates a single monolithic JS file.
 
@@ -164,7 +164,7 @@ Note: `--build` defaults to `--optimized` being off (single JS file), matching t
 ### "Component not rendering"
 
 All components are included in the bundle. If a component doesn't render:
-1. Check that PyFlow has the component class implemented
+1. Check that PyXFlow has the component class implemented
 2. Verify the tag name matches (`vaadin-checkbox`, `vaadin-grid`, etc.)
 3. Check browser console for errors
 

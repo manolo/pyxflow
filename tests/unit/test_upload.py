@@ -2,10 +2,10 @@
 
 import pytest
 
-from pyflow.components.upload import Upload
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
-from pyflow.server.http_server import _upload_handlers, _sessions
+from pyxflow.components.upload import Upload
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
+from pyxflow.server.http_server import _upload_handlers, _sessions
 
 
 class TestUpload:

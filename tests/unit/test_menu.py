@@ -1,9 +1,9 @@
 """Tests for @Menu decorator and MenuConfiguration."""
 
 import pytest
-from pyflow.menu import Menu, MenuEntry, get_menu_entries, get_page_header
-from pyflow.router import Route, PageTitle, _routes, clear_routes
-from pyflow.core.component import Component
+from pyxflow.menu import Menu, MenuEntry, get_menu_entries, get_page_header
+from pyxflow.router import Route, PageTitle, _routes, clear_routes
+from pyxflow.core.component import Component
 
 
 @pytest.fixture(autouse=True)

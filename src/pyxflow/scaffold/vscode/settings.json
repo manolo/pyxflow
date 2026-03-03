@@ -1,0 +1,48 @@
+{
+    "files.exclude": {
+        "**/__pycache__": true
+    },
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.packageIndexDepths": [
+        { "name": "", "depth": 5, "includeAllSymbols": true }
+    ],
+    "python.analysis.completeFunctionParens": false,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportWildcardImportFromLibrary": "none",
+        "reportWildcardImportFromModule": "none"
+    },
+    "python.analysis.extraPaths": ["."],
+    "python.defaultInterpreterPath": ".venv/bin/python",
+    "editor.snippetSuggestions": "top",
+    "folderTemplates.structures": [
+        {
+            "name": "Vaadin PyXFlow View",
+            "omitParentDirectory": true,
+            "structure": [
+                {
+                    "fileName": "<FTName>_view.py",
+                    "template": "pyxflow_view"
+                }
+            ]
+        }
+    ],
+    "folderTemplates.fileTemplates": {
+        "pyxflow_view": [
+            "from pyxflow import Route",
+            "from pyxflow.components import (",
+            "    Div,",
+            "    H3,",
+            "    VerticalLayout,",
+            ")",
+            "",
+            "",
+            "@Route(\"<FTName>\")",
+            "class <FTName | pascalcase>View(VerticalLayout):",
+            "    def __init__(self):",
+            "        self.set_size_full()",
+            "",
+            "        self.add(H3(\"<FTName>\"))",
+            ""
+        ]
+    }
+}

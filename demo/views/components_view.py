@@ -2,11 +2,11 @@ import datetime
 
 from demo.services import people_service
 from demo.views.main_layout import MainLayout
-from pyflow import *
-from pyflow.components import *
-from pyflow.components.horizontal_layout import Alignment
-from pyflow.core.keys import Key
-from pyflow.data import *
+from pyxflow import *
+from pyxflow.components import *
+from pyxflow.components.horizontal_layout import Alignment
+from pyxflow.core.keys import Key
+from pyxflow.data import *
 
 
 class CrudPerson:
@@ -290,7 +290,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         text_form = FormLayout()
 
         text_field = TextField("TextField")
-        text_field.set_value("Hello PyFlow!")
+        text_field.set_value("Hello PyXFlow!")
         text_form.add(text_field)
 
         password_field = PasswordField("PasswordField")

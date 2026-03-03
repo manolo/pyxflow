@@ -1,11 +1,11 @@
 import logging
 
-from pyflow import Menu, Route
+from pyxflow import Menu, Route
 
-log = logging.getLogger("pyflow")
+log = logging.getLogger("pyxflow")
 from demo.services import people_service
 from demo.views.main_layout import MainLayout
-from pyflow.components import *
+from pyxflow.components import *
 
 
 # Pre-load for lazy data provider

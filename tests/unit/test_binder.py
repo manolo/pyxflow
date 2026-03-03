@@ -2,10 +2,10 @@
 
 import pytest
 
-from pyflow.core.state_tree import StateTree
-from pyflow.components.text_field import TextField
-from pyflow.components.checkbox import Checkbox
-from pyflow.data import (
+from pyxflow.core.state_tree import StateTree
+from pyxflow.components.text_field import TextField
+from pyxflow.components.checkbox import Checkbox
+from pyxflow.data import (
     Binder,
     Converter,
     Result,

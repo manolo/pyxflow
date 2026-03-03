@@ -2,10 +2,10 @@
 
 import pytest
 
-from pyflow.router import ColorScheme, AppShell, clear_app_shell
-from pyflow.server.http_server import get_index_html
-from pyflow.core.state_tree import StateTree
-from pyflow.core.component import UI
+from pyxflow.router import ColorScheme, AppShell, clear_app_shell
+from pyxflow.server.http_server import get_index_html
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.component import UI
 
 
 class TestColorSchemeDecorator:

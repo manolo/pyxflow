@@ -1,7 +1,7 @@
 import asyncio
 
-from pyflow import Menu, Route
-from pyflow.components import *
+from pyxflow import Menu, Route
+from pyxflow.components import *
 from demo.views.main_layout import MainLayout
 
 @Route("push-demo", page_title="Stopwatch", layout=MainLayout)

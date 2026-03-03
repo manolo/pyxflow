@@ -2,8 +2,8 @@
 
 import pytest
 
-from pyflow.components import Button, TextField
-from pyflow.core.state_tree import StateTree
+from pyxflow.components import Button, TextField
+from pyxflow.core.state_tree import StateTree
 
 
 class TestComponentVisibility:

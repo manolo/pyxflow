@@ -2,7 +2,7 @@
 
 import pytest
 
-from pyflow.components.flex_layout import (
+from pyxflow.components.flex_layout import (
     Alignment,
     ContentAlignment,
     FlexDirection,
@@ -10,9 +10,9 @@ from pyflow.components.flex_layout import (
     FlexWrap,
     JustifyContentMode,
 )
-from pyflow.components.span import Span
-from pyflow.core.state_node import Feature
-from pyflow.core.state_tree import StateTree
+from pyxflow.components.span import Span
+from pyxflow.core.state_node import Feature
+from pyxflow.core.state_tree import StateTree
 
 
 class TestFlexLayout:

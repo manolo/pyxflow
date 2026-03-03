@@ -1,6 +1,6 @@
 """Playwright UI test configuration.
 
-Auto-starts the PyFlow test server unless a valid one is already running.
+Auto-starts the PyXFlow test server unless a valid one is already running.
 """
 
 import re
@@ -20,7 +20,7 @@ MAX_CONSECUTIVE = 4
 DEFAULT_PORT = 8088
 DEFAULT_BASE_URL = f"http://localhost:{DEFAULT_PORT}"
 
-# Root of the pyflow project
+# Root of the pyxflow project
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 # The views module that the test server must be running
@@ -31,19 +31,19 @@ def _check_server():
     """Check if a server is running on the default port.
 
     Returns:
-        True — a PyFlow test server is responding (correct views module)
-        str — a PyFlow server with wrong views module (e.g. "demo.views")
-        False — something is listening but not a PyFlow dev server
+        True — a PyXFlow test server is responding (correct views module)
+        str — a PyXFlow server with wrong views module (e.g. "demo.views")
+        False — something is listening but not a PyXFlow dev server
         None — nothing is listening (connection refused)
     """
     try:
         resp = urllib.request.urlopen(f"{DEFAULT_BASE_URL}/", timeout=2)
         html = resp.read().decode("utf-8", errors="replace")
-        # In dev mode, PyFlow injects <meta name="pyflow-views" content="...">
-        m = re.search(r'<meta\s+name="pyflow-views"\s+content="([^"]+)"', html)
+        # In dev mode, PyXFlow injects <meta name="pyxflow-views" content="...">
+        m = re.search(r'<meta\s+name="pyxflow-views"\s+content="([^"]+)"', html)
         if m:
             return True if m.group(1) == _EXPECTED_VIEWS else m.group(1)
-        # No meta tag — either not PyFlow, or PyFlow in production mode
+        # No meta tag — either not PyXFlow, or PyXFlow in production mode
         return False
     except (urllib.error.URLError, OSError):
         # Connection refused → nothing running
@@ -60,22 +60,22 @@ def base_url(request):
 
     status = _check_server()
 
-    # Wrong PyFlow app (e.g. demo instead of tests)
+    # Wrong PyXFlow app (e.g. demo instead of tests)
     if isinstance(status, str):
         pytest.fail(
             f"Port {DEFAULT_PORT} is running '{status}' but UI tests need '{_EXPECTED_VIEWS}'.\n"
-            f"Stop it and run:  cd pyflow && python -m tests"
+            f"Stop it and run:  cd pyxflow && python -m tests"
         )
 
-    # Port occupied by something that's not a PyFlow dev server
+    # Port occupied by something that's not a PyXFlow dev server
     if status is False:
         pytest.fail(
-            f"Port {DEFAULT_PORT} is in use but not a PyFlow dev server.\n"
+            f"Port {DEFAULT_PORT} is in use but not a PyXFlow dev server.\n"
             f"Kill it:  lsof -ti :{DEFAULT_PORT} | xargs kill -9\n"
             f"Or use a different port:  pytest tests/ui/ --base-url http://localhost:XXXX"
         )
 
-    # Valid PyFlow test server already running
+    # Valid PyXFlow test server already running
     if status is True:
         yield DEFAULT_BASE_URL
         return
@@ -83,7 +83,7 @@ def base_url(request):
     # Nothing running — auto-start the test server
     proc = subprocess.Popen(
         [sys.executable, "-c",
-         "import pyflow.app as _a; "
+         "import pyxflow.app as _a; "
          f"_a._serve('tests.views', 'localhost', {DEFAULT_PORT}, False, dev=True)"],
         cwd=str(_PROJECT_ROOT),
         stdout=subprocess.PIPE,

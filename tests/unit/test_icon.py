@@ -2,9 +2,9 @@
 
 import pytest
 
-from pyflow.components.icon import Icon
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.components.icon import Icon
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 class TestIcon:

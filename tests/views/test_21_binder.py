@@ -2,14 +2,14 @@
 
 from datetime import date, time
 
-from pyflow import Route
-from pyflow.components import (
+from pyxflow import Route
+from pyxflow.components import (
     Button, ComboBox, DatePicker, Select, Span, TextField, TimePicker,
     VerticalLayout,
 )
-from pyflow.data.binder import Binder
-from pyflow.data.converter import string_to_int
-from pyflow.menu import Menu
+from pyxflow.data.binder import Binder
+from pyxflow.data.converter import string_to_int
+from pyxflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

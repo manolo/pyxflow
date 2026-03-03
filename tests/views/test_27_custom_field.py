@@ -1,10 +1,10 @@
 """Test View 27: CustomField — /test/custom-field"""
 
-from pyflow import Route
-from pyflow.components import (
+from pyxflow import Route
+from pyxflow.components import (
     Button, CustomField, Span, TextField, VerticalLayout,
 )
-from pyflow.menu import Menu
+from pyxflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

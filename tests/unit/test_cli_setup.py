@@ -7,7 +7,7 @@ from unittest import mock
 
 import pytest
 
-from pyflow.app import (
+from pyxflow.app import (
     _auto_detect_app,
     _scaffold_dir,
     _setup_project,
@@ -36,7 +36,7 @@ class TestScaffoldDir:
         assert (d / "settings.json").is_file()
         assert (d / "extensions.json").is_file()
         assert (d / "python.code-snippets").is_file()
-        assert (d / "templates" / "pyflow_view.py").is_file()
+        assert (d / "templates" / "pyxflow_view.py").is_file()
 
 
 # ---------------------------------------------------------------------------
@@ -156,7 +156,7 @@ class TestSetupVscode:
         assert (tmp_path / ".vscode" / "settings.json").exists()
         assert (tmp_path / ".vscode" / "extensions.json").exists()
         assert (tmp_path / ".vscode" / "python.code-snippets").exists()
-        assert (tmp_path / ".vscode" / "templates" / "pyflow_view.py").exists()
+        assert (tmp_path / ".vscode" / "templates" / "pyxflow_view.py").exists()
 
     def test_settings_json_valid(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
@@ -293,7 +293,7 @@ class TestCliParsing:
 
     def test_dot_treated_as_auto_detect(self, tmp_path, monkeypatch):
         """vaadin . should auto-detect like vaadin (no args)."""
-        from pyflow.app import main
+        from pyxflow.app import main
 
         (tmp_path / "myapp" / "views").mkdir(parents=True)
         (tmp_path / "myapp" / "__init__.py").touch()
@@ -310,14 +310,14 @@ class TestCliParsing:
             captured["host"] = host
             captured["port"] = port
 
-        monkeypatch.setattr("pyflow.app._serve", mock_serve)
+        monkeypatch.setattr("pyxflow.app._serve", mock_serve)
         main()
 
         assert captured["views"] == "myapp.views"
 
     def test_explicit_module(self, tmp_path, monkeypatch):
         """vaadin myapp should use myapp.views."""
-        from pyflow.app import main
+        from pyxflow.app import main
 
         (tmp_path / "myapp" / "views").mkdir(parents=True)
         (tmp_path / "myapp" / "__init__.py").touch()
@@ -330,14 +330,14 @@ class TestCliParsing:
         def mock_serve(views, host, port, debug, *, dev=False, socket_fd=None):
             captured["views"] = views
 
-        monkeypatch.setattr("pyflow.app._serve", mock_serve)
+        monkeypatch.setattr("pyxflow.app._serve", mock_serve)
         main()
 
         assert captured["views"] == "myapp.views"
 
     def test_no_args_auto_detects(self, tmp_path, monkeypatch):
         """vaadin (no args) should auto-detect module."""
-        from pyflow.app import main
+        from pyxflow.app import main
 
         (tmp_path / "demo" / "views").mkdir(parents=True)
         (tmp_path / "demo" / "__init__.py").touch()
@@ -350,13 +350,13 @@ class TestCliParsing:
         def mock_serve(views, host, port, debug, *, dev=False, socket_fd=None):
             captured["views"] = views
 
-        monkeypatch.setattr("pyflow.app._serve", mock_serve)
+        monkeypatch.setattr("pyxflow.app._serve", mock_serve)
         main()
 
         assert captured["views"] == "demo.views"
 
     def test_port_flag(self, tmp_path, monkeypatch):
-        from pyflow.app import main
+        from pyxflow.app import main
 
         (tmp_path / "myapp" / "views").mkdir(parents=True)
         (tmp_path / "myapp" / "__init__.py").touch()
@@ -369,13 +369,13 @@ class TestCliParsing:
         def mock_serve(views, host, port, debug, *, dev=False, socket_fd=None):
             captured["port"] = port
 
-        monkeypatch.setattr("pyflow.app._serve", mock_serve)
+        monkeypatch.setattr("pyxflow.app._serve", mock_serve)
         main()
 
         assert captured["port"] == 9999
 
     def test_setup_flag_creates_project(self, tmp_path, monkeypatch):
-        from pyflow.app import main
+        from pyxflow.app import main
 
         project = tmp_path / "new-app"
         project.mkdir()
@@ -391,7 +391,7 @@ class TestCliParsing:
         assert (project / "views" / "hello_world.py").exists()
 
     def test_setup_with_name_creates_subdir(self, tmp_path, monkeypatch):
-        from pyflow.app import main
+        from pyxflow.app import main
 
         monkeypatch.chdir(tmp_path)
         monkeypatch.setattr(sys, "argv", ["vaadin", "--setup", "webapp"])
@@ -404,7 +404,7 @@ class TestCliParsing:
         assert (tmp_path / "webapp" / "views" / "hello_world.py").exists()
 
     def test_vscode_flag_only(self, tmp_path, monkeypatch):
-        from pyflow.app import main
+        from pyxflow.app import main
 
         monkeypatch.chdir(tmp_path)
         monkeypatch.setattr(sys, "argv", ["vaadin", "--vscode"])
@@ -420,7 +420,7 @@ class TestCliParsing:
 
     def test_cwd_views_synthetic_module(self, tmp_path, monkeypatch):
         """When views/ is in cwd, a synthetic module should be injected."""
-        from pyflow.app import main
+        from pyxflow.app import main
 
         # Simulate --setup result: views/ at root
         project = tmp_path / "my-app"
@@ -430,8 +430,8 @@ class TestCliParsing:
         (project / "views" / "__init__.py").touch()
         # Need at least one view file
         (project / "views" / "hello.py").write_text(
-            "from pyflow import Route\n"
-            "from pyflow.components import Div\n"
+            "from pyxflow import Route\n"
+            "from pyxflow.components import Div\n"
             "@Route('hello')\n"
             "class HelloView(Div): pass\n"
         )
@@ -443,7 +443,7 @@ class TestCliParsing:
         def mock_serve(views, host, port, debug, *, dev=False, socket_fd=None):
             captured["views"] = views
 
-        monkeypatch.setattr("pyflow.app._serve", mock_serve)
+        monkeypatch.setattr("pyxflow.app._serve", mock_serve)
         main()
 
         # Should derive my_app from my-app
@@ -457,7 +457,7 @@ class TestCliParsing:
 
     def test_cwd_views_sibling_packages_importable(self, tmp_path, monkeypatch):
         """When views/ is in cwd, sibling packages (e.g. lib/) must be importable."""
-        from pyflow.app import main
+        from pyxflow.app import main
 
         project = tmp_path / "my-app"
         project.mkdir()
@@ -465,8 +465,8 @@ class TestCliParsing:
         (project / "__init__.py").touch()
         (project / "views" / "__init__.py").touch()
         (project / "views" / "hello.py").write_text(
-            "from pyflow import Route\n"
-            "from pyflow.components import Div\n"
+            "from pyxflow import Route\n"
+            "from pyxflow.components import Div\n"
             "@Route('hello')\n"
             "class HelloView(Div): pass\n"
         )
@@ -480,7 +480,7 @@ class TestCliParsing:
         def mock_serve(views, host, port, debug, *, dev=False, socket_fd=None):
             pass
 
-        monkeypatch.setattr("pyflow.app._serve", mock_serve)
+        monkeypatch.setattr("pyxflow.app._serve", mock_serve)
         main()
 
         # cwd must be in sys.path so sibling packages are importable
@@ -498,12 +498,12 @@ class TestCliParsing:
 
 class TestFaviconInIndexHtml:
     def test_index_html_has_favicon_link(self):
-        from pyflow.server.http_server import get_index_html
+        from pyxflow.server.http_server import get_index_html
         html = get_index_html()
         assert '<link rel="icon" href="/favicon.ico">' in html
 
     def test_favicon_link_is_in_head(self):
-        from pyflow.server.http_server import get_index_html
+        from pyxflow.server.http_server import get_index_html
         html = get_index_html()
         head_end = html.index("</head>")
         favicon_pos = html.index('<link rel="icon" href="/favicon.ico">')
@@ -516,7 +516,7 @@ class TestFaviconFallback:
     def test_scaffold_favicon_exists(self):
         """The package scaffold must ship a favicon.ico."""
         import importlib.resources
-        favicon = importlib.resources.files("pyflow") / "scaffold" / "favicon.ico"
+        favicon = importlib.resources.files("pyxflow") / "scaffold" / "favicon.ico"
         with importlib.resources.as_file(favicon) as f:
             assert f.is_file()
             data = f.read_bytes()

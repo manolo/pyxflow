@@ -6,8 +6,8 @@ __pycache__/
 .Python
 /build/
 /bundle-project/
-# Keep src/pyflow/bundle/ (Vaadin frontend assets shipped in wheel)
-!src/pyflow/bundle/
+# Keep src/pyxflow/bundle/ (Vaadin frontend assets shipped in wheel)
+!src/pyxflow/bundle/
 develop-eggs/
 dist/
 downloads/

@@ -1,11 +1,11 @@
 """Test View 16: Card, Scroller, MasterDetailLayout — /test/card-scroller"""
 
-from pyflow import Route
-from pyflow.components import (
+from pyxflow import Route
+from pyxflow.components import (
     Button, Card, MasterDetailLayout, Scroller, ScrollDirection,
     Span, VerticalLayout,
 )
-from pyflow.menu import Menu
+from pyxflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 
@@ -43,7 +43,7 @@ class TestCardScrollerView(VerticalLayout):
         scroller_h = Scroller(scroll_direction=ScrollDirection.HORIZONTAL)
         scroller_h.set_id("scroller-h")
         scroller_h.set_height("50px")
-        from pyflow.components import HorizontalLayout
+        from pyxflow.components import HorizontalLayout
         wide = HorizontalLayout()
         for i in range(20):
             s = Span(f"Item {i}")

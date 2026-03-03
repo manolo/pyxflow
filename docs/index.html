@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PyFlow — Build Web Apps in Pure Python</title>
+<title>PyXFlow — Build Web Apps in Pure Python</title>
 <link rel="icon" href="favicon.ico" type="image/x-icon">
 <style>
 /* ===== Reset & Base ===== */
@@ -189,7 +189,7 @@ nav .links a:hover { color: #fff; }
 .cmt { color: #6e7681; font-style: italic; }
 .op { color: #79c0ff; }
 
-/* ===== Why PyFlow ===== */
+/* ===== Why PyXFlow ===== */
 .why {
   background: linear-gradient(180deg, #16213e 0%, #1a1a2e 100%);
 }
@@ -559,8 +559,8 @@ footer .footer-links {
 <nav>
   <div class="container">
     <a href="#" class="brand">
-      <img src="logo.png" alt="PyFlow">
-      PyFlow
+      <img src="logo.png" alt="PyXFlow">
+      PyXFlow
       <!-- <span class="by-vaadin">by Vaadin</span> -->
     </a>
     <div class="links">
@@ -569,7 +569,7 @@ footer .footer-links {
       <a href="#showcase">Examples</a>
       <a href="#gallery">Components</a>
       <a href="#quickstart">Quick Start</a>
-      <a href="https://github.com/manolo/pyflow" target="_blank">GitHub</a>
+      <a href="https://github.com/manolo/pyxflow" target="_blank">GitHub</a>
     </div>
   </div>
 </nav>
@@ -582,7 +582,7 @@ footer .footer-links {
       <p class="subtitle">No JavaScript. No HTML. Just Python.<br>Enterprise-grade Vaadin components, powered by Python.</p>
       <div class="hero-buttons">
         <a href="#quickstart" class="btn btn-primary">Get Started</a>
-        <a href="https://github.com/manolo/pyflow" target="_blank" class="btn btn-outline">
+        <a href="https://github.com/manolo/pyxflow" target="_blank" class="btn btn-outline">
           <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
           View on GitHub
         </a>
@@ -596,10 +596,10 @@ footer .footer-links {
   </div>
 </section>
 
-<!-- ===== Why PyFlow ===== -->
+<!-- ===== Why PyXFlow ===== -->
 <section class="section why" id="why">
   <div class="container">
-    <h2 class="section-title fade-in">Why PyFlow?</h2>
+    <h2 class="section-title fade-in">Why PyXFlow?</h2>
     <p class="section-subtitle fade-in">Everything you need to build production web apps, without leaving Python.</p>
     <div class="features">
       <div class="feature-card fade-in">
@@ -722,8 +722,8 @@ footer .footer-links {
             <div class="dot"></div><div class="dot"></div><div class="dot"></div>
             <span class="file">views/hello.py</span>
           </div>
-          <pre><span class="kw">from</span> vaadin.flow <span class="kw">import</span> Route, Menu
-<span class="kw">from</span> vaadin.flow.components <span class="kw">import</span> *
+          <pre><span class="kw">from</span> pyxflow <span class="kw">import</span> Route, Menu
+<span class="kw">from</span> pyxflow.components <span class="kw">import</span> *
 
 <span class="dec">@Route</span>(<span class="str">"hello"</span>)
 <span class="dec">@Menu</span>(<span class="str">"Hello"</span>, icon=<span class="str">"vaadin:hand"</span>)
@@ -783,8 +783,8 @@ footer .footer-links {
             <div class="dot"></div><div class="dot"></div><div class="dot"></div>
             <span class="file">views/master_detail.py</span>
           </div>
-          <pre><span class="kw">from</span> vaadin.flow.components <span class="kw">import</span> *
-<span class="kw">from</span> vaadin.flow.data <span class="kw">import</span> Binder
+          <pre><span class="kw">from</span> pyxflow.components <span class="kw">import</span> *
+<span class="kw">from</span> pyxflow.data <span class="kw">import</span> Binder
 
 <span class="dec">@Route</span>(<span class="str">"master-detail"</span>)
 <span class="dec">@Menu</span>(<span class="str">"Master-Detail"</span>, icon=<span class="str">"vaadin:split-h"</span>)
@@ -844,18 +844,18 @@ footer .footer-links {
         <span></span><span></span><span></span>
       </div>
       <div class="terminal-body">
-        <span class="comment"># Install PyFlow</span><br>
-        <span class="prompt">$</span> pip install pyflow<br>
+        <span class="comment"># Install PyXFlow</span><br>
+        <span class="prompt">$</span> pip install pyxflow<br>
         <br>
         <span class="comment"># Create your app</span><br>
         <span class="prompt">$</span> mkdir myapp && cd myapp<br>
         <span class="prompt">$</span> mkdir views<br>
         <br>
         <span class="comment"># Optionally create some demo views</span><br>
-        <span class="prompt">$</span> pyflow --setup<br>
+        <span class="prompt">$</span> pyxflow --setup<br>
         <br>
         <span class="comment"># Run with hot reload</span><br>
-        <span class="prompt">$</span> pyflow --dev<br>
+        <span class="prompt">$</span> pyxflow --dev<br>
       </div>
     </div>
     <div class="file-tree fade-in">
@@ -872,19 +872,19 @@ footer .footer-links {
 <footer>
   <div class="container">
     <div class="footer-links">
-      <a href="https://github.com/manolo/pyflow" target="_blank">GitHub</a>
-      <a href="https://github.com/manolo/pyflow/issues" target="_blank">Issues</a>
+      <a href="https://github.com/manolo/pyxflow" target="_blank">GitHub</a>
+      <a href="https://github.com/manolo/pyxflow/issues" target="_blank">Issues</a>
     </div>
-    <!-- <p>PyFlow by <a href="https://vaadin.com" target="_blank">Vaadin }></a> -- Open source under the Apache 2.0 License.</p> -->
-    <p>PyFlow - Open source under the Apache 2.0 License.</p>
+    <!-- <p>PyXFlow by <a href="https://vaadin.com" target="_blank">Vaadin }></a> -- Open source under the Apache 2.0 License.</p> -->
+    <p>PyXFlow - Open source under the Apache 2.0 License.</p>
   </div>
 </footer>
 
 <script>
 // ===== Typing animation =====
 const codeLines = [
-  '<span class="kw">from</span> vaadin.flow <span class="kw">import</span> Route, Menu',
-  '<span class="kw">from</span> vaadin.flow.components <span class="kw">import</span> *',
+  '<span class="kw">from</span> pyxflow <span class="kw">import</span> Route, Menu',
+  '<span class="kw">from</span> pyxflow.components <span class="kw">import</span> *',
   '',
   '<span class="dec">@Route</span>(<span class="str">"hello"</span>)',
   '<span class="dec">@Menu</span>(<span class="str">"Hello"</span>, icon=<span class="str">"vaadin:hand"</span>)',

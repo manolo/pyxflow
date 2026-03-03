@@ -2,12 +2,12 @@
 
 import pytest
 
-from pyflow.components.grid import Grid, Column
-from pyflow.components.renderer import LitRenderer, ComponentRenderer
-from pyflow.components.button import Button
-from pyflow.components.span import Span
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.components.grid import Grid, Column
+from pyxflow.components.renderer import LitRenderer, ComponentRenderer
+from pyxflow.components.button import Button
+from pyxflow.components.span import Span
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 class TestLitRenderer:

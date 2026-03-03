@@ -1,9 +1,9 @@
 from demo.services.sample_person_service import SamplePerson, sample_person_service
 from demo.views.main_layout import MainLayout
-from pyflow import Menu, Route
-from pyflow.components import *
-from pyflow.components.split_layout import SplitLayout
-from pyflow.data import Binder, ValidationError
+from pyxflow import Menu, Route
+from pyxflow.components import *
+from pyxflow.components.split_layout import SplitLayout
+from pyxflow.data import Binder, ValidationError
 
 
 @Route("master-detail", page_title="Master-Detail", layout=MainLayout)

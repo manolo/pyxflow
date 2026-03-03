@@ -1,10 +1,10 @@
 """Test View 9: Grid — Selection, Sorting, Events — /test/grid-features"""
 
-from pyflow import Route
-from pyflow.components import (
+from pyxflow import Route
+from pyxflow.components import (
     Button, Grid, GridDropMode, SelectionMode, Span, VerticalLayout,
 )
-from pyflow.menu import Menu
+from pyxflow.menu import Menu
 from tests.views.test_main_layout import TestMainLayout
 
 

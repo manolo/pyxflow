@@ -4,14 +4,14 @@ import json
 
 from aiohttp.test_utils import AioHTTPTestCase
 
-from pyflow.server.http_server import _sessions
+from pyxflow.server.http_server import _sessions
 
 
 class TestMultiUI(AioHTTPTestCase):
     """Test that multiple browser tabs get independent UIs."""
 
     async def get_application(self):
-        from pyflow.server.http_server import create_app
+        from pyxflow.server.http_server import create_app
         return create_app()
 
     def setUp(self):

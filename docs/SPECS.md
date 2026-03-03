@@ -1,10 +1,10 @@
-# PyFlow Landing Website — Design Specs
+# PyXFlow Landing Website — Design Specs
 
 **Content source of truth**: See `INDEX.md` — section-by-section content for regenerating `index.html`.
 
 ## Purpose
 
-Single-page marketing landing site for Vaadin PyFlow. Dark theme, zero external dependencies, single HTML file.
+Single-page marketing landing site for Vaadin PyXFlow. Dark theme, zero external dependencies, single HTML file.
 
 ## Design Language
 
@@ -49,9 +49,9 @@ Single-page marketing landing site for Vaadin PyFlow. Dark theme, zero external 
 
 ## Screenshots
 
-Screenshots are captured from the PyFlow demo app running at `localhost:8089` with Lumo Dark theme. To refresh them:
+Screenshots are captured from the PyXFlow demo app running at `localhost:8089` with Lumo Dark theme. To refresh them:
 
-1. Start the demo: `cd pyflow && source .venv/bin/activate && python -m demo` → :8088
+1. Start the demo: `cd pyxflow && source .venv/bin/activate && python -m demo` → :8088
 2. Use Playwright MCP to navigate and take screenshots
 3. Save to `docs/screenshots/`
 

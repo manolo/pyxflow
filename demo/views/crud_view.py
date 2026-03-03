@@ -9,9 +9,9 @@ Routes:
 
 from demo.services.sample_person_service import SamplePerson, sample_person_service
 from demo.views.main_layout import MainLayout
-from pyflow import BeforeEnterEvent, Menu, Route
-from pyflow.components import *
-from pyflow.data import Binder, ValidationError
+from pyxflow import BeforeEnterEvent, Menu, Route
+from pyxflow.components import *
+from pyxflow.data import Binder, ValidationError
 
 
 @Route("crud/:id?/:action?", page_title="Responsive CRUD", layout=MainLayout)

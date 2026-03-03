@@ -2,9 +2,9 @@
 
 import pytest
 
-from pyflow.components.message_list import MessageList, MessageListItem
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.components.message_list import MessageList, MessageListItem
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 class TestMessageListItem:

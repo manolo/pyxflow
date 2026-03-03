@@ -2,8 +2,8 @@
 
 import pytest
 
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import StateNode, Feature
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import StateNode, Feature
 
 
 class TestStateTree:

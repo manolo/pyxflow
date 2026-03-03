@@ -1,12 +1,12 @@
-<img src="docs/logo.png" alt="PyFlow" width="80" align="left" style="margin-right: 16px;">
+<img src="docs/logo.png" alt="PyXFlow" width="80" align="left" style="margin-right: 16px;">
 
-# [PyFlow](https://manolo.github.io/pyflow/)
+# [PyXFlow](https://manolo.github.io/pyxflow/)
 
 **Build full-stack web apps in pure Python. No JavaScript. No HTML templates.**
 
 Write your code and business logic in Python. It runs on the server. The browser is just a thin client rendering standard web components: you never touch the frontend.
 
-Under the hood, PyFlow uses the same server-driven architecture as [Vaadin Flow](https://vaadin.com/flow) but entirely written in Python, and ships with 49 [Vaadin web components](https://vaadin.com/components): enterprise-grade, accessible, and battle-tested over years.
+Under the hood, PyXFlow uses the same server-driven architecture as [Vaadin Flow](https://vaadin.com/flow) but entirely written in Python, and ships with 49 [Vaadin web components](https://vaadin.com/components): enterprise-grade, accessible, and battle-tested over years.
 
 <p align="center">
   <img src="docs/screenshots/architecture-diagram.png" alt="Architecture">
@@ -15,8 +15,8 @@ Under the hood, PyFlow uses the same server-driven architecture as [Vaadin Flow]
 ---
 
 ```python
-from pyflow import Route
-from pyflow.components import *
+from pyxflow import Route
+from pyxflow.components import *
 
 @Route("hello")
 class HelloView(HorizontalLayout):
@@ -61,8 +61,8 @@ The included demo app showcases real-world patterns across 8 views:
 ### Run the demo
 
 ```bash
-git clone https://github.com/manolo/pyflow.git
-cd pyflow
+git clone https://github.com/manolo/pyxflow.git
+cd pyxflow
 python -m venv .venv && source .venv/bin/activate
 pip install -e .
 python -m demo          # http://localhost:8088
@@ -71,7 +71,7 @@ python -m demo          # http://localhost:8088
 ## Installation
 
 ```bash
-pip install pyflow
+pip install pyxflow
 ```
 
 ## Quick start
@@ -80,9 +80,9 @@ pip install pyflow
 mkdir my-app && cd my-app
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install pyflow
-pyflow --setup
-pyflow
+pip install pyxflow
+pyxflow --setup
+pyxflow
 # http://localhost:8080
 ```
 
@@ -104,7 +104,7 @@ my-app/
 ### Running
 
 ```bash
-pyflow [app_module] [options]
+pyxflow [app_module] [options]
 
   app_module               Python module with views/ (auto-detected if omitted)
   --setup [app_name]       Scaffold a new project (views, static, .vscode/)
@@ -118,10 +118,10 @@ pyflow [app_module] [options]
 
 ## Routing
 
-Each view is a Python class with a `@Route` decorator that defines the URL path. Add `@Menu` to include it in the navigation. PyFlow handles client-side URL routing automatically.
+Each view is a Python class with a `@Route` decorator that defines the URL path. Add `@Menu` to include it in the navigation. PyXFlow handles client-side URL routing automatically.
 
 ```python
-from pyflow import Route, Menu
+from pyxflow import Route, Menu
 
 @Route("dashboard", page_title="Dashboard", layout=MainLayout)
 @Menu(title="Dashboard", order=1, icon="vaadin:dashboard")
@@ -139,9 +139,9 @@ class DashboardView(VerticalLayout):
 `@AppShell` marks the global app configuration: push, theme, stylesheets. Only one per app. In practice, you put it on your main layout class (`AppLayout`) which provides the navbar, drawer, and content area.
 
 ```python
-from pyflow import AppShell, Push, ColorScheme, StyleSheet
-from pyflow.components import AppLayout, DrawerToggle, H1, SideNav, SideNavItem
-from pyflow.menu import get_menu_entries
+from pyxflow import AppShell, Push, ColorScheme, StyleSheet
+from pyxflow.components import AppLayout, DrawerToggle, H1, SideNav, SideNavItem
+from pyxflow.menu import get_menu_entries
 
 @AppShell
 @Push

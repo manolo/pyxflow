@@ -1,4 +1,4 @@
-# PyFlow — Python Implementation of Vaadin Flow
+# PyXFlow — Python Implementation of Vaadin Flow
 
 ## First Steps
 
@@ -23,8 +23,8 @@
 # Run the app (auto-detects demo/ module)
 source .venv/bin/activate && python -m demo
 # http://localhost:8088
-# Or via CLI: pyflow demo --port 8088
-# Or auto-detect: pyflow --port 8088  (finds demo/views/ automatically)
+# Or via CLI: pyxflow demo --port 8088
+# Or auto-detect: pyxflow --port 8088  (finds demo/views/ automatically)
 
 # Run unit tests (default — runs tests/unit/)
 pytest -v
@@ -40,7 +40,7 @@ pytest tests/ui/ -v            # headless
 pytest tests/ui/ --headed -v   # visible browser
 
 # Regenerate the frontend bundle (auto-discovers _v_fqcn components)
-pyflow --bundle
+pyxflow --bundle
 
 # Run Java reference (bundle-generator with AllComponentsView)
 cd ../bundle-generator && ./mvnw package jetty:run-war
@@ -52,8 +52,8 @@ cd ../bundle-generator && ./mvnw package jetty:run-war
 ## Project Structure
 
 ```
-pyflow/
-├── src/pyflow/
+pyxflow/
+├── src/pyxflow/
 │   ├── core/           # StateTree, StateNode, Element, Component
 │   ├── components/     # Button, TextField, Grid, Dialog, etc. (49 components)
 │   ├── data/           # Binder, DataProvider, validators, converters
@@ -97,13 +97,13 @@ pyflow/
 5. Export in `components/__init__.py`
 6. Add tests in `tests/`
 7. Add `_v_fqcn` class attribute with the Java FQCN (e.g. `_v_fqcn = "com.vaadin.flow.component.button.Button"`)
-8. Regenerate bundle: `pyflow --bundle` (auto-discovers all `_v_fqcn` components)
+8. Regenerate bundle: `pyxflow --bundle` (auto-discovers all `_v_fqcn` components)
 
 ---
 
 ## Event Hashes
 
-PyFlow computes event hashes dynamically using `compute_event_hash(config)` in `server/uidl_handler.py`. The function uses `base64(sha256(BOM + json.encode('utf-16-be'))[:8])` -- the same algorithm as Java Flow.
+PyXFlow computes event hashes dynamically using `compute_event_hash(config)` in `server/uidl_handler.py`. The function uses `base64(sha256(BOM + json.encode('utf-16-be'))[:8])` -- the same algorithm as Java Flow.
 
 All hash constants are computed at module load from their config dicts (e.g. `_CLICK_HASH = compute_event_hash(_CLICK_CONFIG)`). No hardcoded hash strings -- if a config changes, the hash updates automatically.
 
@@ -141,16 +141,16 @@ browser_take_screenshot → visual check
 
 ## Bundle
 
-The Vaadin frontend bundle (FlowClient, web components, Lumo/Aura themes) is pre-built and shipped inside the wheel at `src/pyflow/bundle/`. At runtime, the server discovers it automatically.
+The Vaadin frontend bundle (FlowClient, web components, Lumo/Aura themes) is pre-built and shipped inside the wheel at `src/pyxflow/bundle/`. At runtime, the server discovers it automatically.
 
-### Regenerating the bundle (PyFlow developers)
+### Regenerating the bundle (PyXFlow developers)
 
-From the `pyflow/` checkout:
+From the `pyxflow/` checkout:
 
 ```bash
-pyflow --bundle                          # build → src/pyflow/bundle/
-pyflow --bundle --keep                   # keep bundle-project/ for debugging
-pyflow --bundle --vaadin-version 25.1.0  # pin a different Vaadin version
+pyxflow --bundle                          # build → src/pyxflow/bundle/
+pyxflow --bundle --keep                   # keep bundle-project/ for debugging
+pyxflow --bundle --vaadin-version 25.1.0  # pin a different Vaadin version
 ```
 
 The command auto-discovers all `Component` subclasses with `_v_fqcn`, generates a Maven project with `@Uses` for each, builds in production mode, and extracts the bundle from the WAR.
@@ -163,12 +163,12 @@ Users can generate their own bundle to include only the components they use, or 
 
 ```bash
 # From the project root (where my_app/ lives)
-pyflow my_app --bundle                   # build → my_app/bundle/
-pyflow my_app --bundle --keep            # keep my_app/bundle-project/
+pyxflow my_app --bundle                   # build → my_app/bundle/
+pyxflow my_app --bundle --keep            # keep my_app/bundle-project/
 ```
 
 The generated `my_app/bundle/` takes priority over the package-internal bundle at runtime. This allows projects to:
-- Use a different Vaadin version than the one shipped with pyflow
+- Use a different Vaadin version than the one shipped with pyxflow
 - Include additional web components (by adding `_v_fqcn` to custom components)
 - Reduce bundle size by only including used components (future)
 

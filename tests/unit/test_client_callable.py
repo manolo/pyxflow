@@ -12,10 +12,10 @@ Tests that:
 
 import pytest
 
-from pyflow.core.component import Component, ClientCallable
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
-from pyflow.server.uidl_handler import UidlHandler
+from pyxflow.core.component import Component, ClientCallable
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
+from pyxflow.server.uidl_handler import UidlHandler
 
 
 class MyComponent(Component):
@@ -342,5 +342,5 @@ class TestExport:
     """Test that ClientCallable is properly exported."""
 
     def test_import_from_components(self):
-        from pyflow.components import ClientCallable as CC
+        from pyxflow.components import ClientCallable as CC
         assert CC is ClientCallable

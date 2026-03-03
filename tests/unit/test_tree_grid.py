@@ -2,10 +2,10 @@
 
 import pytest
 
-from pyflow.components.grid import TreeGrid, Column, HeaderRow, HeaderCell, ColumnGroup
-from pyflow.components.renderer import LitRenderer
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.components.grid import TreeGrid, Column, HeaderRow, HeaderCell, ColumnGroup
+from pyxflow.components.renderer import LitRenderer
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 # --- Test data ---

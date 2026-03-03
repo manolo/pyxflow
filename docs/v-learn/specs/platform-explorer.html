@@ -313,7 +313,7 @@ const DATA = [
         ]
       },
       { name:"FlowClient.js + Push + Connectors", c:"fe", desc:"FlowClient.js · VaadinPush.js · *Connector.js",
-        detail:'<h3>FlowClient.js + VaadinPush.js + Connectors</h3><span class="tag open">Apache 2.0</span><p>Client-side runtime scripts:</p><ul><li><b>FlowClient.js</b> — UIDL interpreter (GWT-compiled ~200KB). Receives JSON, applies changes to the DOM, sends RPCs via HTTP POST. Constant pool, SyncId tracking, SPA navigation.</li><li><b>VaadinPush.js</b> — Atmosphere client for WebSocket push server→client. Handshake, heartbeat, automatic reconnect.</li><li><b>*Connector.js</b> — Per-component scripts: <code>gridConnector.js</code>, <code>comboBoxConnector.js</code>, <code>contextMenuConnector.js</code>, <code>menubarConnector.js</code>, etc. Bridge between Lit components and the UIDL protocol.</li></ul><p class="stat">Reused identically by PyFlow.</p>' },
+        detail:'<h3>FlowClient.js + VaadinPush.js + Connectors</h3><span class="tag open">Apache 2.0</span><p>Client-side runtime scripts:</p><ul><li><b>FlowClient.js</b> — UIDL interpreter (GWT-compiled ~200KB). Receives JSON, applies changes to the DOM, sends RPCs via HTTP POST. Constant pool, SyncId tracking, SPA navigation.</li><li><b>VaadinPush.js</b> — Atmosphere client for WebSocket push server→client. Handshake, heartbeat, automatic reconnect.</li><li><b>*Connector.js</b> — Per-component scripts: <code>gridConnector.js</code>, <code>comboBoxConnector.js</code>, <code>contextMenuConnector.js</code>, <code>menubarConnector.js</code>, etc. Bridge between Lit components and the UIDL protocol.</li></ul><p class="stat">Reused identically by PyXFlow.</p>' },
       { name:"React Wrappers", c:"fe", desc:"@vaadin/react-components",
         detail:'<h3>React Wrappers</h3><span class="tag open">Apache 2.0</span><p>React wrappers for all Vaadin web components. Two packages:</p><ul><li><code>@vaadin/react-components</code> — 49 core components</li><li><code>@vaadin/react-components-pro</code> — 7 commercial components</li></ul><p>Used by Hilla (React frontend). Flow uses the Lit web components directly, doesn\'t need these wrappers.</p>' },
       { name:"Lumo / Aura", c:"fe", desc:"2 themes with light + dark variants",
@@ -555,7 +555,7 @@ function render() {
 
       // Server box (right)
       html += '<div class="mvp-box c-fl" style="view-transition-name:sec-1">';
-      html += `<div class="mvp-box-title"><span class="mvp-icon">${pythonMode?'🐍':'⚡'}</span> ${pythonMode?'Python':'Server'} <span class="mvp-sub">${pythonMode?'PyFlow':'State'}</span></div>`;
+      html += `<div class="mvp-box-title"><span class="mvp-icon">${pythonMode?'🐍':'⚡'}</span> ${pythonMode?'Python':'Server'} <span class="mvp-sub">${pythonMode?'PyXFlow':'State'}</span></div>`;
       html += '<div class="mvp-items">';
       (fl.children || []).forEach((child, ci) => {
         if (!isEssential(1, child.name)) return;

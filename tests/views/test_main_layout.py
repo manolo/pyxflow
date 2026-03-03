@@ -1,8 +1,8 @@
 """Shared layout for all test views — provides SideNav menu."""
 
-from pyflow import AppShell, Push, StyleSheet
-from pyflow.components import HorizontalLayout, SideNav, SideNavItem, Span, VerticalLayout
-from pyflow.menu import get_menu_entries, get_page_header
+from pyxflow import AppShell, Push, StyleSheet
+from pyxflow.components import HorizontalLayout, SideNav, SideNavItem, Span, VerticalLayout
+from pyxflow.menu import get_menu_entries, get_page_header
 
 
 @AppShell

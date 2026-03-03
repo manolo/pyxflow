@@ -2,8 +2,8 @@
 
 import pytest
 
-from pyflow.components import VerticalLayout, Span
-from pyflow.router import Route, clear_routes, BeforeEnterEvent
+from pyxflow.components import VerticalLayout, Span
+from pyxflow.router import Route, clear_routes, BeforeEnterEvent
 
 
 class TestViewReuse:
@@ -16,8 +16,8 @@ class TestViewReuse:
         clear_routes()
 
     def _make_handler(self):
-        from pyflow.server.uidl_handler import UidlHandler
-        from pyflow.core.state_tree import StateTree
+        from pyxflow.server.uidl_handler import UidlHandler
+        from pyxflow.core.state_tree import StateTree
 
         tree = StateTree()
         handler = UidlHandler(tree)
@@ -157,8 +157,8 @@ class TestPushUrl:
         clear_routes()
 
     def _make_tree_and_ui(self):
-        from pyflow.core.state_tree import StateTree
-        from pyflow.core.component import UI
+        from pyxflow.core.state_tree import StateTree
+        from pyxflow.core.component import UI
         tree = StateTree()
         ui = UI(tree)
         return tree, ui
@@ -206,8 +206,8 @@ class TestNavigationRequest:
     @pytest.fixture
     def session(self):
         """Create a session with init completed."""
-        from pyflow.server.uidl_handler import UidlHandler
-        from pyflow.core.state_tree import StateTree
+        from pyxflow.server.uidl_handler import UidlHandler
+        from pyxflow.core.state_tree import StateTree
 
         tree = StateTree()
         handler = UidlHandler(tree)
@@ -261,8 +261,8 @@ class TestViewCreation:
     @pytest.fixture
     def navigation_changes(self):
         """Get changes from navigation response."""
-        from pyflow.server.uidl_handler import UidlHandler
-        from pyflow.core.state_tree import StateTree
+        from pyxflow.server.uidl_handler import UidlHandler
+        from pyxflow.core.state_tree import StateTree
 
         tree = StateTree()
         handler = UidlHandler(tree)

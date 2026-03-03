@@ -1,9 +1,9 @@
 """Tests for Accordion component."""
 
 import pytest
-from pyflow.components import Accordion, AccordionPanel, Span
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.components import Accordion, AccordionPanel, Span
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def tree():
 
 class TestAccordionPanel:
     def test_extends_details(self):
-        from pyflow.components.details import Details
+        from pyxflow.components.details import Details
         panel = AccordionPanel("Title", Span("Content"))
         assert isinstance(panel, Details)
 

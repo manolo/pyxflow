@@ -2,9 +2,9 @@
 
 import pytest
 
-from pyflow.components.login import LoginForm, LoginOverlay
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.components.login import LoginForm, LoginOverlay
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 class TestLoginForm:

@@ -1,4 +1,4 @@
-# PyFlow Landing Website — Content Spec
+# PyXFlow Landing Website — Content Spec
 
 **Source of truth** for `index.html`. Edit this file to change page content; regenerate HTML from it.
 
@@ -12,7 +12,7 @@
 
 | Field | Value |
 |-------|-------|
-| Title | `PyFlow — Build Web Apps in Pure Python` |
+| Title | `PyXFlow — Build Web Apps in Pure Python` |
 | Language | `en` |
 | Format | Single self-contained HTML file (embedded `<style>` + `<script>`, zero external dependencies) |
 
@@ -24,7 +24,7 @@
 |-------|-------|
 | ID | *(none — `<nav>` element)* |
 | Position | Fixed top, z-index 100, frosted glass (`backdrop-filter: blur(12px)`) |
-| Brand | Logo (`logo.png`, 60px) + "PyFlow" + "by Vaadin" subtitle |
+| Brand | Logo (`logo.png`, 60px) + "PyXFlow" + "by Vaadin" subtitle |
 
 **Nav links** (in order):
 
@@ -35,7 +35,7 @@
 | Examples | `#showcase` |
 | Components | `#gallery` |
 | Quick Start | `#quickstart` |
-| GitHub | `https://github.com/manolo/pyflow` (external) |
+| GitHub | `https://github.com/manolo/pyxflow` (external) |
 
 **Responsive**: Links hidden on mobile (<768px), only brand visible.
 
@@ -56,7 +56,7 @@
 | Headline | `Build Web Apps` / `in Pure Python` (gradient accent on "Pure Python") |
 | Subtitle | `No JavaScript. No HTML. Just Python.` / `Enterprise-grade Vaadin components, powered by Python.` |
 | CTA primary | "Get Started" → `#quickstart` |
-| CTA secondary | "View on GitHub" (with GitHub SVG icon) → `https://github.com/manolo/pyflow` |
+| CTA secondary | "View on GitHub" (with GitHub SVG icon) → `https://github.com/manolo/pyxflow` |
 
 **Right column — code block with typing animation:**
 
@@ -67,8 +67,8 @@
 | Animation | Character-by-character reveal, 35-60ms/char, 120ms between lines, blinking cursor |
 
 ```python
-from pyflow import Route, Menu
-from pyflow.components import *
+from pyxflow import Route, Menu
+from pyxflow.components import *
 
 @Route("hello")
 @Menu("Hello", icon="vaadin:hand")
@@ -82,12 +82,12 @@ class HelloView(HorizontalLayout):
 
 ---
 
-## Section 3: Why PyFlow
+## Section 3: Why PyXFlow
 
 | Field | Value |
 |-------|-------|
 | ID | `why` |
-| Title | `Why PyFlow?` |
+| Title | `Why PyXFlow?` |
 | Subtitle | `Everything you need to build production web apps, without leaving Python.` |
 | Layout | 4 feature cards in responsive grid (`minmax(240px, 1fr)`) |
 
@@ -166,8 +166,8 @@ class HelloView(HorizontalLayout):
 | Layout | Normal (code left, screenshot right) |
 
 ```python
-from pyflow import Route, Menu
-from pyflow.components import *
+from pyxflow import Route, Menu
+from pyxflow.components import *
 
 @Route("hello")
 @Menu("Hello", icon="vaadin:hand")
@@ -219,8 +219,8 @@ class GridView(VerticalLayout):
 | Layout | Normal (code left, screenshot right) |
 
 ```python
-from pyflow.components import *
-from pyflow.data import Binder
+from pyxflow.components import *
+from pyxflow.data import Binder
 
 @Route("master-detail")
 @Menu("Master-Detail", icon="vaadin:split-h")
@@ -275,18 +275,18 @@ class MasterDetailView(Div):
 **Terminal commands:**
 
 ```bash
-# Install PyFlow
-$ pip install pyflow
+# Install PyXFlow
+$ pip install pyxflow
 
 # Create your app
 $ mkdir myapp && cd myapp
 $ mkdir views
 
 # Optionally create some demo views
-$ pyflow --setup
+$ pyxflow --setup
 
 # Run with hot reload
-$ pyflow --dev
+$ pyxflow --dev
 ```
 
 **File tree:**
@@ -306,8 +306,8 @@ myapp/
 | Field | Value |
 |-------|-------|
 | ID | *(none — `<footer>` element)* |
-| Links | GitHub (`https://github.com/manolo/pyflow`), Issues (`https://github.com/manolo/pyflow/issues`) |
-| Text | `PyFlow by Vaadin }> — Open source under the Apache 2.0 License.` |
+| Links | GitHub (`https://github.com/manolo/pyxflow`), Issues (`https://github.com/manolo/pyxflow/issues`) |
+| Text | `PyXFlow by Vaadin }> — Open source under the Apache 2.0 License.` |
 
 ---
 

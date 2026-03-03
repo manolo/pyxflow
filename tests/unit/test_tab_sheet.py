@@ -2,11 +2,11 @@
 
 import pytest
 
-from pyflow.components.tabs import Tab, Tabs
-from pyflow.components.tab_sheet import TabSheet
-from pyflow.components.span import Span
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.components.tabs import Tab, Tabs
+from pyxflow.components.tab_sheet import TabSheet
+from pyxflow.components.span import Span
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 class TestTabSheet:

@@ -6,9 +6,9 @@ Tests response structure, changes format, and constants handling.
 
 import pytest
 
-from pyflow.server.uidl_handler import UidlHandler
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
+from pyxflow.server.uidl_handler import UidlHandler
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
 
 
 class TestResponseStructure:
@@ -577,10 +577,10 @@ class TestOverlayClientKey:
     @pytest.fixture
     def handler_with_dialog(self):
         """Create handler that navigates to a view with a Dialog."""
-        from pyflow.components.dialog import Dialog
-        from pyflow.components.span import Span
-        from pyflow.components import VerticalLayout
-        from pyflow.router import Route
+        from pyxflow.components.dialog import Dialog
+        from pyxflow.components.span import Span
+        from pyxflow.components import VerticalLayout
+        from pyxflow.router import Route
 
         # Register a temporary view with a Dialog
         @Route("_test_dialog_key")
@@ -612,7 +612,7 @@ class TestOverlayClientKey:
         response = handler.handle_uidl(payload)
 
         # Clean up route registry
-        from pyflow.router import _routes
+        from pyxflow.router import _routes
         _routes.pop("_test_dialog_key", None)
 
         return handler, response
@@ -634,10 +634,10 @@ class TestOverlayClientKey:
     @pytest.fixture
     def handler_with_notification(self):
         """Create handler that navigates to a view with a Notification."""
-        from pyflow.components.notification import Notification
-        from pyflow.components.span import Span
-        from pyflow.components import VerticalLayout
-        from pyflow.router import Route
+        from pyxflow.components.notification import Notification
+        from pyxflow.components.span import Span
+        from pyxflow.components import VerticalLayout
+        from pyxflow.router import Route
 
         @Route("_test_notif_key")
         class TestNotifView(VerticalLayout):
@@ -667,7 +667,7 @@ class TestOverlayClientKey:
         }
         response = handler.handle_uidl(payload)
 
-        from pyflow.router import _routes
+        from pyxflow.router import _routes
         _routes.pop("_test_notif_key", None)
 
         return handler, response

@@ -10,7 +10,7 @@ APIs, Upload slotted components, HTML elements, Binder, SplitLayout, Card,
 MasterDetailLayout.
 """
 
-from pyflow.components import (
+from pyxflow.components import (
     Accordion, AccordionPanel, Anchor, Article, Aside, Button, Card,
     CheckboxGroup, ContextMenu, DatePicker, DateTimePicker, Details, Dialog,
     Div, EmailField, FlexLayout, Grid, H5, H6, HorizontalLayout, Hr, IFrame,
@@ -20,15 +20,15 @@ from pyflow.components import (
     SplitLayout, Tab, TabSheet, Tabs, TextArea, TextField, TimePicker,
     VerticalLayout,
 )
-from pyflow.components.confirm_dialog import ConfirmDialog
-from pyflow.components.horizontal_layout import Alignment, JustifyContentMode
-from pyflow.components.master_detail_layout import MasterDetailLayout
-from pyflow.components.upload import Upload
-from pyflow.components.combo_box import ComboBox
-from pyflow.core.component import Component
-from pyflow.core.state_tree import StateTree
-from pyflow.core.state_node import Feature
-from pyflow.data.binder import Binder
+from pyxflow.components.confirm_dialog import ConfirmDialog
+from pyxflow.components.horizontal_layout import Alignment, JustifyContentMode
+from pyxflow.components.master_detail_layout import MasterDetailLayout
+from pyxflow.components.upload import Upload
+from pyxflow.components.combo_box import ComboBox
+from pyxflow.core.component import Component
+from pyxflow.core.state_tree import StateTree
+from pyxflow.core.state_node import Feature
+from pyxflow.data.binder import Binder
 
 
 def tree():
