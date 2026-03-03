@@ -362,9 +362,9 @@ class TestDiscoverViews:
         """After discover_views, get_menu_entries should return @Menu entries."""
         discover_views("demo.views")
         entries = get_menu_entries()
-        assert len(entries) == 8
+        assert len(entries) == 9
         titles = [e.title for e in entries]
-        assert titles == ["About", "Hello", "Components", "Grid", "Master-Detail", "Responsive CRUD", "Stopwatch", "File Explorer"]
+        assert titles == ["About", "Hello", "Components", "Grid", "Grid Editor", "Master-Detail", "Responsive CRUD", "Stopwatch", "File Explorer"]
         # Verify sorted by (order, path)
         orders = [e.order for e in entries]
         assert orders == sorted(orders)

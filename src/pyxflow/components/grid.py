@@ -17,6 +17,40 @@ if TYPE_CHECKING:
     from pyxflow.core.state_tree import StateTree
 
 
+# --- Editor Event Classes ---
+
+class EditorOpenEvent:
+    """Fired when the editor opens for an item."""
+
+    def __init__(self, editor: "EditorImpl", item):
+        self.editor = editor
+        self.item = item
+
+
+class EditorCloseEvent:
+    """Fired when the editor closes."""
+
+    def __init__(self, editor: "EditorImpl", item):
+        self.editor = editor
+        self.item = item
+
+
+class EditorSaveEvent:
+    """Fired when the editor saves (buffered mode)."""
+
+    def __init__(self, editor: "EditorImpl", item):
+        self.editor = editor
+        self.item = item
+
+
+class EditorCancelEvent:
+    """Fired when the editor cancels (buffered mode)."""
+
+    def __init__(self, editor: "EditorImpl", item):
+        self.editor = editor
+        self.item = item
+
+
 class GridSortOrder:
     """Represents a sort order for a grid column."""
 
@@ -54,6 +88,9 @@ class Column:
         self._frozen_to_end = False
         self._visible = True
         self._key: str | None = None
+        self._editor_renderer: "_EditorRenderer | None" = None
+        self._editor_component: "Component | None" = None
+        self._grid: "Grid | None" = None
 
     @property
     def internal_id(self) -> str:
@@ -159,6 +196,40 @@ class Column:
     def get_key(self) -> str | None:
         return self._key
 
+    def set_editor_component(self, component_or_function) -> "Column":
+        """Set the editor component for inline editing.
+
+        Args:
+            component_or_function: A Component instance (shared for all items),
+                a callable(item) -> Component (per-item factory), or None to clear.
+
+        Returns:
+            This column for chaining.
+        """
+        if component_or_function is None:
+            self._editor_component = None
+            if self._editor_renderer:
+                self._editor_renderer._component_function = None
+            return self
+
+        if callable(component_or_function) and not isinstance(component_or_function, Component):
+            self._editor_component = None
+            factory = component_or_function
+        else:
+            self._editor_component = component_or_function
+            factory = lambda item: component_or_function
+
+        if self._editor_renderer is None:
+            assert self._grid is not None, "Column must be added to a Grid before setting editor component"
+            editor = self._grid.get_editor()
+            self._editor_renderer = _EditorRenderer(editor, self._internal_id)
+        self._editor_renderer._component_function = factory
+        return self
+
+    def get_editor_component(self) -> "Component | None":
+        """Get the static editor component, if one was set."""
+        return self._editor_component
+
     def _create_element(self, tree: "StateTree"):
         """Create the vaadin-grid-column state node."""
         self._node = tree.create_node()
@@ -186,6 +257,103 @@ class Column:
         if not self._visible:
             self._node.put(Feature.ELEMENT_PROPERTY_MAP, "hidden", True)
         return self._node
+
+
+class _EditorRenderer:
+    """Renders editor components for a column when the grid editor is open.
+
+    Creates a virtual container div (like ComponentRenderer) and patches the
+    column's renderer function to switch between view/edit modes based on the
+    ``_editing`` flag in the row data.
+    """
+
+    def __init__(self, editor: "EditorImpl", column_internal_id: str):
+        self._editor = editor
+        self._column_internal_id = column_internal_id
+        self._component_function: Callable | None = None
+        self._component: Component | None = None
+        self._container_node = None
+
+    def setup(self, tree: "StateTree", column_node):
+        """Create virtual container and patch the column renderer."""
+        # Create container div as virtual child of the column
+        self._container_node = tree.create_node()
+        self._container_node.attach()
+        self._container_node.put(Feature.ELEMENT_DATA, "tag", "div")
+        self._container_node.put(Feature.ELEMENT_DATA, "payload", {"type": "inMemory"})
+        tree.add_change({
+            "node": column_node.id,
+            "type": "splice",
+            "feat": Feature.VIRTUAL_CHILDREN_LIST,
+            "index": 0,
+            "addNodes": [self._container_node.id],
+        })
+
+        # Patch virtual container
+        container_ref = {"@v-node": self._container_node.id}
+        tree.queue_execute([
+            container_ref,
+            "return (async function() { Vaadin.FlowComponentHost.patchVirtualContainer(this) }).apply($0)",
+        ])
+
+        # Patch column renderer to switch between view/edit modes
+        client_key = tree._app_id.split("-")[0]
+        col_ref = {"@v-node": column_node.id}
+        col_id = self._column_internal_id
+        tree.queue_execute([
+            col_ref, client_key, col_id,
+            "const col=$0, appId=$1, colId=$2;"
+            "const originalRender=col.renderer;"
+            "col.renderer=function(root,container,model){"
+            "  const editingChanged=root.__editing!==model.item._editing;"
+            "  root.__editing=model.item._editing;"
+            "  if(editingChanged){delete root._$litPart$;root.innerHTML=''}"
+            "  if(root.__editing){"
+            "    const nodeId=model.item['_'+colId+'_editor'];"
+            "    if(nodeId!=null)Vaadin.FlowComponentHost.setChildNodes(appId,[nodeId],root)"
+            "  }else if(originalRender){originalRender(root,container,model)}"
+            "  else{col._defaultRenderer(root,container,model)}"
+            "}",
+        ])
+
+    def generate_data(self, item, connector_item):
+        """Add editor component node ID to connector item for the edited row."""
+        if self._editor.is_open() and self._component is not None and item is self._editor.get_item():
+            key = f"_{self._column_internal_id}_editor"
+            connector_item[key] = self._component.element.node_id
+
+    def refresh_data(self, item):
+        """Rebuild the editor component for the given item."""
+        if self._editor.is_open():
+            self._build_component(item)
+
+    def _build_component(self, item):
+        """Create the editor component from the factory and attach it."""
+        if self._component_function is None:
+            return
+        new_component = self._component_function(item)
+        self._set_component(new_component)
+
+    def _set_component(self, new_component: "Component | None"):
+        """Replace the current editor component with a new one."""
+        if new_component is self._component:
+            return
+        grid = self._editor._grid
+        if grid._element is None:
+            # Grid not attached yet -- just store the component
+            self._component = new_component
+            return
+        tree = grid.element._tree
+        # Remove old component from container
+        if self._component is not None and self._container_node is not None:
+            if self._component._element:
+                self._container_node.remove_child(self._component.element.node)
+        # Attach new component
+        if new_component is not None and self._container_node is not None:
+            if not new_component._element:
+                new_component._attach(tree)
+            self._container_node.add_child(new_component.element.node)
+        self._component = new_component
 
 
 class ColumnGroup:
@@ -292,6 +460,184 @@ class _GridSelectionColumn:
         pass
 
 
+class EditorImpl:
+    """Manages inline editing of grid rows.
+
+    In **buffered** mode, changes are applied only when ``save()`` is called.
+    In **unbuffered** mode, the binder's ``set_bean()`` auto-writes changes.
+    """
+
+    def __init__(self, grid: "Grid"):
+        self._grid = grid
+        self._binder = None
+        self._edited = None  # Current item being edited, or None
+        self._buffered = False
+        self._open_listeners: list[Callable] = []
+        self._close_listeners: list[Callable] = []
+        self._save_listeners: list[Callable] = []
+        self._cancel_listeners: list[Callable] = []
+
+    # --- Binder ---
+
+    def set_binder(self, binder) -> "EditorImpl":
+        """Set the Binder used for binding editor fields to item properties."""
+        self._binder = binder
+        return self
+
+    def get_binder(self):
+        """Get the current Binder."""
+        return self._binder
+
+    # --- Buffered mode ---
+
+    def set_buffered(self, buffered: bool) -> "EditorImpl":
+        """Set whether the editor uses buffered mode (requires explicit save/cancel)."""
+        self._buffered = buffered
+        return self
+
+    def is_buffered(self) -> bool:
+        return self._buffered
+
+    # --- State ---
+
+    def is_open(self) -> bool:
+        """Return True if the editor is currently open."""
+        return self._edited is not None
+
+    def get_item(self):
+        """Return the item currently being edited, or None."""
+        return self._edited
+
+    # --- Lifecycle ---
+
+    def edit_item(self, item):
+        """Open the editor for the given item.
+
+        In buffered mode, if another item is already being edited the call
+        is silently ignored (the user must save or cancel first).
+        In unbuffered mode, closes the current editor before opening for
+        the new item.
+        """
+        if self._binder is None:
+            raise ValueError("Binder must be set before editing")
+        if item is None:
+            raise ValueError("Item must not be None")
+        if self._buffered and self._edited is not None and self._edited is not item:
+            return  # Must save/cancel first -- ignore silently (matches Java)
+
+        # Close current editor if open
+        if self._edited is not None:
+            self._close()
+
+        self._edited = item
+
+        # Refresh data for all editor renderers (builds components)
+        for col in self._grid._columns:
+            if col._editor_renderer:
+                col._editor_renderer.refresh_data(item)
+
+        # Bind the item
+        if self._buffered:
+            self._binder.read_bean(item)
+        else:
+            self._binder.set_bean(item)
+
+        # Push data to client
+        if self._grid._element:
+            self._grid._push_data()
+
+        # Fire open event
+        event = EditorOpenEvent(self, item)
+        for listener in list(self._open_listeners):
+            listener(event)
+
+    def save(self) -> bool:
+        """Save changes in buffered mode.
+
+        Returns True if validation passed and changes were written.
+        """
+        if not self._buffered or self._edited is None:
+            return False
+        if not self._binder.write_bean_if_valid(self._edited):
+            return False
+
+        item = self._edited
+        event = EditorSaveEvent(self, item)
+        for listener in list(self._save_listeners):
+            listener(event)
+
+        self._close()
+        return True
+
+    def cancel(self):
+        """Cancel editing in buffered mode."""
+        if self._edited is None:
+            return
+        item = self._edited
+        event = EditorCancelEvent(self, item)
+        for listener in list(self._cancel_listeners):
+            listener(event)
+        self._close()
+
+    def close_editor(self):
+        """Close the editor in unbuffered mode."""
+        if self._buffered:
+            raise ValueError("Use save() or cancel() in buffered mode")
+        if self._edited is not None:
+            self._close()
+
+    def refresh(self):
+        """Refresh editor components and push data."""
+        if self._edited is not None:
+            for col in self._grid._columns:
+                if col._editor_renderer:
+                    col._editor_renderer.refresh_data(self._edited)
+            if self._grid._element:
+                self._grid._push_data()
+
+    def _close(self):
+        """Internal close: clear edited, push data, fire close event."""
+        old_edited = self._edited
+        self._edited = None
+
+        # Push data to client (removes _editing flag)
+        if self._grid._element:
+            self._grid._push_data()
+
+        # Fire close event
+        if old_edited is not None:
+            event = EditorCloseEvent(self, old_edited)
+            for listener in list(self._close_listeners):
+                listener(event)
+
+    def generate_data(self, item, connector_item):
+        """Add ``_editing: true`` to the connector item being edited."""
+        if item is self._edited:
+            connector_item["_editing"] = True
+
+    # --- Listeners ---
+
+    def add_open_listener(self, listener: Callable) -> Callable:
+        """Add a listener for editor open events. Returns removal callable."""
+        self._open_listeners.append(listener)
+        return lambda: self._open_listeners.remove(listener)
+
+    def add_close_listener(self, listener: Callable) -> Callable:
+        """Add a listener for editor close events. Returns removal callable."""
+        self._close_listeners.append(listener)
+        return lambda: self._close_listeners.remove(listener)
+
+    def add_save_listener(self, listener: Callable) -> Callable:
+        """Add a listener for editor save events. Returns removal callable."""
+        self._save_listeners.append(listener)
+        return lambda: self._save_listeners.remove(listener)
+
+    def add_cancel_listener(self, listener: Callable) -> Callable:
+        """Add a listener for editor cancel events. Returns removal callable."""
+        self._cancel_listeners.append(listener)
+        return lambda: self._cancel_listeners.remove(listener)
+
+
 class Grid(Component):
     """A data grid component.
 
@@ -331,6 +677,8 @@ class Grid(Component):
         self._data_provider_obj: DataProvider | None = None
         self._data_provider_listener_unsub: Callable | None = None
         self._data_provider_size: int = 0
+        # Editor
+        self._editor: EditorImpl | None = None
 
     def set_columns(self, *property_names: str) -> list["Column"]:
         """Set columns from property names, auto-generating Title Case headers.
@@ -367,6 +715,7 @@ class Grid(Component):
             column._renderer = arg
         else:
             column = Column(internal_id, arg, header)
+        column._grid = self
         self._columns.append(column)
         return column
 
@@ -458,6 +807,14 @@ class Grid(Component):
         """
         renderer = ComponentRenderer(component_provider)
         return self.add_column(renderer)
+
+    # --- Editor ---
+
+    def get_editor(self) -> EditorImpl:
+        """Get the grid editor (lazily created)."""
+        if self._editor is None:
+            self._editor = EditorImpl(self)
+        return self._editor
 
     # --- All Rows Visible ---
 
@@ -808,6 +1165,11 @@ class Grid(Component):
             if col._renderer:
                 self._setup_renderer(tree, col)
 
+        # 3d. Set up editor renderers for columns with editor components
+        for col in self._columns:
+            if col._editor_renderer:
+                col._editor_renderer.setup(tree, col._node)
+
         # 4. Register item click event listeners
         if self._item_click_listeners:
             self.element.add_event_listener("item-click", self._handle_item_click, _ITEM_CLICK_HASH)
@@ -952,6 +1314,12 @@ class Grid(Component):
                     self._add_renderer_data(tree, col, connector_item, item, key)
                 else:
                     connector_item[col.internal_id] = item.get(col.property_name, "")
+            # Editor data
+            if self._editor is not None and self._editor.is_open():
+                self._editor.generate_data(item, connector_item)
+                for col in self._columns:
+                    if col._editor_renderer:
+                        col._editor_renderer.generate_data(item, connector_item)
             connector_items.append(connector_item)
 
         if selected_item_ids:
@@ -1071,6 +1439,12 @@ class Grid(Component):
                     self._add_renderer_data(tree, col, connector_item, item, key)
                 else:
                     connector_item[col.internal_id] = item.get(col.property_name, "")
+            # Editor data
+            if self._editor is not None and self._editor.is_open():
+                self._editor.generate_data(item, connector_item)
+                for col in self._columns:
+                    if col._editor_renderer:
+                        col._editor_renderer.generate_data(item, connector_item)
             connector_items.append(connector_item)
 
         # updateSize
@@ -1410,6 +1784,12 @@ class TreeGrid(Grid):
                     self._add_renderer_data(tree, col, connector_item, item, key)
                 else:
                     connector_item[col.internal_id] = item.get(col.property_name, "")
+            # Editor data
+            if self._editor is not None and self._editor.is_open():
+                self._editor.generate_data(item, connector_item)
+                for col in self._columns:
+                    if col._editor_renderer:
+                        col._editor_renderer.generate_data(item, connector_item)
             connector_items.append(connector_item)
 
         # updateSize

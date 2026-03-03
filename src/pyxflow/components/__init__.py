@@ -10,7 +10,10 @@ from pyxflow.components.dialog import Dialog
 from pyxflow.components.email_field import EmailField
 from pyxflow.components.flex_layout import FlexLayout
 from pyxflow.components.form_layout import FormLayout, FormItem, FormRow, ResponsiveStep
-from pyxflow.components.grid import Grid, TreeGrid, Column, ColumnGroup, HeaderRow, HeaderCell, GridSortOrder
+from pyxflow.components.grid import (
+    Grid, TreeGrid, Column, ColumnGroup, HeaderRow, HeaderCell, GridSortOrder,
+    EditorImpl, EditorOpenEvent, EditorCloseEvent, EditorSaveEvent, EditorCancelEvent,
+)
 from pyxflow.components.renderer import LitRenderer, TextRenderer, ComponentRenderer
 from pyxflow.components.html import (
     Div, H1, H2, H3, H4, H5, H6, Header, Footer, HtmlContainer, Image,
@@ -116,6 +119,11 @@ __all__ = [
     "Dialog",
     "Div",
     "DrawerToggle",
+    "EditorCancelEvent",
+    "EditorCloseEvent",
+    "EditorImpl",
+    "EditorOpenEvent",
+    "EditorSaveEvent",
     "EmailField",
     "FlexLayout",
     "Footer",

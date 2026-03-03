@@ -4,10 +4,10 @@
 
 **Vaadin version:** 25.0.6
 **Components:** 50+ implemented (all Vaadin 25 UI components)
-**Lines of code:** ~18,300 (core src/), ~56,100 (total with demo + tests)
-**Test structure:** `tests/unit/` (2457 unit tests, default `pytest`) + `tests/ui/` (446 Playwright, run explicitly)
-**Tests:** 2457 unit + 446 UI (Playwright)
-**Last updated:** 2026-02-25
+**Lines of code:** ~19,000 (core src/), ~58,000 (total with demo + tests)
+**Test structure:** `tests/unit/` (2519 unit tests, default `pytest`) + `tests/ui/` (456 Playwright, run explicitly)
+**Tests:** 2519 unit + 456 UI (Playwright)
+**Last updated:** 2026-03-03
 
 ---
 
@@ -31,6 +31,7 @@
 - [x] **Grid connector protocol** - `gridConnector.initLazy`, `$connector.set/updateSize/confirm`, `setHeaderRenderer`, `setFooterRenderer`
 - [x] **Grid header rows** - `prepend_header_row()`, `HeaderRow.join()` creates `<vaadin-grid-column-group>` for spanning headers
 - [x] **Grid column footers** - `Column.set_footer_text()` renders footer via `setFooterRenderer`
+- [x] **Grid Editor** - `EditorImpl` (buffered/unbuffered), `_EditorRenderer` with virtual container + JS renderer patching, `Column.set_editor_component()`, Binder integration
 - [x] **TreeGrid** - Hierarchical Grid with expand/collapse, inline treeGridConnector overrides (no bundle rebuild)
 - [x] **Select connector protocol** - `selectConnector.initLazy`, `requestContentUpdate`
 - [x] **ComboBox connector protocol** - `comboBoxConnector.initLazy`, `$connector.set/updateSize/confirm`, filtering
@@ -65,7 +66,7 @@
 - [x] RadioButtonGroup - Radio button selection
 - [x] CheckboxGroup - Multiple checkbox selection
 - [x] FormLayout - Responsive steps, colspan, FormItem (label slot), FormRow, auto-responsive, CSS custom properties
-- [x] Grid - Columns (path, header, width, flexGrow, autoWidth, resizable, sortable, textAlign), in-memory data push, single/multi selection, sorting, lazy loading/DataProvider, column reordering, LitRenderer, ComponentRenderer, header rows (column groups), column footers, item click listeners, scroll_to_item, remove_column, set_rows_draggable, set_drop_mode, set_empty_state_text, set_details_visible_on_click, programmatic selection push to client
+- [x] Grid - Columns (path, header, width, flexGrow, autoWidth, resizable, sortable, textAlign), in-memory data push, single/multi selection, sorting, lazy loading/DataProvider, column reordering, LitRenderer, ComponentRenderer, header rows (column groups), column footers, item click listeners, scroll_to_item, remove_column, set_rows_draggable, set_drop_mode, set_empty_state_text, set_details_visible_on_click, programmatic selection push to client, **inline editor** (buffered/unbuffered, Binder integration, EditorRenderer with virtual containers, open/close/save/cancel events)
 - [x] ConfirmDialog - Confirm/cancel/reject actions, header/message/button text, theme, cancelable/rejectable
 - [x] ComboBox - Filtered dropdown, data push protocol, item label generator, custom value support, class name generator, prefix component, overlay width
 - [x] DatePicker - Date selection with calendar overlay, min/max, connector init, i18n, week numbers, initial position, open/close, opened-change listener
@@ -108,7 +109,7 @@
 - [x] `focus()` / `blur()` - Focus management via execute commands
 - [x] `setHelperText()` / `getHelperText()` - Helper text below fields
 - [x] `setTooltipText()` / `getTooltipText()` - Tooltips via `<vaadin-tooltip>` child
-- [x] `addClickShortcut(Key)` - Keyboard shortcuts (keydown→click dispatch)
+- [x] `addClickShortcut(Key)` - Keyboard shortcuts (keydown->click dispatch) with specific key matching (e.g., only Escape triggers Cancel)
 - [x] `get_style()` - Returns `_BufferedStyle` that works before and after attach (set/get/remove buffered pre-attach, delegates to real `Style` post-attach)
 - [x] `set_aria_label()` / `get_aria_label()` - ARIA label (HasAriaLabel)
 - [x] `set_aria_labelled_by()` / `get_aria_labelled_by()` - ARIA labelled-by reference
@@ -214,7 +215,7 @@
 
 > **For the detailed per-component API inventory (every method, [x]/[ ]), see `STATUS.API.md`.**
 >
-> API coverage: **~470 methods implemented, ~40 missing** (~92% complete).
+> API coverage: **~480 methods implemented, ~30 missing** (~94% complete).
 
 ### Unimplemented Features
 
@@ -222,7 +223,7 @@
 |---------|----------|-------------|
 | `@PWA` annotation | Medium | Activate `sw.js` from bundle, serve `manifest.json` with configurable app name/icons |
 | Security (`--secure`) | Medium | Login screen from local config, restrict interfaces (localhost vs 0.0.0.0), HTTPS/TLS |
-| Grid Editor API | Low | Inline row editing (`get_editor`, bind fields to columns, save/cancel) |
+| ~~Grid Editor API~~ | ~~Low~~ | ~~Inline row editing~~ -- **DONE**: `get_editor()`, `EditorImpl` (buffered/unbuffered), `Column.set_editor_component()`, `_EditorRenderer` with virtual containers, Binder integration, open/close/save/cancel events |
 | `HasErrorParameter` error views | Medium | Navigate to error view on unhandled exceptions (Java's `DefaultErrorHandler` + `ErrorHandlerUtil`). Currently shows Notification instead. |
 | Grid Drag/Drop listeners | Low | Drag start/end/drop event listeners (rows draggable & drop mode already implemented) |
 | Grid item details renderer | Low | Expandable row details via `set_item_details_renderer` (set_details_visible_on_click already implemented) |
@@ -239,7 +240,7 @@
 
 | Component | Missing Methods | Priority |
 |-----------|----------------|----------|
-| **Grid** | `add_component_column`, `set_item_details_renderer`, Editor API, Drag/Drop listeners | Medium |
+| **Grid** | `add_component_column`, `set_item_details_renderer`, Drag/Drop listeners | Medium |
 | **ComboBox** | `set_renderer` | Low |
 | **MultiSelectComboBox** | `set_renderer` | Low |
 | **MenuBar** | `add_item(Component)`, `close` | Low |
@@ -255,8 +256,8 @@
 
 | Category | Coverage | Details |
 |----------|----------|---------|
-| **Unit tests** | 2415 passing | Good coverage of all 50+ components + core + data layer. Located in `tests/unit/` |
-| **UI tests** | 446 passed | All 32 test views (in `tests/views/`) with shared SideNav layout and single browser session. UI tests in `tests/ui/`. |
+| **Unit tests** | 2519 passing | Good coverage of all 50+ components + core + data layer. Located in `tests/unit/` |
+| **UI tests** | 456 passed | All 33 test views (in `tests/views/`) with shared SideNav layout and single browser session. UI tests in `tests/ui/`. |
 
 ---
 

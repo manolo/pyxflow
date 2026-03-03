@@ -578,6 +578,7 @@ class Component:
         if self._click_shortcut_registered:
             return
         self._click_shortcut_registered = True
+        self._click_shortcut_key = key
 
         if self._element:
             self._register_click_shortcut(key)

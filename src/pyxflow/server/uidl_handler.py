@@ -921,22 +921,35 @@ class UidlHandler:
         """Handle keydown event.
 
         If the component has a click shortcut registered, dispatch as click.
+        Matches the pressed key against each component's shortcut key.
         """
+        pressed_key = event_data.get("event.key", "")
+
+        def _key_matches(shortcut_key):
+            """Match if no shortcut key set, no key data sent, or keys match."""
+            if shortcut_key is None or not pressed_key:
+                return True
+            return shortcut_key.value == pressed_key
+
         component = self._tree.get_component(node_id)
         if component and getattr(component, "_click_shortcut_registered", False):
-            # Dispatch as click on the same element
-            self._handle_click(node_id, event_data)
-        elif node_id == self._body_node.id:
-            # Global shortcut: scan all components for click shortcuts
+            shortcut_key = getattr(component, "_click_shortcut_key", None)
+            if _key_matches(shortcut_key):
+                self._handle_click(node_id, event_data)
+                return
+        if node_id == self._body_node.id:
+            # Global shortcut: scan all components for matching click shortcuts
             for comp in self._tree._components.values():
-                if getattr(comp, "_click_shortcut_registered", False):
+                if not getattr(comp, "_click_shortcut_registered", False):
+                    continue
+                shortcut_key = getattr(comp, "_click_shortcut_key", None)
+                if _key_matches(shortcut_key):
                     self._handle_click(comp.element.node_id, event_data)
-                    break
-        else:
-            # Generic keydown dispatch
-            element = self._tree.get_element(node_id)
-            if element:
-                element.fire_event("keydown", event_data)
+                    return
+        # Generic keydown dispatch
+        element = self._tree.get_element(node_id)
+        if element:
+            element.fire_event("keydown", event_data)
 
     def _handle_msync(self, rpc: dict[str, Any]):
         """Handle property sync RPC."""

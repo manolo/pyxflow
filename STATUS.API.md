@@ -1,7 +1,7 @@
 # PyXFlow API Inventory — Python vs Java Vaadin 25
 
-**Generated: 2026-02-25**
-**Python components: 50+ | Tests: 2415 unit + 446 UI | LOC: ~18,100 (core)**
+**Generated: 2026-03-03**
+**Python components: 50+ | Tests: 2519 unit + 456 UI | LOC: ~19,000 (core)**
 
 Legend: `[x]` = implemented, `[ ]` = missing
 
@@ -430,7 +430,8 @@ All components inherit from `Component` which provides:
 | `set_rows_draggable` / `set_drop_mode` (GridDropMode) | [x] |
 | `set_empty_state_text` / `set_empty_state_component` | [x] |
 | `set_item_details_renderer` | [ ] |
-| Editor API (`get_editor`) | [ ] |
+| Editor API (`get_editor`, `EditorImpl`: `set_binder`/`set_buffered`/`edit_item`/`save`/`cancel`/`close_editor`/`is_open`/`refresh`, open/close/save/cancel listeners) | [x] |
+| Column: `set_editor_component` / `get_editor_component` | [x] |
 | Drag/drop listeners (drag-start, drag-end, drop) | [ ] |
 | `add_theme_variants` / `remove_theme_variants` (GridVariant) | [x] |
 

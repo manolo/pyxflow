@@ -82,7 +82,7 @@ src/pyxflow/
 └── server/         # HTTP server (aiohttp), UIDL protocol handler
 
 demo/
-├── views/          # Demo views (7 routes)
+├── views/          # Demo views (9 routes)
 └── __main__.py     # python -m demo
 
 tests/
