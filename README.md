@@ -1,6 +1,6 @@
 <img src="docs/logo.png" alt="PyXFlow" width="80" align="left" style="margin-right: 16px;">
 
-# [PyXFlow](docs/)
+# [PyXFlow](https://manolo.github.io/pyxflow/)
 
 **Build full-stack web apps in pure Python. No JavaScript. No HTML templates.**
 
