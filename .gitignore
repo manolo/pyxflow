@@ -49,3 +49,5 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+docs/screenshots/demo-tour-original.gif
+docs/screenshots/screenshot-components-original.gif
