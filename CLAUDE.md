@@ -55,7 +55,7 @@ cd ../bundle-generator && ./mvnw package jetty:run-war
 pyxflow/
 ├── src/pyxflow/
 │   ├── core/           # StateTree, StateNode, Element, Component
-│   ├── components/     # Button, TextField, Grid, Dialog, etc. (49 components)
+│   ├── components/     # Button, TextField, Grid, Dialog, etc. (50+ components)
 │   ├── data/           # Binder, DataProvider, validators, converters
 │   ├── server/         # HTTP server (aiohttp), UIDL handler
 │   └── app.py          # FlowApp entry point

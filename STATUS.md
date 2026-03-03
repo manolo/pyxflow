@@ -1,9 +1,9 @@
 # PyXFlow Implementation Status
 
-## Current State: All 49 Components + WebSocket Push + Multi-UI Sessions + Full UIDL Compatibility
+## Current State: All 50+ Components + WebSocket Push + Multi-UI Sessions + Full UIDL Compatibility
 
 **Vaadin version:** 25.0.6
-**Components:** 49 implemented (all Vaadin 25 UI components)
+**Components:** 50+ implemented (all Vaadin 25 UI components)
 **Lines of code:** ~18,300 (core src/), ~56,100 (total with demo + tests)
 **Test structure:** `tests/unit/` (2457 unit tests, default `pytest`) + `tests/ui/` (446 Playwright, run explicitly)
 **Tests:** 2457 unit + 446 UI (Playwright)
@@ -255,7 +255,7 @@
 
 | Category | Coverage | Details |
 |----------|----------|---------|
-| **Unit tests** | 2415 passing | Good coverage of all 49 components + core + data layer. Located in `tests/unit/` |
+| **Unit tests** | 2415 passing | Good coverage of all 50+ components + core + data layer. Located in `tests/unit/` |
 | **UI tests** | 446 passed | All 32 test views (in `tests/views/`) with shared SideNav layout and single browser session. UI tests in `tests/ui/`. |
 
 ---

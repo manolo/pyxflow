@@ -281,7 +281,7 @@ const DATA = [
   { name:"Frontend", icon:"🌐", c:"fe", desc:"Browser: Web Components + FlowClient.js + Themes + DevTools",
     meta:"56 npm packages",
     children:[
-      { name:"Web Components Core", c:"fe", desc:"49 open-source Lit-based components",
+      { name:"Web Components Core", c:"fe", desc:"50+ open-source Lit-based components",
         meta:"Apache 2.0 · @vaadin/* · Shadow DOM",
         children:[
           { name:"Inputs (16)", c:"fe",
@@ -315,7 +315,7 @@ const DATA = [
       { name:"FlowClient.js + Push + Connectors", c:"fe", desc:"FlowClient.js · VaadinPush.js · *Connector.js",
         detail:'<h3>FlowClient.js + VaadinPush.js + Connectors</h3><span class="tag open">Apache 2.0</span><p>Client-side runtime scripts:</p><ul><li><b>FlowClient.js</b> — UIDL interpreter (GWT-compiled ~200KB). Receives JSON, applies changes to the DOM, sends RPCs via HTTP POST. Constant pool, SyncId tracking, SPA navigation.</li><li><b>VaadinPush.js</b> — Atmosphere client for WebSocket push server→client. Handshake, heartbeat, automatic reconnect.</li><li><b>*Connector.js</b> — Per-component scripts: <code>gridConnector.js</code>, <code>comboBoxConnector.js</code>, <code>contextMenuConnector.js</code>, <code>menubarConnector.js</code>, etc. Bridge between Lit components and the UIDL protocol.</li></ul><p class="stat">Reused identically by PyXFlow.</p>' },
       { name:"React Wrappers", c:"fe", desc:"@vaadin/react-components",
-        detail:'<h3>React Wrappers</h3><span class="tag open">Apache 2.0</span><p>React wrappers for all Vaadin web components. Two packages:</p><ul><li><code>@vaadin/react-components</code> — 49 core components</li><li><code>@vaadin/react-components-pro</code> — 7 commercial components</li></ul><p>Used by Hilla (React frontend). Flow uses the Lit web components directly, doesn\'t need these wrappers.</p>' },
+        detail:'<h3>React Wrappers</h3><span class="tag open">Apache 2.0</span><p>React wrappers for all Vaadin web components. Two packages:</p><ul><li><code>@vaadin/react-components</code> — 50+ core components</li><li><code>@vaadin/react-components-pro</code> — 7 commercial components</li></ul><p>Used by Hilla (React frontend). Flow uses the Lit web components directly, doesn\'t need these wrappers.</p>' },
       { name:"Lumo / Aura", c:"fe", desc:"2 themes with light + dark variants",
         detail:'<h3>Theme System</h3><span class="tag open">Apache 2.0</span><p>Two complete themes:</p><ul><li><b>Lumo</b> — Classic Vaadin theme. Dark via <code>&lt;html theme="dark"&gt;</code></li><li><b>Aura</b> — Modern theme. Dark via <code>color-scheme: dark</code></li></ul><p>CSS variables at 3 levels: <code>--vaadin-*</code> (base, both themes), <code>--lumo-*</code> (Lumo only), <code>--aura-*</code> (Aura only). Components import their own styles via Shadow DOM.</p>' },
       { name:"DevTools", c:"fe", desc:"In-browser dev overlay (was Copilot)",
@@ -368,9 +368,9 @@ const DATA = [
       { name:"Component Model", c:"fl", desc:"Component base + 30+ mixins + lifecycle",
         meta:"141 classes",
         detail:'<h3>Component Model</h3><span class="tag open">Apache 2.0</span><p>Base <code>Component</code> class + mixins for common features:</p><ul><li><code>HasValue&lt;T&gt;</code> — getValue/setValue for fields</li><li><code>HasComponents</code> — add/remove/removeAll</li><li><code>HasEnabled</code>, <code>HasSize</code>, <code>HasStyle</code></li><li><code>HasText</code>, <code>HasTheme</code>, <code>HasAriaLabel</code></li><li><code>ClickNotifier</code>, <code>FocusNotifier</code>, <code>BlurNotifier</code></li><li><code>AbstractField&lt;C,T&gt;</code>, <code>AbstractSinglePropertyField</code></li><li><code>Composite&lt;T&gt;</code>, <code>KeyNotifier</code></li></ul><p>Lifecycle: constructor → <code>onAttach()</code> → visible → <code>onDetach()</code>. The component wraps an Element and delegates operations.</p>' },
-      { name:"Flow Components", c:"fl", desc:"Java wrappers for the 49 web components",
-        meta:"977 classes · 209K LOC · 49 modules",
-        detail:'<h3>Flow Components</h3><span class="tag open">Apache 2.0</span><p>Each web component has a Java module in <code>flow-components/</code> with:</p><ul><li>Main Java class (e.g. <code>Button</code>, <code>Grid&lt;T&gt;</code>)</li><li>Event classes (e.g. <code>ClickEvent</code>)</li><li>Sub-components (e.g. <code>Grid.Column&lt;T&gt;</code>)</li><li>JS Connectors (e.g. <code>gridConnector.js</code>)</li><li>Renderers (e.g. <code>ComponentRenderer&lt;C,T&gt;</code>)</li></ul><p>Most complex: <b>Grid</b> (virtual scroll, lazy loading, sorting, filtering, selection, column reorder, detail rows, tree mode, drag-and-drop, renderers).</p><p class="stat">977 classes in 49 vaadin-*-flow-parent modules. 209K LOC total.</p>' },
+      { name:"Flow Components", c:"fl", desc:"Java wrappers for the 50+ web components",
+        meta:"977 classes · 209K LOC · 50+ modules",
+        detail:'<h3>Flow Components</h3><span class="tag open">Apache 2.0</span><p>Each web component has a Java module in <code>flow-components/</code> with:</p><ul><li>Main Java class (e.g. <code>Button</code>, <code>Grid&lt;T&gt;</code>)</li><li>Event classes (e.g. <code>ClickEvent</code>)</li><li>Sub-components (e.g. <code>Grid.Column&lt;T&gt;</code>)</li><li>JS Connectors (e.g. <code>gridConnector.js</code>)</li><li>Renderers (e.g. <code>ComponentRenderer&lt;C,T&gt;</code>)</li></ul><p>Most complex: <b>Grid</b> (virtual scroll, lazy loading, sorting, filtering, selection, column reorder, detail rows, tree mode, drag-and-drop, renderers).</p><p class="stat">977 classes in 50+ vaadin-*-flow-parent modules. 209K LOC total.</p>' },
       { name:"Data Binding", c:"fl", desc:"Binder, DataProvider, Validators, Converters",
         meta:"155 classes · flow-data/",
         detail:'<h3>Data Binding (flow-data/)</h3><span class="tag open">Apache 2.0</span><ul><li><b>Binder&lt;T&gt;</b> — Binds fields to bean properties. <code>binder.forField(field).withConverter(...).withValidator(...).bind(getter, setter)</code></li><li><b>DataProvider&lt;T,F&gt;</b> — Lazy loading for Grid/ComboBox. <code>fromCallbacks(fetch, count)</code></li><li><b>DataCommunicator</b> — Manages the visible window (offset/limit), pushes data to client</li><li><b>Validators</b> — Email, Range, StringLength, Regexp, Bean (JSR-303)</li><li><b>Converters</b> — StringToInteger, StringToDouble, LocalDateToDate...</li><li><b>SelectionModel</b> — Single, Multi, None</li></ul><p class="stat">155 classes. Binder is the central pattern for typed forms.</p>' },
@@ -489,7 +489,7 @@ const PYTHON_NAMES = {
   "StateTree": "state_tree.py + state_node.py",
   "Element API": "element.py",
   "Component Model": "component.py + mixins.py",
-  "Flow Components": "components/*.py (49 files)",
+  "Flow Components": "components/*.py (50+ files)",
   "Data Binding": "data/*.py (5 files)",
   "Router": "app.py"
 };

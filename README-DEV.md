@@ -77,7 +77,7 @@ See `BUNDLE.md` for details on optimized vs unoptimized variants and `--build` m
 ```
 src/pyxflow/
 ├── core/           # StateTree, StateNode, Element, Component
-├── components/     # 49 Vaadin components
+├── components/     # 50+ Vaadin components
 ├── data/           # Binder, DataProvider, validators, converters
 └── server/         # HTTP server (aiohttp), UIDL protocol handler
 
