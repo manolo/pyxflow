@@ -83,8 +83,8 @@ def base_url(request):
     # Nothing running — auto-start the test server
     proc = subprocess.Popen(
         [sys.executable, "-c",
-         "import pyxflow.app as _a; "
-         f"_a._serve('tests.views', 'localhost', {DEFAULT_PORT}, False, dev=True)"],
+         "from pyxflow.server.app_runner import _serve; "
+         f"_serve('tests.views', 'localhost', {DEFAULT_PORT}, False, dev=True)"],
         cwd=str(_PROJECT_ROOT),
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,

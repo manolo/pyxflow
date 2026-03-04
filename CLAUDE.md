@@ -58,7 +58,8 @@ pyxflow/
 │   ├── components/     # Button, TextField, Grid, Dialog, etc. (50+ components)
 │   ├── data/           # Binder, DataProvider, validators, converters
 │   ├── server/         # HTTP server (aiohttp), UIDL handler
-│   └── app.py          # FlowApp entry point
+│   ├── main.py         # FlowApp + CLI entry point
+│   └── resources/      # setup_app, generate_bundle, scaffold templates
 ├── demo/               # Demo app + __main__.py entry point
 │   ├── views/          # Demo views (9 routes)
 │   ├── static/         # Static assets (images, CSS) served at /images/*, /styles/*

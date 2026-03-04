@@ -3,7 +3,7 @@
 import pytest
 from pathlib import Path
 
-from pyxflow.bundle_generator import (
+from pyxflow.resources.generate_bundle import (
     generate_pom_xml,
     generate_fake_view,
     generate_feature_flags,

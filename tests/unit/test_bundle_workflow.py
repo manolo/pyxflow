@@ -8,7 +8,7 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from pyxflow.bundle_generator import generate_and_build
+from pyxflow.resources.generate_bundle import generate_and_build
 
 
 class TestGenerateAndBuildPyflowDev:
@@ -20,8 +20,8 @@ class TestGenerateAndBuildPyflowDev:
         (tmp_path / "src" / "pyxflow").mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        with patch("pyxflow.bundle_generator.generate_project") as mock_gen, \
-             patch("pyxflow.bundle_generator.build_and_extract") as mock_build:
+        with patch("pyxflow.resources.generate_bundle.generate_project") as mock_gen, \
+             patch("pyxflow.resources.generate_bundle.build_and_extract") as mock_build:
             # generate_project is mocked, so create the dir it would create
             mock_gen.side_effect = lambda d, v, **kw: d.mkdir(parents=True, exist_ok=True)
             generate_and_build(app_dir=None, keep=False, vaadin_version="25.0.6")
@@ -35,8 +35,8 @@ class TestGenerateAndBuildPyflowDev:
         (tmp_path / "src" / "pyxflow").mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        with patch("pyxflow.bundle_generator.generate_project") as mock_gen, \
-             patch("pyxflow.bundle_generator.build_and_extract"):
+        with patch("pyxflow.resources.generate_bundle.generate_project") as mock_gen, \
+             patch("pyxflow.resources.generate_bundle.build_and_extract"):
             generate_and_build(app_dir=None, keep=True)
 
             project_dir = mock_gen.call_args[0][0]
@@ -55,7 +55,7 @@ class TestGenerateAndBuildPyflowDev:
         (tmp_path / "src" / "pyxflow").mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        with patch("pyxflow.bundle_generator.build_and_extract"):
+        with patch("pyxflow.resources.generate_bundle.build_and_extract"):
             self._create_bundle_project(tmp_path)
             generate_and_build(keep=True)
             assert (tmp_path / "bundle-project").exists()
@@ -65,7 +65,7 @@ class TestGenerateAndBuildPyflowDev:
         (tmp_path / "src" / "pyxflow").mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        with patch("pyxflow.bundle_generator.build_and_extract"):
+        with patch("pyxflow.resources.generate_bundle.build_and_extract"):
             bp = self._create_bundle_project(tmp_path)
             generate_and_build(keep=False)
             assert not bp.exists()
@@ -80,8 +80,8 @@ class TestGenerateAndBuildUserProject:
         app_dir = tmp_path / "my_app"
         app_dir.mkdir()
 
-        with patch("pyxflow.bundle_generator.generate_project") as mock_gen, \
-             patch("pyxflow.bundle_generator.build_and_extract") as mock_build:
+        with patch("pyxflow.resources.generate_bundle.generate_project") as mock_gen, \
+             patch("pyxflow.resources.generate_bundle.build_and_extract") as mock_build:
             generate_and_build(app_dir=app_dir, keep=True)
 
             bundle_dir = mock_build.call_args[0][1]
@@ -93,8 +93,8 @@ class TestGenerateAndBuildUserProject:
         app_dir = tmp_path / "my_app"
         app_dir.mkdir()
 
-        with patch("pyxflow.bundle_generator.generate_project") as mock_gen, \
-             patch("pyxflow.bundle_generator.build_and_extract"):
+        with patch("pyxflow.resources.generate_bundle.generate_project") as mock_gen, \
+             patch("pyxflow.resources.generate_bundle.build_and_extract"):
             generate_and_build(app_dir=app_dir, keep=True)
 
             project_dir = mock_gen.call_args[0][0]
@@ -113,8 +113,8 @@ class TestGenerateAndBuildUserProject:
         app_dir = tmp_path / "my_app"
         app_dir.mkdir()
 
-        with patch("pyxflow.bundle_generator.generate_project") as mock_gen, \
-             patch("pyxflow.bundle_generator.build_and_extract"):
+        with patch("pyxflow.resources.generate_bundle.generate_project") as mock_gen, \
+             patch("pyxflow.resources.generate_bundle.build_and_extract"):
             generate_and_build(app_dir=app_dir, keep=True, vaadin_version="25.1.0")
 
             version = mock_gen.call_args[0][1]
@@ -136,8 +136,8 @@ class TestGenerateAndBuildReuse:
         java_dir.mkdir(parents=True)
         (java_dir / "FakeView.java").write_text("// old")
 
-        with patch("pyxflow.bundle_generator.generate_project") as mock_gen, \
-             patch("pyxflow.bundle_generator.build_and_extract") as mock_build:
+        with patch("pyxflow.resources.generate_bundle.generate_project") as mock_gen, \
+             patch("pyxflow.resources.generate_bundle.build_and_extract") as mock_build:
             generate_and_build(app_dir=app_dir, keep=True)
 
             # generate_project should NOT be called
@@ -156,7 +156,7 @@ class TestGenerateAndBuildReuse:
         java_dir.mkdir(parents=True)
         (java_dir / "FakeView.java").write_text("// old content")
 
-        with patch("pyxflow.bundle_generator.build_and_extract"):
+        with patch("pyxflow.resources.generate_bundle.build_and_extract"):
             generate_and_build(app_dir=app_dir, keep=True)
 
             new_content = (java_dir / "FakeView.java").read_text()
@@ -169,8 +169,8 @@ class TestGenerateAndBuildReuse:
         app_dir = tmp_path / "my_app"
         app_dir.mkdir()
 
-        with patch("pyxflow.bundle_generator.generate_project"), \
-             patch("pyxflow.bundle_generator.build_and_extract") as mock_build:
+        with patch("pyxflow.resources.generate_bundle.generate_project"), \
+             patch("pyxflow.resources.generate_bundle.build_and_extract") as mock_build:
             generate_and_build(app_dir=app_dir, keep=True)
 
             assert mock_build.call_args[1]["clean"] is True
@@ -182,8 +182,8 @@ class TestBundleCopyOptimized:
     def _run_main_copy(self, argv):
         """Run main() with copy mode, capturing the copy_from_jars call."""
         with patch("sys.argv", ["pyxflow"] + argv), \
-             patch("pyxflow.bundle_generator.copy_from_jars") as mock_cfj:
-            from pyxflow.app import main
+             patch("pyxflow.resources.generate_bundle.copy_from_jars") as mock_cfj:
+            from pyxflow.main import main
             with pytest.raises(SystemExit) as exc_info:
                 main()
             assert exc_info.value.code == 0
@@ -201,10 +201,10 @@ class TestBundleCopyOptimized:
 
     def test_copy_from_jars_optimized_prefix(self, tmp_path):
         """copy_from_jars(optimized=True) uses vaadin-prod-bundle/webapp/ prefix."""
-        from pyxflow.bundle_generator import copy_from_jars, _extract_jar_to
-        with patch("pyxflow.bundle_generator._find_m2_jar") as mock_find, \
-             patch("pyxflow.bundle_generator._download_jar") as mock_dl, \
-             patch("pyxflow.bundle_generator._extract_jar_to") as mock_extract:
+        from pyxflow.resources.generate_bundle import copy_from_jars, _extract_jar_to
+        with patch("pyxflow.resources.generate_bundle._find_m2_jar") as mock_find, \
+             patch("pyxflow.resources.generate_bundle._download_jar") as mock_dl, \
+             patch("pyxflow.resources.generate_bundle._extract_jar_to") as mock_extract:
             mock_find.return_value = Path("/fake.jar")
             mock_extract.return_value = 1
             copy_from_jars(tmp_path, "25.0.6", optimized=True)
@@ -214,10 +214,10 @@ class TestBundleCopyOptimized:
 
     def test_copy_from_jars_unoptimized_prefix(self, tmp_path):
         """copy_from_jars(optimized=False) uses vaadin-prod-bundle-unoptimized/webapp/ prefix."""
-        from pyxflow.bundle_generator import copy_from_jars, _extract_jar_to
-        with patch("pyxflow.bundle_generator._find_m2_jar") as mock_find, \
-             patch("pyxflow.bundle_generator._download_jar") as mock_dl, \
-             patch("pyxflow.bundle_generator._extract_jar_to") as mock_extract:
+        from pyxflow.resources.generate_bundle import copy_from_jars, _extract_jar_to
+        with patch("pyxflow.resources.generate_bundle._find_m2_jar") as mock_find, \
+             patch("pyxflow.resources.generate_bundle._download_jar") as mock_dl, \
+             patch("pyxflow.resources.generate_bundle._extract_jar_to") as mock_extract:
             mock_find.return_value = Path("/fake.jar")
             mock_extract.return_value = 1
             copy_from_jars(tmp_path, "25.0.6", optimized=False)
@@ -231,8 +231,8 @@ class TestCliArgParsing:
     def _run_main_build(self, argv):
         """Run main() with --build flag, capturing the generate_and_build call."""
         with patch("sys.argv", ["pyxflow"] + argv), \
-             patch("pyxflow.bundle_generator.generate_and_build") as mock_gab:
-            from pyxflow.app import main
+             patch("pyxflow.resources.generate_bundle.generate_and_build") as mock_gab:
+            from pyxflow.main import main
             with pytest.raises(SystemExit) as exc_info:
                 main()
             assert exc_info.value.code == 0
@@ -241,8 +241,8 @@ class TestCliArgParsing:
     def _run_main_copy(self, argv):
         """Run main() with copy mode, capturing the copy_from_jars call."""
         with patch("sys.argv", ["pyxflow"] + argv), \
-             patch("pyxflow.bundle_generator.copy_from_jars") as mock_cfj:
-            from pyxflow.app import main
+             patch("pyxflow.resources.generate_bundle.copy_from_jars") as mock_cfj:
+            from pyxflow.main import main
             with pytest.raises(SystemExit) as exc_info:
                 main()
             assert exc_info.value.code == 0
@@ -287,7 +287,7 @@ class TestCliArgParsing:
 
     def test_bundle_default_vaadin_version(self):
         """pyxflow bundle -> default version from pyproject.toml (25.0.6)."""
-        from pyxflow.bundle_generator import _DEFAULT_VAADIN_VERSION
+        from pyxflow.resources.generate_bundle import _DEFAULT_VAADIN_VERSION
         mock = self._run_main_copy(["bundle"])
         assert mock.call_args[0][1] == _DEFAULT_VAADIN_VERSION
 

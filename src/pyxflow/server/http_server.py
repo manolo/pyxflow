@@ -770,7 +770,7 @@ async def handle_route(request: web.Request) -> web.Response:
         if path == "favicon.ico":
             import importlib.resources
             try:
-                favicon = importlib.resources.files("pyxflow") / "scaffold" / "favicon.ico"
+                favicon = importlib.resources.files("pyxflow") / "resources" / "scaffold" / "favicon.ico"
                 with importlib.resources.as_file(favicon) as f:
                     if f.is_file():
                         return web.FileResponse(f, headers={"Content-Type": "image/x-icon", "Cache-Control": "no-cache"})  # type: ignore[return-value]

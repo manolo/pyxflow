@@ -40,8 +40,8 @@ dev = [
 ]
 
 [project.scripts]
-pyxflow = "pyxflow.app:main"
-vaadin = "pyxflow.app:main_deprecated"
+pyxflow = "pyxflow.main:main"
+vaadin = "pyxflow.main:main_deprecated"
 
 [project.urls]
 Homepage = "https://github.com/manolo/pyxflow"

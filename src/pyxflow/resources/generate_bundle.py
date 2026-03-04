@@ -34,10 +34,10 @@ from pathlib import Path
 
 def _read_pyproject_version() -> str:
     """Read Vaadin version from pyproject.toml [tool.pyxflow] section."""
-    pyproject = Path(__file__).parent.parent.parent / "pyproject.toml"
+    pyproject = Path(__file__).parent.parent.parent.parent / "pyproject.toml"
     if not pyproject.is_file():
         # Fallback: look relative to package install location
-        pyproject = Path(__file__).parent / "pyproject.toml"
+        pyproject = Path(__file__).parent.parent / "pyproject.toml"
     vaadin_ver = "25.0.6"
     if pyproject.is_file():
         in_section = False
@@ -292,7 +292,7 @@ def generate_project(output_dir: Path, vaadin_version: str, *, optimized: bool =
     )
 
     # Copy Maven wrapper from packaged resources
-    resources_pkg = Path(__file__).parent / "bundle_generator_resources"
+    resources_pkg = Path(__file__).parent.parent / "bundle_generator_resources"
     if not resources_pkg.exists():
         print(f"ERROR: Maven wrapper resources not found at {resources_pkg}")
         sys.exit(1)
