@@ -54,7 +54,7 @@ packages = ["src/pyxflow"]
 include = ["src/", "/README.md", "/LICENSE", "/pyproject.toml"]
 
 [tool.pyxflow]
-vaadin-version = "25.0.6"
+vaadin-version = "25.1.0-beta1"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
