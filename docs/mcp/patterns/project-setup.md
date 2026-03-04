@@ -6,16 +6,19 @@
 pip install pyxflow
 ```
 
-## Minimal Project Structure
+## Project Structure
 
 ```
 my-app/
-  app.py           # Entry point
+  app.py               # Entry point
   views/
     __init__.py
-    main_view.py   # Your views
-  static/          # Optional CSS/images
-    styles.css
+    layout.py          # AppShell with theme config
+    home.py            # Your views
+  static/
+    styles/
+      app.css          # Custom styles
+    images/            # Static assets
 ```
 
 ## Entry Point
@@ -34,33 +37,19 @@ Or with CLI:
 pyxflow views --port 8080
 ```
 
-## View Discovery
+## App Layout with Theme
 
-PyXFlow auto-discovers all `@Route`-decorated classes in the views module:
-
-```python
-# views/main_view.py
-from pyxflow import Route
-from pyxflow.components import VerticalLayout, H1
-
-@Route("")
-class MainView(VerticalLayout):
-    def __init__(self):
-        self.add(H1("Hello PyXFlow!"))
-```
-
-## With App Layout
+Most apps need an AppLayout with navigation and a configured theme.
+Create `views/layout.py`:
 
 ```python
-# views/layout.py
-from pyxflow import AppShell, Push, ColorScheme, StyleSheet
+from pyxflow import AppShell, ColorScheme, StyleSheet
 from pyxflow.components import AppLayout, DrawerToggle, H2, SideNav, SideNavItem, Icon
 from pyxflow.menu import get_menu_entries
 
 @AppShell
-@Push
 @ColorScheme("dark")
-@StyleSheet("styles/app.css")
+@StyleSheet("lumo/lumo.css", "styles/app.css")
 class MainLayout(AppLayout):
     def __init__(self):
         self.add_to_navbar(DrawerToggle(), H2("My App"))
@@ -69,7 +58,39 @@ class MainLayout(AppLayout):
             icon = Icon(entry.icon) if entry.icon else None
             nav.add_item(SideNavItem(entry.title, entry.path, icon))
         self.add_to_drawer(nav)
+```
 
+**Important:**
+- `@AppShell` must be the outermost decorator (first line)
+- Always include `"lumo/lumo.css"` as the first stylesheet in `@StyleSheet`
+- `@ColorScheme("dark")` or `@ColorScheme("light")` sets the initial theme
+
+## Starter CSS
+
+Create `static/styles/app.css`:
+
+```css
+/* Full-height app */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+/* Uncomment to customize Lumo theme colors */
+/* html {
+  --lumo-primary-color: hsl(220, 90%, 52%);
+  --lumo-border-radius-m: 8px;
+} */
+```
+
+See the `get_pattern("theming")` tool for the full Lumo CSS variable reference and
+a more complete starter CSS template.
+
+## View Discovery
+
+PyXFlow auto-discovers all `@Route`-decorated classes in the views module:
+
+```python
 # views/home.py
 from pyxflow import Route, Menu
 from pyxflow.components import VerticalLayout, H1
@@ -79,7 +100,24 @@ from views.layout import MainLayout
 @Menu(title="Home", order=1, icon="vaadin:home")
 class HomeView(VerticalLayout):
     def __init__(self):
+        super().__init__()
         self.add(H1("Welcome!"))
+```
+
+## Simple App (no AppLayout)
+
+For quick prototypes without navigation:
+
+```python
+# views/main_view.py
+from pyxflow import Route
+from pyxflow.components import VerticalLayout, H1
+
+@Route("")
+class MainView(VerticalLayout):
+    def __init__(self):
+        super().__init__()
+        self.add(H1("Hello PyXFlow!"))
 ```
 
 ## Static Files

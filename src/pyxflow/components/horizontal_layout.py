@@ -12,6 +12,9 @@ class HorizontalLayout(Component):
     _v_fqcn = "com.vaadin.flow.component.orderedlayout.HorizontalLayout"
     _tag = "vaadin-horizontal-layout"
 
+    Alignment = Alignment
+    JustifyContentMode = JustifyContentMode
+
     def __init__(self, *children: Component):
         super().__init__()
         self._children: list[Component] = list(children)

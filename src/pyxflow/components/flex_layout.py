@@ -15,6 +15,12 @@ class FlexLayout(Component):
     _v_fqcn = "com.vaadin.flow.component.orderedlayout.FlexLayout"
     _tag = "div"
 
+    FlexDirection = FlexDirection
+    FlexWrap = FlexWrap
+    JustifyContentMode = JustifyContentMode
+    ContentAlignment = ContentAlignment
+    Alignment = Alignment
+
     def __init__(self, *children: Component):
         super().__init__()
         self._children: list[Component] = list(children)
