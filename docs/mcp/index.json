@@ -1,0 +1,140 @@
+{
+  "version": "0.5.0",
+  "generated": "2026-03-04T22:19:27",
+  "base_url": "https://manolo.github.io/pyxflow/mcp",
+  "tools": {
+    "get_pyxflow_primer": {
+      "file": "primer.md"
+    },
+    "list_components": {
+      "file": "components.json"
+    },
+    "get_component_api": {
+      "param": "component_name",
+      "file_pattern": "components/{name}.md"
+    },
+    "get_example": {
+      "param": "example_name",
+      "file_pattern": "examples/{name}.md"
+    },
+    "get_pattern": {
+      "param": "pattern_name",
+      "file_pattern": "patterns/{name}.md"
+    },
+    "get_constants": {
+      "param": "category",
+      "file_pattern": "constants/{category}.md",
+      "default": "all"
+    }
+  },
+  "available": {
+    "components": [
+      "accordion",
+      "anchor",
+      "app-layout",
+      "article",
+      "aside",
+      "avatar",
+      "avatar-group",
+      "button",
+      "card",
+      "checkbox",
+      "checkbox-group",
+      "combo-box",
+      "confirm-dialog",
+      "context-menu",
+      "custom-field",
+      "date-picker",
+      "date-time-picker",
+      "details",
+      "dialog",
+      "div",
+      "drawer-toggle",
+      "email-field",
+      "flex-layout",
+      "footer",
+      "form-layout",
+      "grid",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+      "header",
+      "horizontal-layout",
+      "hr",
+      "icon",
+      "iframe",
+      "image",
+      "integer-field",
+      "list-box",
+      "login-form",
+      "login-overlay",
+      "main",
+      "markdown",
+      "master-detail-layout",
+      "menu-bar",
+      "message-input",
+      "message-list",
+      "multi-select-combo-box",
+      "multi-select-list-box",
+      "native-label",
+      "nav",
+      "notification",
+      "number-field",
+      "paragraph",
+      "password-field",
+      "popover",
+      "pre",
+      "progress-bar",
+      "radio-button-group",
+      "router-link",
+      "scroller",
+      "section",
+      "select",
+      "side-nav",
+      "side-nav-item",
+      "span",
+      "split-layout",
+      "tab",
+      "tab-sheet",
+      "tabs",
+      "text-area",
+      "text-field",
+      "time-picker",
+      "tree-grid",
+      "upload",
+      "vertical-layout",
+      "virtual-list"
+    ],
+    "examples": [
+      "app-layout",
+      "crud",
+      "dialog",
+      "grid",
+      "hello",
+      "master-detail",
+      "push"
+    ],
+    "patterns": [
+      "app-layout",
+      "binder",
+      "client-callable",
+      "data-provider",
+      "field-validation",
+      "project-setup",
+      "push",
+      "renderers",
+      "routing",
+      "theming"
+    ],
+    "constants": [
+      "all",
+      "layout",
+      "grid",
+      "field",
+      "variants"
+    ]
+  }
+}

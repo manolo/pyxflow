@@ -1,0 +1,473 @@
+{
+  "count": 78,
+  "components": [
+    {
+      "name": "Accordion",
+      "file": "components/accordion.md",
+      "category": "Layout",
+      "description": "Vertically stacked collapsible panels"
+    },
+    {
+      "name": "Anchor",
+      "file": "components/anchor.md",
+      "category": "HTML",
+      "description": "Hyperlink element"
+    },
+    {
+      "name": "AppLayout",
+      "file": "components/app-layout.md",
+      "category": "Layout",
+      "description": "Application shell with navbar/drawer"
+    },
+    {
+      "name": "Article",
+      "file": "components/article.md",
+      "category": "HTML",
+      "description": "Article section"
+    },
+    {
+      "name": "Aside",
+      "file": "components/aside.md",
+      "category": "HTML",
+      "description": "Sidebar content"
+    },
+    {
+      "name": "Avatar",
+      "file": "components/avatar.md",
+      "category": "Display",
+      "description": "User avatar image/initials"
+    },
+    {
+      "name": "AvatarGroup",
+      "file": "components/avatar-group.md",
+      "category": "Display",
+      "description": "Group of overlapping avatars"
+    },
+    {
+      "name": "Button",
+      "file": "components/button.md",
+      "category": "Action",
+      "description": "Clickable button"
+    },
+    {
+      "name": "Card",
+      "file": "components/card.md",
+      "category": "Layout",
+      "description": "Content card with optional media/actions"
+    },
+    {
+      "name": "Checkbox",
+      "file": "components/checkbox.md",
+      "category": "Input",
+      "description": "Single checkbox toggle"
+    },
+    {
+      "name": "CheckboxGroup",
+      "file": "components/checkbox-group.md",
+      "category": "Input",
+      "description": "Checkbox group for multiple selection"
+    },
+    {
+      "name": "ComboBox",
+      "file": "components/combo-box.md",
+      "category": "Input",
+      "description": "Searchable dropdown with type-ahead"
+    },
+    {
+      "name": "ConfirmDialog",
+      "file": "components/confirm-dialog.md",
+      "category": "Overlay",
+      "description": "Pre-built confirmation dialog"
+    },
+    {
+      "name": "ContextMenu",
+      "file": "components/context-menu.md",
+      "category": "Navigation",
+      "description": "Right-click context menu"
+    },
+    {
+      "name": "CustomField",
+      "file": "components/custom-field.md",
+      "category": "Input",
+      "description": "Wrapper for custom field compositions"
+    },
+    {
+      "name": "DatePicker",
+      "file": "components/date-picker.md",
+      "category": "Input",
+      "description": "Date selection with calendar popup"
+    },
+    {
+      "name": "DateTimePicker",
+      "file": "components/date-time-picker.md",
+      "category": "Input",
+      "description": "Combined date and time picker"
+    },
+    {
+      "name": "Details",
+      "file": "components/details.md",
+      "category": "Layout",
+      "description": "Collapsible content panel"
+    },
+    {
+      "name": "Dialog",
+      "file": "components/dialog.md",
+      "category": "Overlay",
+      "description": "Modal dialog window"
+    },
+    {
+      "name": "Div",
+      "file": "components/div.md",
+      "category": "HTML",
+      "description": "Generic <div> container"
+    },
+    {
+      "name": "DrawerToggle",
+      "file": "components/drawer-toggle.md",
+      "category": "Navigation",
+      "description": "Toggle button for AppLayout drawer"
+    },
+    {
+      "name": "EmailField",
+      "file": "components/email-field.md",
+      "category": "Input",
+      "description": "Email input with validation"
+    },
+    {
+      "name": "FlexLayout",
+      "file": "components/flex-layout.md",
+      "category": "Layout",
+      "description": "Flexible CSS layout"
+    },
+    {
+      "name": "Footer",
+      "file": "components/footer.md",
+      "category": "HTML",
+      "description": "Semantic footer"
+    },
+    {
+      "name": "FormLayout",
+      "file": "components/form-layout.md",
+      "category": "Layout",
+      "description": "Responsive form layout with label positioning"
+    },
+    {
+      "name": "Grid",
+      "file": "components/grid.md",
+      "category": "Data",
+      "description": "Data table with sorting, selection, lazy loading"
+    },
+    {
+      "name": "H1",
+      "file": "components/h1.md",
+      "category": "HTML",
+      "description": "Heading level 1"
+    },
+    {
+      "name": "H2",
+      "file": "components/h2.md",
+      "category": "HTML",
+      "description": "Heading level 2"
+    },
+    {
+      "name": "H3",
+      "file": "components/h3.md",
+      "category": "HTML",
+      "description": "Heading level 3"
+    },
+    {
+      "name": "H4",
+      "file": "components/h4.md",
+      "category": "HTML",
+      "description": "Heading level 4"
+    },
+    {
+      "name": "H5",
+      "file": "components/h5.md",
+      "category": "HTML",
+      "description": "Heading level 5"
+    },
+    {
+      "name": "H6",
+      "file": "components/h6.md",
+      "category": "HTML",
+      "description": "Heading level 6"
+    },
+    {
+      "name": "Header",
+      "file": "components/header.md",
+      "category": "HTML",
+      "description": "Semantic header"
+    },
+    {
+      "name": "HorizontalLayout",
+      "file": "components/horizontal-layout.md",
+      "category": "Layout",
+      "description": "Horizontal flex container with spacing"
+    },
+    {
+      "name": "Hr",
+      "file": "components/hr.md",
+      "category": "HTML",
+      "description": "Horizontal rule"
+    },
+    {
+      "name": "IFrame",
+      "file": "components/iframe.md",
+      "category": "HTML",
+      "description": "Inline frame"
+    },
+    {
+      "name": "Icon",
+      "file": "components/icon.md",
+      "category": "Display",
+      "description": "Vaadin/Lumo icon"
+    },
+    {
+      "name": "Image",
+      "file": "components/image.md",
+      "category": "HTML",
+      "description": "Image element"
+    },
+    {
+      "name": "IntegerField",
+      "file": "components/integer-field.md",
+      "category": "Input",
+      "description": "Integer-only input"
+    },
+    {
+      "name": "ListBox",
+      "file": "components/list-box.md",
+      "category": "Input",
+      "description": "Scrollable single-select list"
+    },
+    {
+      "name": "LoginForm",
+      "file": "components/login-form.md",
+      "category": "Authentication",
+      "description": "Inline login form"
+    },
+    {
+      "name": "LoginOverlay",
+      "file": "components/login-overlay.md",
+      "category": "Authentication",
+      "description": "Login dialog overlay"
+    },
+    {
+      "name": "Main",
+      "file": "components/main.md",
+      "category": "HTML",
+      "description": "Main content area"
+    },
+    {
+      "name": "Markdown",
+      "file": "components/markdown.md",
+      "category": "Display",
+      "description": "Markdown renderer"
+    },
+    {
+      "name": "MasterDetailLayout",
+      "file": "components/master-detail-layout.md",
+      "category": "Layout",
+      "description": "Responsive master-detail with drawer"
+    },
+    {
+      "name": "MenuBar",
+      "file": "components/menu-bar.md",
+      "category": "Navigation",
+      "description": "Horizontal menu with dropdowns"
+    },
+    {
+      "name": "MessageInput",
+      "file": "components/message-input.md",
+      "category": "Input",
+      "description": "Chat message input"
+    },
+    {
+      "name": "MessageList",
+      "file": "components/message-list.md",
+      "category": "Display",
+      "description": "Chat message list"
+    },
+    {
+      "name": "MultiSelectComboBox",
+      "file": "components/multi-select-combo-box.md",
+      "category": "Input",
+      "description": "Multi-value searchable dropdown"
+    },
+    {
+      "name": "MultiSelectListBox",
+      "file": "components/multi-select-list-box.md",
+      "category": "Input",
+      "description": "Scrollable multi-select list"
+    },
+    {
+      "name": "NativeLabel",
+      "file": "components/native-label.md",
+      "category": "HTML",
+      "description": "Native <label> element"
+    },
+    {
+      "name": "Nav",
+      "file": "components/nav.md",
+      "category": "HTML",
+      "description": "Navigation section"
+    },
+    {
+      "name": "Notification",
+      "file": "components/notification.md",
+      "category": "Feedback",
+      "description": "Toast notification"
+    },
+    {
+      "name": "NumberField",
+      "file": "components/number-field.md",
+      "category": "Input",
+      "description": "Numeric input with step buttons"
+    },
+    {
+      "name": "Paragraph",
+      "file": "components/paragraph.md",
+      "category": "HTML",
+      "description": "Paragraph element"
+    },
+    {
+      "name": "PasswordField",
+      "file": "components/password-field.md",
+      "category": "Input",
+      "description": "Password input with reveal toggle"
+    },
+    {
+      "name": "Popover",
+      "file": "components/popover.md",
+      "category": "Layout",
+      "description": "Popup content anchored to a target"
+    },
+    {
+      "name": "Pre",
+      "file": "components/pre.md",
+      "category": "HTML",
+      "description": "Preformatted text"
+    },
+    {
+      "name": "ProgressBar",
+      "file": "components/progress-bar.md",
+      "category": "Display",
+      "description": "Progress indicator"
+    },
+    {
+      "name": "RadioButtonGroup",
+      "file": "components/radio-button-group.md",
+      "category": "Input",
+      "description": "Radio button group"
+    },
+    {
+      "name": "RouterLink",
+      "file": "components/router-link.md",
+      "category": "Navigation",
+      "description": "Client-side navigation link"
+    },
+    {
+      "name": "Scroller",
+      "file": "components/scroller.md",
+      "category": "Layout",
+      "description": "Scrollable content container"
+    },
+    {
+      "name": "Section",
+      "file": "components/section.md",
+      "category": "HTML",
+      "description": "Semantic section"
+    },
+    {
+      "name": "Select",
+      "file": "components/select.md",
+      "category": "Input",
+      "description": "Dropdown selection (single value)"
+    },
+    {
+      "name": "SideNav",
+      "file": "components/side-nav.md",
+      "category": "Navigation",
+      "description": "Vertical navigation menu"
+    },
+    {
+      "name": "SideNavItem",
+      "file": "components/side-nav-item.md",
+      "category": "Navigation",
+      "description": "Item within SideNav"
+    },
+    {
+      "name": "Span",
+      "file": "components/span.md",
+      "category": "HTML",
+      "description": "Inline <span> element"
+    },
+    {
+      "name": "SplitLayout",
+      "file": "components/split-layout.md",
+      "category": "Layout",
+      "description": "Resizable split panel"
+    },
+    {
+      "name": "Tab",
+      "file": "components/tab.md",
+      "category": "Navigation",
+      "description": "Individual tab within Tabs"
+    },
+    {
+      "name": "TabSheet",
+      "file": "components/tab-sheet.md",
+      "category": "Layout",
+      "description": "Tab-based content switcher"
+    },
+    {
+      "name": "Tabs",
+      "file": "components/tabs.md",
+      "category": "Navigation",
+      "description": "Horizontal/vertical tab bar"
+    },
+    {
+      "name": "TextArea",
+      "file": "components/text-area.md",
+      "category": "Input",
+      "description": "Multi-line text input"
+    },
+    {
+      "name": "TextField",
+      "file": "components/text-field.md",
+      "category": "Input",
+      "description": "Single-line text input"
+    },
+    {
+      "name": "TimePicker",
+      "file": "components/time-picker.md",
+      "category": "Input",
+      "description": "Time selection"
+    },
+    {
+      "name": "TreeGrid",
+      "file": "components/tree-grid.md",
+      "category": "Data",
+      "description": "Hierarchical data grid"
+    },
+    {
+      "name": "Upload",
+      "file": "components/upload.md",
+      "category": "Input",
+      "description": "File upload component"
+    },
+    {
+      "name": "VerticalLayout",
+      "file": "components/vertical-layout.md",
+      "category": "Layout",
+      "description": "Vertical flex container with spacing"
+    },
+    {
+      "name": "VirtualList",
+      "file": "components/virtual-list.md",
+      "category": "Data",
+      "description": "Virtualized list for large datasets"
+    }
+  ]
+}

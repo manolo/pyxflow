@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "pyxflow": {
+      "type": "http",
+      "url": "https://pyxflow-mcp.manolo-corp.workers.dev/mcp"
+    }
+  }
+}
