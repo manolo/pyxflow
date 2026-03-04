@@ -6,50 +6,92 @@
 pip install pyxflow
 ```
 
-## Project Structure
+## Recommended Project Structure
 
 ```
 my-app/
-  app.py               # Entry point
+  __init__.py
+  __main__.py          # Entry point: FlowApp().run()
   views/
     __init__.py
-    layout.py          # AppShell with theme config
+    main_layout.py     # AppShell with theme + navigation
     home.py            # Your views
+  lib/
+    __init__.py        # Business logic, services, data models
   static/
     styles/
-      app.css          # Custom styles
-    images/            # Static assets
+      styles.css       # Custom CSS (loaded via @StyleSheet)
+    images/            # Static assets (logo, icons, etc.)
 ```
+
+### Directory roles
+
+| Directory | Purpose |
+|-----------|---------|
+| `views/`  | UI views decorated with `@Route`. Auto-discovered by PyXFlow. |
+| `lib/`    | Business logic, services, data access, models. Imported by views. |
+| `static/` | CSS, images, fonts. Served automatically at their path (e.g. `/styles/styles.css`). |
+
+### When to use multiple apps
+
+For projects with multiple independent apps, nest each under its own package:
+
+```
+my-project/
+  app_admin/
+    views/
+    lib/
+    static/
+  app_public/
+    views/
+    lib/
+    static/
+```
+
+Run each with: `pyxflow app_admin` or `pyxflow app_public`.
+
+## Scaffolding a New Project
+
+The fastest way to create this structure:
+
+```bash
+mkdir my-app && cd my-app
+pyxflow --setup
+```
+
+This creates `views/`, `static/`, `__main__.py`, a starter layout, and a hello-world view.
 
 ## Entry Point
 
 ```python
-# app.py
+# __main__.py
 from pyxflow import FlowApp
 
-app = FlowApp("views")
-app.run()  # http://localhost:8080
+FlowApp().run()  # auto-discovers views/ in the current package
 ```
 
-Or with CLI:
+Run with:
 
 ```bash
-pyxflow views --port 8080
+python -m my_app                    # from parent directory
+pyxflow                             # from inside my-app/ (auto-detects views/)
+pyxflow --port 9090                 # custom port
+pyxflow --dev                       # auto-reload on changes
 ```
 
 ## App Layout with Theme
 
-Most apps need an AppLayout with navigation and a configured theme.
-Create `views/layout.py`:
+Most apps need an `AppLayout` with navigation and theme configuration.
+Create `views/main_layout.py`:
 
 ```python
-from pyxflow import AppShell, ColorScheme, StyleSheet
-from pyxflow.components import AppLayout, DrawerToggle, H2, SideNav, SideNavItem, Icon
+from pyxflow import *
+from pyxflow.components import *
 from pyxflow.menu import get_menu_entries
 
 @AppShell
-@ColorScheme("dark")
-@StyleSheet("lumo/lumo.css", "styles/app.css")
+@Push
+@StyleSheet("styles/styles.css")
 class MainLayout(AppLayout):
     def __init__(self):
         self.add_to_navbar(DrawerToggle(), H2("My App"))
@@ -62,29 +104,26 @@ class MainLayout(AppLayout):
 
 **Important:**
 - `@AppShell` must be the outermost decorator (first line)
-- Always include `"lumo/lumo.css"` as the first stylesheet in `@StyleSheet`
-- `@ColorScheme("dark")` or `@ColorScheme("light")` sets the initial theme
+- `@Push` enables WebSocket push (needed for background tasks updating the UI)
+- `@StyleSheet("styles/styles.css")` loads your custom CSS from `static/styles/styles.css`
+- Add `@ColorScheme("dark")` for dark mode
 
 ## Starter CSS
 
-Create `static/styles/app.css`:
+The scaffold creates `static/styles/styles.css` with:
 
 ```css
-/* Full-height app */
-html, body {
-  height: 100%;
-  margin: 0;
-}
+/* Global Theme: aura or lumo */
+/* @import url('/aura/aura.css'); */
+@import url('/lumo/lumo.css');
 
-/* Uncomment to customize Lumo theme colors */
-/* html {
-  --lumo-primary-color: hsl(220, 90%, 52%);
-  --lumo-border-radius-m: 8px;
-} */
+/* Set custom styles below */
 ```
 
-See the `get_pattern("theming")` tool for the full Lumo CSS variable reference and
-a more complete starter CSS template.
+The `@import url('/lumo/lumo.css')` line loads Lumo utility CSS classes.
+Add your custom styles below it.
+
+See `get_pattern("theming")` for the full Lumo CSS variable reference.
 
 ## View Discovery
 
@@ -92,9 +131,9 @@ PyXFlow auto-discovers all `@Route`-decorated classes in the views module:
 
 ```python
 # views/home.py
-from pyxflow import Route, Menu
-from pyxflow.components import VerticalLayout, H1
-from views.layout import MainLayout
+from pyxflow import *
+from pyxflow.components import *
+from my_app.views.main_layout import MainLayout
 
 @Route("", layout=MainLayout)
 @Menu(title="Home", order=1, icon="vaadin:home")
@@ -102,6 +141,28 @@ class HomeView(VerticalLayout):
     def __init__(self):
         super().__init__()
         self.add(H1("Welcome!"))
+```
+
+## Business Logic in lib/
+
+Keep UI and logic separate. Views import from `lib/`:
+
+```python
+# lib/people_service.py
+class PeopleService:
+    def get_all(self) -> list[Person]:
+        ...
+
+# views/people_view.py
+from my_app.lib.people_service import PeopleService
+
+@Route("people", layout=MainLayout)
+class PeopleView(VerticalLayout):
+    def __init__(self):
+        service = PeopleService()
+        grid = Grid()
+        grid.set_items(service.get_all())
+        self.add(grid)
 ```
 
 ## Simple App (no AppLayout)
@@ -122,41 +183,40 @@ class MainView(VerticalLayout):
 
 ## Static Files
 
-Place static assets in `<app_dir>/static/`:
+Place static assets in `static/`:
 
 ```
 my-app/
-  views/
   static/
     styles/
-      app.css
+      styles.css       # /styles/styles.css
     images/
-      logo.png
+      logo.png         # /images/logo.png
+    fonts/
+      custom.woff2     # /fonts/custom.woff2
 ```
 
-Access them at `/styles/app.css` and `/images/logo.png`.
+Files are served at their path relative to `static/`.
 
 ## Custom Bundle
 
 To generate a project-specific bundle (optional):
 
 ```bash
-pyxflow views --bundle
+pyxflow --bundle
 ```
-
-This creates `views/bundle/` with only the components your app uses.
 
 ## Production
 
 ```bash
-pyxflow views --host 0.0.0.0 --port 8080
+pyxflow --host 0.0.0.0 --port 8080
 ```
 
 ## FlowApp Options
 
 ```python
 app = FlowApp(
-    "views",           # Module with @Route views
+    "views",           # Module with @Route views (default: auto-detect)
     host="0.0.0.0",    # Bind address
     port=8080,         # Port
 )

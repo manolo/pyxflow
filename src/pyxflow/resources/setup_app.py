@@ -27,10 +27,11 @@ def _setup_project(app_name: str | None = None) -> None:
 
     # --- Package directories ---
     views_dir = pkg / "views"
+    lib_dir = pkg / "lib"
     static_styles = pkg / "static" / "styles"
     static_images = pkg / "static" / "images"
 
-    for d in (views_dir, static_styles, static_images):
+    for d in (views_dir, lib_dir, static_styles, static_images):
         d.mkdir(parents=True, exist_ok=True)
 
     def _write(path: Path, content: str) -> None:
@@ -50,7 +51,7 @@ def _setup_project(app_name: str | None = None) -> None:
         _write(dest, text)
 
     # --- __init__.py ---
-    for init in (pkg / "__init__.py", views_dir / "__init__.py"):
+    for init in (pkg / "__init__.py", views_dir / "__init__.py", lib_dir / "__init__.py"):
         if not init.exists():
             _write(init, "")
 
