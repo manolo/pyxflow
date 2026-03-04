@@ -110,7 +110,6 @@ class TestSessionExpired(AioHTTPTestCase):
         assert resp.status == 200
         text = await resp.text()
         assert '"sessionExpired":true' in text
-        assert text.startswith("for(;;);")
 
     async def test_uidl_without_session_on_subroute(self):
         """UIDL on sub-route without session should also return session expired."""
@@ -247,15 +246,21 @@ class TestUidlEncoder:
 class TestCriticalErrorJson:
     """Test the meta.appError response for unrecoverable errors."""
 
+    def setup_method(self):
+        import pyxflow.server.http_server as _http
+        self._http = _http
+        self._orig_wrap = _http._wrap_json
+        _http._wrap_json = False  # test without wrapping by default
+
+    def teardown_method(self):
+        self._http._wrap_json = self._orig_wrap
+
     def test_critical_error_json_format(self):
-        """Should produce for(;;);[{syncId:-1, meta:{appError:...}}]."""
+        """Should produce plain JSON {syncId:-1, meta:{appError:...}}."""
         from pyxflow.server.http_server import _critical_error_json
         import json
         result = _critical_error_json("Error", "Something broke")
-        assert result.startswith("for(;;);[")
-        assert result.endswith("]")
-        json_str = result[len("for(;;);["):-1]
-        data = json.loads(json_str)
+        data = json.loads(result)
         assert data["syncId"] == -1
         assert data["changes"] == []
         assert data["meta"]["appError"]["caption"] == "Error"
@@ -268,8 +273,7 @@ class TestCriticalErrorJson:
         from pyxflow.server.http_server import _critical_error_json
         import json
         result = _critical_error_json()
-        json_str = result[len("for(;;);["):-1]
-        data = json.loads(json_str)
+        data = json.loads(result)
         app_error = data["meta"]["appError"]
         assert all(v is None for v in app_error.values())
 
@@ -278,9 +282,84 @@ class TestCriticalErrorJson:
         from pyxflow.server.http_server import _critical_error_json
         import json
         result = _critical_error_json(url="/login")
+        data = json.loads(result)
+        assert data["meta"]["appError"]["url"] == "/login"
+
+    def test_critical_error_json_wrapped_25_0(self):
+        """With 25.0 bundle, response is wrapped in for(;;);[...]."""
+        from pyxflow.server.http_server import _critical_error_json
+        import json
+        self._http._wrap_json = True
+        result = _critical_error_json("Error", "boom")
+        assert result.startswith("for(;;);[")
+        assert result.endswith("]")
         json_str = result[len("for(;;);["):-1]
         data = json.loads(json_str)
-        assert data["meta"]["appError"]["url"] == "/login"
+        assert data["syncId"] == -1
+
+
+class TestWrapUidl:
+    """Test JSON wrapping detection for 25.0 vs 25.1 bundles."""
+
+    def setup_method(self):
+        import pyxflow.server.http_server as _http
+        self._http = _http
+        self._orig_wrap = _http._wrap_json
+
+    def teardown_method(self):
+        self._http._wrap_json = self._orig_wrap
+
+    def test_wrap_uidl_plain(self):
+        """25.1+ bundles: plain JSON."""
+        self._http._wrap_json = False
+        from pyxflow.server.http_server import _wrap_uidl
+        assert _wrap_uidl('{"a":1}') == '{"a":1}'
+
+    def test_wrap_uidl_wrapped(self):
+        """25.0 bundles: for(;;);[...] wrapping."""
+        self._http._wrap_json = True
+        from pyxflow.server.http_server import _wrap_uidl
+        assert _wrap_uidl('{"a":1}') == 'for(;;);[{"a":1}]'
+
+    def test_detect_25_0_bundle(self):
+        """Bundle with vaadin-version 25.0.x should enable wrapping."""
+        from pyxflow.server.http_server import _detect_json_wrapping
+        from pathlib import Path
+        import tempfile, os
+        with tempfile.TemporaryDirectory() as d:
+            bd = os.path.join(d, "VAADIN")
+            os.makedirs(bd)
+            with open(os.path.join(d, "VAADIN", "version"), "w") as f:
+                f.write("25.0.6")
+            # Patch get_bundle_directory to return our temp dir
+            from unittest.mock import patch
+            with patch("pyxflow.server.http_server.get_bundle_directory", return_value=Path(d)):
+                assert _detect_json_wrapping() is True
+
+    def test_detect_25_1_bundle(self):
+        """Bundle with vaadin-version 25.1.x should disable wrapping."""
+        from pyxflow.server.http_server import _detect_json_wrapping
+        from pathlib import Path
+        import tempfile, os
+        with tempfile.TemporaryDirectory() as d:
+            bd = os.path.join(d, "VAADIN")
+            os.makedirs(bd)
+            with open(os.path.join(d, "VAADIN", "version"), "w") as f:
+                f.write("25.1.0-beta1")
+            from unittest.mock import patch
+            with patch("pyxflow.server.http_server.get_bundle_directory", return_value=Path(d)):
+                assert _detect_json_wrapping() is False
+
+    def test_detect_no_version_file(self):
+        """Without vaadin-version file, default to wrapping (25.0 compat)."""
+        from pyxflow.server.http_server import _detect_json_wrapping
+        from pathlib import Path
+        import tempfile, os
+        with tempfile.TemporaryDirectory() as d:
+            os.makedirs(os.path.join(d, "VAADIN"))
+            from unittest.mock import patch
+            with patch("pyxflow.server.http_server.get_bundle_directory", return_value=Path(d)):
+                assert _detect_json_wrapping() is True
 
 
 class TestDevModeMetaTag:
@@ -378,9 +457,10 @@ class TestUidlErrorHandling(AioHTTPTestCase):
         # Must be 200 (not 500) with meta.appError
         assert resp.status == 200
         text = await resp.text()
-        assert text.startswith("for(;;);")
-        json_str = text[len("for(;;);["):-1]
-        data = json.loads(json_str)
+        # Strip optional for(;;);[...] wrapping (25.0 bundles)
+        if text.startswith("for(;;);["):
+            text = text[len("for(;;);["):-1]
+        data = json.loads(text)
         assert data["syncId"] == -1
         assert "appError" in data["meta"]
         assert data["meta"]["appError"]["caption"] == "Internal error"

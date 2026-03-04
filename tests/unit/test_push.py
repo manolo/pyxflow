@@ -49,6 +49,13 @@ class PushTestBase(AioHTTPTestCase):
         session = list(_sessions.values())[0]
         return session["uis"][ui_id]
 
+    @staticmethod
+    def _unwrap(text: str) -> str:
+        """Strip optional for(;;);[...] wrapping."""
+        if text.startswith("for(;;);["):
+            return text[len("for(;;);["):-1]
+        return text
+
 
 class TestPushAuth(PushTestBase):
     """Test push authentication and rejection."""
@@ -161,10 +168,8 @@ class TestPushMessages(PushTestBase):
         # Parse Atmosphere format
         text = msg.data
         pipe = text.index("|")
-        payload = text[pipe + 1:]
-        assert payload.startswith("for(;;);[")
-        json_str = payload[len("for(;;);["):-1]
-        data = json.loads(json_str)
+        payload = self._unwrap(text[pipe + 1:])
+        data = json.loads(payload)
 
         # Must have meta.async = True
         assert data.get("meta", {}).get("async") is True
@@ -175,7 +180,7 @@ class TestPushMessages(PushTestBase):
         await ws.close()
 
     async def test_push_message_atmosphere_format(self):
-        """Push message matches <len>|for(;;);[{...}] format."""
+        """Push message matches <len>|<json> format (with optional wrapping)."""
         push_id, _, _ = await self._init_session()
         ws = await self.client.ws_connect(f"/VAADIN/push?v-pushId={push_id}")
         await ws.receive(timeout=2)  # consume handshake
@@ -194,8 +199,8 @@ class TestPushMessages(PushTestBase):
         declared_len = int(match.group(1))
         message = match.group(2)
         assert len(message) == declared_len
-        assert message.startswith("for(;;);[")
-        assert message.endswith("]")
+        # Unwrap and verify it's valid JSON
+        json.loads(self._unwrap(message))
 
         await ws.close()
 
@@ -248,7 +253,8 @@ class TestPushReconnect(PushTestBase):
         handler = ui_state["handler"]
         response_data = handler._build_response()
         response_data["meta"] = {"async": True}
-        message = f"for(;;);[{json.dumps(response_data)}]"
+        from pyxflow.server.http_server import _wrap_uidl
+        message = _wrap_uidl(json.dumps(response_data))
         prefixed = f"{len(message)}|{message}"
         ui_state["pending_push"] = prefixed
 
@@ -261,9 +267,8 @@ class TestPushReconnect(PushTestBase):
         assert msg.type == aiohttp.WSMsgType.TEXT
         text = msg.data
         pipe = text.index("|")
-        payload = text[pipe + 1:]
-        json_str = payload[len("for(;;);["):-1]
-        data = json.loads(json_str)
+        payload = self._unwrap(text[pipe + 1:])
+        data = json.loads(payload)
         assert any(c.get("value") == "reconnected" for c in data.get("changes", []))
 
         await ws2.close()

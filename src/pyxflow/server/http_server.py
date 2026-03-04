@@ -20,6 +20,48 @@ log = logging.getLogger("pyxflow")
 
 SESSION_TIMEOUT = 1800  # 30 minutes (matches Java servlet default)
 
+# JSON wrapping: Flow <=25.0 wraps UIDL responses in `for(;;);[{...}]` as an
+# XSS protection measure.  Flow 25.1 removed this wrapping (commit fb9a7451a4).
+# Detected once at first request from bundle/VAADIN/version.
+# TODO: remove this compat layer once 25.0 support is dropped.
+_wrap_json: bool | None = None  # None = not yet detected
+
+
+def _detect_json_wrapping() -> bool:
+    """Check whether the bundle requires for(;;); JSON wrapping.
+
+    Reads ``bundle/VAADIN/version`` (written by ``pyxflow --bundle``).
+    Vaadin 25.0.x needs wrapping; 25.1+ does not.
+    Returns True for 25.0, False for 25.1+.
+
+    TODO: remove when 25.0 support is dropped -- just send plain JSON.
+    """
+    bundle_dir = get_bundle_directory()
+    if bundle_dir:
+        version_file = bundle_dir / "VAADIN" / "version"
+        if version_file.is_file():
+            version = version_file.read_text().strip()
+            # 25.0.x -> wrap, 25.1+ -> no wrap
+            try:
+                parts = version.split(".")
+                major, minor = int(parts[0]), int(parts[1])
+                return major < 25 or (major == 25 and minor < 1)
+            except (IndexError, ValueError):
+                pass
+    # No version file -> assume 25.0 (backwards compatible)
+    return True
+
+
+def _wrap_uidl(json_str: str) -> str:
+    """Wrap a JSON string for the FlowClient if the bundle requires it."""
+    global _wrap_json
+    if _wrap_json is None:
+        _wrap_json = _detect_json_wrapping()
+        log.debug("JSON wrapping: %s", "for(;;);[...] (25.0)" if _wrap_json else "plain (25.1+)")
+    if _wrap_json:
+        return f"for(;;);[{json_str}]"
+    return json_str
+
 
 class _UidlEncoder(json.JSONEncoder):
     """JSON encoder that handles Python types in UIDL responses.
@@ -67,7 +109,7 @@ def _critical_error_json(
         "changes": [],
         "meta": {"appError": app_error},
     }
-    return f"for(;;);[{json.dumps(response)}]"
+    return _wrap_uidl(json.dumps(response))
 
 
 # Session storage (in-memory for now)
@@ -178,7 +220,7 @@ async def handle_init(request: web.Request) -> web.Response:
 def _session_expired_response() -> web.Response:
     """Return session-expired JSON (HTTP 200) so FlowClient reloads the page."""
     return web.Response(
-        text='for(;;);[{"meta":{"sessionExpired":true}}]',
+        text=_wrap_uidl('{"meta":{"sessionExpired":true}}'),
         content_type="application/json"
     )
 
@@ -233,7 +275,7 @@ async def handle_uidl(request: web.Request) -> web.Response:
         # _UidlEncoder has a str() fallback so json.dumps should never raise.
         # User code errors are already caught in _process_rpc() which shows
         # an error notification before _build_response() consumes tree changes.
-        response_text = f"for(;;);[{json.dumps(response_data, cls=_UidlEncoder)}]"
+        response_text = _wrap_uidl(json.dumps(response_data, cls=_UidlEncoder))
     except Exception:
         # Safety net for truly unexpected errors (serialization bugs, etc.).
         # At this point _build_response() may have already consumed tree changes,
@@ -417,7 +459,7 @@ async def _push_sender(ws: web.WebSocketResponse, ui_state: dict):
             response_data["meta"] = {"async": True}
 
             response_json = json.dumps(response_data, cls=_UidlEncoder)
-            message = f"for(;;);[{response_json}]"
+            message = _wrap_uidl(response_json)
             # Atmosphere trackMessageLength format: <length>|<message>
             prefixed = f"{len(message)}|{message}"
         except Exception:
@@ -786,13 +828,30 @@ def run_server(host: str = "localhost", port: int = 8080, debug: bool = False, s
         logging.basicConfig(level=logging.DEBUG, format="%(name)s  %(message)s")
         log.setLevel(logging.DEBUG)
 
-    # Show registered routes
+    # -- Startup banner --------------------------------------------------------
+    from datetime import datetime
+    from pyxflow import __version__
     from pyxflow.router import get_all_routes
+
+    bundle_dir = get_bundle_directory()
+    vaadin_ver = "?"
+    if bundle_dir:
+        vf = bundle_dir / "VAADIN" / "version"
+        if vf.is_file():
+            vaadin_ver = vf.read_text().strip()
+
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print()
+    print(f"  PyXFlow {__version__}  |  Vaadin {vaadin_ver}  |  {now}")
+    print()
+
     routes = get_all_routes()
     if routes:
-        print("Registered routes:")
+        max_path = max(len(f"/{p}") for p in routes)
+        print("  Routes:")
         for path, cls in routes.items():
-            print(f"  /{path} -> {cls.__name__}")
+            print(f"    /{path:<{max_path}}  {cls.__name__}")
+        print()
 
     app = create_app()
     # shutdown_timeout=0 avoids waiting for open WebSocket push connections

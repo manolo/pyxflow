@@ -587,6 +587,10 @@ def copy_from_jars(
     n = _extract_jar_to(aura_jar, "META-INF/resources/aura/", bundle_dir, strip_prefix="META-INF/resources/")
     print(f"  aura-theme:  {n} files from {aura_jar.name}")
 
+    # --- Write version marker ---------------------------------------------------
+    (bundle_dir / "VAADIN").mkdir(parents=True, exist_ok=True)
+    (bundle_dir / "VAADIN" / "version").write_text(vaadin_version)
+
     # --- Report ---------------------------------------------------------------
     js_size = sum(f.stat().st_size for f in bundle_dir.rglob("*.js"))
     css_size = sum(f.stat().st_size for f in bundle_dir.rglob("*.css"))
@@ -647,6 +651,10 @@ def generate_and_build(
         generate_project(project_dir, vaadin_version, optimized=optimized)
         print()
         build_and_extract(project_dir, bundle_dir, clean=True)
+
+    # Write version marker
+    (bundle_dir / "VAADIN").mkdir(parents=True, exist_ok=True)
+    (bundle_dir / "VAADIN" / "version").write_text(vaadin_version)
 
     if not keep:
         shutil.rmtree(project_dir)
