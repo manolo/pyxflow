@@ -458,20 +458,29 @@ class UidlHandler:
         _set_current_tree(self._tree)
         try:
             # Pass 1: process all mSync RPCs first (property syncs)
-            other_rpcs: list[dict[str, Any]] = []
+            other_rpcs: list = []
             for rpc in rpc_list:
                 try:
+                    if isinstance(rpc, list):
+                        # Array-form RPCs (e.g. serverConnected) -- handle in pass 2
+                        other_rpcs.append(rpc)
+                        continue
                     if rpc.get("type") == "mSync":
                         self._handle_msync(rpc)
                     else:
                         other_rpcs.append(rpc)
                 except Exception:
-                    log.exception("Error processing RPC: %s", rpc.get("type", "unknown"))
+                    rpc_type = rpc.get("type", "unknown") if isinstance(rpc, dict) else rpc[0] if rpc else "unknown"
+                    log.exception("Error processing RPC: %s", rpc_type)
                     self._show_error_notification()
 
             # Pass 2: process events and other RPCs
             for rpc in other_rpcs:
                 try:
+                    if isinstance(rpc, list):
+                        # Array-form RPC (e.g. ["serverConnected", ...])
+                        # These are handled by the client, nothing to do server-side
+                        continue
                     rpc_type = rpc.get("type")
                     if rpc_type == "event":
                         self._handle_event(rpc)
@@ -483,7 +492,8 @@ class UidlHandler:
                         args = rpc.get("args", [])
                         self._tree.handle_return_channel(node_id, channel_id, args)
                 except Exception:
-                    log.exception("Error processing RPC: %s", rpc.get("type", "unknown"))
+                    rpc_type = rpc.get("type", "unknown") if isinstance(rpc, dict) else rpc[0] if rpc else "unknown"
+                    log.exception("Error processing RPC: %s", rpc_type)
                     self._show_error_notification()
         finally:
             _set_current_tree(None)
