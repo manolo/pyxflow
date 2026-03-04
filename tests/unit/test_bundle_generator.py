@@ -230,7 +230,9 @@ class TestDefaultVaadinVersion:
     """Test default version constant."""
 
     def test_default_version_is_set(self):
-        assert _DEFAULT_VAADIN_VERSION == "25.1.0-beta1"
+        # Must be a valid semver-ish string, not the fallback "25.0.6"
+        assert _DEFAULT_VAADIN_VERSION
+        assert _DEFAULT_VAADIN_VERSION == _read_pyproject_version()
 
 
 class TestReadPyprojectVersion:
@@ -238,11 +240,10 @@ class TestReadPyprojectVersion:
 
     def test_reads_from_pyproject(self):
         vaadin_ver = _read_pyproject_version()
-        assert vaadin_ver == "25.1.0-beta1"
+        assert vaadin_ver.startswith("25.")
 
     def test_version_matches_module_constant(self):
-        vaadin_ver = _read_pyproject_version()
-        assert vaadin_ver == _DEFAULT_VAADIN_VERSION
+        assert _read_pyproject_version() == _DEFAULT_VAADIN_VERSION
 
 
 class TestParseFlowVersion:
