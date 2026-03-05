@@ -241,6 +241,46 @@ Requires `@Push` on the `@AppShell` class.
 | Display | `Span`, `H1`-`H6`, `Paragraph`, `Pre` | Text elements |
 | Display | `Image`, `Anchor`, `IFrame` | Media and links |
 
+## AI-assisted development (MCP)
+
+PyXFlow ships an [MCP server](https://modelcontextprotocol.io/) that gives AI coding assistants (Claude Code, Cursor, Windsurf, etc.) up-to-date knowledge of every component, pattern, and API. When enabled, your AI can look up constructors, method signatures, theme variants, and working examples without hallucinating outdated information.
+
+### Setup
+
+Add the PyXFlow MCP server to your editor's config:
+
+**Claude Code** -- run once in your project:
+
+```bash
+claude mcp add pyxflow --transport http https://pyxflow-mcp.manolo-345.workers.dev/mcp
+```
+
+**Cursor / Windsurf / Other** -- add to your MCP settings file (`.cursor/mcp.json`, etc.):
+
+```json
+{
+  "mcpServers": {
+    "pyxflow": {
+      "type": "http",
+      "url": "https://pyxflow-mcp.manolo-345.workers.dev/mcp"
+    }
+  }
+}
+```
+
+### Available tools
+
+| Tool | What it does |
+|------|-------------|
+| `get_pyxflow_primer` | Framework overview, imports, component categories |
+| `list_components` | All 78+ components with descriptions |
+| `get_component_api` | Constructor, methods, properties, theme variants for any component |
+| `get_example` | Runnable examples: `hello`, `grid`, `crud`, `master-detail`, `push`, `dialog`, `app-layout` |
+| `get_pattern` | Pattern guides: `routing`, `binder`, `data-provider`, `push`, `renderers`, `theming`, etc. |
+| `get_constants` | Enum values: layout, grid, field, variants |
+
+The AI calls these tools automatically when you ask it to build PyXFlow views. No manual invocation needed.
+
 ## Development
 
 See [README-DEV.md](README-DEV.md) for setup, tests, project structure, and architecture.
