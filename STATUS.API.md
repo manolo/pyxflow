@@ -1,7 +1,7 @@
 # PyXFlow API Inventory — Python vs Java Vaadin 25
 
-**Generated: 2026-03-03**
-**Python components: 50+ | Tests: 2519 unit + 456 UI | LOC: ~19,000 (core)**
+**Generated: 2026-03-05**
+**Python components: 50+ | Tests: 2548 unit + 456 UI | LOC: ~19,200 (core)**
 
 Legend: `[x]` = implemented, `[ ]` = missing
 
@@ -734,6 +734,24 @@ All components inherit from `Component` which provides:
 | TextRenderer / ComponentRenderer | [x] |
 | NumberRenderer / LocalDateRenderer / LocalDateTimeRenderer | [ ] |
 | NativeButtonRenderer / IconRenderer | [ ] |
+
+---
+
+## Server Utilities
+
+### Request / Response Context
+
+| Feature | Status |
+|---------|--------|
+| `Request.get_current()` — get current HTTP request (via `contextvars`) | [x] |
+| `Request.get_cookie` / `get_cookies` | [x] |
+| `Request.get_header` / `get_headers` | [x] |
+| `Request.get_remote_address` | [x] |
+| `Request.is_secure` | [x] |
+| `Response.get_current()` — get current response (via `contextvars`) | [x] |
+| `Response.add_cookie` (name, value, max_age, path, domain, secure, httponly, samesite) | [x] |
+| `Response.set_header` | [x] |
+| Available in `handle_init` and `handle_uidl` request cycles | [x] |
 
 ---
 

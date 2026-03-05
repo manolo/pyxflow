@@ -1,6 +1,7 @@
 """HTTP Server for Vaadin Flow."""
 
 import asyncio
+import contextvars
 import datetime
 import json
 import logging
@@ -17,6 +18,121 @@ from pyxflow.server.uidl_handler import UidlHandler
 from pyxflow.core.state_tree import StateTree
 
 log = logging.getLogger("pyxflow")
+
+# ── Request / Response context ──────────────────────────────────────────
+
+_current_request: contextvars.ContextVar["Request | None"] = contextvars.ContextVar(
+    "_current_request", default=None
+)
+_current_response: contextvars.ContextVar["Response | None"] = contextvars.ContextVar(
+    "_current_response", default=None
+)
+
+
+class Request:
+    """Read-only wrapper around the current HTTP request.
+
+    Available during view construction and event handlers via
+    ``Request.get_current()``.
+    """
+
+    def __init__(self, aiohttp_request: web.Request):
+        self._request = aiohttp_request
+
+    @staticmethod
+    def get_current() -> "Request | None":
+        """Return the current request, or ``None`` outside a request cycle."""
+        return _current_request.get()
+
+    def get_cookies(self) -> dict[str, str]:
+        """Return all cookies as a dict."""
+        return dict(self._request.cookies)
+
+    def get_cookie(self, name: str) -> str | None:
+        """Return a single cookie value, or ``None``."""
+        return self._request.cookies.get(name)
+
+    def get_header(self, name: str) -> str | None:
+        """Return a single header value (case-insensitive), or ``None``."""
+        return self._request.headers.get(name)
+
+    def get_headers(self) -> dict[str, str]:
+        """Return all headers as a dict."""
+        return dict(self._request.headers)
+
+    def get_remote_address(self) -> str | None:
+        """Return the client IP address."""
+        peername = self._request.transport.get_extra_info("peername") if self._request.transport else None
+        return peername[0] if peername else None
+
+    def is_secure(self) -> bool:
+        """Return ``True`` if the request was made over HTTPS."""
+        return self._request.secure
+
+
+class Response:
+    """Queue cookies and headers to be applied to the HTTP response.
+
+    Available during view construction and event handlers via
+    ``Response.get_current()``.
+    """
+
+    def __init__(self):
+        self._cookies: list[dict[str, Any]] = []
+        self._headers: dict[str, str] = {}
+
+    @staticmethod
+    def get_current() -> "Response | None":
+        """Return the current response, or ``None`` outside a request cycle."""
+        return _current_response.get()
+
+    def add_cookie(
+        self,
+        name: str,
+        value: str,
+        *,
+        max_age: int | None = None,
+        path: str = "/",
+        domain: str | None = None,
+        secure: bool = False,
+        httponly: bool = False,
+        samesite: str = "Lax",
+    ):
+        """Queue a Set-Cookie header on the response."""
+        self._cookies.append({
+            "name": name,
+            "value": value,
+            "max_age": max_age,
+            "path": path,
+            "domain": domain,
+            "secure": secure,
+            "httponly": httponly,
+            "samesite": samesite,
+        })
+
+    def set_header(self, name: str, value: str):
+        """Set a custom response header."""
+        self._headers[name] = value
+
+    def _apply_to(self, aiohttp_response: web.Response):
+        """Apply pending cookies and headers to an aiohttp response."""
+        for c in self._cookies:
+            kwargs: dict[str, Any] = {}
+            if c["max_age"] is not None:
+                kwargs["max_age"] = c["max_age"]
+            if c["domain"] is not None:
+                kwargs["domain"] = c["domain"]
+            aiohttp_response.set_cookie(
+                c["name"],
+                c["value"],
+                path=c["path"],
+                secure=c["secure"],
+                httponly=c["httponly"],
+                samesite=c["samesite"],
+                **kwargs,
+            )
+        for name, value in self._headers.items():
+            aiohttp_response.headers[name] = value
 
 SESSION_TIMEOUT = 1800  # 30 minutes (matches Java servlet default)
 
@@ -182,39 +298,48 @@ async def handle_init(request: web.Request) -> web.Response:
     Each init call allocates a new UI (tree + handler) within the session,
     allowing multiple browser tabs to coexist independently.
     """
-    session_id, session = get_or_create_session(request)
+    req = Request(request)
+    resp = Response()
+    _current_request.set(req)
+    _current_response.set(resp)
+    try:
+        session_id, session = get_or_create_session(request)
 
-    # Parse browser details (optional)
-    browser_details = {}
-    if "v-browserDetails" in request.query:
-        try:
-            browser_details = json.loads(request.query["v-browserDetails"])
-        except json.JSONDecodeError:
-            pass
+        # Parse browser details (optional)
+        browser_details = {}
+        if "v-browserDetails" in request.query:
+            try:
+                browser_details = json.loads(request.query["v-browserDetails"])
+            except json.JSONDecodeError:
+                pass
 
-    # Allocate a new UI for this tab
-    ui_id = session["next_ui_id"]
-    session["next_ui_id"] = ui_id + 1
+        # Allocate a new UI for this tab
+        ui_id = session["next_ui_id"]
+        session["next_ui_id"] = ui_id + 1
 
-    tree = StateTree()
-    handler = UidlHandler(tree, csrf_token=session["csrf_token"])
+        tree = StateTree()
+        handler = UidlHandler(tree, csrf_token=session["csrf_token"])
 
-    session["uis"][ui_id] = {
-        "tree": tree,
-        "handler": handler,
-        "push_ws": None,
-        "push_sender_task": None,
-        "pending_push": None,
-    }
+        session["uis"][ui_id] = {
+            "tree": tree,
+            "handler": handler,
+            "push_ws": None,
+            "push_sender_task": None,
+            "pending_push": None,
+        }
 
-    # Pass the request path so the handler knows the initial route
-    initial_route = request.path.strip("/")  # "/about" -> "about", "/" -> ""
-    response_data = handler.handle_init(browser_details, initial_route=initial_route, ui_id=ui_id)
+        # Pass the request path so the handler knows the initial route
+        initial_route = request.path.strip("/")  # "/about" -> "about", "/" -> ""
+        response_data = handler.handle_init(browser_details, initial_route=initial_route, ui_id=ui_id)
 
-    # Set session cookie
-    response = web.json_response(response_data)
-    response.set_cookie("JSESSIONID", session_id, httponly=True)
-    return response
+        # Set session cookie
+        http_response = web.json_response(response_data)
+        http_response.set_cookie("JSESSIONID", session_id, httponly=True)
+        resp._apply_to(http_response)
+        return http_response
+    finally:
+        _current_request.set(None)
+        _current_response.set(None)
 
 
 def _session_expired_response() -> web.Response:
@@ -267,33 +392,43 @@ async def handle_uidl(request: web.Request) -> web.Response:
 
     session["last_activity"] = time.monotonic()
 
-    # Process UIDL
-    log.debug("RPC: %s", payload.get("rpc", []))
-    handler: UidlHandler = ui_state["handler"]
+    req = Request(request)
+    resp = Response()
+    _current_request.set(req)
+    _current_response.set(resp)
     try:
-        response_data = handler.handle_uidl(payload)
-        # _UidlEncoder has a str() fallback so json.dumps should never raise.
-        # User code errors are already caught in _process_rpc() which shows
-        # an error notification before _build_response() consumes tree changes.
-        response_text = _wrap_uidl(json.dumps(response_data, cls=_UidlEncoder))
-    except Exception:
-        # Safety net for truly unexpected errors (serialization bugs, etc.).
-        # At this point _build_response() may have already consumed tree changes,
-        # so we can't add a Notification (it would be the only content → blank page).
-        # Instead, send meta.appError with syncId=-1 — FlowClient shows an error
-        # overlay and refreshes on click/ESC.  Matches Java's
-        # VaadinService.handleExceptionDuringRequest() behavior.
-        log.exception("Unexpected error processing UIDL request")
-        response_text = _critical_error_json(
-            "Internal error",
-            "An internal error has occurred. Click to reload.",
-        )
+        # Process UIDL
+        log.debug("RPC: %s", payload.get("rpc", []))
+        handler: UidlHandler = ui_state["handler"]
+        try:
+            response_data = handler.handle_uidl(payload)
+            # _UidlEncoder has a str() fallback so json.dumps should never raise.
+            # User code errors are already caught in _process_rpc() which shows
+            # an error notification before _build_response() consumes tree changes.
+            response_text = _wrap_uidl(json.dumps(response_data, cls=_UidlEncoder))
+        except Exception:
+            # Safety net for truly unexpected errors (serialization bugs, etc.).
+            # At this point _build_response() may have already consumed tree changes,
+            # so we can't add a Notification (it would be the only content → blank page).
+            # Instead, send meta.appError with syncId=-1 — FlowClient shows an error
+            # overlay and refreshes on click/ESC.  Matches Java's
+            # VaadinService.handleExceptionDuringRequest() behavior.
+            log.exception("Unexpected error processing UIDL request")
+            response_text = _critical_error_json(
+                "Internal error",
+                "An internal error has occurred. Click to reload.",
+            )
 
-    log.debug("Response: %s...", response_text[:500])
-    return web.Response(
-        text=response_text,
-        content_type="application/json"
-    )
+        log.debug("Response: %s...", response_text[:500])
+        http_response = web.Response(
+            text=response_text,
+            content_type="application/json"
+        )
+        resp._apply_to(http_response)
+        return http_response
+    finally:
+        _current_request.set(None)
+        _current_response.set(None)
 
 
 async def handle_upload(request: web.Request) -> web.Response:

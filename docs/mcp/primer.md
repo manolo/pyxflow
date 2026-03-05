@@ -1,6 +1,6 @@
 # PyXFlow - Python Server-Side UI Framework
 
-**Version:** 0.5.0 | **Components:** 78+ | **Python 3.10+**
+**Version:** 0.5.1 | **Components:** 78+ | **Python 3.10+**
 
 PyXFlow is a Python port of Vaadin Flow. It lets you build reactive web UIs
 entirely in Python -- no JavaScript, HTML, or CSS required. The browser runs
@@ -101,6 +101,7 @@ class LiveView(VerticalLayout):
 from pyxflow import Route, RouteAlias, Menu, FlowApp, Push, AppShell
 from pyxflow import ColorScheme, StyleSheet, PageTitle, BeforeEnterEvent
 from pyxflow import Component, Element, Location, QueryParameters, RouteParameters
+from pyxflow import Request, Response  # HTTP request/response context
 
 # Components (use what you need)
 from pyxflow.components import Button, TextField, Grid, Dialog, Notification
@@ -138,3 +139,4 @@ from pyxflow.components import FlexDirection, JustifyContentMode, Alignment
 - **Push:** `@Push` + `asyncio.create_task()` + `ui.access(callback)` for live updates
 - **Theming:** `@ColorScheme("dark")`, `@StyleSheet("styles.css")`, `ButtonVariant.LUMO_PRIMARY`
 - **@ClientCallable:** Decorate methods to call from client JS
+- **Request/Response:** `Request.get_current()` / `Response.get_current()` for cookies/headers

@@ -4,10 +4,10 @@
 
 **Vaadin version:** 25.0.6
 **Components:** 50+ implemented (all Vaadin 25 UI components)
-**Lines of code:** ~19,000 (core src/), ~58,000 (total with demo + tests)
-**Test structure:** `tests/unit/` (2519 unit tests, default `pytest`) + `tests/ui/` (456 Playwright, run explicitly)
-**Tests:** 2519 unit + 456 UI (Playwright)
-**Last updated:** 2026-03-03
+**Lines of code:** ~19,200 (core src/), ~58,000 (total with demo + tests)
+**Test structure:** `tests/unit/` (2548 unit tests, default `pytest`) + `tests/ui/` (456 Playwright, run explicitly)
+**Tests:** 2548 unit + 456 UI (Playwright)
+**Last updated:** 2026-03-05
 
 ---
 
@@ -142,6 +142,7 @@
 
 ### Server
 - [x] HTTP Server (aiohttp) - Sessions, static files
+- [x] Request / Response context API - `Request.get_current()` / `Response.get_current()` via `contextvars`, read cookies/headers, set response cookies/headers from views and event handlers
 - [x] UIDL Handler - Init, navigation, events, mSync (two-pass: mSync before events, matching Java Flow)
 - [x] Page reload support - State reset on init
 - [x] Multiple UIs per session - Each browser tab gets independent StateTree/UidlHandler keyed by `v-uiId`, shared CSRF token per session
@@ -215,7 +216,7 @@
 
 > **For the detailed per-component API inventory (every method, [x]/[ ]), see `STATUS.API.md`.**
 >
-> API coverage: **~480 methods implemented, ~30 missing** (~94% complete).
+> API coverage: **~490 methods implemented, ~30 missing** (~94% complete).
 
 ### Unimplemented Features
 
@@ -256,7 +257,7 @@
 
 | Category | Coverage | Details |
 |----------|----------|---------|
-| **Unit tests** | 2519 passing | Good coverage of all 50+ components + core + data layer. Located in `tests/unit/` |
+| **Unit tests** | 2548 passing | Good coverage of all 50+ components + core + data layer + server utilities. Located in `tests/unit/` |
 | **UI tests** | 456 passed | All 33 test views (in `tests/views/`) with shared SideNav layout and single browser session. UI tests in `tests/ui/`. |
 
 ---
