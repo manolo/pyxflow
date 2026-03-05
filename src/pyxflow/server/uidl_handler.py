@@ -1028,7 +1028,8 @@ class UidlHandler:
         hierarchy (infrastructure nodes + navigation) so that connector init
         scripts and execute_js commands are also re-sent.
 
-        Constants are re-sent because the client clears its cache on resync.
+        Constants are NOT re-sent: FlowClient keeps its constant registry
+        across resync and throws on duplicate hashes.
         """
         saved_route = self._current_route
 
@@ -1041,7 +1042,8 @@ class UidlHandler:
         self._body_node = None
         self._container_node = None
         self._pending_execute = []
-        self._sent_constants.clear()
+        # NOTE: Do NOT clear _sent_constants -- FlowClient keeps its constant
+        # registry across resync (Y2/eE) and throws on duplicate hashes.
         self._sent_stylesheets.clear()
         self._pending_dependencies = []
 

@@ -620,6 +620,14 @@ class TestResyncAfterNavigation:
                            if c.get("key") == "tag" and c.get("feat") == 0]
             assert "vaadin-button" in resync_tags
             assert len(resync_resp["changes"]) > 0
+
+            # Constants already sent in nav_resp must NOT appear in resync_resp.
+            # FlowClient keeps its constant registry across resync and throws
+            # on duplicate hashes (eE function: a.a.has(E) -> throw).
+            nav_constants = set(nav_resp.get("constants", {}).keys())
+            resync_constants = set(resync_resp.get("constants", {}).keys())
+            duplicates = nav_constants & resync_constants
+            assert not duplicates, f"Duplicate constants in resync: {duplicates}"
         finally:
             _routes.pop("resync-test", None)
 
