@@ -612,6 +612,13 @@ Feature: Select & ListBox
     When select "UK" then clear selection
     Then invalid state shown
 
+  # --- Resync ---
+  Scenario: V05.21 — Page reload preserves Select state (resync)
+    Given preset Select #sel-pre has value "DE"
+    When page is reloaded
+    Then Select #sel-pre still has value "DE"
+    And Select #sel1 still has label "Country"
+
   # --- Nav ---
   Scenario: V05.20 — Nav to next view
     When click link "Next: ComboBox"

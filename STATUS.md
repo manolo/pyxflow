@@ -6,7 +6,7 @@
 **Components:** 50+ implemented (all Vaadin 25 UI components)
 **Lines of code:** ~19,200 (core src/), ~58,000 (total with demo + tests)
 **Test structure:** `tests/unit/` (2548 unit tests, default `pytest`) + `tests/ui/` (456 Playwright, run explicitly)
-**Tests:** 2548 unit + 456 UI (Playwright)
+**Tests:** 2548 unit + 457 UI (Playwright)
 **Last updated:** 2026-03-05
 
 ---

@@ -110,6 +110,53 @@ class TestMultiSelectListBox:
         expect(view_page.locator("#mslb-ro")).to_have_js_property("readonly", True)
 
 
+class TestResync:
+    @pytest.mark.spec("V05.21")
+    def test_resync_rebuilds_page(self, base_url, browser):
+        """Force a resync via injected flag -- page must rebuild, not go blank.
+
+        Uses a fresh browser context (not shared_page) because resync
+        destroys and rebuilds the entire page, which would break SPA
+        state for subsequent tests.
+        """
+        context = browser.new_context()
+        page = context.new_page()
+        page.goto(f"{base_url}/test/select-listbox")
+        page.wait_for_selector("vaadin-select", timeout=5000)
+
+        # Verify initial state
+        expect(page.locator("#sel-pre")).to_have_js_property("value", "DE")
+
+        # Intercept the next UIDL POST and inject resynchronize:true.
+        # This forces the server through _build_resync_response().
+        def inject_resync(route):
+            body = route.request.post_data
+            if body:
+                import json as _json
+                payload = _json.loads(body)
+                payload["resynchronize"] = True
+                route.continue_(post_data=_json.dumps(payload))
+            else:
+                route.continue_()
+        page.route("**/?v-r=uidl&v-uiId=*", inject_resync)
+
+        # Trigger a UIDL request by clicking on a Select to change value
+        sel = page.locator("#sel1")
+        sel.click()
+        page.wait_for_timeout(300)
+        sel.locator("vaadin-select-item").nth(0).click()
+        page.wait_for_timeout(1000)
+
+        # Remove the route interceptor
+        page.unroute("**/?v-r=uidl&v-uiId=*", inject_resync)
+
+        # After resync, the page must still have its components (not blank)
+        expect(page.locator("#sel-pre")).to_be_visible()
+        expect(page.locator("#sel1")).to_have_js_property("label", "Country")
+
+        context.close()
+
+
 class TestNavigation:
     @pytest.mark.spec("V05.20")
     def test_nav_via_sidenav(self, view_page: Page):
