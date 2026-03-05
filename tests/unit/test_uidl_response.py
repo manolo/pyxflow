@@ -473,7 +473,9 @@ class TestSyncIdValidation:
         }
         resync = session["handler"].handle_uidl(payload2)
         assert resync.get("resynchronize") is True
-        assert resync["syncId"] == sync_id_after  # Unchanged
+        # Resync rebuilds the full state tree and increments syncId
+        assert resync["syncId"] == sync_id_after + 1
+        assert len(resync["changes"]) > 0  # Full state, not empty
 
 
 class TestClientIdValidation:
@@ -534,7 +536,7 @@ class TestResynchronize:
         return {"handler": handler, "csrf": csrf}
 
     def test_client_resync_flag(self, session):
-        """Client setting resynchronize=true should get resync response."""
+        """Client setting resynchronize=true should get full state rebuild."""
         payload = {
             "csrfToken": session["csrf"],
             "rpc": [],
@@ -544,11 +546,11 @@ class TestResynchronize:
         }
         response = session["handler"].handle_uidl(payload)
         assert response.get("resynchronize") is True
-        assert response["changes"] == []
-        assert response["constants"] == {}
+        # Resync rebuilds full state tree (infrastructure nodes at minimum)
+        assert len(response["changes"]) > 0
 
     def test_resync_response_has_correct_ids(self, session):
-        """Resync response should have current syncId and expected clientId."""
+        """Resync response should increment syncId (it's a full rebuild)."""
         # First do a valid request to advance the IDs
         payload = {
             "csrfToken": session["csrf"],
@@ -567,8 +569,59 @@ class TestResynchronize:
             "resynchronize": True,
         }
         resync = session["handler"].handle_uidl(payload2)
-        assert resync["syncId"] == resp1["syncId"]  # Not incremented
+        assert resync["syncId"] == resp1["syncId"] + 1  # Incremented (full rebuild)
         assert resync.get("resynchronize") is True
+
+
+class TestResyncAfterNavigation:
+    """Test that resync after navigation rebuilds the full view."""
+
+    def test_resync_rebuilds_view(self):
+        """Resync after navigating to a view should include the view's changes."""
+        from pyxflow.components import VerticalLayout, Button
+        from pyxflow.router import Route, _routes
+
+        @Route("resync-test")
+        class ResyncTestView(VerticalLayout):
+            def __init__(self):
+                self.add(Button("Click me"))
+
+        try:
+            tree = StateTree()
+            handler = UidlHandler(tree)
+            init = handler.handle_init({})
+            csrf = init["appConfig"]["uidl"]["Vaadin-Security-Key"]
+
+            # Navigate to the view
+            nav_payload = {
+                "csrfToken": csrf,
+                "rpc": [{"type": "event", "node": 1, "event": "ui-navigate",
+                         "data": {"route": "resync-test"}}],
+                "syncId": 0,
+                "clientId": 0,
+            }
+            nav_resp = handler.handle_uidl(nav_payload)
+            # Verify view was created (has button tag in changes)
+            nav_tags = [c.get("value") for c in nav_resp["changes"]
+                        if c.get("key") == "tag" and c.get("feat") == 0]
+            assert "vaadin-button" in nav_tags
+
+            # Now trigger resync (wrong syncId)
+            resync_payload = {
+                "csrfToken": csrf,
+                "rpc": [],
+                "syncId": 999,
+                "clientId": 1,
+            }
+            resync_resp = handler.handle_uidl(resync_payload)
+            assert resync_resp.get("resynchronize") is True
+            # Resync should contain the full state including the button
+            resync_tags = [c.get("value") for c in resync_resp["changes"]
+                           if c.get("key") == "tag" and c.get("feat") == 0]
+            assert "vaadin-button" in resync_tags
+            assert len(resync_resp["changes"]) > 0
+        finally:
+            _routes.pop("resync-test", None)
 
 
 class TestOverlayClientKey:

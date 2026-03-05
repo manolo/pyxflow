@@ -1021,14 +1021,42 @@ class UidlHandler:
                         raise
 
     def _build_resync_response(self) -> dict:
-        """Build a resynchronize response (no state change, no syncId increment)."""
-        return {
-            "syncId": self._sync_id,
-            "clientId": self._last_processed_client_id + 1,
-            "resynchronize": True,
-            "changes": [],
-            "constants": {},
-        }
+        """Build a resynchronize response with the full state tree.
+
+        Like Java Flow's ``prepareForResync()``, re-emits all nodes so the
+        client can rebuild its DOM from scratch.  We rebuild the entire view
+        hierarchy (infrastructure nodes + navigation) so that connector init
+        scripts and execute_js commands are also re-sent.
+
+        Constants are re-sent because the client clears its cache on resync.
+        """
+        saved_route = self._current_route
+
+        # Reset tree and handler state (like handle_init, but keep session)
+        self._tree.reset()
+        self._view = None
+        self._layout = None
+        self._layout_class = None
+        self._current_route = None
+        self._body_node = None
+        self._container_node = None
+        self._pending_execute = []
+        self._sent_constants.clear()
+        self._sent_stylesheets.clear()
+        self._pending_dependencies = []
+
+        # Rebuild infrastructure nodes
+        self._tree._app_id = self._app_id
+        self._create_initial_nodes()
+
+        # Re-navigate to current route (rebuilds view + layout + connectors)
+        if saved_route is not None:
+            self._handle_navigation({"route": saved_route})
+
+        # Build a normal response (increments syncId, resolves constants)
+        response = self._build_response()
+        response["resynchronize"] = True
+        return response
 
     def _build_response(self) -> dict:
         """Build UIDL response."""
