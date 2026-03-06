@@ -611,8 +611,39 @@ class VirtualListVariant(str, Enum):
 class AppLayoutSection(str, Enum):
     """Sections that can be used as primary in AppLayout.
 
-    NAVBAR — navbar takes full width, drawer below (default).
-    DRAWER — drawer takes full height, navbar beside it.
+    NAVBAR -- navbar takes full width, drawer below (default).
+    DRAWER -- drawer takes full height, navbar beside it.
     """
     NAVBAR = "navbar"
     DRAWER = "drawer"
+
+
+# ---------------------------------------------------------------------------
+#  Drag and Drop enums
+# ---------------------------------------------------------------------------
+
+class EffectAllowed(str, Enum):
+    """Allowed effects for drag-and-drop operations.
+
+    Controls what operations (move, copy, link) are allowed on a drag source.
+    """
+    MOVE = "move"
+    COPY = "copy"
+    LINK = "link"
+    COPY_MOVE = "copyMove"
+    COPY_LINK = "copyLink"
+    MOVE_LINK = "moveLink"
+    ALL = "all"
+    NONE = "none"
+    UNINITIALIZED = "uninitialized"
+
+
+class DropEffect(str, Enum):
+    """Drop effect for drag-and-drop operations.
+
+    Controls how the drop target processes the dropped data.
+    """
+    MOVE = "move"
+    COPY = "copy"
+    LINK = "link"
+    NONE = "none"

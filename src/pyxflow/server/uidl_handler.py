@@ -130,6 +130,16 @@ _FOCUS_HASH = compute_event_hash(_FOCUS_CONFIG)
 _BLUR_CONFIG = {}
 _BLUR_HASH = compute_event_hash(_BLUR_CONFIG)
 
+# Drag and Drop event configurations
+_DRAGSTART_CONFIG = {}
+_DRAGSTART_HASH = compute_event_hash(_DRAGSTART_CONFIG)
+_DRAGEND_CONFIG = {
+    "event.dataTransfer.dropEffect": False
+}
+_DRAGEND_HASH = compute_event_hash(_DRAGEND_CONFIG)
+_DROP_CONFIG = {}
+_DROP_HASH = compute_event_hash(_DROP_CONFIG)
+
 # =============================================================================
 # UI Navigation Event Configurations
 # =============================================================================
@@ -224,6 +234,9 @@ _HASH_TO_CONFIG = {
     _SELECTED_ITEMS_CHANGED_HASH: _SELECTED_ITEMS_CHANGED_CONFIG,
     _SPLITTER_DRAGEND_HASH: _SPLITTER_DRAGEND_CONFIG,
     _ITEM_CLICK_HASH: _ITEM_CLICK_CONFIG,
+    _DRAGSTART_HASH: _DRAGSTART_CONFIG,
+    _DRAGEND_HASH: _DRAGEND_CONFIG,
+    _DROP_HASH: _DROP_CONFIG,
 }
 
 

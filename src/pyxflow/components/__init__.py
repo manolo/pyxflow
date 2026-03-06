@@ -57,6 +57,9 @@ from pyxflow.components.message_list import MessageList, MessageListItem
 from pyxflow.components.list_box import ListBox, MultiSelectListBox
 from pyxflow.components.custom_field import CustomField
 from pyxflow.components.mixins import HasReadOnly, HasValidation, HasRequired
+from pyxflow.components.dnd import (
+    DragSource, DropTarget, DragStartEvent, DragEndEvent, DropEvent,
+)
 from pyxflow.components.login import LoginForm, LoginOverlay
 from pyxflow.components.multi_select_combo_box import MultiSelectComboBox
 from pyxflow.components.virtual_list import VirtualList
@@ -73,6 +76,8 @@ from pyxflow.components.constants import (
     PopoverPosition,
     # AppLayout
     AppLayoutSection,
+    # DnD
+    EffectAllowed, DropEffect,
     # Theme variants
     AvatarGroupVariant, AvatarVariant, ButtonVariant, CardVariant,
     CheckboxGroupVariant, CheckboxVariant, ComboBoxVariant, CustomFieldVariant,
@@ -91,6 +96,12 @@ __all__ = [
     # Core
     "ClientCallable",
     "Key",
+    # DnD
+    "DragSource",
+    "DropTarget",
+    "DragStartEvent",
+    "DragEndEvent",
+    "DropEvent",
     # Components
     "Accordion",
     "AccordionPanel",
@@ -216,6 +227,9 @@ __all__ = [
     "PopoverPosition",
     # Enums — AppLayout
     "AppLayoutSection",
+    # Enums — DnD
+    "EffectAllowed",
+    "DropEffect",
     # Enums — theme variants
     "AvatarGroupVariant",
     "AvatarVariant",
