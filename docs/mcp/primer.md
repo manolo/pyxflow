@@ -1,6 +1,6 @@
 # PyXFlow - Python Server-Side UI Framework
 
-**Version:** 0.5.1 | **Components:** 78+ | **Python 3.10+**
+**Version:** 0.5.3 | **Components:** 78+ | **Python 3.10+**
 
 PyXFlow is a Python port of Vaadin Flow. It lets you build reactive web UIs
 entirely in Python -- no JavaScript, HTML, or CSS required. The browser runs

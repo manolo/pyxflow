@@ -297,6 +297,37 @@ from pyxflow.components import DialogVariant
 |------|-------|
 | `DialogVariant.LUMO_NO_PADDING` | `"no-padding"` |
 
+## DropEffect
+
+```python
+from pyxflow.components import DropEffect
+```
+
+| Name | Value |
+|------|-------|
+| `DropEffect.MOVE` | `"move"` |
+| `DropEffect.COPY` | `"copy"` |
+| `DropEffect.LINK` | `"link"` |
+| `DropEffect.NONE` | `"none"` |
+
+## EffectAllowed
+
+```python
+from pyxflow.components import EffectAllowed
+```
+
+| Name | Value |
+|------|-------|
+| `EffectAllowed.MOVE` | `"move"` |
+| `EffectAllowed.COPY` | `"copy"` |
+| `EffectAllowed.LINK` | `"link"` |
+| `EffectAllowed.COPY_MOVE` | `"copyMove"` |
+| `EffectAllowed.COPY_LINK` | `"copyLink"` |
+| `EffectAllowed.MOVE_LINK` | `"moveLink"` |
+| `EffectAllowed.ALL` | `"all"` |
+| `EffectAllowed.NONE` | `"none"` |
+| `EffectAllowed.UNINITIALIZED` | `"uninitialized"` |
+
 ## FlexDirection
 
 ```python

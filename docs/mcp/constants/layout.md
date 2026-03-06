@@ -21,8 +21,8 @@ from pyxflow.components import Alignment
 
 Sections that can be used as primary in AppLayout.
 
-NAVBAR — navbar takes full width, drawer below (default).
-DRAWER — drawer takes full height, navbar beside it.
+NAVBAR -- navbar takes full width, drawer below (default).
+DRAWER -- drawer takes full height, navbar beside it.
 
 ```python
 from pyxflow.components import AppLayoutSection
@@ -49,6 +49,45 @@ from pyxflow.components import ContentAlignment
 | `ContentAlignment.STRETCH` | `"stretch"` |
 | `ContentAlignment.SPACE_BETWEEN` | `"space-between"` |
 | `ContentAlignment.SPACE_AROUND` | `"space-around"` |
+
+## DropEffect
+
+Drop effect for drag-and-drop operations.
+
+Controls how the drop target processes the dropped data.
+
+```python
+from pyxflow.components import DropEffect
+```
+
+| Name | Value |
+|------|-------|
+| `DropEffect.MOVE` | `"move"` |
+| `DropEffect.COPY` | `"copy"` |
+| `DropEffect.LINK` | `"link"` |
+| `DropEffect.NONE` | `"none"` |
+
+## EffectAllowed
+
+Allowed effects for drag-and-drop operations.
+
+Controls what operations (move, copy, link) are allowed on a drag source.
+
+```python
+from pyxflow.components import EffectAllowed
+```
+
+| Name | Value |
+|------|-------|
+| `EffectAllowed.MOVE` | `"move"` |
+| `EffectAllowed.COPY` | `"copy"` |
+| `EffectAllowed.LINK` | `"link"` |
+| `EffectAllowed.COPY_MOVE` | `"copyMove"` |
+| `EffectAllowed.COPY_LINK` | `"copyLink"` |
+| `EffectAllowed.MOVE_LINK` | `"moveLink"` |
+| `EffectAllowed.ALL` | `"all"` |
+| `EffectAllowed.NONE` | `"none"` |
+| `EffectAllowed.UNINITIALIZED` | `"uninitialized"` |
 
 ## FlexDirection
 
