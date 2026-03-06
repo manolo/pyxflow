@@ -167,6 +167,62 @@ class Component:
         # Apply deferred enabled state (disabled attribute)
         if not self._enabled:
             self._element.set_attribute("disabled", "")
+        # Flush deferred DnD connector calls
+        if getattr(self, "_pending_dnd_drag", False):
+            del self._pending_dnd_drag
+            self._element.execute_js(
+                "window.Vaadin.Flow.dndConnector.updateDragSource($0)")
+            # Register deferred drag event listeners
+            if getattr(self, "_drag_start_listeners", None) \
+                    and not getattr(self, "_dragstart_event_registered", False):
+                self._dragstart_event_registered = True
+                from pyxflow.server.uidl_handler import _DRAGSTART_HASH
+                self._element.add_event_listener(
+                    "dragstart", self._on_dragstart, hash_key=_DRAGSTART_HASH)
+            if getattr(self, "_drag_end_listeners", None) \
+                    and not getattr(self, "_dragend_event_registered", False):
+                self._dragend_event_registered = True
+                from pyxflow.server.uidl_handler import _DRAGEND_HASH
+                self._element.add_event_listener(
+                    "dragend", self._on_dragend, hash_key=_DRAGEND_HASH)
+            # Flush deferred drag image
+            pending_img = getattr(self, "_pending_drag_image", None)
+            if pending_img is not None:
+                img_comp, ox, oy = pending_img
+                if img_comp._element is not None:
+                    del self._pending_drag_image
+                    self._element.execute_js(
+                        "window.Vaadin.Flow.dndConnector.setDragImage($1, $2, $3, $0)",
+                        img_comp._element, ox, oy)
+                else:
+                    # Image not attached yet; register so it flushes when it does
+                    refs = getattr(img_comp, "_drag_image_refs", None)
+                    if refs is None:
+                        img_comp._drag_image_refs = refs = []
+                    refs.append(self)
+        if getattr(self, "_pending_dnd_drop", False):
+            del self._pending_dnd_drop
+            self._element.execute_js(
+                "window.Vaadin.Flow.dndConnector.updateDropTarget($0)")
+            # Register deferred drop event listener
+            if getattr(self, "_drop_listeners", None) \
+                    and not getattr(self, "_drop_event_registered", False):
+                self._drop_event_registered = True
+                from pyxflow.server.uidl_handler import _DROP_HASH
+                self._element.add_event_listener(
+                    "drop", self._on_drop, hash_key=_DROP_HASH)
+        # Flush pending drag images for components that reference this as image
+        drag_refs = getattr(self, "_drag_image_refs", None)
+        if drag_refs:
+            del self._drag_image_refs
+            for src in drag_refs:
+                pending = getattr(src, "_pending_drag_image", None)
+                if pending and src._element is not None:
+                    del src._pending_drag_image
+                    img_comp, ox, oy = pending
+                    src._element.execute_js(
+                        "window.Vaadin.Flow.dndConnector.setDragImage($1, $2, $3, $0)",
+                        img_comp._element, ox, oy)
         # Auto-register @ClientCallable methods in Feature 19
         self._register_client_callable_methods(tree)
 
@@ -618,6 +674,7 @@ class UI:
         self._root: Component | None = None
         self._theme: str = "lumo"
         self._variant: str = "light"
+        self._active_drag_source: Component | None = None
         # Initialize from @ColorScheme on @AppShell if set
         from pyxflow.router import get_app_shell
         app_shell = get_app_shell()
