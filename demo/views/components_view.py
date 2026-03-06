@@ -384,7 +384,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         section.add(self.upload_gallery)
 
         # --- Selection Components ---
-        section = self.add_section("Selection Components", "col-span-2", "tall")
+        section = self.add_section("Selection Components", "col-span-2")
 
         selection_form = FormLayout()
 
@@ -453,7 +453,7 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
             md_btn.add_click_listener(on_md_click)
             md_master.add(md_btn)
         md_layout.set_master(md_master)
-        md_layout.set_height("250px")
+        md_layout.set_height_full()
         md_layout.get_style().set("border", "1px solid var(--vaadin-border-color)")
         section.add(md_layout)
 
@@ -504,6 +504,191 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         page_layout.expand(middle)
 
         section.add(page_layout)
+
+
+        # --- Icon, DrawerToggle, SideNav (for bundle inclusion) ---
+        section = self.add_section("Icon / SideNav")
+
+        home_icon = Icon("vaadin:home")
+        section.add(home_icon)
+
+        drawer_toggle = DrawerToggle()
+        section.add(drawer_toggle)
+
+        side_nav = SideNav()
+        side_nav.set_label("Navigation")
+        side_nav.add_item(SideNavItem("Home", "/", Icon("vaadin:home")))
+        side_nav.add_item(SideNavItem("About", "/", Icon("vaadin:info-circle")))
+        parent_item = SideNavItem("Settings")
+        parent_item.add_item(SideNavItem("General", "/settings/general"))
+        parent_item.add_item(SideNavItem("Security", "/settings/security"))
+        side_nav.add_item(parent_item)
+        section.add(side_nav)
+
+        # --- Scroller ---
+        section = self.add_section("Scroller")
+
+        scroll_content = VerticalLayout()
+        for i in range(1, 21):
+            scroll_content.add(Span(f"Scrollable item {i}"))
+        scroller = Scroller(scroll_content, scroll_direction=ScrollDirection.VERTICAL)
+        scroller.set_width_full()
+        scroller.set_height("300px")
+        scroller.get_style().set("flex", "none")
+        scroller.get_style().set("border", "1px solid var(--vaadin-border-color)")
+        section.add(scroller)
+
+        # --- MessageInput + MessageList ---
+        section = self.add_section("MessageInput + MessageList", "col-span-2")
+
+        self.message_list = MessageList()
+        self.messages = [
+            MessageListItem("Hello! How can I help?", user_name="Assistant"),
+        ]
+        self.message_list.set_items(*self.messages)
+        self.message_list.get_style().set("flex", "1")
+        section.add(self.message_list)
+
+        message_input = MessageInput()
+        message_input.add_submit_listener(self._on_message_submit)
+        section.add(message_input)
+
+        # --- VirtualList ---
+        section = self.add_section("VirtualList")
+
+        virtual_list = VirtualList()
+        virtual_items = [{"name": f"Person {i}", "city": f"City {i % 20}", "role": f"Role {i % 5}"} for i in range(200)]
+        self.vl_label = Span("VirtualList: click an item")
+        virtual_list.set_renderer(
+            LitRenderer.of(
+                '<div style="display:flex;align-items:center;padding:var(--vaadin-padding-xs) var(--vaadin-padding-s);border-bottom:1px solid var(--vaadin-border-color-secondary);cursor:pointer" @click="${handleClick}">'
+                '<vaadin-avatar name="${item.name}" style="margin-right:var(--vaadin-gap-s)"></vaadin-avatar>'
+                '<div><strong>${item.name}</strong><br/><small style="color:var(--vaadin-text-color-secondary)">${item.city} — ${item.role}</small></div>'
+                '</div>'
+            )
+            .with_property("name", lambda x: x["name"])
+            .with_property("city", lambda x: x["city"])
+            .with_property("role", lambda x: x["role"])
+            .with_function("handleClick", lambda item: self.vl_label.set_text(f"VirtualList: clicked {item['name']}"))
+        )
+        virtual_list.set_items(virtual_items)
+        virtual_list.set_height("300px")
+        virtual_list.get_style().set("flex", "none")
+        virtual_list.get_style().set("overflow", "auto")
+        virtual_list.get_style().set("border", "1px solid var(--vaadin-border-color)")
+        virtual_list.get_style().set("border-radius", "var(--vaadin-radius-m)")
+        section.add(virtual_list)
+        section.add(self.vl_label)
+
+        # --- Drag and Drop ---
+        section = self.add_section("Drag and Drop", "col-span-2")
+
+        # Data model: two lists of fruits
+        self._dnd_left = ["Apple", "Banana", "Cherry"]
+        self._dnd_right = ["Mango", "Peach"]
+
+        dnd_layout = HorizontalLayout()
+        dnd_layout.set_width_full()
+
+        # Left panel (drag source + drop target)
+        self._dnd_left_box = VerticalLayout()
+        self._dnd_right_box = VerticalLayout()
+        for box in (self._dnd_left_box, self._dnd_right_box):
+            box.add_class_name("dnd-basket")
+            DropTarget.configure(box)
+            box.set_drop_effect(DropEffect.MOVE)
+            box.add_drop_listener(self._on_dnd_drop)
+
+        # Status labels
+        self._dnd_left_label = Span()
+        self._dnd_right_label = Span()
+        for lbl in (self._dnd_left_label, self._dnd_right_label):
+            lbl.add_class_name("dnd-secondary")
+
+        self._dnd_left_items = VerticalLayout()
+        self._dnd_right_items = VerticalLayout()
+        for items_box in (self._dnd_left_items, self._dnd_right_items):
+            items_box.add_class_name("dnd-items")
+
+        self._dnd_left_box.add(NativeLabel("Basket A"), self._dnd_left_label, self._dnd_left_items)
+        self._dnd_right_box.add(NativeLabel("Basket B"), self._dnd_right_label, self._dnd_right_items)
+
+        # Container for per-item drag images (hidden off-screen)
+        self._dnd_images_box = Div()
+        self._dnd_images_box.add_class_name("dnd-images")
+
+        # Create draggable items
+        self._dnd_rebuild_items()
+
+        dnd_layout.add(self._dnd_images_box, self._dnd_left_box, self._dnd_right_box)
+        section.add(dnd_layout)
+
+        # Event log
+        self._dnd_log = Span("Drag items between baskets (with custom drag image)")
+        self._dnd_log.add_class_name("dnd-secondary")
+        section.add(self._dnd_log)
+
+        # --- FormLayout (auto-responsive, add children) ---
+        section = self.add_section("FormLayout", "col-span-2")
+
+        fl_first = TextField("First name")
+        fl_last = TextField("Last name")
+        fl_email = EmailField("Email")
+        fl_phone = TextField("Phone")
+        fl_call = Checkbox("Call me")
+        fl_pwd = PasswordField("Password")
+        fl_confirm = PasswordField("Confirm password")
+        fl_phone_row = HorizontalLayout(fl_phone, fl_call)
+        fl_phone_row.set_align_items(Alignment.BASELINE)
+
+        form1 = FormLayout()
+        form1.set_auto_responsive(True)
+        form1.set_expand_columns(True)
+        form1.set_expand_fields(True)
+
+        form1.add_form_row(fl_first, fl_last)
+        form1.add_form_row(fl_email, fl_phone_row)
+        form1.add_form_row(fl_pwd, fl_confirm)
+
+        section.add(form1)
+
+        # --- FormLayout (auto-responsive, FormItem labels aside) ---
+        section = self.add_section("FormLayout (labels aside)", "col-span-2")
+
+        fi_first = TextField()
+        fi_last = TextField()
+        fi_email = EmailField()
+        fi_phone = TextField()
+        fi_call = Checkbox("Call me")
+        fi_pwd = PasswordField()
+        fi_confirm = PasswordField()
+        fi_phone_row = HorizontalLayout(fi_phone, fi_call)
+        fi_phone_row.set_align_items(Alignment.BASELINE)
+
+        form2 = FormLayout()
+        form2.set_auto_responsive(True)
+        form2.set_expand_columns(True)
+        form2.set_expand_fields(True)
+        form2.set_labels_aside(True)
+
+        row1 = form2.add_form_row()
+        row1.add_form_item(fi_first, "First name")
+        row1.add_form_item(fi_last, "Last name")
+
+        row2 = form2.add_form_row()
+        email_item = row2.add_form_item(fi_email, "Email")
+        form2.set_colspan(email_item, 2)
+
+        row3 = form2.add_form_row()
+        phone_item = row3.add_form_item(fi_phone_row, "Phone")
+        form2.set_colspan(phone_item, 2)
+        fi_call.set_width("20%")
+        fi_phone.set_width("80%")
+
+        form2.add_form_item(fi_pwd, "Password")
+        form2.add_form_item(fi_confirm, "Repeat")
+
+        section.add(form2)
 
         # --- Shared data for all grids ---
         people = [p.to_dict() for p in people_service.find_all()]
@@ -741,141 +926,6 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
         section.add(self._lazy_stats_label)
         section.add(lazy_grid)
 
-        # --- Icon, DrawerToggle, SideNav (for bundle inclusion) ---
-        section = self.add_section("Icon / SideNav")
-
-        home_icon = Icon("vaadin:home")
-        section.add(home_icon)
-
-        drawer_toggle = DrawerToggle()
-        section.add(drawer_toggle)
-
-        side_nav = SideNav()
-        side_nav.set_label("Navigation")
-        side_nav.add_item(SideNavItem("Home", "/", Icon("vaadin:home")))
-        side_nav.add_item(SideNavItem("About", "/", Icon("vaadin:info-circle")))
-        parent_item = SideNavItem("Settings")
-        parent_item.add_item(SideNavItem("General", "/settings/general"))
-        parent_item.add_item(SideNavItem("Security", "/settings/security"))
-        side_nav.add_item(parent_item)
-        section.add(side_nav)
-
-        # --- Scroller ---
-        section = self.add_section("Scroller")
-
-        scroll_content = VerticalLayout()
-        for i in range(1, 21):
-            scroll_content.add(Span(f"Scrollable item {i}"))
-        scroller = Scroller(scroll_content, scroll_direction=ScrollDirection.VERTICAL)
-        scroller.set_height("200px")
-        scroller.set_width("300px")
-        scroller.get_style().set("flex", "none")
-        scroller.get_style().set("border", "1px solid var(--vaadin-border-color)")
-        section.add(scroller)
-
-        # --- MessageInput + MessageList ---
-        section = self.add_section("MessageInput + MessageList", "col-span-2")
-
-        self.message_list = MessageList()
-        self.messages = [
-            MessageListItem("Hello! How can I help?", user_name="Assistant"),
-        ]
-        self.message_list.set_items(*self.messages)
-        section.add(self.message_list)
-
-        message_input = MessageInput()
-        message_input.add_submit_listener(self._on_message_submit)
-        section.add(message_input)
-
-        # --- VirtualList ---
-        section = self.add_section("VirtualList", "col-span-2")
-
-        virtual_list = VirtualList()
-        virtual_items = [{"name": f"Person {i}", "city": f"City {i % 20}", "role": f"Role {i % 5}"} for i in range(200)]
-        self.vl_label = Span("VirtualList: click an item")
-        virtual_list.set_renderer(
-            LitRenderer.of(
-                '<div style="display:flex;align-items:center;padding:var(--vaadin-padding-xs) var(--vaadin-padding-s);border-bottom:1px solid var(--vaadin-border-color-secondary);cursor:pointer" @click="${handleClick}">'
-                '<vaadin-avatar name="${item.name}" style="margin-right:var(--vaadin-gap-s)"></vaadin-avatar>'
-                '<div><strong>${item.name}</strong><br/><small style="color:var(--vaadin-text-color-secondary)">${item.city} — ${item.role}</small></div>'
-                '</div>'
-            )
-            .with_property("name", lambda x: x["name"])
-            .with_property("city", lambda x: x["city"])
-            .with_property("role", lambda x: x["role"])
-            .with_function("handleClick", lambda item: self.vl_label.set_text(f"VirtualList: clicked {item['name']}"))
-        )
-        virtual_list.set_items(virtual_items)
-        virtual_list.set_height("300px")
-        virtual_list.get_style().set("flex", "none")
-        virtual_list.get_style().set("overflow", "auto")
-        virtual_list.get_style().set("border", "1px solid var(--vaadin-border-color)")
-        virtual_list.get_style().set("border-radius", "var(--vaadin-radius-m)")
-        section.add(virtual_list)
-        section.add(self.vl_label)
-
-        # --- FormLayout (auto-responsive, add children) ---
-        section = self.add_section("FormLayout", "col-span-3")
-
-        fl_first = TextField("First name")
-        fl_last = TextField("Last name")
-        fl_email = EmailField("Email")
-        fl_phone = TextField("Phone")
-        fl_call = Checkbox("Call me")
-        fl_pwd = PasswordField("Password")
-        fl_confirm = PasswordField("Confirm password")
-        fl_phone_row = HorizontalLayout(fl_phone, fl_call)
-        fl_phone_row.set_align_items(Alignment.BASELINE)
-
-        form1 = FormLayout()
-        form1.set_auto_responsive(True)
-        form1.set_expand_columns(True)
-        form1.set_expand_fields(True)
-
-        form1.add_form_row(fl_first, fl_last)
-        form1.add_form_row(fl_email, fl_phone_row)
-        form1.add_form_row(fl_pwd, fl_confirm)
-
-        section.add(form1)
-
-        # --- FormLayout (auto-responsive, FormItem labels aside) ---
-        section = self.add_section("FormLayout (labels aside)", "col-span-3")
-
-        fi_first = TextField()
-        fi_last = TextField()
-        fi_email = EmailField()
-        fi_phone = TextField()
-        fi_call = Checkbox("Call me")
-        fi_pwd = PasswordField()
-        fi_confirm = PasswordField()
-        fi_phone_row = HorizontalLayout(fi_phone, fi_call)
-        fi_phone_row.set_align_items(Alignment.BASELINE)
-
-        form2 = FormLayout()
-        form2.set_auto_responsive(True)
-        form2.set_expand_columns(True)
-        form2.set_expand_fields(True)
-        form2.set_labels_aside(True)
-
-        row1 = form2.add_form_row()
-        row1.add_form_item(fi_first, "First name")
-        row1.add_form_item(fi_last, "Last name")
-
-        row2 = form2.add_form_row()
-        email_item = row2.add_form_item(fi_email, "Email")
-        form2.set_colspan(email_item, 2)
-
-        row3 = form2.add_form_row()
-        phone_item = row3.add_form_item(fi_phone_row, "Phone")
-        form2.set_colspan(phone_item, 2)
-        fi_call.set_width("20%")
-        fi_phone.set_width("80%")
-
-        form2.add_form_item(fi_pwd, "Password")
-        form2.add_form_item(fi_confirm, "Repeat")
-
-        section.add(form2)
-
     def _attach(self, tree):
         super()._attach(tree)
         ui = self.get_ui()
@@ -898,6 +948,59 @@ You can create **bold text**, *italicized text*, and `inline code` with Markdown
     def _on_message_submit(self, event):
         self.messages.append(MessageListItem(event["value"], user_name="You"))
         self.message_list.set_items(*self.messages)
+
+    # Fruit emoji mapping for custom drag images
+    _FRUIT_EMOJI = {
+        "Apple": "🍎", "Banana": "🍌", "Cherry": "🍒",
+        "Mango": "🥭", "Peach": "🍑",
+    }
+
+    def _dnd_make_item(self, fruit: str) -> Span:
+        """Create a draggable fruit item with custom drag image."""
+        emoji = self._FRUIT_EMOJI.get(fruit, "📦")
+        item = Span(f"{emoji} {fruit}")
+        item.add_class_name("dnd-item")
+        DragSource.configure(item)
+        item.set_drag_data(fruit)
+        # Per-item drag ghost with the fruit emoji (must be in DOM before drag)
+        drag_img = Span(emoji)
+        drag_img.add_class_name("dnd-ghost")
+        self._dnd_images_box.add(drag_img)
+        item.set_drag_image(drag_img, 20, 20)
+        return item
+
+    def _dnd_rebuild_items(self):
+        """Rebuild draggable items in both boxes from the data model."""
+        # Clear old per-item drag images
+        old_imgs = list(self._dnd_images_box._children)
+        if old_imgs:
+            self._dnd_images_box.remove(*old_imgs)
+        for container, items in ((self._dnd_left_items, self._dnd_left),
+                                 (self._dnd_right_items, self._dnd_right)):
+            container.remove(*list(container._children))
+            for fruit in items:
+                container.add(self._dnd_make_item(fruit))
+
+        self._dnd_left_label.set_text(", ".join(self._dnd_left) or "(empty)")
+        self._dnd_right_label.set_text(", ".join(self._dnd_right) or "(empty)")
+
+    def _on_dnd_drop(self, event):
+        fruit = event.get_drag_data()
+        if not fruit:
+            return
+        target_box = event.get_component()
+        # Determine which list the fruit came from and move it
+        if fruit in self._dnd_left and target_box is self._dnd_right_box:
+            self._dnd_left.remove(fruit)
+            self._dnd_right.append(fruit)
+            self._dnd_log.set_text(f"Moved {fruit}: A -> B")
+        elif fruit in self._dnd_right and target_box is self._dnd_left_box:
+            self._dnd_right.remove(fruit)
+            self._dnd_left.append(fruit)
+            self._dnd_log.set_text(f"Moved {fruit}: B -> A")
+        else:
+            return  # dropped on same box, ignore
+        self._dnd_rebuild_items()
 
     def add_section(self, title: str, *class_names: str) -> Div:
         """Create a dashboard card. Returns the card Div to add content to."""
