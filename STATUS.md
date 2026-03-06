@@ -4,10 +4,10 @@
 
 **Vaadin version:** 25.0.6
 **Components:** 50+ implemented (all Vaadin 25 UI components)
-**Lines of code:** ~19,200 (core src/), ~58,000 (total with demo + tests)
-**Test structure:** `tests/unit/` (2548 unit tests, default `pytest`) + `tests/ui/` (456 Playwright, run explicitly)
-**Tests:** 2548 unit + 457 UI (Playwright)
-**Last updated:** 2026-03-05
+**Lines of code:** ~19,700 (core src/), ~58,000 (total with demo + tests)
+**Test structure:** `tests/unit/` (2602 unit tests, default `pytest`) + `tests/ui/` (456 Playwright, run explicitly)
+**Tests:** 2602 unit + 457 UI (Playwright)
+**Last updated:** 2026-03-06
 
 ---
 
@@ -116,6 +116,8 @@
 - [x] `add_focus_listener()` / `add_blur_listener()` - Focus/blur events (FocusNotifier/BlurNotifier)
 - [x] `ValueChangeMode` - Controls when text fields sync to server (EAGER/LAZY/TIMEOUT/ON_BLUR/ON_CHANGE). Applied to TextField, TextArea, EmailField, PasswordField, NumberField
 - [x] `set_i18n(dict)` / `get_i18n()` - Localization via dict-based approach on 7 components (Upload, DatePicker, TimePicker, DateTimePicker, LoginForm, LoginOverlay, MessageInput)
+- [x] `DragSource` - Mixin/factory for HTML5 drag: `configure(component)`, `set_draggable`, `set_drag_data`, `set_effect_allowed`, `set_drag_image` (custom ghost), drag start/end listeners, deferred attach with `_pending_drag_image` cross-component resolution
+- [x] `DropTarget` - Mixin/factory for HTML5 drop: `configure(component)`, `set_active`, `set_drop_effect`, drop listener with `get_drag_source_component()` / `get_drag_data()`, active drag source tracking via UI
 
 ### Constants & Enums
 - [x] `components/constants.py` - Central enum file with all 34 theme variant enums, layout enums, field enums, GridDropMode, AutoExpandMode
@@ -257,7 +259,7 @@
 
 | Category | Coverage | Details |
 |----------|----------|---------|
-| **Unit tests** | 2548 passing | Good coverage of all 50+ components + core + data layer + server utilities. Located in `tests/unit/` |
+| **Unit tests** | 2602 passing | Good coverage of all 50+ components + core + data layer + server utilities. Located in `tests/unit/` |
 | **UI tests** | 456 passed | All 33 test views (in `tests/views/`) with shared SideNav layout and single browser session. UI tests in `tests/ui/`. |
 
 ---

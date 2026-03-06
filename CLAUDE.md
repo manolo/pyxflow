@@ -3,9 +3,9 @@
 ## First Steps
 
 1. Read `STATUS.md` — current implementation status and what's pending
-2. Read parent `../CLAUDE.md` — project overview, architecture, specs index
-3. For protocol details: `../specs/PROTOCOL.md`, `../specs/RPC.md`, `../specs/PITFALLS.md`
-4. For component roadmap: `../specs/COMPONENTS.md`
+2. Read parent `../migrate-flow-specs/CLAUDE.md` — project overview, architecture, specs index
+3. For protocol details: `../migrate-flow-specs/specs/PROTOCOL.md`, `../migrate-flow-specs/specs/RPC.md`, `../migrate-flow-specs/specs/PITFALLS.md`
+4. For component roadmap: `../migrate-flow-specs/specs/COMPONENTS.md`
 
 ---
 
@@ -42,8 +42,8 @@ pytest tests/ui/ --headed -v   # visible browser
 # Regenerate the frontend bundle (auto-discovers _v_fqcn components)
 pyxflow --bundle
 
-# Run Java reference (bundle-generator with AllComponentsView)
-cd ../bundle-generator && ./mvnw package jetty:run-war
+# Run Java reference (flow-components)
+cd ../migrate-flow-specs/flow-components && ./mvnw package jetty:run-war
 # http://localhost:8080
 ```
 
@@ -69,7 +69,7 @@ pyxflow/
 │   ├── unit/           # 2457 unit tests (default pytest target)
 │   └── ui/             # 446 Playwright UI tests (run explicitly via pytest tests/ui/)
 └── STATUS.md           # Implementation progress
-../bundle-generator/    # Java project → frontend bundle (shared, at root level)
+../migrate-flow-specs/flow-components/  # Java project → frontend bundle
 ```
 
 ---
@@ -91,8 +91,8 @@ pyxflow/
 
 ## Adding New Components
 
-1. Check Java implementation in `../flow-components/`
-2. Check complexity/connector info in `../specs/COMPONENTS.md`
+1. Check Java implementation in `../migrate-flow-specs/flow-components/`
+2. Check complexity/connector info in `../migrate-flow-specs/specs/COMPONENTS.md`
 3. Get API: `mcp__Vaadin__get_component_java_api`
 4. Create `components/new_component.py`
 5. Export in `components/__init__.py`
