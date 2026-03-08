@@ -5,9 +5,9 @@
 **Vaadin version:** 25.0.6
 **Components:** 50+ implemented (all Vaadin 25 UI components)
 **Lines of code:** ~19,700 (core src/), ~58,000 (total with demo + tests)
-**Test structure:** `tests/unit/` (2602 unit tests, default `pytest`) + `tests/ui/` (456 Playwright, run explicitly)
-**Tests:** 2602 unit + 457 UI (Playwright)
-**Last updated:** 2026-03-06
+**Test structure:** `tests/unit/` (2604 unit tests, default `pytest`) + `tests/ui/` (465 Playwright, run explicitly)
+**Tests:** 2604 unit + 465 UI (Playwright)
+**Last updated:** 2026-03-08
 
 ---
 
@@ -22,7 +22,7 @@
 ### UIDL Protocol Compatibility (Java Flow)
 - [x] **Event hashes** - Dynamically computed via `compute_event_hash(config)` using `base64(sha256(BOM + json.encode('utf-16-be'))[:8])` for exact Java Flow compatibility
 - [x] **contextRootUrl** - Uses `"./"` matching Java Flow
-- [x] **Execute commands** - document.title, invalid property, serverConnected, component-queued (`queue_execute`)
+- [x] **Execute commands** - document.title, invalid property, serverConnected (always last), component-queued (`queue_execute`)
 - [x] **FlowComponentHost** - Virtual children renderer for Dialog/Overlay components
 - [x] **publishedEventHandler** - Client-callable methods via Feature 19 (`CLIENT_DELEGATE_HANDLERS`)
 - [x] **Server-client state sync** - `_pending_server_change` flag absorbs echoes from server-initiated property changes

@@ -47,8 +47,10 @@
 | 30 | `/test/server-errors` | 8 | Error notification, meta.appError, JSON serialization, session resilience |
 | 31 | `/test/route-params` | 5 | Wildcard, mid-optional, QueryParameters, BeforeEnterEvent |
 | 32 | `/test/mdl-nav` | 16 | MasterDetailLayout (URL-driven detail, push_url, navigate, animation, back/forward) |
+| 33 | `/test/grid-editor` | 10 | Grid inline editor (open, save, cancel, validation, buffered mode) |
+| 34 | `/test/before-enter-js` | 8 | execute_js in before_enter (serverConnected ordering, reenter, no resync) |
 
-**Total: 446 tests across 32 views (446 pass, 0 skip)**
+**Total: 465 tests across 34 views (465 pass, 0 skip)**
 
 ---
 
@@ -3146,4 +3148,51 @@ class TestButtonsIcons:
 6. **Compact views** — each view loads only its components, no heavy overhead
 
 ### Test Execution Order
-Views are visited in sequence 1→29 via RouterLinks. Within each view, tests run top-to-bottom. The fail-fast counter spans the entire suite.
+Views are visited in sequence 1→34 via RouterLinks. Within each view, tests run top-to-bottom. The fail-fast counter spans the entire suite.
+
+---
+
+## View 34: `/test/before-enter-js`
+
+```gherkin
+Feature: execute_js during before_enter (serverConnected ordering)
+
+  Background:
+    Given view at /test/before-enter-js with TestMainLayout
+    And the view calls execute_js() inside before_enter()
+
+  # --- Initial navigation ---
+  Scenario: V34.01 -- Initial before_enter updates status
+    Then #bej-status text is "count:1"
+
+  Scenario: V34.02 -- Initial before_enter updates target text
+    Then #bej-js-target text is "py:default"
+
+  Scenario: V34.03 -- Initial execute_js sets data attribute
+    Then #bej-js-target has data-from-js="js:default"
+
+  # --- Reenter navigation (same route, different params) ---
+  Scenario: V34.04 -- Reenter via Navigate button (no resync)
+    When click #bej-navigate
+    Then #bej-status text becomes "count:2"
+    And #bej-js-target text becomes "py:click-1"
+
+  Scenario: V34.05 -- Reenter execute_js updates data attribute
+    Then #bej-js-target has data-from-js="js:click-1"
+
+  Scenario: V34.06 -- Multiple reenters work without resync
+    When click #bej-navigate twice more
+    Then #bej-status text becomes "count:4"
+
+  # --- Direct URL navigation ---
+  Scenario: V34.07 -- Direct URL with param
+    When goto /test/before-enter-js/hello
+    Then #bej-status text is "count:1"
+    And #bej-js-target text is "py:hello"
+
+  Scenario: V34.08 -- No console errors during reenter
+    Given fresh browser context with console error listener
+    When navigate to /test/before-enter-js
+    And click #bej-navigate
+    Then no resync-related console errors
+```
