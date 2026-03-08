@@ -263,6 +263,7 @@ class UidlHandler:
         self._body_node: Any = None
         self._container_node: Any = None
         self._pending_execute: list = []  # Execute commands for next response
+        self._server_connected_cmd: list | None = None  # serverConnected must be last
         self._last_client_id = 0  # Track client's message counter
         self._sent_constants: set[str] = set()  # Track already-sent constant hashes
         self._pending_dependencies: list[dict] = []  # EAGER deps for next response
@@ -292,6 +293,7 @@ class UidlHandler:
         self._body_node = None
         self._container_node = None
         self._pending_execute = []
+        self._server_connected_cmd = None
         self._last_client_id = 0
         self._sent_constants = set()
         self._pending_dependencies = []
@@ -823,10 +825,15 @@ class UidlHandler:
             })
 
         # serverConnected on every navigation (React Router waits for this
-        # callback before completing pushState URL update)
-        self._pending_execute.append(
-            [False, {"@v-node": self._container_node.id}, "return (async function() { this.serverConnected($0)}).apply($1)"]
-        )
+        # callback before completing pushState URL update).
+        # Stored separately so _build_response can place it LAST -- after all
+        # component execute_js commands.  If it fires earlier, the client
+        # considers navigation "done" before component JS has run, which can
+        # trigger a resync.
+        self._server_connected_cmd = [
+            False, {"@v-node": self._container_node.id},
+            "return (async function() { this.serverConnected($0)}).apply($1)"
+        ]
 
     def _collect_stylesheets(self, view_class: type, layout_class: type | None):
         """Collect stylesheets from view and layout classes as EAGER dependencies."""
@@ -1055,6 +1062,7 @@ class UidlHandler:
         self._body_node = None
         self._container_node = None
         self._pending_execute = []
+        self._server_connected_cmd = None
         # NOTE: Do NOT clear _sent_constants -- FlowClient keeps its constant
         # registry across resync (Y2/eE) and throws on duplicate hashes.
         self._sent_stylesheets.clear()
@@ -1142,9 +1150,14 @@ class UidlHandler:
             response["EAGER"] = self._pending_dependencies
             self._pending_dependencies = []
 
-        # Merge execute commands from both UidlHandler and tree (components)
+        # Merge execute commands from both UidlHandler and tree (components).
+        # serverConnected is always last -- it tells the client "navigation is
+        # done", so all component JS must have been queued before it fires.
         tree_execute = self._tree.collect_execute()
         all_execute = self._pending_execute + tree_execute
+        if self._server_connected_cmd is not None:
+            all_execute.append(self._server_connected_cmd)
+            self._server_connected_cmd = None
         if all_execute:
             response["execute"] = all_execute
         self._pending_execute = []

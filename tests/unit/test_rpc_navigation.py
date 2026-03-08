@@ -178,6 +178,35 @@ class TestNavigationExecuteCommands:
         )
         assert server_cmd is not None
 
+    def test_server_connected_is_last_execute_command(self, session):
+        """serverConnected must be the last execute command in the response.
+
+        If it fires before component execute_js commands, the client considers
+        navigation "done" too early, which can cause a resync when component JS
+        runs afterwards.
+        """
+        payload = {
+            "csrfToken": session["csrf"],
+            "rpc": [{
+                "type": "event",
+                "node": 1,
+                "event": "ui-navigate",
+                "data": {"route": "", "query": "", "appShellTitle": "",
+                         "historyState": {"idx": 0}, "trigger": ""}
+            }],
+            "syncId": 0,
+            "clientId": 0,
+        }
+        response = session["handler"].handle_uidl(payload)
+        execute = response.get("execute", [])
+        assert len(execute) > 0
+
+        # serverConnected must be the very last command
+        last_cmd = execute[-1]
+        assert "serverConnected" in str(last_cmd), (
+            f"Expected serverConnected as last execute command, got: {last_cmd}"
+        )
+
 
 class TestNavigationAddKeydownListener:
     """Test that navigation adds keydown listener."""
@@ -317,6 +346,81 @@ class TestSameRouteNavigationSkipped:
         # Must include serverConnected (among title + other commands)
         execute = response2.get("execute", [])
         assert any("serverConnected" in cmd[-1] for cmd in execute)
+
+    def test_execute_js_in_before_enter_comes_before_server_connected(self, session):
+        """execute_js called during before_enter must run before serverConnected.
+
+        When a view calls execute_js() in before_enter (e.g. on a reenter),
+        those commands must appear before serverConnected in the response.
+        Otherwise the client considers navigation "done" before the component
+        JS has run, causing a resync.
+        """
+        from pyxflow import Route
+        from pyxflow.components import VerticalLayout, Div
+        from pyxflow.router import _routes
+
+        @Route("exec-test")
+        class ExecTestView(VerticalLayout):
+            def __init__(self):
+                self.status = Div("idle")
+                self.add(self.status)
+
+            def before_enter(self, event):
+                self.execute_js("console.log('before_enter_js')")
+
+        try:
+            # First navigation creates the view
+            payload1 = {
+                "csrfToken": session["csrf"],
+                "rpc": [{
+                    "type": "event",
+                    "node": 1,
+                    "event": "ui-navigate",
+                    "data": {"route": "exec-test", "query": "",
+                             "appShellTitle": "",
+                             "historyState": {"idx": 0}, "trigger": ""}
+                }],
+                "syncId": 0,
+                "clientId": 0,
+            }
+            response1 = session["handler"].handle_uidl(payload1)
+
+            # Second navigation reuses the view (reenter path)
+            payload2 = {
+                "csrfToken": session["csrf"],
+                "rpc": [{
+                    "type": "event",
+                    "node": 1,
+                    "event": "ui-navigate",
+                    "data": {"route": "exec-test", "query": "",
+                             "appShellTitle": "",
+                             "historyState": {"idx": 1}, "trigger": ""}
+                }],
+                "syncId": response1["syncId"],
+                "clientId": 1,
+            }
+            response2 = session["handler"].handle_uidl(payload2)
+            execute = response2.get("execute", [])
+
+            # Find indices of the component JS and serverConnected
+            js_idx = next(
+                (i for i, cmd in enumerate(execute)
+                 if "before_enter_js" in str(cmd)),
+                None
+            )
+            sc_idx = next(
+                (i for i, cmd in enumerate(execute)
+                 if "serverConnected" in str(cmd)),
+                None
+            )
+            assert js_idx is not None, "before_enter execute_js not found"
+            assert sc_idx is not None, "serverConnected not found"
+            assert js_idx < sc_idx, (
+                f"execute_js (idx={js_idx}) must come before "
+                f"serverConnected (idx={sc_idx})"
+            )
+        finally:
+            _routes.pop("exec-test", None)
 
 
 class TestNavigationViewComponents:
