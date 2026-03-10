@@ -998,7 +998,7 @@ def run_server(host: str = "localhost", port: int = 8080, debug: bool = False, s
         import socket
         probe = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            probe.connect((host, port))
+            probe.connect(("127.0.0.1", port))
             probe.close()
             print(f"\n  ERROR: Port {port} is already in use.")
             print(f"  Kill the other process:  lsof -ti :{port} | xargs kill -9\n")

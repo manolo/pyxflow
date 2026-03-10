@@ -72,7 +72,7 @@ class FlowApp:
         # Check if something is already listening on the port
         probe = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            probe.connect((self._host, self._port))
+            probe.connect(("127.0.0.1", self._port))
             probe.close()
             print(f"\n  ERROR: Port {self._port} is already in use.")
             print(f"  Kill the other process:  lsof -ti :{self._port} | xargs kill -9\n")
