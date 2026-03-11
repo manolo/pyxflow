@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
 authors = [
-    { name = "Vaadin", email = "info@vaadin.com" }
+    { name = "Manolo Carrasco", email = "manolo@vaadin.com" }
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -45,7 +45,7 @@ vaadin = "pyxflow.main:main_deprecated"
 
 [project.urls]
 Homepage = "https://github.com/manolo/pyxflow"
-Documentation = "https://vaadin.com/docs"
+Documentation = "https://manolo.github.io/pyxflow/"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pyxflow"]
