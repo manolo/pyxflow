@@ -85,12 +85,24 @@ class StateNode:
             "addNodes": [child._id]
         })
 
+    @property
+    def is_attached(self) -> bool:
+        """Whether this node is attached to the tree."""
+        return self._attached
+
+    def _detach_recursive(self):
+        """Mark this node and all descendants as detached."""
+        self._attached = False
+        for child in self._children:
+            child._detach_recursive()
+
     def remove_child(self, child: "StateNode"):
         """Remove a child node."""
         if child in self._children:
             index = self._children.index(child)
             self._children.remove(child)
             child._parent = None
+            child._detach_recursive()
             self._tree.add_change({
                 "node": self._id,
                 "type": "splice",
