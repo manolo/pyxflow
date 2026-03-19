@@ -3,6 +3,7 @@
 import asyncio
 import contextvars
 import datetime
+import hmac
 import json
 import logging
 import secrets
@@ -382,9 +383,9 @@ async def handle_uidl(request: web.Request) -> web.Response:
     except json.JSONDecodeError:
         return web.json_response({"error": "Invalid JSON"}, status=400)
 
-    # Validate CSRF token
-    csrf = payload.get("csrfToken")
-    if csrf != session["csrf_token"]:
+    # Validate CSRF token (constant-time comparison to prevent timing attacks)
+    csrf = payload.get("csrfToken", "")
+    if not hmac.compare_digest(csrf, session["csrf_token"]):
         return web.json_response(
             {"error": "Invalid CSRF token"},
             status=403
