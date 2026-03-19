@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import functools
+from enum import Enum
 from typing import TYPE_CHECKING
 
 from pyxflow.core.element import Element, Style
@@ -10,6 +11,18 @@ from pyxflow.core.element import Element, Style
 if TYPE_CHECKING:
     from pyxflow.core.keys import Key
     from pyxflow.core.state_tree import StateTree
+
+
+class DisabledUpdateMode(Enum):
+    """Controls whether client updates are accepted when a component is disabled."""
+    ONLY_WHEN_ENABLED = "ONLY_WHEN_ENABLED"
+    ALWAYS = "ALWAYS"
+
+
+# Properties that must NEVER be synced from client (security)
+FORBIDDEN_SYNC_PROPERTIES = frozenset({
+    "textContent", "classList", "className", "innerHTML", "outerHTML",
+})
 
 
 class _BufferedStyle:
@@ -68,6 +81,17 @@ class Component:
 
     _tag: str = "div"
 
+    # Properties the client is allowed to sync back (mSync whitelist).
+    # None = allow all (backwards compat for unregistered components).
+    # frozenset(...) = only these properties are allowed.
+    _v_sync_properties: frozenset[str] | None = None
+
+    # Properties that sync even when the component is disabled.
+    _v_disabled_sync: frozenset[str] = frozenset()
+
+    # @ClientCallable methods that execute even when the component is disabled.
+    _v_disabled_methods: frozenset[str] = frozenset()
+
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         orig_init = cls.__dict__.get("__init__")
@@ -93,6 +117,7 @@ class Component:
         self._pending_theme: str | None = None
         self._tooltip_element: Element | None = None
         self._click_shortcut_registered: bool = False
+        self._registered_methods: set[str] = set()
 
     @property
     def element(self) -> Element:
@@ -237,6 +262,7 @@ class Component:
                     callable_methods.append(name)
                     seen.add(name)
         if callable_methods:
+            self._registered_methods.update(callable_methods)
             tree.add_change({
                 "node": self._element.node_id,
                 "type": "splice",
@@ -244,6 +270,15 @@ class Component:
                 "index": 0,
                 "add": callable_methods,
             })
+
+    def _register_server_method(self, method_name: str):
+        """Register a method name as callable from client (for security whitelist).
+
+        Called by components that register methods via direct splice (Dialog,
+        Grid, etc.) rather than @ClientCallable. The snake_case name must match
+        the actual Python method.
+        """
+        self._registered_methods.add(method_name)
 
     def get_element(self) -> Element:
         """Get the element (public API)."""
