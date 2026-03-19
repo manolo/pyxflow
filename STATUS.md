@@ -5,9 +5,9 @@
 **Vaadin version:** 25.0.6
 **Components:** 50+ implemented (all Vaadin 25 UI components)
 **Lines of code:** ~19,700 (core src/), ~58,000 (total with demo + tests)
-**Test structure:** `tests/unit/` (2604 unit tests, default `pytest`) + `tests/ui/` (465 Playwright, run explicitly)
-**Tests:** 2604 unit + 465 UI (Playwright)
-**Last updated:** 2026-03-08
+**Test structure:** `tests/unit/` (2626 unit tests, default `pytest`) + `tests/ui/` (465 Playwright, run explicitly)
+**Tests:** 2626 unit + 465 UI (Playwright)
+**Last updated:** 2026-03-19
 
 ---
 
@@ -160,12 +160,17 @@
 - [x] Missing bundle file logging — `[404] /VAADIN/{path}` printed to server console for easier debugging
 
 ### Protocol / Security
-- [x] CSRF token validation (actual check) — validated in `http_server.py`
+- [x] CSRF token validation — constant-time comparison (`hmac.compare_digest`) matching Java Flow's `MessageDigest.isEqual()`
 - [x] ClientId validation (duplicate detection, replays last response)
 - [x] SyncId validation (out-of-sync detection)
 - [x] Resynchronize flag support
 - [x] Return channels — used by Grid and VirtualList ComponentRenderer
 - [x] Multi-UI session routing — `v-uiId` query param routes UIDL/push to correct UI; invalid UI returns session-expired
+- [x] **RPC node validation** — All RPC handlers check: node exists, node is attached, component is enabled (matching Java Flow's `AbstractRpcInvocationHandler`)
+- [x] **mSync property whitelist** — Per-component `_v_sync_properties` frozenset, default deny. Forbidden properties (`textContent`, `innerHTML`, etc.) always blocked (matching Java Flow's `ElementPropertyMap.allowUpdateFromClient()`)
+- [x] **DisabledUpdateMode** — `ALWAYS` vs `ONLY_WHEN_ENABLED` per property/method. Dialog `opened`, LoginForm `disabled` sync even when disabled (matching Java Flow's `DisabledUpdateMode` enum)
+- [x] **publishedEventHandler security** — Method registration check (Feature 19), argument count validation, UI attachment check, disabled bypass (matching Java Flow's `PublishedServerEventHandlerRpcHandler`)
+- [x] **XSS response wrapping** — `for(;;);[{...}]` prefix on UIDL responses
 
 ### Theme
 - [x] Lumo/Aura theme support — `@StyleSheet("lumo/lumo.css")` or `@StyleSheet("aura/aura.css")` on layout
@@ -225,7 +230,12 @@
 | Feature | Priority | Description |
 |---------|----------|-------------|
 | `@PWA` annotation | Medium | Activate `sw.js` from bundle, serve `manifest.json` with configurable app name/icons |
-| Security (`--secure`) | Medium | Login screen from local config, restrict interfaces (localhost vs 0.0.0.0), HTTPS/TLS |
+| Security (`--secure`) | Medium | Login screen from local config, restrict interfaces (localhost vs 0.0.0.0), HTTPS/TLS. Note: RPC-level security (CSRF, property whitelist, node validation) is already implemented |
+| Inert state (modal dialogs) | Medium | Block RPCs on elements outside a modal dialog when one is open (Java Flow's `isInert()` check) |
+| Session expired dialog | Low | Show "Session Expired" overlay instead of silent page reload (set `sessExpMsg.caption` in init) |
+| Session persistence | Low | Serialize sessions to disk/Redis to survive server restarts. Challenge: Python callbacks are not serializable |
+| Form state preservation | Low | Save form values in localStorage before session timeout, restore after reload |
+| Rate limiting | Low | Per-session RPC rate limiting to prevent DoS. Typically handled by reverse proxy (nginx) |
 | ~~Grid Editor API~~ | ~~Low~~ | ~~Inline row editing~~ -- **DONE**: `get_editor()`, `EditorImpl` (buffered/unbuffered), `Column.set_editor_component()`, `_EditorRenderer` with virtual containers, Binder integration, open/close/save/cancel events |
 | `HasErrorParameter` error views | Medium | Navigate to error view on unhandled exceptions (Java's `DefaultErrorHandler` + `ErrorHandlerUtil`). Currently shows Notification instead. |
 | Grid Drag/Drop listeners | Low | Drag start/end/drop event listeners (rows draggable & drop mode already implemented) |
