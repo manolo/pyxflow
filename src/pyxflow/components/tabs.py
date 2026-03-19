@@ -74,6 +74,7 @@ class Tabs(Component):
 
     _v_fqcn = "com.vaadin.flow.component.tabs.Tabs"
     _tag = "vaadin-tabs"
+    _v_sync_properties = frozenset({"selected"})
 
     def __init__(self, *tabs: Tab):
         super().__init__()
@@ -104,6 +105,7 @@ class Tabs(Component):
         self.element.add_event_listener("selected-changed", self._handle_selected_changed)
 
         # Register updateSelectedTab as a client-callable method (Feature 19)
+        self._register_server_method("update_selected_tab")
         tree.add_change({
             "node": self.element.node_id,
             "type": "splice",

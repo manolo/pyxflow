@@ -12,6 +12,7 @@ class NumberField(HasReadOnly, HasValidation, HasRequired, Component):
 
     _v_fqcn = "com.vaadin.flow.component.textfield.NumberField"
     _tag = "vaadin-number-field"
+    _v_sync_properties = frozenset({"value", "invalid"})
 
     def __init__(self, label: str = ""):
         super().__init__()
@@ -223,6 +224,7 @@ class IntegerField(NumberField):
 
     _v_fqcn = "com.vaadin.flow.component.textfield.IntegerField"
     _tag = "vaadin-integer-field"
+    _v_sync_properties = frozenset({"value", "invalid"})
 
     def __init__(self, label: str = ""):
         super().__init__(label)

@@ -25,6 +25,8 @@ class LoginForm(Component):
 
     _v_fqcn = "com.vaadin.flow.component.login.LoginForm"
     _tag = "vaadin-login-form"
+    _v_sync_properties = frozenset({"error", "disabled"})
+    _v_disabled_sync = frozenset({"disabled"})
 
     def __init__(self):
         self._error = False
@@ -132,6 +134,7 @@ class LoginOverlay(Component):
 
     _v_fqcn = "com.vaadin.flow.component.login.LoginOverlay"
     _tag = "vaadin-login-overlay"
+    _v_sync_properties = frozenset({"opened", "error"})
 
     def __init__(self):
         self._opened = False

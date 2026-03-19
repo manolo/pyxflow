@@ -39,6 +39,7 @@ class VirtualList(Component, Generic[T]):
         super()._attach(tree)
 
         # Register client-callable method via Feature 19
+        self._register_server_method("set_viewport_range")
         tree.add_change({
             "node": self.element.node_id,
             "type": "splice",

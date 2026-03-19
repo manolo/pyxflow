@@ -40,6 +40,8 @@ class Notification(Component):
 
     _v_fqcn = "com.vaadin.flow.component.notification.Notification"
     _tag = "vaadin-notification"
+    _v_sync_properties = frozenset({"opened"})
+    _v_disabled_sync = frozenset({"opened"})
 
     class Position(Enum):
         """Notification position on the screen."""

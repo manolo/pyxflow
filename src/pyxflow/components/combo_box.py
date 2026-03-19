@@ -23,6 +23,7 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
 
     _v_fqcn = "com.vaadin.flow.component.combobox.ComboBox"
     _tag = "vaadin-combo-box"
+    _v_sync_properties = frozenset({"value", "invalid"})
 
     def __init__(self, label: str = ""):
         super().__init__()
@@ -69,6 +70,8 @@ class ComboBox(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
                 comp.element.set_attribute("slot", "prefix")
                 self.element.add_child(comp.element)
         # Register client-callable methods via Feature 19
+        for m in ("set_viewport_range", "reset_data_communicator", "confirm_update"):
+            self._register_server_method(m)
         tree.add_change({
             "node": self.element.node_id,
             "type": "splice",

@@ -18,6 +18,7 @@ class Details(Component):
 
     _v_fqcn = "com.vaadin.flow.component.details.Details"
     _tag = "vaadin-details"
+    _v_sync_properties = frozenset({"opened"})
 
     def __init__(self, summary: "str | Component | None" = None, *content: Component):
         super().__init__()

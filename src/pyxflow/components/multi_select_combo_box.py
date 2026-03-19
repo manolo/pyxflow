@@ -30,6 +30,7 @@ class MultiSelectComboBox(HasReadOnly, HasValidation, HasRequired, Component, Ge
 
     _v_fqcn = "com.vaadin.flow.component.combobox.MultiSelectComboBox"
     _tag = "vaadin-multi-select-combo-box"
+    _v_sync_properties = frozenset({"selectedItems"})
 
     def __init__(self, label: str = ""):
         super().__init__()
@@ -70,6 +71,8 @@ class MultiSelectComboBox(HasReadOnly, HasValidation, HasRequired, Component, Ge
             self.element.set_property("keepFilter", True)
 
         # Register client-callable methods via Feature 19
+        for m in ("set_viewport_range", "reset_data_communicator", "confirm_update"):
+            self._register_server_method(m)
         tree.add_change({
             "node": self.element.node_id,
             "type": "splice",

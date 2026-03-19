@@ -27,6 +27,7 @@ class Popover(Component):
 
     _v_fqcn = "com.vaadin.flow.component.popover.Popover"
     _tag = "vaadin-popover"
+    _v_sync_properties = frozenset({"opened"})
 
     def __init__(self):
         super().__init__()

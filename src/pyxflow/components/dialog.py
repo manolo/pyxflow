@@ -60,6 +60,9 @@ class Dialog(Component):
 
     _v_fqcn = "com.vaadin.flow.component.dialog.Dialog"
     _tag = "vaadin-dialog"
+    _v_sync_properties = frozenset({"opened"})
+    _v_disabled_sync = frozenset({"opened"})
+    _v_disabled_methods = frozenset({"handle_client_close"})
 
     def __init__(self):
         super().__init__()
@@ -132,6 +135,7 @@ class Dialog(Component):
 
         # Register handleClientClose as a client-callable method (feature 19).
         # FlowClient creates $server proxy with this method on the dialog element.
+        self._register_server_method("handle_client_close")
         tree.add_change({
             "node": self.element.node_id,
             "type": "splice",

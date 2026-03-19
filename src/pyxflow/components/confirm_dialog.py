@@ -21,6 +21,9 @@ class ConfirmDialog(Component):
 
     _v_fqcn = "com.vaadin.flow.component.confirmdialog.ConfirmDialog"
     _tag = "vaadin-confirm-dialog"
+    _v_sync_properties = frozenset({"opened"})
+    _v_disabled_sync = frozenset({"opened"})
+    _v_disabled_methods = frozenset({"handle_client_close"})
 
     def __init__(self, header: str = "", text: str = "", confirm_text: str = "Confirm"):
         super().__init__()

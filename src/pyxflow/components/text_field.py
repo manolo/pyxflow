@@ -15,6 +15,7 @@ class TextField(HasReadOnly, HasValidation, HasRequired, Component):
 
     _v_fqcn = "com.vaadin.flow.component.textfield.TextField"
     _tag = "vaadin-text-field"
+    _v_sync_properties = frozenset({"value", "invalid"})
 
     def __init__(self, label: str = ""):
         super().__init__()

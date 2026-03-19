@@ -16,6 +16,7 @@ class PasswordField(HasReadOnly, HasValidation, HasRequired, Component):
 
     _v_fqcn = "com.vaadin.flow.component.textfield.PasswordField"
     _tag = "vaadin-password-field"
+    _v_sync_properties = frozenset({"value", "invalid"})
 
     def __init__(self, label: str = ""):
         super().__init__()

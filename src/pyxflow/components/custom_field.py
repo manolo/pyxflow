@@ -28,6 +28,7 @@ class CustomField(HasReadOnly, HasValidation, HasRequired, Component):
 
     _v_fqcn = "com.vaadin.flow.component.customfield.CustomField"
     _tag = "vaadin-custom-field"
+    _v_sync_properties = frozenset({"value", "invalid"})
 
     def __init__(self, label: str = ""):
         self._label = label

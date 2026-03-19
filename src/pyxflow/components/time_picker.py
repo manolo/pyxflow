@@ -18,6 +18,7 @@ class TimePicker(HasReadOnly, HasValidation, HasRequired, Component):
 
     _v_fqcn = "com.vaadin.flow.component.timepicker.TimePicker"
     _tag = "vaadin-time-picker"
+    _v_sync_properties = frozenset({"value", "invalid"})
 
     def __init__(self, label: str = ""):
         super().__init__()

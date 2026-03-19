@@ -18,6 +18,7 @@ class DatePicker(HasReadOnly, HasValidation, HasRequired, Component):
 
     _v_fqcn = "com.vaadin.flow.component.datepicker.DatePicker"
     _tag = "vaadin-date-picker"
+    _v_sync_properties = frozenset({"value", "invalid"})
 
     def __init__(self, label: str = ""):
         super().__init__()

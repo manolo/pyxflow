@@ -18,6 +18,7 @@ class CheckboxGroup(HasReadOnly, HasValidation, HasRequired, Component, Generic[
 
     _v_fqcn = "com.vaadin.flow.component.checkbox.CheckboxGroup"
     _tag = "vaadin-checkbox-group"
+    _v_sync_properties = frozenset({"value"})
 
     def __init__(self, label: str = ""):
         super().__init__()

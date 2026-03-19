@@ -19,6 +19,7 @@ class Select(HasReadOnly, HasValidation, HasRequired, Component, Generic[T]):
 
     _v_fqcn = "com.vaadin.flow.component.select.Select"
     _tag = "vaadin-select"
+    _v_sync_properties = frozenset({"value", "invalid"})
 
     def __init__(self, label: str = ""):
         super().__init__()

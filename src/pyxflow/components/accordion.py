@@ -23,6 +23,7 @@ class Accordion(Component):
 
     _v_fqcn = "com.vaadin.flow.component.accordion.Accordion"
     _tag = "vaadin-accordion"
+    _v_sync_properties = frozenset({"opened"})
 
     def __init__(self):
         super().__init__()

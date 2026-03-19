@@ -409,6 +409,15 @@ class _GridSelectionColumn:
     def __init__(self, grid: "Grid"):
         self._grid = grid
         self._node = None
+        self._ui = grid._ui if hasattr(grid, '_ui') else None
+        self._enabled = True
+        self._registered_methods: set[str] = {"select_all", "deselect_all"}
+        self._v_disabled_sync: frozenset[str] = frozenset()
+        self._v_disabled_methods: frozenset[str] = frozenset()
+        self._v_sync_properties = None
+
+    def is_enabled(self):
+        return self._enabled
 
     def _create_element(self, tree: "StateTree"):
         """Create the selection column node and register it."""
@@ -647,6 +656,7 @@ class Grid(Component):
 
     _v_fqcn = "com.vaadin.flow.component.grid.Grid"
     _tag = "vaadin-grid"
+    _v_sync_properties = frozenset()
 
     def __init__(self):
         super().__init__()
@@ -1108,6 +1118,9 @@ class Grid(Component):
             "setViewportRange", "sortersChanged",
             "setDetailsVisible", "setRequestedRange",
         ]
+        for m in ("select", "deselect", "confirm_update", "set_viewport_range",
+                  "sorters_changed", "set_details_visible", "set_requested_range"):
+            self._register_server_method(m)
         tree.add_change({
             "node": self.element.node_id,
             "type": "splice",
@@ -1815,6 +1828,7 @@ class TreeGrid(Grid):
         super()._attach(tree)
 
         # Register updateExpandedState in Feature 19 (called by expandItem/collapseItem)
+        self._register_server_method("update_expanded_state")
         tree.add_change({
             "node": self.element.node_id,
             "type": "splice",

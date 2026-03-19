@@ -12,6 +12,7 @@ class TextArea(HasReadOnly, HasValidation, HasRequired, Component):
 
     _v_fqcn = "com.vaadin.flow.component.textfield.TextArea"
     _tag = "vaadin-text-area"
+    _v_sync_properties = frozenset({"value", "invalid"})
 
     def __init__(self, label: str = ""):
         super().__init__()

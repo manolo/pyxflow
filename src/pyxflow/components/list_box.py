@@ -27,6 +27,7 @@ class ListBox(HasReadOnly, Component, Generic[T]):
 
     _v_fqcn = "com.vaadin.flow.component.listbox.ListBox"
     _tag = "vaadin-list-box"
+    _v_sync_properties = frozenset({"selected"})
 
     def __init__(self):
         self._items: list[T] = []
@@ -159,6 +160,7 @@ class MultiSelectListBox(HasReadOnly, Component, Generic[T]):
 
     _v_fqcn = "com.vaadin.flow.component.listbox.MultiSelectListBox"
     _tag = "vaadin-list-box"
+    _v_sync_properties = frozenset({"selectedValues"})
 
     def __init__(self):
         self._items: list[T] = []

@@ -12,6 +12,7 @@ class Checkbox(HasReadOnly, HasRequired, Component):
 
     _v_fqcn = "com.vaadin.flow.component.checkbox.Checkbox"
     _tag = "vaadin-checkbox"
+    _v_sync_properties = frozenset({"checked"})
 
     def __init__(self, label: str = ""):
         super().__init__()

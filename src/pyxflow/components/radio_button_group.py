@@ -18,6 +18,7 @@ class RadioButtonGroup(HasReadOnly, HasValidation, HasRequired, Component, Gener
 
     _v_fqcn = "com.vaadin.flow.component.radiobutton.RadioButtonGroup"
     _tag = "vaadin-radio-group"
+    _v_sync_properties = frozenset({"value"})
 
     def __init__(self, label: str = ""):
         super().__init__()
