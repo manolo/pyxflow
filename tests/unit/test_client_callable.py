@@ -141,6 +141,7 @@ class TestRPCDispatch:
 
         comp = MyComponent()
         comp._attach(tree)
+        comp._ui = handler._ui  # Security checks require UI attachment
         tree.collect_changes()  # Clear changes from attach
 
         return tree, handler, comp
@@ -194,6 +195,7 @@ class TestPromiseResolution:
 
         comp = comp_class()
         comp._attach(tree)
+        comp._ui = handler._ui  # Security checks require UI attachment
         tree.collect_changes()  # Clear
 
         return tree, handler, comp

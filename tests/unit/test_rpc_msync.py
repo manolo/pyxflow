@@ -491,7 +491,7 @@ class TestSyncEdgeCases:
         assert value is None
 
     def test_sync_boolean_value(self, session_with_view):
-        """mSync with boolean value should work."""
+        """mSync with boolean value should work (uses whitelisted property)."""
         session = session_with_view
         assert session["tf_node_id"] is not None
 
@@ -514,7 +514,7 @@ class TestSyncEdgeCases:
         assert value is True
 
     def test_sync_numeric_value(self, session_with_view):
-        """mSync with numeric value should work."""
+        """mSync with numeric value should work (uses whitelisted property)."""
         session = session_with_view
         assert session["tf_node_id"] is not None
 
@@ -524,7 +524,7 @@ class TestSyncEdgeCases:
                 "type": "mSync",
                 "node": session["tf_node_id"],
                 "feature": Feature.ELEMENT_PROPERTY_MAP,
-                "property": "maxlength",
+                "property": "invalid",
                 "value": 100
             }],
             "syncId": session["sync_id"],
@@ -533,5 +533,5 @@ class TestSyncEdgeCases:
         session["handler"].handle_uidl(payload)
 
         node = session["tree"].get_node(session["tf_node_id"])
-        value = node.get(Feature.ELEMENT_PROPERTY_MAP, "maxlength")
+        value = node.get(Feature.ELEMENT_PROPERTY_MAP, "invalid")
         assert value == 100
