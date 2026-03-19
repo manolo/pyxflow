@@ -2,14 +2,17 @@
 
 import base64
 import hashlib
+import inspect
 import json
 import logging
 import random
+import re
 import secrets
 from typing import Any, TYPE_CHECKING
 
 log = logging.getLogger("pyxflow")
 
+from pyxflow.core.component import FORBIDDEN_SYNC_PROPERTIES, DisabledUpdateMode
 from pyxflow.core.state_node import Feature
 
 if TYPE_CHECKING:
@@ -522,15 +525,57 @@ class UidlHandler:
         n.add_theme_variants(NotificationVariant.LUMO_ERROR)
         n.open()
 
+    # =========================================================================
+    # RPC Security Validation (matches Java Flow AbstractRpcInvocationHandler)
+    # =========================================================================
+
+    def _validate_rpc_node(self, node_id: int, rpc_type: str,
+                           check_enabled: bool = True) -> bool:
+        """Validate that a node is eligible for RPC processing.
+
+        Checks (matching Java Flow's AbstractRpcInvocationHandler):
+        1. Node exists in the state tree
+        2. Node is attached (not detached/removed)
+        3. Component is enabled (unless check_enabled=False)
+
+        Returns True if the RPC should proceed, False if it should be ignored.
+        """
+        node = self._tree.get_node(node_id)
+        if node is None:
+            log.debug("Ignoring %s RPC for non-existent node: %d",
+                      rpc_type, node_id)
+            return False
+
+        if not node.is_attached:
+            log.debug("Ignoring %s RPC for detached node: %d",
+                      rpc_type, node_id)
+            return False
+
+        if check_enabled:
+            component = self._tree.get_component(node_id)
+            if component and not component.is_enabled():
+                log.debug("Ignoring %s RPC for disabled component: %d (%s)",
+                          rpc_type, node_id, type(component).__name__)
+                return False
+
+        return True
+
     def _handle_event(self, rpc: dict[str, Any]):
         """Handle event RPC."""
         node_id: int = rpc["node"]
         event_type: str = rpc["event"]
         event_data = rpc.get("data", {})
 
+        # ui-navigate is a global event, no node validation needed
         if event_type == "ui-navigate":
             self._handle_navigation(event_data)
-        elif event_type == "click":
+            return
+
+        # Validate node (attached + enabled) before processing
+        if not self._validate_rpc_node(node_id, "event"):
+            return
+
+        if event_type == "click":
             self._handle_click(node_id, event_data)
         elif event_type == "change":
             self._handle_change(node_id, event_data)
@@ -982,26 +1027,69 @@ class UidlHandler:
             element.fire_event("keydown", event_data)
 
     def _handle_msync(self, rpc: dict[str, Any]):
-        """Handle property sync RPC."""
+        """Handle property sync RPC.
+
+        Security checks (matching Java Flow MapSyncRpcHandler):
+        1. Reject forbidden properties (textContent, classList, className, etc.)
+        2. Reject if node is detached
+        3. Reject if component is disabled (unless property has ALWAYS mode)
+        4. Reject if property is not in the component's sync whitelist
+        """
         node_id: int = rpc["node"]
         feature = rpc.get("feature")
         prop: str = rpc["property"]
         value = rpc.get("value")
 
-        node = self._tree.get_node(node_id)
-        if node and feature == Feature.ELEMENT_PROPERTY_MAP:
-            # Update the node's property (without generating a change back)
-            if feature not in node._features:
-                node._features[feature] = {}
-            node._features[feature][prop] = value
+        if feature != Feature.ELEMENT_PROPERTY_MAP:
+            return
 
-            # Also update the component's internal state
-            component = self._tree.get_component(node_id)
-            if component:
-                component._sync_property(prop, value)
+        # Security: reject forbidden properties
+        if prop in FORBIDDEN_SYNC_PROPERTIES:
+            log.warning("mSync blocked: forbidden property '%s' on node %d",
+                        prop, node_id)
+            return
+
+        # Security: validate node exists and is attached
+        node = self._tree.get_node(node_id)
+        if node is None or not node.is_attached:
+            log.debug("mSync ignored: node %d not found or detached", node_id)
+            return
+
+        component = self._tree.get_component(node_id)
+
+        # Security: check disabled state with DisabledUpdateMode
+        if component and not component.is_enabled():
+            if prop not in type(component)._v_disabled_sync:
+                log.debug("mSync blocked: property '%s' on disabled %s (node %d)",
+                          prop, type(component).__name__, node_id)
+                return
+
+        # Security: property whitelist (None = allow all for backwards compat)
+        if component:
+            whitelist = type(component)._v_sync_properties
+            if whitelist is not None and prop not in whitelist:
+                log.warning("mSync blocked: property '%s' not in sync whitelist "
+                            "for %s (node %d)",
+                            prop, type(component).__name__, node_id)
+                return
+
+        # Update the node's property (without generating a change back)
+        if feature not in node._features:
+            node._features[feature] = {}
+        node._features[feature][prop] = value
+
+        # Also update the component's internal state
+        if component:
+            component._sync_property(prop, value)
 
     def _handle_published_event(self, rpc: dict[str, Any]):
         """Handle publishedEventHandler RPC (client-callable methods).
+
+        Security checks (matching Java Flow PublishedServerEventHandlerRpcHandler):
+        1. Node must exist, be attached, and be enabled (with DisabledUpdateMode)
+        2. Method must be registered in Feature 19 (CLIENT_DELEGATE_HANDLERS)
+        3. Argument count must match method signature
+        4. Component must be attached to a UI
 
         Dispatches to the component method named by templateEventMethodName.
         Used by Dialog (handleClientClose), Grid (select, deselect, etc.),
@@ -1015,30 +1103,89 @@ class UidlHandler:
         args = rpc.get("templateEventMethodArgs", [])
         promise_id = rpc.get("promise", -1)
 
+        if not method_name:
+            return
+
+        # Security: validate node exists and is attached (skip enabled check,
+        # we handle it below with DisabledUpdateMode)
+        if not self._validate_rpc_node(node_id, "publishedEventHandler",
+                                       check_enabled=False):
+            return
+
         component = self._tree.get_component(node_id)
-        if component and method_name:
-            # Convert camelCase to snake_case for Python method lookup
-            import re
-            py_name = re.sub(r'([A-Z])', r'_\1', method_name).lower().lstrip('_')
-            method = getattr(component, py_name, None)
-            if method and callable(method):
-                if promise_id == -1:
-                    # Fire-and-forget (no return value expected)
-                    method(*args)
-                else:
-                    # Client expects a return value via promise resolution
-                    try:
-                        result = method(*args)
-                        component.element.execute_js(
-                            "$0.$server['}p']($1, true, $2)",
-                            promise_id, result
-                        )
-                    except Exception:
-                        component.element.execute_js(
-                            "$0.$server['}p']($1, false)",
-                            promise_id
-                        )
-                        raise
+        if not component:
+            log.debug("publishedEventHandler ignored: no component for node %d",
+                      node_id)
+            return
+
+        # Security: check component is attached to UI
+        if component._ui is None:
+            log.warning("publishedEventHandler blocked: component not attached "
+                        "to UI (node %d)", node_id)
+            return
+
+        # Convert camelCase to snake_case for Python method lookup
+        py_name = re.sub(r'([A-Z])', r'_\1', method_name).lower().lstrip('_')
+
+        # Security: check disabled state with DisabledUpdateMode
+        if not component.is_enabled():
+            if py_name not in type(component)._v_disabled_methods:
+                log.debug("publishedEventHandler blocked: method '%s' on "
+                          "disabled %s (node %d)",
+                          py_name, type(component).__name__, node_id)
+                return
+
+        # Security: verify method is registered (via @ClientCallable or _register_server_method)
+        registered = getattr(component, '_registered_methods', set())
+        if py_name not in registered:
+            log.warning("publishedEventHandler blocked: method '%s' not "
+                        "registered on %s (node %d). Registered: %s",
+                        py_name, type(component).__name__, node_id,
+                        registered)
+            return
+
+        method = getattr(component, py_name, None)
+        if not method or not callable(method):
+            log.warning("publishedEventHandler blocked: method '%s' not found "
+                        "on %s (node %d)", py_name, type(component).__name__,
+                        node_id)
+            return
+
+        # Security: validate argument count
+        try:
+            sig = inspect.signature(method)
+            params = [p for p in sig.parameters.values()
+                      if p.kind not in (inspect.Parameter.VAR_POSITIONAL,
+                                        inspect.Parameter.VAR_KEYWORD)]
+            required = sum(1 for p in params
+                           if p.default is inspect.Parameter.empty)
+            max_args = len(params)
+            has_var = any(p.kind == inspect.Parameter.VAR_POSITIONAL
+                         for p in sig.parameters.values())
+            if not has_var and (len(args) < required or len(args) > max_args):
+                log.warning("publishedEventHandler blocked: %s.%s expects "
+                            "%d-%d args, got %d",
+                            type(component).__name__, py_name,
+                            required, max_args, len(args))
+                return
+        except (ValueError, TypeError):
+            pass  # Can't inspect, allow through
+
+        if promise_id == -1:
+            method(*args)
+        else:
+            try:
+                result = method(*args)
+                component.element.execute_js(
+                    "$0.$server['}p']($1, true, $2)",
+                    promise_id, result
+                )
+            except Exception:
+                component.element.execute_js(
+                    "$0.$server['}p']($1, false)",
+                    promise_id
+                )
+                raise
 
     def _build_resync_response(self) -> dict:
         """Build a resynchronize response with the full state tree.
